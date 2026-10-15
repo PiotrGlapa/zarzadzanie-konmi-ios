@@ -135,7 +135,8 @@ jobs:
           set -o pipefail
           token="$(node scripts/ci/asc-jwt.js)"
           echo "::add-mask::$token"
-          transporter="$(xcode-select -p)/../SharedFrameworks/ContentDeliveryServices.framework/Frameworks/ITunesSoftwareService.framework/Support/Transporter"
+          transporter="$(find "$(dirname "$(xcode-select -p)")" -name iTMSTransporter -type f 2>/dev/null | head -n 1)"
+          [ -x "$transporter" ] || { echo "::error title=Transporter::Nie znaleziono iTMSTransporter w Xcode"; exit 1; }
           "$transporter" -m upload -assetType ios -jwt "$token" -assetFile "$(ls "$RUNNER_TEMP"/export/*.ipa)" -v informational 2>&1 | tee build/upload.log
 
       - name: Podsumowanie przebiegu
