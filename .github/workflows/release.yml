@@ -83,10 +83,10 @@ jobs:
         id: key
         run: bash scripts/ci/write-api-key.sh
 
-      # Archiwum z podpisem doraźnym (uprawnienia trafiają do pliku wykonywalnego): zespół nie ma zarejestrowanych urządzeń,
-      # więc podpis deweloperski w archiwum jest niemożliwy. Podpis dystrybucyjny (certyfikat i profil zarządzane w chmurze
-      # Apple) nadaje dopiero eksport.
-      - name: Archiwum (Release, podpis doraźny)
+      # Archiwum bez podpisu: zespół nie ma zarejestrowanych urządzeń, więc podpis deweloperski w archiwum jest niemożliwy,
+      # a SDK urządzenia zabrania podpisu doraźnego w xcodebuild. Uprawnienia wstawia embed-entitlements.sh, a podpis
+      # dystrybucyjny (certyfikat i profil zarządzane w chmurze Apple) nadaje dopiero eksport.
+      - name: Archiwum (Release, bez podpisu)
         id: archive
         run: |
           set -o pipefail
@@ -96,8 +96,9 @@ jobs:
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Horsely.xcarchive" \
             CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
-            CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
             | tee build/archive.log | tail -n 40
+          bash scripts/ci/embed-entitlements.sh "$RUNNER_TEMP/Horsely.xcarchive"
 
       - name: Eksport próbny i sprawdzenie uprawnień (App Group, pęk kluczy)
         run: |
