@@ -1850,7 +1850,10 @@ dostęp do biblioteki zdjęć.
 Decyzje z 2026-10-15 (odpowiednik prywatnych wydań APK na Androidzie):
 
 - **Wyłącznie TestFlight, bez App Store.** Płatne konto Apple Developer Program; aplikacja w App Store Connect jako
-  „Horsely – Zarządzanie Koniem, Trening i Budżet” (nazwa pod ikoną „Horsely”, FR-021), nigdy nie wysyłana do przeglądu App Store.
+  „Horsely – Zarządzanie Koniem” (limit App Store Connect: 30 znaków; pełna nazwa „Horsely – Zarządzanie Koniem, Trening
+  i Budżet” jest w aplikacji — ekran powitalny, „O aplikacji”; nazwa pod ikoną „Horsely”, FR-021), nigdy nie wysyłana do
+  przeglądu App Store. Identyfikatory: aplikacja `pl.glapa.horsely`, rozszerzenie udostępniania
+  `pl.glapa.horsely.ShareExtension`, App Group `group.pl.glapa.horsely`, SKU `horsely-ios`.
 - **Testerzy wewnętrzni** — właściciel i współwłaściciele jako członkowie zespołu w App Store Connect (bez przeglądu Beta App
   Review). Testerzy zewnętrzni poza zakresem.
 - **Ważność kompilacji**: kompilacja w TestFlight wygasa po 90 dniach — nowa kompilacja MUST trafić do TestFlight co najmniej
@@ -1896,9 +1899,19 @@ Rozwój odbywa się na Windows, bez lokalnego Maca — kompilacja, testy, podpis
   - pull request i wypchnięcie na `main`: `xcodegen generate`, kompilacja, testy jednostkowe, testy UI i migawkowe na
     symulatorze iPhone 15 Pro, zrzuty ekranów jako artefakty;
   - tag `v*` albo ręczne uruchomienie (`workflow_dispatch`): to samo plus archiwum, podpis i wysyłka do TestFlight.
-- **Podpisywanie**: klucz API App Store Connect (sekrety repozytorium: identyfikator klucza, wystawcy i plik `.p8`) z
-  automatycznym zarządzaniem certyfikatami i profilami (`-allowProvisioningUpdates`) albo fastlane `match`; żadne sekrety
-  nie trafiają do repozytorium ani do logów.
+- **Podpisywanie**: klucz API App Store Connect (rola Admin) z automatycznym zarządzaniem certyfikatami i profilami
+  (`-allowProvisioningUpdates` z `-authenticationKeyPath/ID/IssuerID`, certyfikat dystrybucyjny zarządzany w chmurze); żadne
+  sekrety nie trafiają do repozytorium ani do logów. Nazwy w repozytorium GitHub (MUST — proces CI używa dokładnie tych):
+
+  | Rodzaj | Nazwa | Zawartość |
+  |---|---|---|
+  | sekret | `ASC_ISSUER_ID` | Issuer ID klucza API App Store Connect |
+  | sekret | `ASC_KEY_ID` | Key ID klucza API |
+  | sekret | `ASC_KEY_P8` | treść pliku `AuthKey_<KeyID>.p8` (CI zapisuje ją do pliku tymczasowego i usuwa po przebiegu) |
+  | zmienna | `APPLE_TEAM_ID` | Team ID konta Apple Developer (`DEVELOPMENT_TEAM`) |
+  | zmienna | `IOS_BUNDLE_ID` | `pl.glapa.horsely` |
+  | zmienna | `IOS_APP_GROUP` | `group.pl.glapa.horsely` |
+  | zmienna | `ASC_APP_ID` | Apple ID aplikacji w App Store Connect (liczba) |
 - **Brak sekretów** (np. w pull requeście z rozwidlenia) — przebieg testów działa, wysyłka kończy się jawnym błędem
   z wyjaśnieniem.
 - Debugowanie na urządzeniu odbywa się przez kompilacje TestFlight i dziennik diagnostyczny aplikacji (FR-031); gdy pojawi
