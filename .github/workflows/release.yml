@@ -14,6 +14,10 @@ on:
         type: choice
         options: [Deweloper]
         default: Deweloper
+      skip_tests:
+        description: TYMCZASOWO — pomiń testy (diagnoza podpisywania)
+        type: boolean
+        default: false
 
 concurrency:
   group: release
@@ -43,6 +47,7 @@ jobs:
   test:
     name: Testy przed wydaniem
     needs: secrets
+    if: ${{ inputs.skip_tests != true }}
     uses: ./.github/workflows/ci.yml
     with:
       ui-tests: true
@@ -50,6 +55,7 @@ jobs:
   release:
     name: Archiwum i wysyłka do TestFlight
     needs: [secrets, test]
+    if: ${{ !cancelled() && needs.secrets.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
     runs-on: macos-15
     timeout-minutes: 60
     env:
@@ -77,7 +83,9 @@ jobs:
         id: key
         run: bash scripts/ci/write-api-key.sh
 
-      - name: Archiwum (Release, podpis automatyczny)
+      # Archiwum bez podpisu: zespół nie ma zarejestrowanych urządzeń, a podpis deweloperski w archiwum wymaga profilu
+      # z urządzeniami. Podpis dystrybucyjny (certyfikat i profil zarządzane w chmurze Apple) nadaje dopiero eksport.
+      - name: Archiwum (Release, bez podpisu)
         id: archive
         run: |
           set -o pipefail
@@ -87,11 +95,32 @@ jobs:
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/Horsely.xcarchive" \
             CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            CODE_SIGNING_ALLOWED=NO \
+            | tee build/archive.log | tail -n 40
+
+      - name: Eksport próbny i sprawdzenie uprawnień (App Group, pęk kluczy)
+        run: |
+          set -o pipefail
+          sed -e "s/\${APPLE_TEAM_ID}/${APPLE_TEAM_ID}/" -e 's#<string>upload</string>#<string>export</string>#' \
+            scripts/ci/ExportOptions.plist > "$RUNNER_TEMP/ExportOptionsLocal.plist"
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Horsely.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptionsLocal.plist" \
+            -exportPath "$RUNNER_TEMP/export-local" \
             -allowProvisioningUpdates \
             -authenticationKeyPath "${{ steps.key.outputs.key_file }}" \
             -authenticationKeyID "$ASC_KEY_ID" \
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            | tee build/archive.log | tail -n 40
+            | tee build/export-local.log | tail -n 40
+          mkdir -p "$RUNNER_TEMP/ipa" && unzip -q -o "$RUNNER_TEMP"/export-local/*.ipa -d "$RUNNER_TEMP/ipa"
+          for app in "$RUNNER_TEMP"/ipa/Payload/Horsely.app "$RUNNER_TEMP"/ipa/Payload/Horsely.app/PlugIns/HorselyShare.appex; do
+            entitlements="$(codesign -d --entitlements :- "$app" 2>/dev/null)"
+            echo "$entitlements" | grep -q "group.pl.glapa.horsely" \
+              || { echo "::error title=Uprawnienia::Brak App Group w $app"; exit 1; }
+            echo "$entitlements" | grep -q "keychain-access-groups" \
+              || { echo "::error title=Uprawnienia::Brak grupy pęku kluczy w $app"; exit 1; }
+          done
+          echo "Uprawnienia App Group i pęku kluczy obecne w aplikacji i rozszerzeniu."
 
       - name: Eksport i wysyłka do App Store Connect
         id: upload
