@@ -47,6 +47,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely
         PRODUCT_NAME: Horsely
+        TARGETED_DEVICE_FAMILY: "1"
         INFOPLIST_FILE: App/Info.plist
         GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_ENTITLEMENTS: App/Horsely.entitlements
@@ -71,6 +72,7 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely.ShareExtension
         PRODUCT_NAME: HorselyShare
+        TARGETED_DEVICE_FAMILY: "1"
         INFOPLIST_FILE: ShareExtension/Info.plist
         GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_ENTITLEMENTS: ShareExtension/HorselyShare.entitlements
