@@ -4,26 +4,19 @@ import Testing
 
 /// Pliki wzorcowe programu skopiowane z Androida (T014) muszą być dostępne w pakiecie testów.
 struct FixturesSmokeTests {
-    private func fixture(_ path: String) -> URL {
-        Bundle.module.resourceURL!.appendingPathComponent("Resources/\(path)")
-    }
-
     @Test func parityVersionIsProgram200() throws {
-        let version = try String(contentsOf: fixture("parity/VERSION"), encoding: .utf8)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let version = try Fixtures.string("parity/VERSION").trimmingCharacters(in: .whitespacesAndNewlines)
         #expect(version == "2.0.0")
     }
 
     @Test(arguments: ["maly", "brzegowy", "duzy"])
     func parityExportIsJson(set: String) throws {
-        let data = try Data(contentsOf: fixture("parity/\(set)/export.json"))
-        let object = try JSONSerialization.jsonObject(with: data)
+        let object = try JSONSerialization.jsonObject(with: Fixtures.data("parity/\(set)/export.json"))
         #expect(object is [String: Any])
     }
 
     @Test func goldenCasesAreAvailable() throws {
-        let cases = try String(contentsOf: fixture("golden/cases.csv"), encoding: .utf8)
-        #expect(!cases.isEmpty)
+        #expect(!(try Fixtures.string("golden/cases.csv")).isEmpty)
     }
 
     @Test func coreKnowsAppVersion() {
