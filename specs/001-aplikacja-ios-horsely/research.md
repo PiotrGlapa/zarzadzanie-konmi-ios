@@ -197,7 +197,7 @@ przebieg CI je potwierdzi albo obali (wtedy aktualizacja tego dokumentu).
      Sam eksport ma więc `destination = export` (`scripts/ci/ExportOptions.plist`).
   5. Przetwarzanie w App Store Connect wykryło 2 prawdziwe błędy pakietu (naprawione): brak `TARGETED_DEVICE_FAMILY = 1` na poziomie celów
      (wymóg orientacji iPada, błąd 90474) i stary SDK (pkt 1).
-  - Kompilacja 2.0.1 (…) jest w TestFlight w stanie `VALID`; stan dla testerów wewnętrznych `MISSING_EXPORT_COMPLIANCE` — właściciel musi raz
+  - Kompilacja 2.0.1 (15; pełny przebieg release.yml z testami: https://github.com/PiotrGlapa/zarzadzanie-konmi-ios/actions/runs/38809217065) jest w TestFlight w stanie `VALID`; stan dla testerów wewnętrznych `MISSING_EXPORT_COMPLIANCE` — właściciel musi raz
     odpowiedzieć na pytanie o szyfrowanie w App Store Connect (albo ustalić wartość `ITSAppUsesNonExemptEncryption` w `Info.plist`; zob. uwagi w T009).
 - Koszt: minuty macOS ×10; `HorselyCore` testowany `swift test` (bez symulatora) dla krótszych przebiegów; testy UI tylko
   na `main` i w wydaniu, na PR — testy jednostkowe i migawkowe.
