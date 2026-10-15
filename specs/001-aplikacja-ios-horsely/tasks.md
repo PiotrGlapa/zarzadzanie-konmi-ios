@@ -56,38 +56,38 @@ zielonym przebiegiem CI (`gh run watch`), nie lokalnym uruchomieniem.
 
 ### Testy podstaw
 
-- [ ] T015 [P] Testy formatów w `Packages/HorselyCore/Tests/HorselyCoreTests/FormatsTests.swift`: daty `30.09.2026`, kwoty `1 250,00 zł` (spacja niełamliwa jak w Androidzie `FormatsTest`), czas „1 h 5 min” / „45 min” / „—”, gwiazdki „★★★☆☆”, wprowadzanie kwot z przecinkiem (przypadki z `MoneyInputTest`, `StarsTest`)
-- [ ] T016 [P] Testy modelu w `Packages/HorselyCore/Tests/HorselyCoreTests/ExportModelTests.swift`: odczyt `parity/maly/export.json` (schemat 1.4/1.5), status `Injured`, nieznane pola ignorowane, zapis i ponowny odczyt bez zmian
-- [ ] T017 [P] Testy magazynu w `Packages/HorselyKit/Tests/HorselyKitTests/RecordStoreTests.swift`: zapis/odczyt rekordów wszystkich `RecordType`, indeksy `horseId`/`dateKey`/`ownerId`, `record_horse` dla zakupu wielu koni, transakcja rekord + licznik zmian, obserwacja zmian
-- [ ] T018 [P] Test kontrastu palety w `Tests/AppSnapshotTests/PaletteContrastTests.swift` (pary z SG 5.4: tekst ≥ 4,5:1, ikony i paski ≥ 3:1, oba motywy)
-- [ ] T019 [P] Test zgodności tekstów w `Tests/AppSnapshotTests/StringsParityTests.swift`: każdy klucz `App/Resources/android/strings.xml` istnieje w `Localizable.xcstrings` z tą samą treścią po konwersji formatów; brak nazwy „Zarządzanie końmi” w tekstach (SC-008 SG)
+- [X] T015 [P] Testy formatów w `Packages/HorselyCore/Tests/HorselyCoreTests/FormatsTests.swift`: daty `30.09.2026`, kwoty `1 250,00 zł` (spacja niełamliwa jak w Androidzie `FormatsTest`), czas „1 h 5 min” / „45 min” / „—”, gwiazdki „★★★☆☆”, wprowadzanie kwot z przecinkiem (przypadki z `MoneyInputTest`, `StarsTest`)
+- [X] T016 [P] Testy modelu w `Packages/HorselyCore/Tests/HorselyCoreTests/ExportModelTests.swift`: odczyt `parity/maly/export.json` (schemat 1.4/1.5), status `Injured`, nieznane pola ignorowane, zapis i ponowny odczyt bez zmian
+- [X] T017 [P] Testy magazynu w `Packages/HorselyKit/Tests/HorselyKitTests/RecordStoreTests.swift`: zapis/odczyt rekordów wszystkich `RecordType`, indeksy `horseId`/`dateKey`/`ownerId`, `record_horse` dla zakupu wielu koni, transakcja rekord + licznik zmian, obserwacja zmian
+- [X] T018 [P] Test kontrastu palety w `Tests/AppSnapshotTests/PaletteContrastTests.swift` (pary z SG 5.4: tekst ≥ 4,5:1, ikony i paski ≥ 3:1, oba motywy)
+- [X] T019 [P] Test zgodności tekstów w `Tests/AppSnapshotTests/StringsParityTests.swift`: każdy klucz `App/Resources/android/strings.xml` istnieje w `Localizable.xcstrings` z tą samą treścią po konwersji formatów; brak nazwy „Zarządzanie końmi” w tekstach (SC-008 SG)
 
 ### Rdzeń (`HorselyCore`)
 
-- [ ] T020 [P] `Packages/HorselyCore/Sources/HorselyCore/Model/LocalDate.swift`, `Money.swift` (`Decimal`, 2 miejsca, zaokrąglenie jak program), `Clock.swift` (wstrzykiwany zegar „dziś/teraz”)
-- [ ] T021 [P] `Packages/HorselyCore/Sources/HorselyCore/Model/Enums.swift`: `HorseStatus` (`Active`/`Injured`/`Sold`/`Deceased`/`Leased`), `Sex`, `ReminderKind`, `ReminderStatus`, `ContactType` (z `Trainer`, `Rider`), `Intensity`, `ResultStatus`, `PurchaseAssignment`, `MedicationMode`, `RecordType`, `SyncState`, `WorkMode`
-- [ ] T022 `Packages/HorselyCore/Sources/HorselyCore/Model/ExportRecords.swift`: Codable rekordy eksportu 1.5 (koń z `finance`, 4 rodzaje wizyt z lekami, zawody, start, zakup, notatka, trening z `coaching`, termin, kontakt, słownik, załącznik) wg `contracts/android/export-schema-1.4.json` + zmian 1.5; `ExportDocument` z `scope`, `trashed`, `purged`
-- [ ] T023 [P] `Packages/HorselyCore/Sources/HorselyCore/Format/Formats.swift`: daty, kwoty, czas, gwiazdki, imię konia w listach (bez pustych nawiasów u źrebaka)
-- [ ] T024 [P] `Packages/HorselyCore/Sources/HorselyCore/Model/EnumLabels.swift`: polskie nazwy wartości wyliczeniowych (klucze `strings.xml`, np. `Deworming`→„Odrobaczanie”, `Deceased`→„Padł”, `Injured`→„Kontuzjowany”)
+- [X] T020 [P] `Packages/HorselyCore/Sources/HorselyCore/Model/LocalDate.swift`, `Money.swift` (`Decimal`, 2 miejsca, zaokrąglenie jak program), `Clock.swift` (wstrzykiwany zegar „dziś/teraz”)
+- [X] T021 [P] `Packages/HorselyCore/Sources/HorselyCore/Model/Enums.swift`: `HorseStatus` (`Active`/`Injured`/`Sold`/`Deceased`/`Leased`), `Sex`, `ReminderKind`, `ReminderStatus`, `ContactType` (z `Trainer`, `Rider`), `Intensity`, `ResultStatus`, `PurchaseAssignment`, `MedicationMode`, `RecordType`, `SyncState`, `WorkMode`
+- [X] T022 `Packages/HorselyCore/Sources/HorselyCore/Model/ExportRecords.swift`: Codable rekordy eksportu 1.5 (koń z `finance`, 4 rodzaje wizyt z lekami, zawody, start, zakup, notatka, trening z `coaching`, termin, kontakt, słownik, załącznik) wg `contracts/android/export-schema-1.4.json` + zmian 1.5; `ExportDocument` z `scope`, `trashed`, `purged`
+- [X] T023 [P] `Packages/HorselyCore/Sources/HorselyCore/Format/Formats.swift`: daty, kwoty, czas, gwiazdki, imię konia w listach (bez pustych nawiasów u źrebaka)
+- [X] T024 [P] `Packages/HorselyCore/Sources/HorselyCore/Model/EnumLabels.swift`: polskie nazwy wartości wyliczeniowych (klucze `strings.xml`, np. `Deworming`→„Odrobaczanie”, `Deceased`→„Padł”, `Injured`→„Kontuzjowany”)
 
 ### Magazyn (`HorselyKit`)
 
-- [ ] T025 `Packages/HorselyKit/Sources/HorselyKit/Store/Database.swift`: `DatabasePool` w App Group (WAL, `isExcludedFromBackup`, ochrona `completeUntilFirstUserAuthentication`), migracja `v1` z tabelami `local_record`, `record_horse`, `local_file`, `queue_operation`, `queue_history`, `conflict`, `local_meta`, `address` i indeksami z data-model.md §2
-- [ ] T026 `Packages/HorselyKit/Sources/HorselyKit/Store/RecordStore.swift`: CRUD rekordów (treść JSON, `version`, `syncState`, `baseVersion`, `deletedAt`, `deletionBatchId`), zapytania po koniu/dacie/właścicielu, `changeCounter` w każdej transakcji zapisu, `ValueObservation` jako `AsyncSequence`
-- [ ] T027 [P] `Packages/HorselyKit/Sources/HorselyKit/Store/SettingsStore.swift`: `UserDefaults` grupy z kluczami i wartościami domyślnymi z data-model.md §5 (`workMode` domyślnie `unset`, `notifications.dailyTime` 08:00, `data.timelineMonths` 12, `data.attachmentLimitMB` 200, `data.wifiOnly` true)
-- [ ] T028 [P] `Packages/HorselyKit/Sources/HorselyKit/Log/DiagnosticLog.swift`: zdarzenia bez danych osobowych, rotacja 2 × 2,5 MB w App Group (NFR-M-06)
-- [ ] T029 [P] `Packages/HorselyKit/Sources/HorselyKit/Security/KeychainStore.swift`: klucz API `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, grupa dostępu wspólna z rozszerzeniem
+- [X] T025 `Packages/HorselyKit/Sources/HorselyKit/Store/Database.swift`: `DatabasePool` w App Group (WAL, `isExcludedFromBackup`, ochrona `completeUntilFirstUserAuthentication`), migracja `v1` z tabelami `local_record`, `record_horse`, `local_file`, `queue_operation`, `queue_history`, `conflict`, `local_meta`, `address` i indeksami z data-model.md §2
+- [X] T026 `Packages/HorselyKit/Sources/HorselyKit/Store/RecordStore.swift`: CRUD rekordów (treść JSON, `version`, `syncState`, `baseVersion`, `deletedAt`, `deletionBatchId`), zapytania po koniu/dacie/właścicielu, `changeCounter` w każdej transakcji zapisu, `ValueObservation` jako `AsyncSequence`
+- [X] T027 [P] `Packages/HorselyKit/Sources/HorselyKit/Store/SettingsStore.swift`: `UserDefaults` grupy z kluczami i wartościami domyślnymi z data-model.md §5 (`workMode` domyślnie `unset`, `notifications.dailyTime` 08:00, `data.timelineMonths` 12, `data.attachmentLimitMB` 200, `data.wifiOnly` true)
+- [X] T028 [P] `Packages/HorselyKit/Sources/HorselyKit/Log/DiagnosticLog.swift`: zdarzenia bez danych osobowych, rotacja 2 × 2,5 MB w App Group (NFR-M-06)
+- [X] T029 [P] `Packages/HorselyKit/Sources/HorselyKit/Security/KeychainStore.swift`: klucz API `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`, grupa dostępu wspólna z rozszerzeniem
 
 ### System projektowy i powłoka (`App`)
 
-- [ ] T030 [P] `App/DesignSystem/HorselyColor.swift` + kolory w `App/Resources/Assets.xcassets/Colors/` (jasny/ciemny) — paleta motywu, ostrzeżenie, „Nadchodzące”, kolory rodzajów wpisów i działów z SG 5.4
-- [ ] T031 [P] `App/DesignSystem/Spacing.swift`, `SectionHeader.swift`, `DividedList.swift` (linia 1 pt, wcięcie 16 pt, tylko między wierszami), `InfoCard.swift` (tony Neutral/Primary/Warning, promień 12 pt, ramka 1 pt), `AccentIcon.swift` (kółko 12 %), `AccentRow.swift` (pasek 4 pt)
-- [ ] T032 [P] `App/DesignSystem/StarRating.swift` (wyświetlanie ★ w kolorze ostrzeżenia, „Ocena: N z 5”/„Brak oceny”; wejście 5 przycisków ≥ 44 pt + „Wyczyść”), `HorseAvatar.swift` (okrąg 40/72 pt, głowa konia), `InjuredBadge.swift` (`healing` 18 pt + „Kontuzjowany”), `FormSaveBar.swift`, `SaveBanner.swift` („Zapisano” + „Cofnij”, 4 s), `ScreenState.swift` (ładowanie/pusto/błąd z „Spróbuj ponownie”)
-- [ ] T033 `App/Shell/RootView.swift`: `TabView` Pulpit · Konie · Terminy · Treningi · Więcej z ikonami i kolorami działów, plakietka licznika kolejki na „Więcej”, przycisk „+” nad paskiem (Pulpit, Konie, Terminy), wybór motywu (`preferredColorScheme`)
-- [ ] T034 `App/Shell/MoreView.swift`: pozycje wg trybu (SG 5.2, contracts/android/ui-screens.md §3), separator pełnej szerokości, licznik/strzałka
-- [ ] T035 `App/Shell/DeepLinkRouter.swift`: adresy `horsely://` z contracts/app-entry-points-ios.md (nieznany → Pulpit; tryb nieustawiony → powitanie)
-- [ ] T036 `App/Shell/AppEnvironment.swift`: kontener zależności (magazyn, ustawienia, zegar, dziennik), tryb pracy z `SettingsStore`, argumenty testowe `-UITestFixture`/`-UITestToday` tylko w konfiguracji Debug (contracts/test-fixtures.md)
-- [ ] T037 Test migawkowy powłoki w `Tests/AppSnapshotTests/ShellSnapshotTests.swift` (pasek kart i „Więcej” w obu trybach, jasny/ciemny/XXXL)
+- [X] T030 [P] `App/DesignSystem/HorselyColor.swift` + kolory w `App/Resources/Assets.xcassets/Colors/` (jasny/ciemny) — paleta motywu, ostrzeżenie, „Nadchodzące”, kolory rodzajów wpisów i działów z SG 5.4. **Odstępstwo**: paleta jest tabelą szesnastkową w Swift (`ColorPair`), a nie zestawami kolorów w katalogu zasobów — jedno źródło prawdy dla aplikacji i testu kontrastu (T018), kolory dynamiczne jasny/ciemny przez `UIColor`
+- [X] T031 [P] `App/DesignSystem/Spacing.swift`, `SectionHeader.swift`, `DividedList.swift` (linia 1 pt, wcięcie 16 pt, tylko między wierszami), `InfoCard.swift` (tony Neutral/Primary/Warning, promień 12 pt, ramka 1 pt), `AccentIcon.swift` (kółko 12 %), `AccentRow.swift` (pasek 4 pt)
+- [X] T032 [P] `App/DesignSystem/StarRating.swift` (wyświetlanie ★ w kolorze ostrzeżenia, „Ocena: N z 5”/„Brak oceny”; wejście 5 przycisków ≥ 44 pt + „Wyczyść”), `HorseAvatar.swift` (okrąg 40/72 pt, głowa konia), `InjuredBadge.swift` (`healing` 18 pt + „Kontuzjowany”), `FormSaveBar.swift`, `SaveBanner.swift` („Zapisano” + „Cofnij”, 4 s), `ScreenState.swift` (ładowanie/pusto/błąd z „Spróbuj ponownie”)
+- [X] T033 `App/Shell/RootView.swift`: `TabView` Pulpit · Konie · Terminy · Treningi · Więcej z ikonami i kolorami działów, plakietka licznika kolejki na „Więcej”, przycisk „+” nad paskiem (Pulpit, Konie, Terminy), wybór motywu (`preferredColorScheme`)
+- [X] T034 `App/Shell/MoreView.swift`: pozycje wg trybu (SG 5.2, contracts/android/ui-screens.md §3), separator pełnej szerokości, licznik/strzałka
+- [X] T035 `App/Shell/DeepLinkRouter.swift`: adresy `horsely://` z contracts/app-entry-points-ios.md (nieznany → Pulpit; tryb nieustawiony → powitanie)
+- [X] T036 `App/Shell/AppEnvironment.swift`: kontener zależności (magazyn, ustawienia, zegar, dziennik), tryb pracy z `SettingsStore`, argumenty testowe `-UITestFixture`/`-UITestToday` tylko w konfiguracji Debug (contracts/test-fixtures.md)
+- [X] T037 Test migawkowy powłoki w `Tests/AppSnapshotTests/ShellSnapshotTests.swift` (pasek kart i „Więcej” w obu trybach, jasny/ciemny/XXXL)
 
 **Checkpoint**: aplikacja uruchamia się z pustymi kartami, magazyn i formaty przetestowane, teksty i ikony zgodne z Androidem.
 
