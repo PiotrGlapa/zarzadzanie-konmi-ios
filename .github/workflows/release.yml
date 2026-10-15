@@ -102,33 +102,11 @@ jobs:
             | tee build/archive.log | tail -n 40
           bash scripts/ci/embed-entitlements.sh "$RUNNER_TEMP/Horsely.xcarchive"
 
-      - name: Eksport próbny i sprawdzenie uprawnień (App Group, pęk kluczy)
-        run: |
-          set -o pipefail
-          sed -e "s/\${APPLE_TEAM_ID}/${APPLE_TEAM_ID}/" -e 's#<string>upload</string>#<string>export</string>#' \
-            scripts/ci/ExportOptions.plist > "$RUNNER_TEMP/ExportOptionsLocal.plist"
-          xcodebuild -exportArchive \
-            -archivePath "$RUNNER_TEMP/Horsely.xcarchive" \
-            -exportOptionsPlist "$RUNNER_TEMP/ExportOptionsLocal.plist" \
-            -exportPath "$RUNNER_TEMP/export-local" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "${{ steps.key.outputs.key_file }}" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            | tee build/export-local.log | tail -n 40
-          mkdir -p "$RUNNER_TEMP/ipa" && unzip -q -o "$RUNNER_TEMP"/export-local/*.ipa -d "$RUNNER_TEMP/ipa"
-          for app in "$RUNNER_TEMP"/ipa/Payload/Horsely.app "$RUNNER_TEMP"/ipa/Payload/Horsely.app/PlugIns/HorselyShare.appex; do
-            entitlements="$(codesign -d --entitlements :- "$app" 2>/dev/null)"
-            echo "--- $app"; echo "$entitlements"
-            echo "$entitlements" | grep -q "group.pl.glapa.horsely" \
-              || { echo "::error title=Uprawnienia::Brak App Group w $app"; exit 1; }
-            echo "$entitlements" | grep -q "keychain-access-groups" \
-              || { echo "::error title=Uprawnienia::Brak grupy pęku kluczy w $app"; exit 1; }
-          done
-          echo "Uprawnienia App Group i pęku kluczy obecne w aplikacji i rozszerzeniu."
-
-      - name: Eksport i wysyłka do App Store Connect
-        id: upload
+      # Eksport z podpisem dystrybucyjnym (chmura Apple) do pliku .ipa. Wysyłkę wykonuje altool, bo `xcodebuild -exportArchive`
+      # z destination=upload kończy się „No Accounts with App Store Connect Access” (Xcode 16.4 nie uwierzytelnia kluczem API
+      # żądania konfiguracji sklepu, choć ten sam klucz działa w API i przy podpisywaniu) — research R19.
+      - name: Eksport (podpis dystrybucyjny) i sprawdzenie uprawnień
+        id: export
         run: |
           set -o pipefail
           sed "s/\${APPLE_TEAM_ID}/${APPLE_TEAM_ID}/" scripts/ci/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
@@ -141,6 +119,26 @@ jobs:
             -authenticationKeyID "$ASC_KEY_ID" \
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             | tee build/export.log | tail -n 40
+          mkdir -p "$RUNNER_TEMP/ipa" && unzip -q -o "$RUNNER_TEMP"/export/*.ipa -d "$RUNNER_TEMP/ipa"
+          for app in "$RUNNER_TEMP"/ipa/Payload/Horsely.app "$RUNNER_TEMP"/ipa/Payload/Horsely.app/PlugIns/HorselyShare.appex; do
+            entitlements="$(codesign -d --entitlements :- "$app" 2>/dev/null)"
+            echo "$entitlements" | grep -q "group.pl.glapa.horsely" \
+              || { echo "::error title=Uprawnienia::Brak App Group w $app"; exit 1; }
+            echo "$entitlements" | grep -q "keychain-access-groups" \
+              || { echo "::error title=Uprawnienia::Brak grupy pęku kluczy w $app"; exit 1; }
+          done
+          echo "Uprawnienia App Group i pęku kluczy obecne w aplikacji i rozszerzeniu."
+
+      - name: Wysyłka do App Store Connect (TestFlight)
+        id: upload
+        run: |
+          set -o pipefail
+          mkdir -p "$HOME/.appstoreconnect/private_keys"
+          cp "${{ steps.key.outputs.key_file }}" "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+          xcrun altool --upload-app --type ios \
+            --file "$(ls "$RUNNER_TEMP"/export/*.ipa)" \
+            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" \
+            2>&1 | tee build/upload.log
 
       - name: Podsumowanie przebiegu
         if: always()
@@ -150,8 +148,10 @@ jobs:
             result="wysłano do TestFlight"
           elif [ "${{ steps.archive.outcome }}" = "failure" ]; then
             result="BŁĄD: archiwum (podpisywanie lub kompilacja)"
+          elif [ "${{ steps.export.outcome }}" = "failure" ]; then
+            result="BŁĄD: eksport (podpis dystrybucyjny lub uprawnienia)"
           elif [ "${{ steps.upload.outcome }}" = "failure" ]; then
-            result="BŁĄD: eksport lub wysyłka do App Store Connect"
+            result="BŁĄD: wysyłka do App Store Connect"
           else
             result="NIE WYKONANO (wcześniejszy krok zakończył się błędem)"
           fi
@@ -179,4 +179,4 @@ jobs:
 
       - name: Usuń klucz API
         if: always()
-        run: rm -f "$RUNNER_TEMP/AuthKey.p8"
+        run: rm -f "$RUNNER_TEMP/AuthKey.p8" "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
