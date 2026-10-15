@@ -43,6 +43,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: bash scripts/ci/check-secrets.sh
+      - name: Sprawdź klucz API App Store Connect
+        run: node scripts/ci/check-asc-key.js
 
   test:
     name: Testy przed wydaniem
