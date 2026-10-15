@@ -102,7 +102,7 @@ jobs:
             | tee build/archive.log | tail -n 40
           bash scripts/ci/embed-entitlements.sh "$RUNNER_TEMP/Horsely.xcarchive"
 
-      # Eksport z podpisem dystrybucyjnym (chmura Apple) do pliku .ipa. Wysyłkę wykonuje altool, bo `xcodebuild -exportArchive`
+      # Eksport z podpisem dystrybucyjnym (chmura Apple) do pliku .ipa. Wysyłkę wykonuje Transporter z własnym tokenem JWT, bo `xcodebuild -exportArchive`
       # z destination=upload kończy się „No Accounts with App Store Connect Access” (Xcode 16.4 nie uwierzytelnia kluczem API
       # żądania konfiguracji sklepu, choć ten sam klucz działa w API i przy podpisywaniu) — research R19.
       - name: Eksport (podpis dystrybucyjny) i sprawdzenie uprawnień
@@ -133,12 +133,10 @@ jobs:
         id: upload
         run: |
           set -o pipefail
-          mkdir -p "$HOME/.appstoreconnect/private_keys"
-          cp "${{ steps.key.outputs.key_file }}" "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
-          xcrun altool --upload-app --type ios \
-            --file "$(ls "$RUNNER_TEMP"/export/*.ipa)" \
-            --apiKey "$ASC_KEY_ID" --apiIssuer "$ASC_ISSUER_ID" \
-            2>&1 | tee build/upload.log
+          token="$(node scripts/ci/asc-jwt.js)"
+          echo "::add-mask::$token"
+          transporter="$(xcode-select -p)/../SharedFrameworks/ContentDeliveryServices.framework/Frameworks/ITunesSoftwareService.framework/Support/Transporter"
+          "$transporter" -m upload -assetType ios -jwt "$token" -assetFile "$(ls "$RUNNER_TEMP"/export/*.ipa)" -v informational 2>&1 | tee build/upload.log
 
       - name: Podsumowanie przebiegu
         if: always()
@@ -179,4 +177,4 @@ jobs:
 
       - name: Usuń klucz API
         if: always()
-        run: rm -f "$RUNNER_TEMP/AuthKey.p8" "$HOME/.appstoreconnect/private_keys/AuthKey_${ASC_KEY_ID}.p8"
+        run: rm -f "$RUNNER_TEMP/AuthKey.p8"
