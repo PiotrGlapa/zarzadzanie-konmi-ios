@@ -1670,7 +1670,7 @@ kontuzjowane; `status=all` — wszystkie. Pełny opis: `specs/009-horsely-2-0-0/
 
 | ID | Wymaganie |
 |---|---|
-| NFR-M-01 | Uruchomienie do pulpitu z pamięci podręcznej < 2 s; odświeżenie pulpitu z komputerem w tej samej sieci Wi‑Fi < 2 s. Progi czasowe (NFR-M-01…03, SC-M-02, SC-M-09) mierzy się na urządzeniu odniesienia platformy — iOS: iPhone klasy średniej sprzed 3 lat (konkretny model do ustalenia w planie iOS); Android: Honor Magic 6 Pro |
+| NFR-M-01 | Uruchomienie do pulpitu z pamięci podręcznej < 2 s; odświeżenie pulpitu z komputerem w tej samej sieci Wi‑Fi < 2 s. Progi czasowe (NFR-M-01…03, SC-M-02, SC-M-09) mierzy się na urządzeniu odniesienia platformy — iOS: **iPhone 15 Pro** (urządzenie, na którym aplikacja będzie uruchamiana); Android: Honor Magic 6 Pro |
 | NFR-M-02 | Zapis wpisu (do programu albo do kolejki) — informacja zwrotna < 1 s; dodanie notatki ze zdjęciem możliwe w < 30 s od otwarcia aplikacji |
 | NFR-M-03 | Pełne odświeżenie pamięci dla 50 koni i 50 000 wpisów (oś czasu 12 mies.) < 60 s w sieci Wi‑Fi, w tle, bez blokowania interfejsu, z poszanowaniem limitu żądań |
 | NFR-M-04 | Klucz API przechowywany wyłącznie w bezpiecznym magazynie systemu, niedostępny dla kopii zapasowych w chmurze i innych aplikacji; nigdy w logach ani w komunikatach |
@@ -1757,6 +1757,7 @@ Kryteria wersji 2.0.1: **SC-001** pliki wzorcowe programu 2.0.0 (słowniki, koń
 |---|---|
 | Minimalna wersja | iOS 17 |
 | Urządzenia | iPhone; iPad z układem telefonu (bez osobnego układu dwukolumnowego) |
+| Urządzenie docelowe i odniesienia | **iPhone 15 Pro** — na nim aplikacja będzie uruchamiana; na nim mierzy się progi czasowe (NFR-M-01) i wykonuje testy na urządzeniu (Face ID, aparat i skaner QR, powiadomienia, praca w tle, VoiceOver, tekst 200 %). Układ MUST uwzględniać Dynamic Island i ekran 6,1″ (393 × 852 pt); działanie na innych iPhone'ach z iOS 17+ zapewnia układ adaptacyjny |
 | Orientacja | Pionowa; pozioma dozwolona dla podglądu zdjęć i wideo |
 
 ### 9.2 Zgody i opisy w `Info.plist`
