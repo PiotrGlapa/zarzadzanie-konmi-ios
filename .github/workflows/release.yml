@@ -14,10 +14,6 @@ on:
         type: choice
         options: [Deweloper]
         default: Deweloper
-      skip_tests:
-        description: TYMCZASOWO — pomiń testy (diagnoza podpisywania)
-        type: boolean
-        default: false
 
 concurrency:
   group: release
@@ -49,7 +45,6 @@ jobs:
   test:
     name: Testy przed wydaniem
     needs: secrets
-    if: ${{ inputs.skip_tests != true }}
     uses: ./.github/workflows/ci.yml
     with:
       ui-tests: true
@@ -57,7 +52,6 @@ jobs:
   release:
     name: Archiwum i wysyłka do TestFlight
     needs: [secrets, test]
-    if: ${{ !cancelled() && needs.secrets.result == 'success' && (needs.test.result == 'success' || needs.test.result == 'skipped') }}
     runs-on: macos-15
     timeout-minutes: 60
     env:

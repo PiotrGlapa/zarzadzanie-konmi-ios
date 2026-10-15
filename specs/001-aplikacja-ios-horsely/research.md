@@ -181,8 +181,24 @@ przebieg CI je potwierdzi albo obali (wtedy aktualizacja tego dokumentu).
   „Deweloper” z automatyczną dystrybucją; „Właściciele” — kompilacja dodawana ręcznie w App Store Connect po liście
   kontrolnej. Brak sekretów → krok kończy się błędem z komunikatem. Szczegóły: [contracts/ci-release.md](contracts/ci-release.md).
 - **Rationale**: decyzje Q8–Q10, Q14, Q19, sesja clarify (grupy).
-- ⚠ do potwierdzenia w CI: podpisywanie w chmurze (certyfikat dystrybucyjny zarządzany przez Apple) z kluczem roli Admin
-  bez ręcznie utworzonego certyfikatu; w razie problemu — fastlane `match` z prywatnym repozytorium certyfikatów.
+- **Wynik potwierdzenia (T009, 2026-10-15)**: podpisywanie w chmurze **działa bez fastlane `match`**, ale proces różni się od pierwotnego
+  założenia:
+  1. Runner `macos-15`, **Xcode 26** (`scripts/ci/select-xcode.sh`): App Store Connect odrzuca SDK starsze niż iOS 26
+     (błąd 90725 przy Xcode 16.4); cel wdrożenia pozostaje iOS 18.0.
+  2. Obraz runnera nie ma symulatora „iPhone 15 Pro” — `scripts/ci/create-simulator.sh` tworzy go z najnowszym środowiskiem iOS 18.
+  3. Archiwum **bez podpisu** (`CODE_SIGNING_ALLOWED=NO`): zespół nie ma zarejestrowanych urządzeń, więc podpis deweloperski
+     w archiwum kończy się „Your team has no devices”, a podpis doraźny jest zabroniony dla SDK urządzenia. Uprawnienia (App Group,
+     pęk kluczy) wstawia `scripts/ci/embed-entitlements.sh` (podpis doraźny `codesign` z plikami `.entitlements`), a eksport
+     (`-exportArchive -allowProvisioningUpdates` z kluczem API) nadaje podpis dystrybucyjny z chmury Apple i zachowuje uprawnienia
+     (sprawdzane w przebiegu: `codesign -d --entitlements` na aplikacji i rozszerzeniu).
+  4. Wysyłka: `xcodebuild -exportArchive` z `destination = upload` oraz `altool` kończą się błędem 3004 „Cannot verify client’s JWT headers”
+     (usługa dostarczania nie uwierzytelnia klucza), choć ten sam klucz działa w REST API i przy podpisywaniu. Wysyłkę wykonuje
+     `scripts/ci/upload-build.js` przez API „build uploads” (`POST /v1/buildUploads`, `buildUploadFiles`) i czeka na stan `VALID`.
+     Sam eksport ma więc `destination = export` (`scripts/ci/ExportOptions.plist`).
+  5. Przetwarzanie w App Store Connect wykryło 2 prawdziwe błędy pakietu (naprawione): brak `TARGETED_DEVICE_FAMILY = 1` na poziomie celów
+     (wymóg orientacji iPada, błąd 90474) i stary SDK (pkt 1).
+  - Kompilacja 2.0.1 (…) jest w TestFlight w stanie `VALID`; stan dla testerów wewnętrznych `MISSING_EXPORT_COMPLIANCE` — właściciel musi raz
+    odpowiedzieć na pytanie o szyfrowanie w App Store Connect (albo ustalić wartość `ITSAppUsesNonExemptEncryption` w `Info.plist`; zob. uwagi w T009).
 - Koszt: minuty macOS ×10; `HorselyCore` testowany `swift test` (bez symulatora) dla krótszych przebiegów; testy UI tylko
   na `main` i w wydaniu, na PR — testy jednostkowe i migawkowe.
 
