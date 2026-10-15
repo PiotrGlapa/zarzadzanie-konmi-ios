@@ -1,0 +1,2469 @@
+openapi: 3.1.0
+info:
+  title: Zarządzanie końmi — API
+  version: "1.6.1"
+  description: |
+    REST API aplikacji desktopowej „Zarządzanie końmi”, dostępne w sieci lokalnej.
+    Zasady ogólne: SPECYFIKACJA.md sekcja 7. Wszystkie endpointy (poza oznaczonymi `security: []`)
+    wymagają nagłówka `X-Api-Key`.
+
+    Konwencje:
+    - `DateOnly` → `format: date` (`2026-09-28`), `DateTime` lokalny → `format: date-time` bez strefy.
+    - Kwoty w PLN jako liczby z maks. 2 miejscami po przecinku.
+    - `PUT` wymaga `version` (w treści) lub nagłówka `If-Match`; niezgodność → 409 z aktualnym rekordem.
+    - `DELETE` = miękkie usunięcie (do kosza).
+
+    **Dostęp spoza sieci domowej (od 1.2).** Domyślnie API przyjmuje tylko połączenia z adresów lokalnych
+    (10/8, 172.16/12, 192.168/16, 127/8, 169.254/16, `::1`, `fc00::/7`, `fe80::/10`). Po włączeniu trybu „Dostęp spoza
+    sieci domowej” (tylko HTTPS, TLS ≥ 1.2) z internetu działają wyłącznie klucze ze zgodą na dostęp zdalny.
+    Dla adresów zdalnych: `/system/info` wymaga klucza; `/docs` i `/openapi/*` zwracają `404`; 10 nieudanych prób
+    uwierzytelnienia w 10 minut blokuje adres na 1 h (kolejne blokady w ciągu 24 h — 2×, maks. 7 dni) — odpowiedź `429`
+    z `Retry-After`; żądania bez klucza — limit 10/min na adres. Przy wyłączonym trybie żądania z adresów zdalnych
+    dostają `403` bez treści, a ścieżki spoza `/api/v1` — `404`. Odpowiedzi `401`/`429` dla klientów z internetu bez
+    ważnego klucza mają neutralną treść problemu (bez typu specyficznego dla programu). Klienci MUST NOT wysyłać żądań bez klucza
+    ani ponawiać odrzuconych żądań w pętli.
+
+    **Nowości 1.3.** Zasób `/trainings` (dziennik treningów), pola finansowe konia w obiekcie `finance`
+    (zakup, sprzedaż, wartość — ocena własna właściciela), słownik `TrainingType` oraz raporty `/reports/horse-balance`
+    („Bilans konia”) i `/reports/training-summary` („Podsumowanie treningów”). Zmiany są addytywne: klient 1.2, który
+    zapisuje konia bez `finance`, nie zmienia wpisanych kwot. Zmiana statusu konia na `Deceased` ustawia
+    `finance.salePrice = 0`.
+
+    **Nowości 1.4.** Typ kontaktu `Trainer`, trener i koszt treningu w obiekcie `coaching` (`PUT /trainings/{id}` bez
+    `coaching` zachowuje trenera i koszt), filtr `trainerId` oraz `totalCost` w `GET /trainings`, `totalCost` w wierszach
+    `/reports/training-summary` i kategoria „Treningi” w raportach kosztów i bilansie konia. Zmiany są addytywne.
+
+    **Nowości 1.5.** Typ kontaktu `Rider`, raporty `/reports/rider-trainings` („Treningi jeźdźca”) i
+    `/reports/rider-competitions` („Zawody jeźdźca”), `409 InUse` przy usuwaniu kontaktu będącego jeźdźcem treningu lub
+    startu.
+
+    **Breaking 1.5.0 (jednorazowy wyjątek zasady zgodności wstecznej, konstytucja 1.1.0).** Jeździec treningu i startu
+    w zawodach jest kontaktem, nie tekstem: `rider` (tekst) w `TrainingInput`, `Training`, `CompetitionStartInput`
+    i `CompetitionStart` zastępuje `riderContactId` (kontakt typu `Rider`) z polem `riderName` tylko do odczytu, a parametr
+    `rider` listy `GET /trainings` — parametr `riderId`. Pole `rider` wysłane w żądaniu jest ignorowane jak każde nieznane
+    pole. Błędy walidacji (400 z polem `riderContactId` w `errors`, jak dla trenera): kontakt nie istnieje albo jest w koszu, kontakt nie ma typu `Rider`. Żadne inne pole ani operacja nie zmienia nazwy
+    ani znaczenia.
+servers:
+  - url: http://{host}:{port}/api/v1
+    variables:
+      host: { default: 192.168.1.10 }
+      port: { default: "5080" }
+  - url: https://{publicHost}:{publicPort}/api/v1
+    description: Adres publiczny (DynDNS albo stały publiczny IP) — tylko przy włączonym dostępie spoza sieci domowej
+    variables:
+      publicHost: { default: stajnia.dyndns.org }
+      publicPort: { default: "48123" }
+security:
+  - ApiKey: []
+
+tags:
+  - name: System
+  - name: Horses
+  - name: VetVisits
+  - name: FarrierVisits
+  - name: PhysioVisits
+  - name: SpecialistVisits
+  - name: Competitions
+  - name: Purchases
+  - name: Notes
+  - name: Trainings
+  - name: Reminders
+  - name: Contacts
+  - name: Dictionaries
+  - name: Attachments
+  - name: Reports
+  - name: Export
+  - name: Trash
+
+paths:
+  /system/info:
+    get:
+      tags: [System]
+      summary: Informacje o serwerze (test połączenia)
+      description: Z sieci lokalnej bez klucza (jak w 1.0/1.1). Z adresu zdalnego wymaga klucza (`401` bez klucza) — od 1.2.
+      security: []
+      responses:
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SystemInfo" }
+
+  /dashboard:
+    get:
+      tags: [Reminders]
+      summary: Dane pulpitu (FR-PUL-01)
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Dashboard" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  # ---------------- Horses ----------------
+  /horses:
+    get:
+      tags: [Horses]
+      summary: Lista koni
+      parameters:
+        - name: status
+          in: query
+          description: Domyślnie `Active`; `all` = wszystkie
+          schema: { type: string, enum: [Active, Sold, Deceased, Leased, all], default: Active }
+        - name: foal
+          in: query
+          description: true = tylko źrebięta; false = bez źrebiąt; brak = wszystkie (w ramach filtra status) — od 1.1
+          schema: { type: boolean }
+        - $ref: "#/components/parameters/Q"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HorsePage" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+    post:
+      tags: [Horses]
+      summary: Dodanie konia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/HorseInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201": { $ref: "#/components/responses/HorseCreated" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /horses/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Horses]
+      summary: Szczegóły konia
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Horse" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [Horses]
+      summary: Aktualizacja konia
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/HorseUpdate" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Horse" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Horses]
+      summary: Usunięcie konia do kosza (wraz z wpisami)
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /horses/{id}/timeline:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Horses]
+      summary: Oś czasu konia (FR-WYS-01)
+      parameters:
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - name: types
+          in: query
+          style: form
+          explode: false
+          schema:
+            type: array
+            items: { $ref: "#/components/schemas/TimelineEntryType" }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimelinePage" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /horses/{id}/photo:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Horses]
+      summary: Zdjęcie główne konia
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: Plik obrazu
+          content:
+            image/*: { schema: { type: string, format: binary } }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /horses/{id}/stats/competitions:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Horses, Competitions]
+      summary: Statystyki startów konia (FR-ZAW-05)
+      parameters:
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - { name: disciplineId, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompetitionStats" }
+  /horses/{id}/farrier-next-date:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Horses, FarrierVisits]
+      summary: Podpowiedź daty następnej wizyty kowala (FR-KOW-02)
+      parameters:
+        - { name: visitDate, in: query, required: true, schema: { type: string, format: date } }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [nextVisitDate, intervalWeeks]
+                properties:
+                  nextVisitDate: { type: string, format: date }
+                  intervalWeeks: { type: integer }
+
+  # ---------------- Visits ----------------
+  /vet-visits:
+    get:
+      tags: [VetVisits]
+      summary: Lista wizyt weterynaryjnych
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - { name: visitTypeId, in: query, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/Q"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/VetVisitListItem" } }
+    post:
+      tags: [VetVisits]
+      summary: Dodanie wizyty weterynaryjnej
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VetVisitInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          headers: { Location: { $ref: "#/components/headers/Location" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VetVisit" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /vet-visits/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [VetVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VetVisit" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [VetVisits]
+      description: Kolekcja `medications` zastępowana w całości.
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/VetVisitInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VetVisit" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [VetVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /farrier-visits:
+    get:
+      tags: [FarrierVisits]
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/FarrierVisitListItem" } }
+    post:
+      tags: [FarrierVisits]
+      description: Serwer nie wylicza `nextVisitDate` — użyj `/horses/{id}/farrier-next-date`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FarrierVisitInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          headers: { Location: { $ref: "#/components/headers/Location" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FarrierVisit" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /farrier-visits/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [FarrierVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FarrierVisit" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [FarrierVisits]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/FarrierVisitInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/FarrierVisit" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [FarrierVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+
+  /physio-visits:
+    get:
+      tags: [PhysioVisits]
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/PhysioVisitListItem" } }
+    post:
+      tags: [PhysioVisits]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PhysioVisitInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PhysioVisit" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /physio-visits/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [PhysioVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PhysioVisit" }
+    put:
+      tags: [PhysioVisits]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/PhysioVisitInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PhysioVisit" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [PhysioVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+
+  /specialist-visits:
+    get:
+      tags: [SpecialistVisits]
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - { name: specialistTypeId, in: query, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/SpecialistVisitListItem" } }
+    post:
+      tags: [SpecialistVisits]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SpecialistVisitInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SpecialistVisit" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /specialist-visits/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [SpecialistVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SpecialistVisit" }
+    put:
+      tags: [SpecialistVisits]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/SpecialistVisitInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SpecialistVisit" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [SpecialistVisits]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+
+  # ---------------- Competitions ----------------
+  /competitions:
+    get:
+      tags: [Competitions]
+      parameters:
+        - { name: horseId, in: query, description: Zawody, w których koń startował, schema: { type: string, format: uuid } }
+        - { name: disciplineId, in: query, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/Q"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/CompetitionListItem" } }
+    post:
+      tags: [Competitions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CompetitionInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Competition" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /competitions/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Competitions]
+      summary: Zawody wraz ze startami
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Competition" }
+    put:
+      tags: [Competitions]
+      description: Nie zmienia startów (osobny zasób).
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CompetitionInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Competition" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Competitions]
+      summary: Usunięcie zawodów wraz ze startami
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+  /competitions/{id}/starts:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Competitions]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/CompetitionStart" } }
+    post:
+      tags: [Competitions]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CompetitionStartInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompetitionStart" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /competitions/{id}/starts/{startId}:
+    parameters:
+      - $ref: "#/components/parameters/Id"
+      - { name: startId, in: path, required: true, schema: { type: string, format: uuid } }
+    get:
+      tags: [Competitions]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompetitionStart" }
+    put:
+      tags: [Competitions]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/CompetitionStartInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CompetitionStart" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Competitions]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+  /competition-starts:
+    get:
+      tags: [Competitions]
+      summary: Płaska lista startów
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/CompetitionStart" } }
+
+  # ---------------- Purchases ----------------
+  /purchases:
+    get:
+      tags: [Purchases]
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - { name: general, in: query, description: Tylko zakupy ogólne, schema: { type: boolean } }
+        - { name: categoryId, in: query, schema: { type: string, format: uuid } }
+        - { name: supplierId, in: query, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/Q"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+        - $ref: "#/components/parameters/Sort"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/PurchaseListItem" } }
+                      totalAmount: { type: number, description: Suma kwot zakupów (bez dostawy) dla filtra }
+                      totalCost: { type: number, description: Suma łącznych kosztów (z dostawą) dla filtra — od 1.1 }
+    post:
+      tags: [Purchases]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PurchaseInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Purchase" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /purchases/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Purchases]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Purchase" }
+    put:
+      tags: [Purchases]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/PurchaseInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Purchase" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Purchases]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+
+  # ---------------- Notes ----------------
+  /notes:
+    get:
+      tags: [Notes]
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - { name: pinned, in: query, schema: { type: boolean } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/Note" } }
+    post:
+      tags: [Notes]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/NoteInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Note" }
+  /notes/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Notes]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Note" }
+    put:
+      tags: [Notes]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/NoteInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Note" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Notes]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+
+  # ---------------- Trainings ----------------
+  /trainings:
+    get:
+      tags: [Trainings]
+      description: Lista treningów od najnowszego (od 1.3).
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - { name: typeId, in: query, description: Rodzaj treningu (słownik TrainingType), schema: { type: string, format: uuid } }
+        - { name: riderId, in: query, description: Jeździec (kontakt typu Rider; od 1.5, zastępuje parametr rider), schema: { type: string, format: uuid } }
+        - { name: trainerId, in: query, description: Trener (kontakt typu Trainer; od 1.4), schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/Training" } }
+                      totalCost: { type: number, description: "Suma coaching.cost wszystkich treningów spełniających filtr, nie tylko bieżącej strony (od 1.4)" }
+    post:
+      tags: [Trainings]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TrainingInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          headers: { Location: { $ref: "#/components/headers/Location" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Training" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /trainings/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Trainings]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          headers: { ETag: { $ref: "#/components/headers/ETag" } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Training" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    put:
+      tags: [Trainings]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/TrainingInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Training" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Trainings]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+
+  # ---------------- Reminders ----------------
+  /reminders:
+    get:
+      tags: [Reminders]
+      parameters:
+        - $ref: "#/components/parameters/HorseId"
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/ReminderStatus" } }
+        - { name: kind, in: query, schema: { $ref: "#/components/schemas/ReminderKind" } }
+        - { name: dueFrom, in: query, schema: { type: string, format: date } }
+        - { name: dueTo, in: query, schema: { type: string, format: date } }
+        - { name: overdue, in: query, schema: { type: boolean } }
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK (domyślnie tylko `Open`)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/Reminder" } }
+    post:
+      tags: [Reminders]
+      summary: Ręczne dodanie terminu (FR-TER-03)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReminderInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reminder" }
+  /reminders/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Reminders]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reminder" }
+    put:
+      tags: [Reminders]
+      summary: Edycja / przełożenie (tylko status Open)
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ReminderInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reminder" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Reminders]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+  /reminders/{id}/complete:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [Reminders]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reminder" }
+  /reminders/{id}/dismiss:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [Reminders]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Reminder" }
+
+  # ---------------- Contacts ----------------
+  /contacts:
+    get:
+      tags: [Contacts]
+      parameters:
+        - { name: type, in: query, schema: { $ref: "#/components/schemas/ContactType" } }
+        - { name: includeArchived, in: query, schema: { type: boolean, default: false } }
+        - $ref: "#/components/parameters/Q"
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/PageSize"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/PageMeta"
+                  - type: object
+                    properties:
+                      items: { type: array, items: { $ref: "#/components/schemas/ContactListItem" } }
+    post:
+      tags: [Contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContactInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Contact" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /contacts/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Contacts]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Contact" }
+    put:
+      tags: [Contacts]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/ContactInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Contact" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Contacts]
+      description: 409, jeśli kontakt jest używany (zalecana archiwizacja).
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  # ---------------- Dictionaries ----------------
+  /dictionaries:
+    get:
+      tags: [Dictionaries]
+      summary: Wszystkie słowniki
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items: { $ref: "#/components/schemas/DictionaryItem" }
+  /dictionaries/{type}:
+    parameters: [{ $ref: "#/components/parameters/DictionaryTypePath" }]
+    get:
+      tags: [Dictionaries]
+      parameters:
+        - { name: includeInactive, in: query, schema: { type: boolean, default: false } }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/DictionaryItem" } }
+    post:
+      tags: [Dictionaries]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DictionaryItemInput" }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DictionaryItem" }
+        "409": { $ref: "#/components/responses/Conflict" }
+  /dictionaries/{type}/{id}:
+    parameters:
+      - $ref: "#/components/parameters/DictionaryTypePath"
+      - $ref: "#/components/parameters/Id"
+    put:
+      tags: [Dictionaries]
+      parameters: [{ $ref: "#/components/parameters/IfMatch" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/DictionaryItemInput"
+                - $ref: "#/components/schemas/VersionField"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DictionaryItem" }
+        "409": { $ref: "#/components/responses/Conflict" }
+    delete:
+      tags: [Dictionaries]
+      description: 409, gdy wartość jest używana lub systemowa.
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+  # ---------------- Attachments ----------------
+  /attachments:
+    get:
+      tags: [Attachments]
+      parameters:
+        - { name: ownerType, in: query, schema: { $ref: "#/components/schemas/AttachmentOwnerType" } }
+        - { name: ownerId, in: query, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/HorseId"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Attachment" } }
+    post:
+      tags: [Attachments]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [ownerType, ownerId, file]
+              properties:
+                ownerType: { $ref: "#/components/schemas/AttachmentOwnerType" }
+                ownerId: { type: string, format: uuid }
+                description: { type: string, maxLength: 500 }
+                file:
+                  type: array
+                  items: { type: string, format: binary }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "201":
+          description: Utworzono
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Attachment" } }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "413": { $ref: "#/components/responses/Problem" }
+        "415": { $ref: "#/components/responses/Problem" }
+  /attachments/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Attachments]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Attachment" }
+    delete:
+      tags: [Attachments]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Usunięto }
+  /attachments/{id}/content:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Attachments]
+      description: Obsługuje nagłówek `Range`.
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: Plik
+          content:
+            application/octet-stream: { schema: { type: string, format: binary } }
+        "206": { description: Fragment pliku }
+  /attachments/{id}/thumbnail:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [Attachments]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: Miniatura PNG 256 px
+          content:
+            image/png: { schema: { type: string, format: binary } }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  # ---------------- Reports / Export / Trash ----------------
+  /reports/costs:
+    get:
+      tags: [Reports]
+      parameters:
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - name: horseIds
+          in: query
+          description: Pusty = wszystkie; wartość specjalna `general` = tylko zakupy ogólne
+          style: form
+          explode: false
+          schema: { type: array, items: { type: string } }
+        - name: categories
+          in: query
+          style: form
+          explode: false
+          schema: { type: array, items: { type: string } }
+        - { name: groupBy, in: query, schema: { type: string, enum: [horse, month, category], default: month } }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CostReport" }
+  /reports/horse-balance:
+    get:
+      tags: [Reports]
+      description: >
+        Bilans konia (od 1.3): zakup, koszty z całej historii, nagrody, sprzedaż i wynik dla każdego konia spoza kosza.
+        `result = (salePrice ?? 0) + prizes − (purchasePrice ?? 0) − costs`. Wartość konia (`estimatedValue`) jest tylko informacją.
+      parameters:
+        - name: status
+          in: query
+          description: Statusy konia po przecinku; brak = wszystkie
+          style: form
+          explode: false
+          schema: { type: array, items: { $ref: "#/components/schemas/HorseStatus" } }
+        - name: horseIds
+          in: query
+          description: Konie po przecinku; brak = wszystkie konie spoza kosza
+          style: form
+          explode: false
+          schema: { type: array, items: { type: string, format: uuid } }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/HorseBalanceReport" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+  /reports/training-summary:
+    get:
+      tags: [Reports]
+      description: >
+        Podsumowanie treningów konia (od 1.3): statystyki min / średnia / maks. w podziale na rodzaj treningu i serie
+        wykresu postępów dla wybranego okresu.
+      parameters:
+        - { name: horseId, in: query, required: true, schema: { type: string, format: uuid } }
+        - { name: range, in: query, schema: { type: string, enum: [week, month, year, all], default: month } }
+        - { name: date, in: query, description: Dowolny dzień okresu; domyślnie dziś; ignorowany dla all, schema: { type: string, format: date } }
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TrainingSummaryReport" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /reports/rider-trainings:
+    get:
+      tags: [Reports]
+      description: >
+        Treningi jeźdźca (od 1.5): treningi jednego jeźdźca (`riderId`) albo wszystkich jeźdźców (brak `riderId`)
+        w okresie, z podsumowaniem i podziałem na konie (jeden jeździec) albo na jeźdźców (wszyscy). Treningi bez jeźdźca
+        i treningi z kosza są pomijane. `404`, gdy `riderId` lub `horseId` nie istnieje.
+      parameters:
+        - { name: riderId, in: query, description: Jeździec (kontakt); brak = wszyscy jeźdźcy, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/HorseId"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RiderTrainingsReport" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /reports/rider-competitions:
+    get:
+      tags: [Reports]
+      description: >
+        Zawody jeźdźca (od 1.5): zawody ze startami jednego jeźdźca (`riderId`) albo wszystkich jeźdźców w okresie
+        liczonym po dacie startu (`startDate`, a gdy brak — pierwszy dzień zawodów). `costs = entryFee + otherCosts`,
+        `prizes = prizeMoney`, `balance = prizes − costs`. Starty bez jeźdźca i z kosza są pomijane. `404`, gdy `riderId`
+        lub `horseId` nie istnieje.
+      parameters:
+        - { name: riderId, in: query, description: Jeździec (kontakt); brak = wszyscy jeźdźcy, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+        - $ref: "#/components/parameters/HorseId"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/RiderCompetitionsReport" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /export:
+    get:
+      tags: [Export]
+      summary: Eksport JSON (bez plików załączników) — schemat export-schema-1.0.json
+      parameters:
+        - { name: scope, in: query, schema: { type: string, enum: [full, horse], default: full } }
+        - { name: horseId, in: query, schema: { type: string, format: uuid } }
+        - $ref: "#/components/parameters/From"
+        - $ref: "#/components/parameters/To"
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: Plik eksportu
+          content:
+            application/json:
+              schema: { $ref: "./export-schema-1.0.json" }
+  /trash:
+    get:
+      tags: [Trash]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/TrashItem" } }
+  /trash/{type}/{id}/restore:
+    parameters:
+      - { name: type, in: path, required: true, schema: { type: string } }
+      - $ref: "#/components/parameters/Id"
+    post:
+      tags: [Trash]
+      responses:
+        "403": { $ref: "#/components/responses/KeyHomeOnly" }
+        "429": { $ref: "#/components/responses/TooManyRequests" }
+        "204": { description: Przywrócono (cały batch) }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409": { $ref: "#/components/responses/Conflict" }
+
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+
+  headers:
+    ETag:
+      description: Wersja rekordu, np. `"3"`
+      schema: { type: string }
+    Location:
+      schema: { type: string }
+    RetryAfter:
+      description: Liczba sekund, po których można ponowić żądanie
+      schema: { type: integer, minimum: 1 }
+
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string, format: uuid } }
+    HorseId: { name: horseId, in: query, schema: { type: string, format: uuid } }
+    From: { name: from, in: query, schema: { type: string, format: date } }
+    To: { name: to, in: query, schema: { type: string, format: date } }
+    Q: { name: q, in: query, description: Wyszukiwanie tekstowe, schema: { type: string } }
+    Page: { name: page, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+    PageSize: { name: pageSize, in: query, schema: { type: integer, minimum: 1, maximum: 200, default: 50 } }
+    Sort: { name: sort, in: query, description: "Pole sortowania, prefiks `-` = malejąco, np. `-date`", schema: { type: string } }
+    IfMatch: { name: If-Match, in: header, required: false, schema: { type: string } }
+    DictionaryTypePath:
+      name: type
+      in: path
+      required: true
+      schema: { $ref: "#/components/schemas/DictionaryType" }
+
+  responses:
+    Unauthorized:
+      description: Brak lub nieprawidłowy klucz API
+      content:
+        application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } }
+    KeyHomeOnly:
+      description: >
+        Klucz nie ma zgody na dostęp spoza sieci domowej (tylko żądania z adresów zdalnych, od 1.2).
+        `type` = `https://zarzadzanie-konmi/errors/key-home-only`, `title` = „Ten klucz działa tylko w sieci domowej”.
+      content:
+        application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } }
+    TooManyRequests:
+      description: >
+        Przekroczony limit żądań (100 / 10 s na klucz; 10/min bez klucza z adresu zdalnego) albo adres zdalny
+        zablokowany po nieudanych próbach (od 1.2). Nagłówek `Retry-After` podaje liczbę sekund do ponowienia.
+      headers:
+        Retry-After: { $ref: "#/components/headers/RetryAfter" }
+      content:
+        application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } }
+    NotFound:
+      description: Nie znaleziono (lub w koszu)
+      content:
+        application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } }
+    ValidationError:
+      description: Błąd walidacji
+      content:
+        application/problem+json: { schema: { $ref: "#/components/schemas/ValidationProblem" } }
+    Conflict:
+      description: Konflikt wersji / unikalności / użycia. Przy konflikcie wersji `current` zawiera aktualny rekord.
+      content:
+        application/problem+json: { schema: { $ref: "#/components/schemas/ConflictProblem" } }
+    Problem:
+      description: Błąd
+      content:
+        application/problem+json: { schema: { $ref: "#/components/schemas/Problem" } }
+    HorseCreated:
+      description: Utworzono
+      headers: { Location: { $ref: "#/components/headers/Location" } }
+      content:
+        application/json: { schema: { $ref: "#/components/schemas/Horse" } }
+
+  schemas:
+    # ---- common ----
+    Uuid: { type: string, format: uuid }
+    Money: { type: number, minimum: 0, maximum: 10000000, multipleOf: 0.01 }
+    Audit:
+      type: object
+      required: [id, version, createdAt, updatedAt]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        version: { type: integer, readOnly: true }
+        createdAt: { type: string, format: date-time, readOnly: true }
+        updatedAt: { type: string, format: date-time, readOnly: true }
+    VersionField:
+      type: object
+      properties:
+        version: { type: integer, description: Wymagane przy PUT, jeśli brak nagłówka If-Match }
+    ForeignAmount:
+      type: object
+      properties:
+        originalAmount: { type: [number, "null"] }
+        originalCurrency: { type: [string, "null"], pattern: "^[A-Z]{3}$" }
+    NextVisit:
+      type: object
+      properties:
+        nextVisitDate: { type: [string, "null"], format: date }
+        nextVisitPurpose: { type: [string, "null"], maxLength: 200 }
+    PageMeta:
+      type: object
+      required: [page, pageSize, totalCount]
+      properties:
+        page: { type: integer }
+        pageSize: { type: integer }
+        totalCount: { type: integer }
+    Problem:
+      type: object
+      properties:
+        type: { type: string }
+        title: { type: string }
+        status: { type: integer }
+        detail: { type: string }
+    ValidationProblem:
+      allOf:
+        - $ref: "#/components/schemas/Problem"
+        - type: object
+          properties:
+            errors:
+              type: object
+              additionalProperties: { type: array, items: { type: string } }
+            warnings:
+              type: object
+              additionalProperties: { type: array, items: { type: string } }
+    ConflictProblem:
+      allOf:
+        - $ref: "#/components/schemas/Problem"
+        - type: object
+          properties:
+            reason: { type: string, enum: [VersionMismatch, Unique, InUse, InvalidState] }
+            current: { type: object, description: Aktualna wersja rekordu (dla VersionMismatch) }
+
+    SystemInfo:
+      type: object
+      required: [appVersion, apiVersion, schemaVersion, serverTime]
+      properties:
+        appVersion: { type: string }
+        apiVersion: { type: string, const: v1 }
+        schemaVersion: { type: string, description: Wersja schematu eksportu }
+        serverTime: { type: string, format: date-time }
+
+    # ---- enums ----
+    HorseStatus: { type: string, enum: [Active, Sold, Deceased, Leased] }
+    HorseSex: { type: string, enum: [Mare, Stallion, Gelding] }
+    ContactType: { type: string, enum: [Vet, Farrier, Physio, Specialist, Shop, Organizer, Other, Trainer, Rider] }
+    DictionaryType:
+      type: string
+      enum: [VetVisitType, FarrierService, PhysioBodyArea, PhysioTechnique, SpecialistType, CompetitionRank, CompetitionDiscipline, PurchaseCategory, Unit, TrainingType]
+    ReminderKind: { type: string, enum: [Vet, Vaccination, Deworming, Farrier, Physio, Specialist, Competition, Other] }
+    ReminderStatus: { type: string, enum: [Open, Completed, Dismissed] }
+    PurchaseAssignment: { type: string, enum: [SingleHorse, MultipleHorses, General] }
+    ResultStatus: { type: [string, "null"], enum: [Completed, Eliminated, Retired, DidNotStart, null] }
+    MedicationAdministration: { type: [string, "null"], enum: [AdministeredAtVisit, Prescribed, null] }
+    AttachmentOwnerType:
+      type: string
+      enum: [Horse, VetVisit, FarrierVisit, PhysioVisit, SpecialistVisit, Competition, CompetitionStart, Purchase, Note, Contact]
+    TimelineEntryType:
+      type: string
+      enum: [VetVisit, FarrierVisit, PhysioVisit, SpecialistVisit, CompetitionStart, Purchase, Note]
+
+    # ---- horse ----
+    HorseFinance:
+      type: object
+      description: >
+        Zakup, sprzedaż i wartość konia (od 1.3). Wszystkie pola nieobowiązkowe; null ≠ 0. Wartość konia to ocena własna
+        właściciela i nie wchodzi do żadnych sum. Kwoty w PLN (≥ 0, maks. 2 miejsca po przecinku), daty nie z przyszłości.
+      properties:
+        purchasePrice: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+        purchaseDate: { type: [string, "null"], format: date }
+        salePrice: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+        saleDate: { type: [string, "null"], format: date }
+        estimatedValue: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+    HorseInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 100
+          description: Dla źrebaka bez numeru paszportu unikalne (bez względu na wielkość liter) wśród innych źrebiąt bez paszportu spoza kosza (409 Unique) — od 1.1
+        passportNumber:
+          type: [string, "null"]
+          maxLength: 50
+          description: >
+            Nieobowiązkowy w schemacie (od 1.1). Wymagalność sprawdza serwis aplikacji:
+            wymagany, gdy isFoal = false (400, errors.passportNumber). Unikalny wśród wpisanych numerów koni spoza kosza (409 Unique).
+        isFoal: { type: boolean, default: false, description: Źrebak — zdejmuje wymagalność numeru paszportu (od 1.1) }
+        stableName: { type: [string, "null"], maxLength: 100 }
+        ueln: { type: [string, "null"], maxLength: 15 }
+        microchipNumber: { type: [string, "null"], maxLength: 20 }
+        passportIssuer: { type: [string, "null"], maxLength: 150 }
+        passportIssueDate: { type: [string, "null"], format: date }
+        breed: { type: [string, "null"], maxLength: 100 }
+        sex: { oneOf: [{ $ref: "#/components/schemas/HorseSex" }, { type: "null" }] }
+        color: { type: [string, "null"], maxLength: 50 }
+        birthDate: { type: [string, "null"], format: date }
+        birthYearOnly: { type: boolean, default: false }
+        birthCountry: { type: [string, "null"], maxLength: 100 }
+        sire: { type: [string, "null"], maxLength: 100 }
+        dam: { type: [string, "null"], maxLength: 100 }
+        damSire: { type: [string, "null"], maxLength: 100 }
+        breeder: { type: [string, "null"], maxLength: 200 }
+        owner: { type: [string, "null"], maxLength: 200 }
+        markings: { type: [string, "null"] }
+        photoAttachmentId: { type: [string, "null"], format: uuid }
+        farrierIntervalWeeks: { type: integer, minimum: 1, maximum: 26 }
+        status: { $ref: "#/components/schemas/HorseStatus" }
+        statusDate: { type: [string, "null"], format: date }
+        statusNote: { type: [string, "null"] }
+        notes: { type: [string, "null"] }
+        finance:
+          oneOf: [{ $ref: "#/components/schemas/HorseFinance" }, { type: "null" }]
+          description: >
+            Od 1.3. Przy tworzeniu brak = bez kwot. Przy PUT brak (albo null) = pola finansowe bez zmian (klient 1.2);
+            obecny obiekt zastępuje pięć pól, null w polu czyści wartość. Zmiana statusu na Deceased ustawia
+            salePrice = 0 i saleDate = statusDate, także gdy żądanie niesie inną cenę sprzedaży.
+    HorseUpdate:
+      allOf:
+        - $ref: "#/components/schemas/HorseInput"
+        - $ref: "#/components/schemas/VersionField"
+    Horse:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/HorseInput"
+        - type: object
+          properties:
+            nextReminder: { oneOf: [{ $ref: "#/components/schemas/Reminder" }, { type: "null" }], readOnly: true }
+            monthsWithoutPassport:
+              type: [integer, "null"]
+              readOnly: true
+              description: Pełne miesiące od daty urodzenia dla źrebaka bez paszportu; null w pozostałych przypadkach (od 1.1)
+    HorsePage:
+      allOf:
+        - $ref: "#/components/schemas/PageMeta"
+        - type: object
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/HorseListItem" } }
+
+    TimelineItem:
+      type: object
+      required: [entryType, id, date, title]
+      properties:
+        entryType: { $ref: "#/components/schemas/TimelineEntryType" }
+        id: { type: string, format: uuid }
+        date: { type: string, format: date }
+        title: { type: string }
+        summary: { type: [string, "null"] }
+        cost: { type: [number, "null"] }
+        attachmentCount: { type: integer }
+    TimelinePage:
+      allOf:
+        - $ref: "#/components/schemas/PageMeta"
+        - type: object
+          properties:
+            items: { type: array, items: { $ref: "#/components/schemas/TimelineItem" } }
+
+    # ---- vet ----
+    VetMedication:
+      type: object
+      required: [name]
+      properties:
+        id: { type: string, format: uuid, readOnly: true }
+        name: { type: string, maxLength: 200 }
+        dosage: { type: [string, "null"], maxLength: 200 }
+        startDate: { type: [string, "null"], format: date }
+        endDate: { type: [string, "null"], format: date }
+        administration: { $ref: "#/components/schemas/MedicationAdministration" }
+        notes: { type: [string, "null"] }
+    VetVisitInput:
+      allOf:
+        - type: object
+          required: [horseId, visitDateTime, visitTypeId]
+          properties:
+            horseId: { type: string, format: uuid }
+            visitDateTime: { type: string, format: date-time }
+            contactId: { type: [string, "null"], format: uuid }
+            visitTypeId: { type: string, format: uuid }
+            reason: { type: [string, "null"] }
+            diagnosis: { type: [string, "null"] }
+            recommendations: { type: [string, "null"] }
+            vaccineOrProduct: { type: [string, "null"], maxLength: 200 }
+            batchNumber: { type: [string, "null"], maxLength: 50 }
+            cost: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+            medications: { type: array, items: { $ref: "#/components/schemas/VetMedication" } }
+        - $ref: "#/components/schemas/ForeignAmount"
+        - $ref: "#/components/schemas/NextVisit"
+    VetVisit:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/VetVisitInput"
+        - type: object
+          properties:
+            reminderId: { type: [string, "null"], format: uuid, readOnly: true }
+
+    # ---- farrier ----
+    FarrierVisitInput:
+      allOf:
+        - type: object
+          required: [horseId, visitDate, serviceId]
+          properties:
+            horseId: { type: string, format: uuid }
+            visitDate: { type: string, format: date }
+            contactId: { type: [string, "null"], format: uuid }
+            serviceId: { type: string, format: uuid }
+            hoofNotes: { type: [string, "null"] }
+            cost: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+            nextVisitDate: { type: [string, "null"], format: date }
+        - $ref: "#/components/schemas/ForeignAmount"
+    FarrierVisit:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/FarrierVisitInput"
+        - type: object
+          properties:
+            reminderId: { type: [string, "null"], format: uuid, readOnly: true }
+
+    # ---- physio ----
+    PhysioVisitInput:
+      allOf:
+        - type: object
+          required: [horseId, visitDate]
+          properties:
+            horseId: { type: string, format: uuid }
+            visitDate: { type: string, format: date }
+            contactId: { type: [string, "null"], format: uuid }
+            reason: { type: [string, "null"] }
+            bodyAreaIds: { type: array, items: { type: string, format: uuid } }
+            techniqueIds: { type: array, items: { type: string, format: uuid } }
+            observations: { type: [string, "null"] }
+            recommendations: { type: [string, "null"] }
+            cost: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+        - $ref: "#/components/schemas/ForeignAmount"
+        - $ref: "#/components/schemas/NextVisit"
+    PhysioVisit:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/PhysioVisitInput"
+        - type: object
+          properties:
+            reminderId: { type: [string, "null"], format: uuid, readOnly: true }
+
+    # ---- specialist ----
+    SpecialistVisitInput:
+      allOf:
+        - type: object
+          required: [horseId, visitDate, specialistTypeId]
+          properties:
+            horseId: { type: string, format: uuid }
+            visitDate: { type: string, format: date }
+            specialistTypeId: { type: string, format: uuid }
+            contactId: { type: [string, "null"], format: uuid }
+            reason: { type: [string, "null"] }
+            description: { type: [string, "null"] }
+            recommendations: { type: [string, "null"] }
+            cost: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+        - $ref: "#/components/schemas/ForeignAmount"
+        - $ref: "#/components/schemas/NextVisit"
+    SpecialistVisit:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/SpecialistVisitInput"
+        - type: object
+          properties:
+            reminderId: { type: [string, "null"], format: uuid, readOnly: true }
+
+    # ---- competitions ----
+    CompetitionInput:
+      type: object
+      required: [name, dateFrom]
+      properties:
+        name: { type: string, maxLength: 200 }
+        dateFrom: { type: string, format: date }
+        dateTo: { type: [string, "null"], format: date }
+        city: { type: [string, "null"], maxLength: 100 }
+        venue: { type: [string, "null"], maxLength: 200 }
+        organizerContactId: { type: [string, "null"], format: uuid }
+        rankId: { type: [string, "null"], format: uuid }
+        disciplineId: { type: [string, "null"], format: uuid }
+        notes: { type: [string, "null"] }
+    Competition:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/CompetitionInput"
+        - type: object
+          properties:
+            starts: { type: array, items: { $ref: "#/components/schemas/CompetitionStart" }, readOnly: true }
+    CompetitionStartInput:
+      allOf:
+        - type: object
+          required: [horseId]
+          properties:
+            horseId: { type: string, format: uuid }
+            startDate: { type: [string, "null"], format: date }
+            disciplineId: { type: [string, "null"], format: uuid }
+            className: { type: [string, "null"], maxLength: 100 }
+            riderContactId: { type: [string, "null"], format: uuid, description: Kontakt typu Rider (od 1.5; zastępuje rider) }
+            placement: { type: [integer, "null"], minimum: 1 }
+            participantsCount: { type: [integer, "null"], minimum: 1 }
+            resultStatus: { $ref: "#/components/schemas/ResultStatus" }
+            penaltyPoints: { type: [number, "null"], minimum: 0 }
+            scorePercent: { type: [number, "null"], minimum: 0, maximum: 100 }
+            timeSeconds: { type: [number, "null"], exclusiveMinimum: 0 }
+            description: { type: [string, "null"] }
+            subjectiveRating: { type: [integer, "null"], minimum: 1, maximum: 5 }
+            entryFee: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+            otherCosts: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+            prizeMoney: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+        - $ref: "#/components/schemas/ForeignAmount"
+    CompetitionStart:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/CompetitionStartInput"
+        - type: object
+          properties:
+            competitionId: { type: string, format: uuid, readOnly: true }
+            riderName: { type: [string, "null"], readOnly: true, description: Nazwa kontaktu jeźdźca (od 1.5) }
+    CompetitionStats:
+      type: object
+      properties:
+        starts: { type: integer }
+        wins: { type: integer }
+        podiums: { type: integer }
+        averageRating: { type: [number, "null"] }
+        totalPrizeMoney: { type: number }
+        totalCosts: { type: number }
+
+    # ---- purchases ----
+    PurchaseInput:
+      allOf:
+        - type: object
+          required: [purchaseDate, productName, categoryId, totalAmount, assignment]
+          properties:
+            purchaseDate: { type: string, format: date }
+            productName: { type: string, maxLength: 200 }
+            categoryId: { type: string, format: uuid }
+            supplierContactId: { type: [string, "null"], format: uuid }
+            quantity: { type: [number, "null"], exclusiveMinimum: 0 }
+            unitId: { type: [string, "null"], format: uuid }
+            unitPrice: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }] }
+            totalAmount:
+              allOf: [{ $ref: "#/components/schemas/Money" }]
+              description: Kwota zakupu bez kosztu dostawy
+            deliveryCost:
+              allOf: [{ $ref: "#/components/schemas/Money" }]
+              default: 0
+              description: Koszt dostawy w PLN (≥ 0); nieobowiązkowy w żądaniu — brak = 0; w odpowiedzi zawsze liczba (od 1.1)
+            assignment: { $ref: "#/components/schemas/PurchaseAssignment" }
+            horseIds:
+              type: array
+              items: { type: string, format: uuid }
+              description: "SingleHorse: 1, MultipleHorses: ≥2, General: 0"
+            notes: { type: [string, "null"] }
+        - $ref: "#/components/schemas/ForeignAmount"
+    Purchase:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/PurchaseInput"
+        - type: object
+          properties:
+            totalCost:
+              allOf: [{ $ref: "#/components/schemas/Money" }]
+              readOnly: true
+              description: totalAmount + deliveryCost — kwota używana w raportach i podziale na konie (od 1.1)
+
+    # ---- notes ----
+    NoteInput:
+      type: object
+      required: [horseId, noteDate, title]
+      properties:
+        horseId: { type: string, format: uuid }
+        noteDate: { type: string, format: date }
+        title: { type: string, maxLength: 200 }
+        content: { type: [string, "null"] }
+        isPinned: { type: boolean, default: false }
+    Note:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/NoteInput"
+
+    # ---- trainings ----
+    TrainingIntensity: { type: string, enum: [Light, Medium, Hard] }
+    TrainingInput:
+      type: object
+      required: [horseId, trainingDate, trainingTypeId]
+      properties:
+        horseId: { type: string, format: uuid }
+        trainingDate: { type: string, format: date, description: Nie z przyszłości }
+        trainingTypeId: { type: string, format: uuid, description: Pozycja słownika TrainingType }
+        durationMinutes: { type: [integer, "null"], minimum: 1, maximum: 600 }
+        intensity: { oneOf: [{ $ref: "#/components/schemas/TrainingIntensity" }, { type: "null" }] }
+        obstacleHeightCm:
+          type: [integer, "null"]
+          minimum: 10
+          maximum: 200
+          description: Tylko dla rodzaju z systemKey training.jumping; przy innym rodzaju 400
+        riderContactId:
+          type: [string, "null"]
+          format: uuid
+          description: >
+            Kontakt typu Rider (od 1.5; zastępuje rider). Zwykłe pole wpisu — PUT je zastępuje, brak lub null = bez
+            jeźdźca; nie należy do coaching.
+        rating: { type: [integer, "null"], minimum: 1, maximum: 5 }
+        description: { type: [string, "null"] }
+        coaching:
+          oneOf: [{ $ref: "#/components/schemas/TrainingCoaching" }, { type: "null" }]
+          description: >
+            Trener i koszt (od 1.4). Przy POST brak = bez trenera i kosztu. Przy PUT brak lub null = trener i koszt
+            bez zmian; obiekt zastępuje wszystkie cztery pola (null czyści).
+    TrainingCoaching:
+      type: object
+      properties:
+        trainerContactId: { type: [string, "null"], format: uuid, description: Kontakt typu Trainer }
+        cost: { oneOf: [{ $ref: "#/components/schemas/Money" }, { type: "null" }], description: "Łączny koszt treningu (trener, dojazd, hala)" }
+        originalAmount: { type: [number, "null"], description: Kwota w walucie oryginalnej (informacyjnie) }
+        originalCurrency: { type: [string, "null"], description: Kod ISO 4217 różny od PLN; razem z originalAmount albo wcale }
+    Training:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/TrainingInput"
+        - type: object
+          properties:
+            horseName: { type: string, readOnly: true }
+            trainingTypeName: { type: string, readOnly: true }
+            trainerName: { type: [string, "null"], readOnly: true }
+            riderName: { type: [string, "null"], readOnly: true, description: Nazwa kontaktu jeźdźca (od 1.5) }
+
+    # ---- reminders ----
+    ReminderInput:
+      type: object
+      required: [horseId, kind, dueDate, title]
+      properties:
+        horseId: { type: string, format: uuid }
+        kind: { $ref: "#/components/schemas/ReminderKind" }
+        dueDate: { type: string, format: date }
+        title: { type: string, maxLength: 200 }
+        specialistTypeId: { type: [string, "null"], format: uuid }
+        notes: { type: [string, "null"] }
+    Reminder:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/ReminderInput"
+        - type: object
+          properties:
+            status: { $ref: "#/components/schemas/ReminderStatus" }
+            sourceType: { type: [string, "null"] }
+            sourceId: { type: [string, "null"], format: uuid }
+            completedByType: { type: [string, "null"] }
+            completedById: { type: [string, "null"], format: uuid }
+            completedAt: { type: [string, "null"], format: date-time }
+            isOverdue: { type: boolean, readOnly: true }
+    Dashboard:
+      type: object
+      properties:
+        overdue: { type: array, items: { $ref: "#/components/schemas/Reminder" } }
+        upcoming: { type: array, items: { $ref: "#/components/schemas/Reminder" } }
+        laterThisMonth: { type: array, items: { $ref: "#/components/schemas/Reminder" } }
+        recentEntries: { type: array, items: { $ref: "#/components/schemas/TimelineItem" } }
+        costsThisMonth: { type: number }
+        costsPreviousMonth: { type: number }
+        horizonDays: { type: integer }
+
+    # ---- contacts ----
+    ContactInput:
+      type: object
+      required: [name, types]
+      properties:
+        name: { type: string, maxLength: 200 }
+        types: { type: array, minItems: 1, uniqueItems: true, items: { $ref: "#/components/schemas/ContactType" } }
+        company: { type: [string, "null"], maxLength: 200 }
+        phone: { type: [string, "null"], maxLength: 30 }
+        email: { type: [string, "null"], format: email, maxLength: 150 }
+        address: { type: [string, "null"] }
+        specialization: { type: [string, "null"], maxLength: 200 }
+        notes: { type: [string, "null"] }
+        isArchived: { type: boolean, default: false }
+    Contact:
+      allOf:
+        - $ref: "#/components/schemas/Audit"
+        - $ref: "#/components/schemas/ContactInput"
+
+    # ---- elementy list (kształt z programu 1.6.1: GET /openapi/v1.json) ----
+    # Listy zwracają skrócone elementy bez createdAt/updatedAt; pełny rekord daje GET .../{id}.
+    HorseListItem:
+      type: object
+      required: [id, name, status]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        stableName: { type: [string, "null"] }
+        passportNumber: { type: [string, "null"] }
+        breed: { type: [string, "null"] }
+        sex: { oneOf: [{ $ref: "#/components/schemas/HorseSex" }, { type: "null" }] }
+        color: { type: [string, "null"] }
+        ageYears: { type: [integer, "null"] }
+        status: { $ref: "#/components/schemas/HorseStatus" }
+        nextReminderDate: { type: [string, "null"], format: date }
+        nextReminderTitle: { type: [string, "null"] }
+        photoAttachmentId: { type: [string, "null"], format: uuid }
+        isFoal: { type: boolean }
+        monthsWithoutPassport: { type: [integer, "null"] }
+    ContactListItem:
+      type: object
+      required: [id, version, name, types, isArchived]
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer }
+        name: { type: string }
+        types: { type: array, items: { $ref: "#/components/schemas/ContactType" } }
+        company: { type: [string, "null"] }
+        phone: { type: [string, "null"] }
+        email: { type: [string, "null"] }
+        isArchived: { type: boolean }
+    VetVisitListItem:
+      type: object
+      required: [id, version, horseId, visitDateTime, visitTypeName, medicationCount]
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer }
+        horseId: { type: string, format: uuid }
+        visitDateTime: { type: string, format: date-time }
+        visitTypeName: { type: string }
+        visitTypeSystemKey: { type: [string, "null"] }
+        contactName: { type: [string, "null"] }
+        reason: { type: [string, "null"] }
+        cost: { type: [number, "null"] }
+        nextVisitDate: { type: [string, "null"], format: date }
+        medicationCount: { type: integer }
+    FarrierVisitListItem:
+      type: object
+      required: [id, version, horseId, visitDate, serviceName]
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer }
+        horseId: { type: string, format: uuid }
+        visitDate: { type: string, format: date }
+        serviceName: { type: string }
+        contactName: { type: [string, "null"] }
+        hoofNotes: { type: [string, "null"] }
+        cost: { type: [number, "null"] }
+        nextVisitDate: { type: [string, "null"], format: date }
+    PhysioVisitListItem:
+      type: object
+      required: [id, version, horseId, visitDate, bodyAreas]
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer }
+        horseId: { type: string, format: uuid }
+        visitDate: { type: string, format: date }
+        contactName: { type: [string, "null"] }
+        reason: { type: [string, "null"] }
+        bodyAreas: { type: string }
+        cost: { type: [number, "null"] }
+        nextVisitDate: { type: [string, "null"], format: date }
+    SpecialistVisitListItem:
+      type: object
+      required: [id, version, horseId, visitDate, specialistTypeId, specialistTypeName]
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer }
+        horseId: { type: string, format: uuid }
+        visitDate: { type: string, format: date }
+        specialistTypeId: { type: string, format: uuid }
+        specialistTypeName: { type: string }
+        contactName: { type: [string, "null"] }
+        reason: { type: [string, "null"] }
+        cost: { type: [number, "null"] }
+        nextVisitDate: { type: [string, "null"], format: date }
+    CompetitionListItem:
+      type: object
+      required: [id, version, name, dateFrom, startsCount]
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer }
+        name: { type: string }
+        dateFrom: { type: string, format: date }
+        dateTo: { type: [string, "null"], format: date }
+        city: { type: [string, "null"] }
+        venue: { type: [string, "null"] }
+        rankName: { type: [string, "null"] }
+        disciplineName: { type: [string, "null"] }
+        startsCount: { type: integer }
+        bestPlacement: { type: [integer, "null"] }
+    PurchaseListItem:
+      type: object
+      required: [id, version, purchaseDate, productName, categoryName, assignment, horseNames, totalAmount]
+      properties:
+        id: { type: string, format: uuid }
+        version: { type: integer }
+        purchaseDate: { type: string, format: date }
+        productName: { type: string }
+        categoryName: { type: string }
+        supplierName: { type: [string, "null"] }
+        assignment: { $ref: "#/components/schemas/PurchaseAssignment" }
+        horseNames: { type: string }
+        totalAmount: { type: number }
+        deliveryCost: { type: number }
+        totalCost: { type: number }
+
+    # ---- dictionaries ----
+    DictionaryItemInput:
+      type: object
+      required: [value]
+      properties:
+        value: { type: string, maxLength: 100 }
+        sortOrder: { type: integer }
+        isActive: { type: boolean, default: true }
+    DictionaryItem:
+      allOf:
+        - $ref: "#/components/schemas/DictionaryItemInput"
+        - type: object
+          required: [id, version, type, value, sortOrder, isActive, isSystem]
+          properties:
+            id: { type: string, format: uuid, readOnly: true }
+            version: { type: integer, readOnly: true }
+            type: { $ref: "#/components/schemas/DictionaryType" }
+            isSystem: { type: boolean, readOnly: true }
+            systemKey: { type: [string, "null"], readOnly: true }
+
+    # ---- attachments ----
+    Attachment:
+      type: object
+      required: [id, ownerType, ownerId, fileName, contentType, sizeBytes, sha256, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        ownerType: { $ref: "#/components/schemas/AttachmentOwnerType" }
+        ownerId: { type: string, format: uuid }
+        horseId: { type: [string, "null"], format: uuid }
+        fileName: { type: string }
+        contentType: { type: string }
+        sizeBytes: { type: integer }
+        sha256: { type: string, pattern: "^[0-9a-f]{64}$" }
+        description: { type: [string, "null"] }
+        hasThumbnail: { type: boolean }
+        fileAvailable:
+          type: boolean
+          description: false, gdy plik nie istnieje w magazynie (np. po imporcie JSON bez załączników); /content i /thumbnail zwracają wtedy 404
+        createdAt: { type: string, format: date-time }
+
+    # ---- reports ----
+    CostReportRow:
+      type: object
+      properties:
+        group: { type: string, description: "Koń / miesiąc (yyyy-MM) / kategoria — zależnie od groupBy" }
+        horseId: { type: [string, "null"], format: uuid }
+        category: { type: [string, "null"] }
+        month: { type: [string, "null"], pattern: "^\\d{4}-\\d{2}$" }
+        costs: { type: number }
+        income: { type: number }
+    CostReport:
+      type: object
+      properties:
+        from: { type: [string, "null"], format: date }
+        to: { type: [string, "null"], format: date }
+        groupBy: { type: string }
+        rows: { type: array, items: { $ref: "#/components/schemas/CostReportRow" } }
+        generalPurchasesTotal: { type: number, description: Zakupy ogólne (stajnia) }
+        totalCosts: { type: number }
+        totalIncome: { type: number }
+        balance: { type: number }
+
+    HorseBalanceBreakdown:
+      type: object
+      properties:
+        year: { type: integer }
+        category: { type: string }
+        costs: { type: number }
+    HorseBalanceRow:
+      type: object
+      properties:
+        horseId: { type: string, format: uuid }
+        horseName: { type: string }
+        status: { $ref: "#/components/schemas/HorseStatus" }
+        purchasePrice: { type: [number, "null"] }
+        costs: { type: number, description: Koszty konia z całej historii (te same reguły co raport kosztów) }
+        prizes: { type: number, description: Nagrody z zawodów }
+        salePrice: { type: [number, "null"], description: Cena efektywna — dla konia Deceased bez wpisanej ceny 0 }
+        estimatedValue: { type: [number, "null"], description: Ocena własna właściciela; nie wchodzi do wyniku }
+        result: { type: number }
+        isFinal: { type: boolean, description: false = wynik dotychczasowy (koń niesprzedany) }
+        purchaseMissing: { type: boolean }
+        breakdown: { type: array, items: { $ref: "#/components/schemas/HorseBalanceBreakdown" } }
+    HorseBalanceTotals:
+      type: object
+      properties:
+        purchasePrice: { type: number }
+        costs: { type: number }
+        prizes: { type: number }
+        salePrice: { type: number }
+        result: { type: number }
+    HorseBalanceReport:
+      type: object
+      properties:
+        rows: { type: array, items: { $ref: "#/components/schemas/HorseBalanceRow" } }
+        totals: { $ref: "#/components/schemas/HorseBalanceTotals" }
+    TrainingStat:
+      type: object
+      properties:
+        min: { type: number }
+        average: { type: number, description: Jedno miejsce po przecinku }
+        max: { type: number }
+    TrainingSummaryRow:
+      type: object
+      properties:
+        typeId: { type: [string, "null"], format: uuid }
+        typeName: { type: string }
+        paletteIndex: { type: integer }
+        count: { type: integer }
+        totalMinutes: { type: integer }
+        totalCost: { type: number, description: Suma kosztów treningów rodzaju w okresie (od 1.4) }
+        duration: { oneOf: [{ $ref: "#/components/schemas/TrainingStat" }, { type: "null" }] }
+        intensity: { oneOf: [{ $ref: "#/components/schemas/TrainingStat" }, { type: "null" }], description: Skala 1–3 (Light = 1, Medium = 2, Hard = 3) }
+        rating: { oneOf: [{ $ref: "#/components/schemas/TrainingStat" }, { type: "null" }] }
+        obstacleHeight: { oneOf: [{ $ref: "#/components/schemas/TrainingStat" }, { type: "null" }], description: Tylko dla rodzaju systemowego Skoki }
+    TrainingSeriesPoint:
+      type: object
+      properties:
+        date: { type: string, format: date }
+        value: { type: number }
+    TrainingSeries:
+      type: object
+      properties:
+        parameter: { type: string, enum: [Duration, Rating, ObstacleHeight] }
+        typeId: { type: string, format: uuid }
+        points: { type: array, items: { $ref: "#/components/schemas/TrainingSeriesPoint" } }
+    TrainingSummaryReport:
+      type: object
+      properties:
+        horseId: { type: string, format: uuid }
+        horseName: { type: string }
+        range: { type: string, enum: [week, month, year, all] }
+        from: { type: [string, "null"], format: date }
+        to: { type: [string, "null"], format: date }
+        rows: { type: array, items: { $ref: "#/components/schemas/TrainingSummaryRow" } }
+        total: { $ref: "#/components/schemas/TrainingSummaryRow" }
+        series: { type: array, items: { $ref: "#/components/schemas/TrainingSeries" } }
+    RiderTrainingsRow:
+      type: object
+      properties:
+        trainingId: { type: string, format: uuid }
+        date: { type: string, format: date }
+        horseId: { type: string, format: uuid }
+        horseName: { type: string }
+        typeName: { type: string }
+        durationMinutes: { type: [integer, "null"] }
+        intensity: { oneOf: [{ $ref: "#/components/schemas/TrainingIntensity" }, { type: "null" }] }
+        rating: { type: [integer, "null"] }
+        trainerName: { type: [string, "null"] }
+        cost: { type: [number, "null"] }
+        riderContactId: { type: string, format: uuid }
+        riderName: { type: string }
+    RiderTrainingsTotals:
+      type: object
+      properties:
+        count: { type: integer }
+        totalMinutes: { type: integer }
+        averageRating: { type: [number, "null"], description: Średnia z treningów z oceną; null, gdy brak ocen }
+        totalCost: { type: number, description: Suma kosztów treningów z kosztem }
+    RiderTrainingsGroup:
+      allOf:
+        - type: object
+          properties:
+            key: { type: string, format: uuid, description: horseId (jeden jeździec) albo riderContactId (wszyscy) }
+            name: { type: string }
+        - $ref: "#/components/schemas/RiderTrainingsTotals"
+    RiderTrainingsReport:
+      type: object
+      properties:
+        from: { type: [string, "null"], format: date }
+        to: { type: [string, "null"], format: date }
+        riderContactId: { type: [string, "null"], format: uuid, description: Jeździec raportu; null = wszyscy jeźdźcy }
+        riderName: { type: [string, "null"] }
+        rows: { type: array, items: { $ref: "#/components/schemas/RiderTrainingsRow" } }
+        total: { $ref: "#/components/schemas/RiderTrainingsTotals" }
+        groups: { type: array, items: { $ref: "#/components/schemas/RiderTrainingsGroup" } }
+        groupedBy: { type: string, enum: [Horse, Rider] }
+    RiderCompetitionStartRow:
+      type: object
+      properties:
+        startId: { type: string, format: uuid }
+        date: { type: string, format: date }
+        horseId: { type: string, format: uuid }
+        horseName: { type: string }
+        disciplineName: { type: [string, "null"] }
+        className: { type: [string, "null"] }
+        resultStatus: { $ref: "#/components/schemas/ResultStatus" }
+        placement: { type: [integer, "null"] }
+        participantsCount: { type: [integer, "null"] }
+        entryFee: { type: [number, "null"] }
+        otherCosts: { type: [number, "null"] }
+        prizeMoney: { type: [number, "null"] }
+        riderContactId: { type: string, format: uuid }
+        riderName: { type: string }
+    RiderCompetitionRow:
+      type: object
+      properties:
+        competitionId: { type: string, format: uuid }
+        name: { type: string }
+        dateFrom: { type: string, format: date }
+        dateTo: { type: [string, "null"], format: date }
+        city: { type: [string, "null"] }
+        starts: { type: array, items: { $ref: "#/components/schemas/RiderCompetitionStartRow" } }
+    RiderCompetitionsTotals:
+      type: object
+      properties:
+        competitions: { type: integer, description: Zawody liczone raz }
+        starts: { type: integer }
+        totalCosts: { type: number }
+        totalPrizes: { type: number }
+        balance: { type: number, description: totalPrizes − totalCosts }
+    RiderCompetitionsGroup:
+      allOf:
+        - type: object
+          properties:
+            riderContactId: { type: string, format: uuid }
+            riderName: { type: string }
+        - $ref: "#/components/schemas/RiderCompetitionsTotals"
+    RiderCompetitionsReport:
+      type: object
+      properties:
+        from: { type: [string, "null"], format: date }
+        to: { type: [string, "null"], format: date }
+        riderContactId: { type: [string, "null"], format: uuid, description: Jeździec raportu; null = wszyscy jeźdźcy }
+        riderName: { type: [string, "null"] }
+        competitions: { type: array, items: { $ref: "#/components/schemas/RiderCompetitionRow" } }
+        total: { $ref: "#/components/schemas/RiderCompetitionsTotals" }
+        groups: { type: array, items: { $ref: "#/components/schemas/RiderCompetitionsGroup" }, description: Tylko dla wszystkich jeźdźców; pusta dla jednego }
+
+    # ---- trash ----
+    TrashItem:
+      type: object
+      properties:
+        type: { type: string }
+        id: { type: string, format: uuid }
+        description: { type: string }
+        horseName: { type: [string, "null"] }
+        deletedAt: { type: string, format: date-time }
+        dependentCount: { type: integer, description: Liczba rekordów zależnych w batchu }
