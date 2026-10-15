@@ -11,6 +11,7 @@ import XCTest
 /// wzorce zatwierdza się commitem (contracts/test-fixtures.md §3). Rozmiar ekranu: iPhone 15 Pro (393 × 852 pt).
 @MainActor
 final class ShellSnapshotTests: XCTestCase {
+    @MainActor
     private enum Variant: String, CaseIterable {
         case light, dark, xxxl
 
