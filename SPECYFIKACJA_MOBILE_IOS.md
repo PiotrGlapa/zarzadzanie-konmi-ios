@@ -1855,7 +1855,9 @@ Decyzje z 2026-10-15 (odpowiednik prywatnych wydań APK na Androidzie):
   przeglądu App Store. Identyfikatory: aplikacja `pl.glapa.horsely`, rozszerzenie udostępniania
   `pl.glapa.horsely.ShareExtension`, App Group `group.pl.glapa.horsely`, SKU `horsely-ios`.
 - **Testerzy wewnętrzni** — właściciel i współwłaściciele jako członkowie zespołu w App Store Connect (bez przeglądu Beta App
-  Review). Testerzy zewnętrzni poza zakresem.
+  Review). Testerzy zewnętrzni poza zakresem. iPhone 15 Pro (9.1) należy do córki właściciela i jest zalogowany jej Apple ID —
+  to jej Apple ID jest testerem wewnętrznym (użytkownik zespołu z rolą Developer); konto Apple Developer Program jest na
+  osobnym Apple ID właściciela.
 - **Ważność kompilacji**: kompilacja w TestFlight wygasa po 90 dniach — nowa kompilacja MUST trafić do TestFlight co najmniej
   raz na 80 dni (także bez zmian funkcji), aby aplikacja nie przestała się uruchamiać. Wygaśnięcie nie usuwa danych z telefonu,
   ale do czasu instalacji nowej kompilacji aplikacji nie da się otworzyć — stąd przypomnienie dla właściciela w procesie wydania.
