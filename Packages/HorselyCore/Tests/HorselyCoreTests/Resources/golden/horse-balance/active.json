@@ -1,0 +1,116 @@
+{
+  "rows": [
+    {
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "status": "Active",
+      "purchasePrice": 40000,
+      "costs": 3833.12,
+      "prizes": 1700,
+      "salePrice": null,
+      "estimatedValue": 60000,
+      "result": -42133.12,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 100
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 1600.75
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 300
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 270.3
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 270
+        },
+        {
+          "year": 2026,
+          "category": "Pasza",
+          "costs": 57.51
+        },
+        {
+          "year": 2026,
+          "category": "Suplementy",
+          "costs": 1234.56
+        }
+      ]
+    },
+    {
+      "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+      "horseName": "Iskra",
+      "status": "Active",
+      "purchasePrice": 25000.5,
+      "costs": 407.5,
+      "prizes": 0,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": -25408.0,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 180
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 80
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 90
+        },
+        {
+          "year": 2026,
+          "category": "Pasza",
+          "costs": 57.5
+        }
+      ]
+    },
+    {
+      "horseId": "01a10c22-11c1-7e40-84a7-c24a6cb0d4e1",
+      "horseName": "Mgiełka",
+      "status": "Active",
+      "purchasePrice": null,
+      "costs": 95.5,
+      "prizes": 0,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": -95.5,
+      "isFinal": false,
+      "purchaseMissing": true,
+      "breakdown": [
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 95.5
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "purchasePrice": 65000.5,
+    "costs": 4336.12,
+    "prizes": 1700,
+    "salePrice": 0,
+    "result": -67636.62
+  }
+}

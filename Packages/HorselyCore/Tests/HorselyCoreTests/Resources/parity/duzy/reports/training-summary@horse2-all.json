@@ -1,0 +1,462 @@
+{
+  "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+  "horseName": "Dama",
+  "range": "All",
+  "from": "2019-02-02",
+  "to": "2026-02-05",
+  "rows": [
+    {
+      "typeId": "01a13e2d-40b6-7f08-b413-a9d9de2baa78",
+      "typeName": "Skoki",
+      "paletteIndex": 1,
+      "count": 2,
+      "totalMinutes": 113,
+      "duration": {
+        "min": 30,
+        "average": 56.5,
+        "max": 83
+      },
+      "intensity": {
+        "min": 1,
+        "average": 2,
+        "max": 3
+      },
+      "rating": {
+        "min": 1,
+        "average": 1.5,
+        "max": 2
+      },
+      "obstacleHeight": {
+        "min": 80,
+        "average": 100,
+        "max": 120
+      },
+      "totalCost": 370
+    },
+    {
+      "typeId": "01a13e2d-40b6-754b-8805-0a46b9dd306a",
+      "typeName": "Teren",
+      "paletteIndex": 2,
+      "count": 2,
+      "totalMinutes": 88,
+      "duration": {
+        "min": 15,
+        "average": 44,
+        "max": 73
+      },
+      "intensity": {
+        "min": 1,
+        "average": 1.5,
+        "max": 2
+      },
+      "rating": {
+        "min": 2,
+        "average": 3.5,
+        "max": 5
+      },
+      "obstacleHeight": null,
+      "totalCost": 250
+    },
+    {
+      "typeId": "01a13e2d-40b6-7666-9fc0-f89f3b46f143",
+      "typeName": "Karuzela",
+      "paletteIndex": 4,
+      "count": 1,
+      "totalMinutes": 89,
+      "duration": {
+        "min": 89,
+        "average": 89,
+        "max": 89
+      },
+      "intensity": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "rating": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "obstacleHeight": null,
+      "totalCost": 100
+    },
+    {
+      "typeId": "01a13e2d-40b6-7061-bd68-7e7fadae677b",
+      "typeName": "Spacer",
+      "paletteIndex": 5,
+      "count": 3,
+      "totalMinutes": 116,
+      "duration": {
+        "min": 27,
+        "average": 38.7,
+        "max": 58
+      },
+      "intensity": {
+        "min": 2,
+        "average": 2.7,
+        "max": 3
+      },
+      "rating": {
+        "min": 1,
+        "average": 3,
+        "max": 4
+      },
+      "obstacleHeight": null,
+      "totalCost": 390
+    },
+    {
+      "typeId": "01a13e2d-40b6-72dd-9eed-8b6111967636",
+      "typeName": "Zajeżdżanie",
+      "paletteIndex": 6,
+      "count": 1,
+      "totalMinutes": 24,
+      "duration": {
+        "min": 24,
+        "average": 24,
+        "max": 24
+      },
+      "intensity": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "rating": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "obstacleHeight": null,
+      "totalCost": 0
+    },
+    {
+      "typeId": "01a13e2d-40b6-75e4-9b27-a95d4a56598e",
+      "typeName": "Gimnastyka",
+      "paletteIndex": 7,
+      "count": 1,
+      "totalMinutes": 82,
+      "duration": {
+        "min": 82,
+        "average": 82,
+        "max": 82
+      },
+      "intensity": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "rating": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "obstacleHeight": null,
+      "totalCost": 0
+    },
+    {
+      "typeId": "01a13e2d-40b6-7a51-bba9-85529fbe4951",
+      "typeName": "Wszechstronny",
+      "paletteIndex": 8,
+      "count": 4,
+      "totalMinutes": 226,
+      "duration": {
+        "min": 34,
+        "average": 56.5,
+        "max": 87
+      },
+      "intensity": {
+        "min": 1,
+        "average": 1.3,
+        "max": 2
+      },
+      "rating": {
+        "min": 1,
+        "average": 2.3,
+        "max": 4
+      },
+      "obstacleHeight": null,
+      "totalCost": 410
+    },
+    {
+      "typeId": "01a13e2d-40b6-7870-b523-0c8beff42b87",
+      "typeName": "Inne",
+      "paletteIndex": 9,
+      "count": 1,
+      "totalMinutes": 19,
+      "duration": {
+        "min": 19,
+        "average": 19,
+        "max": 19
+      },
+      "intensity": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "rating": {
+        "min": 5,
+        "average": 5,
+        "max": 5
+      },
+      "obstacleHeight": null,
+      "totalCost": 230
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 15,
+    "totalMinutes": 757,
+    "duration": {
+      "min": 15,
+      "average": 50.5,
+      "max": 89
+    },
+    "intensity": {
+      "min": 1,
+      "average": 1.7,
+      "max": 3
+    },
+    "rating": {
+      "min": 1,
+      "average": 2.5,
+      "max": 5
+    },
+    "obstacleHeight": null,
+    "totalCost": 1750
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-7f08-b413-a9d9de2baa78",
+      "points": [
+        {
+          "date": "2021-03-01",
+          "value": 83
+        },
+        {
+          "date": "2023-07-01",
+          "value": 30
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-7f08-b413-a9d9de2baa78",
+      "points": [
+        {
+          "date": "2021-03-01",
+          "value": 1
+        },
+        {
+          "date": "2023-07-01",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "parameter": "ObstacleHeight",
+      "typeId": "01a13e2d-40b6-7f08-b413-a9d9de2baa78",
+      "points": [
+        {
+          "date": "2021-03-01",
+          "value": 120
+        },
+        {
+          "date": "2023-07-01",
+          "value": 80
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-754b-8805-0a46b9dd306a",
+      "points": [
+        {
+          "date": "2019-02-01",
+          "value": 15
+        },
+        {
+          "date": "2019-03-01",
+          "value": 73
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-754b-8805-0a46b9dd306a",
+      "points": [
+        {
+          "date": "2019-02-01",
+          "value": 5
+        },
+        {
+          "date": "2019-03-01",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-7666-9fc0-f89f3b46f143",
+      "points": [
+        {
+          "date": "2025-01-01",
+          "value": 89
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-7666-9fc0-f89f3b46f143",
+      "points": [
+        {
+          "date": "2025-01-01",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-7061-bd68-7e7fadae677b",
+      "points": [
+        {
+          "date": "2021-01-01",
+          "value": 31
+        },
+        {
+          "date": "2022-12-01",
+          "value": 58
+        },
+        {
+          "date": "2026-02-01",
+          "value": 27
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-7061-bd68-7e7fadae677b",
+      "points": [
+        {
+          "date": "2021-01-01",
+          "value": 4
+        },
+        {
+          "date": "2022-12-01",
+          "value": 1
+        },
+        {
+          "date": "2026-02-01",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-72dd-9eed-8b6111967636",
+      "points": [
+        {
+          "date": "2024-02-01",
+          "value": 24
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-72dd-9eed-8b6111967636",
+      "points": [
+        {
+          "date": "2024-02-01",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-75e4-9b27-a95d4a56598e",
+      "points": [
+        {
+          "date": "2025-06-01",
+          "value": 82
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-75e4-9b27-a95d4a56598e",
+      "points": [
+        {
+          "date": "2025-06-01",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-7a51-bba9-85529fbe4951",
+      "points": [
+        {
+          "date": "2019-08-01",
+          "value": 87
+        },
+        {
+          "date": "2019-10-01",
+          "value": 34
+        },
+        {
+          "date": "2019-12-01",
+          "value": 67
+        },
+        {
+          "date": "2022-01-01",
+          "value": 38
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-7a51-bba9-85529fbe4951",
+      "points": [
+        {
+          "date": "2019-08-01",
+          "value": 1
+        },
+        {
+          "date": "2019-10-01",
+          "value": 1
+        },
+        {
+          "date": "2019-12-01",
+          "value": 4
+        },
+        {
+          "date": "2022-01-01",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-7870-b523-0c8beff42b87",
+      "points": [
+        {
+          "date": "2025-01-01",
+          "value": 19
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-7870-b523-0c8beff42b87",
+      "points": [
+        {
+          "date": "2025-01-01",
+          "value": 5
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

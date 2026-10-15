@@ -1,0 +1,3801 @@
+{
+  "rows": [
+    {
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "horseName": "Bursztyn",
+      "status": "Active",
+      "purchasePrice": 56903.01,
+      "costs": 38267.42,
+      "prizes": 3040.85,
+      "salePrice": null,
+      "estimatedValue": 14107.88,
+      "result": -92129.58,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Kowal",
+          "costs": 432.08
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 157.91
+        },
+        {
+          "year": 2018,
+          "category": "Pasza",
+          "costs": 662.65
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 1214.64
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 180.26
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 470.57
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 264.27
+        },
+        {
+          "year": 2019,
+          "category": "Sprzęt",
+          "costs": 184.9
+        },
+        {
+          "year": 2019,
+          "category": "Ściółka",
+          "costs": 591.78
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 3168.72
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 815.23
+        },
+        {
+          "year": 2020,
+          "category": "Specjaliści",
+          "costs": 359.24
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 374.74
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 370
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 78.25
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 620.07
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 410.28
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 557.68
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 433.25
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 730
+        },
+        {
+          "year": 2021,
+          "category": "Ściółka",
+          "costs": 415.76
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 532.13
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 273.21
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 936.28
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 361.57
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 600
+        },
+        {
+          "year": 2022,
+          "category": "Inne",
+          "costs": 809.98
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 581.97
+        },
+        {
+          "year": 2022,
+          "category": "Ściółka",
+          "costs": 892.28
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 768.94
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 1238.00
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 1133.02
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 490
+        },
+        {
+          "year": 2023,
+          "category": "Pielęgnacja",
+          "costs": 1802.77
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 1893.37
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 847.55
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 238.47
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 319.32
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 290
+        },
+        {
+          "year": 2024,
+          "category": "Leki",
+          "costs": 274.4
+        },
+        {
+          "year": 2024,
+          "category": "Usługi",
+          "costs": 301.58
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 898.79
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 311.9
+        },
+        {
+          "year": 2025,
+          "category": "Specjaliści",
+          "costs": 521.87
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 585.52
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 1060
+        },
+        {
+          "year": 2025,
+          "category": "Suplementy",
+          "costs": 201.06
+        },
+        {
+          "year": 2025,
+          "category": "Ściółka",
+          "costs": 94.27
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 2289.55
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 616.22
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 166.54
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 323.56
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 190
+        },
+        {
+          "year": 2026,
+          "category": "Pielęgnacja",
+          "costs": 1549.72
+        },
+        {
+          "year": 2026,
+          "category": "Ściółka",
+          "costs": 2159.73
+        },
+        {
+          "year": 2026,
+          "category": "Usługi",
+          "costs": 221.57
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "horseName": "Dama",
+      "status": "Active",
+      "purchasePrice": 16790.94,
+      "costs": 37328.50,
+      "prizes": 1679.96,
+      "salePrice": null,
+      "estimatedValue": 34117.04,
+      "result": -52439.48,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Weterynarz",
+          "costs": 678.43
+        },
+        {
+          "year": 2018,
+          "category": "Kowal",
+          "costs": 265.77
+        },
+        {
+          "year": 2018,
+          "category": "Specjaliści",
+          "costs": 861.16
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 196.80
+        },
+        {
+          "year": 2018,
+          "category": "Ściółka",
+          "costs": 75.18
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 2010.89
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 435.49
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 307.22
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 390
+        },
+        {
+          "year": 2019,
+          "category": "Pensjonat",
+          "costs": 1302.7
+        },
+        {
+          "year": 2019,
+          "category": "Sprzęt",
+          "costs": 105.71
+        },
+        {
+          "year": 2019,
+          "category": "Ściółka",
+          "costs": 2156.09
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 1855.61
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 211.17
+        },
+        {
+          "year": 2020,
+          "category": "Fizjoterapeuta",
+          "costs": 213.89
+        },
+        {
+          "year": 2020,
+          "category": "Specjaliści",
+          "costs": 198.9
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 152.30
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 532.51
+        },
+        {
+          "year": 2020,
+          "category": "Pensjonat",
+          "costs": 253.55
+        },
+        {
+          "year": 2020,
+          "category": "Sprzęt",
+          "costs": 332.61
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 2991.33
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 209.92
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 756.66
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 270
+        },
+        {
+          "year": 2021,
+          "category": "Pensjonat",
+          "costs": 488.46
+        },
+        {
+          "year": 2021,
+          "category": "Suplementy",
+          "costs": 519.98
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 171.66
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 1760.92
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 266.27
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 273.06
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 234.58
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 440
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 96.13
+        },
+        {
+          "year": 2022,
+          "category": "Pasza",
+          "costs": 357.78
+        },
+        {
+          "year": 2022,
+          "category": "Pielęgnacja",
+          "costs": 7.31
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 849.57
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 1172.01
+        },
+        {
+          "year": 2023,
+          "category": "Specjaliści",
+          "costs": 884.37
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 604.81
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 100
+        },
+        {
+          "year": 2023,
+          "category": "Pielęgnacja",
+          "costs": 377.52
+        },
+        {
+          "year": 2023,
+          "category": "Suplementy",
+          "costs": 62.56
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 2357.06
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 346.11
+        },
+        {
+          "year": 2024,
+          "category": "Specjaliści",
+          "costs": 464.53
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 159.12
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 180.24
+        },
+        {
+          "year": 2024,
+          "category": "Sprzęt",
+          "costs": 40.24
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 2036.67
+        },
+        {
+          "year": 2025,
+          "category": "Fizjoterapeuta",
+          "costs": 153.62
+        },
+        {
+          "year": 2025,
+          "category": "Specjaliści",
+          "costs": 1601.73
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 711.68
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 330
+        },
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 377.68
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 43.81
+        },
+        {
+          "year": 2025,
+          "category": "Ściółka",
+          "costs": 397.57
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 1307.61
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 496.44
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 139.47
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 310.50
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 220
+        },
+        {
+          "year": 2026,
+          "category": "Ściółka",
+          "costs": 223.54
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+      "horseName": "Fokus",
+      "status": "Active",
+      "purchasePrice": 10192.65,
+      "costs": 40454.68,
+      "prizes": 4117.16,
+      "salePrice": null,
+      "estimatedValue": 52309.28,
+      "result": -46530.17,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Weterynarz",
+          "costs": 2012.77
+        },
+        {
+          "year": 2018,
+          "category": "Usługi",
+          "costs": 196.29
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 1299.24
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 562.45
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 776.08
+        },
+        {
+          "year": 2019,
+          "category": "Specjaliści",
+          "costs": 174.35
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 652.36
+        },
+        {
+          "year": 2019,
+          "category": "Pielęgnacja",
+          "costs": 972.93
+        },
+        {
+          "year": 2019,
+          "category": "Sprzęt",
+          "costs": 1788.36
+        },
+        {
+          "year": 2019,
+          "category": "Ściółka",
+          "costs": 591.76
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 1011.7
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 643.35
+        },
+        {
+          "year": 2020,
+          "category": "Fizjoterapeuta",
+          "costs": 200.79
+        },
+        {
+          "year": 2020,
+          "category": "Specjaliści",
+          "costs": 623.34
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 297.60
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 220
+        },
+        {
+          "year": 2020,
+          "category": "Inne",
+          "costs": 665
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 322.18
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 1322.25
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 523.81
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 899.94
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 751.16
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 410
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 171.61
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 3902.11
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 999.01
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 175.12
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 358.84
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 468.30
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 500
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 620.08
+        },
+        {
+          "year": 2022,
+          "category": "Pensjonat",
+          "costs": 1479.93
+        },
+        {
+          "year": 2022,
+          "category": "Pielęgnacja",
+          "costs": 7.29
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 1917.01
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 821.98
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 340.74
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 380
+        },
+        {
+          "year": 2023,
+          "category": "Usługi",
+          "costs": 739.31
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 2495.75
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 625.04
+        },
+        {
+          "year": 2024,
+          "category": "Specjaliści",
+          "costs": 450.79
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 234.60
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 386.58
+        },
+        {
+          "year": 2024,
+          "category": "Sprzęt",
+          "costs": 40.22
+        },
+        {
+          "year": 2024,
+          "category": "Ściółka",
+          "costs": 292.88
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 2275.01
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 280.61
+        },
+        {
+          "year": 2025,
+          "category": "Fizjoterapeuta",
+          "costs": 215.81
+        },
+        {
+          "year": 2025,
+          "category": "Specjaliści",
+          "costs": 235.15
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 341.58
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 170
+        },
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 463.87
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 31.14
+        },
+        {
+          "year": 2025,
+          "category": "Suplementy",
+          "costs": 201.02
+        },
+        {
+          "year": 2025,
+          "category": "Ściółka",
+          "costs": 94.23
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 770.03
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 467.64
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 399.86
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 183.83
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "horseName": "Grom",
+      "status": "Active",
+      "purchasePrice": 20630.06,
+      "costs": 39687.76,
+      "prizes": 6470.42,
+      "salePrice": null,
+      "estimatedValue": 26580.88,
+      "result": -53847.40,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Fizjoterapeuta",
+          "costs": 503.47
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 143.19
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 1090.63
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 239.76
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 299.64
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 333.12
+        },
+        {
+          "year": 2019,
+          "category": "Sprzęt",
+          "costs": 764.47
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 2555.82
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 128.71
+        },
+        {
+          "year": 2020,
+          "category": "Fizjoterapeuta",
+          "costs": 177.69
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 598.50
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 790
+        },
+        {
+          "year": 2020,
+          "category": "Pensjonat",
+          "costs": 2183.56
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 363.54
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 381.78
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 168.78
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 143.48
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 590
+        },
+        {
+          "year": 2021,
+          "category": "Inne",
+          "costs": 1942.47
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 621.7
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 548.79
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 205.66
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 687.80
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 610
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 38.12
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 1470.27
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 588.41
+        },
+        {
+          "year": 2023,
+          "category": "Fizjoterapeuta",
+          "costs": 378.17
+        },
+        {
+          "year": 2023,
+          "category": "Specjaliści",
+          "costs": 455.27
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 1108.72
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 510
+        },
+        {
+          "year": 2023,
+          "category": "Pasza",
+          "costs": 1975.37
+        },
+        {
+          "year": 2023,
+          "category": "Pensjonat",
+          "costs": 1613.9
+        },
+        {
+          "year": 2023,
+          "category": "Pielęgnacja",
+          "costs": 377.49
+        },
+        {
+          "year": 2023,
+          "category": "Suplementy",
+          "costs": 1120.90
+        },
+        {
+          "year": 2023,
+          "category": "Ściółka",
+          "costs": 1660.09
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 3089.59
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 540.46
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 285.98
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 511.03
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 280
+        },
+        {
+          "year": 2024,
+          "category": "Leki",
+          "costs": 274.4
+        },
+        {
+          "year": 2024,
+          "category": "Pasza",
+          "costs": 132.63
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 180.24
+        },
+        {
+          "year": 2024,
+          "category": "Suplementy",
+          "costs": 85.38
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 1281.31
+        },
+        {
+          "year": 2025,
+          "category": "Fizjoterapeuta",
+          "costs": 261.55
+        },
+        {
+          "year": 2025,
+          "category": "Specjaliści",
+          "costs": 221.24
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 527.50
+        },
+        {
+          "year": 2025,
+          "category": "Inne",
+          "costs": 85.86
+        },
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 377.68
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 12.65
+        },
+        {
+          "year": 2025,
+          "category": "Ściółka",
+          "costs": 94.23
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 1905.96
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 536.01
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 255.72
+        },
+        {
+          "year": 2026,
+          "category": "Specjaliści",
+          "costs": 454.88
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 372.40
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 230
+        },
+        {
+          "year": 2026,
+          "category": "Ściółka",
+          "costs": 223.54
+        },
+        {
+          "year": 2026,
+          "category": "Usługi",
+          "costs": 98.25
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "horseName": "Hades",
+      "status": "Active",
+      "purchasePrice": 34685.54,
+      "costs": 51586.97,
+      "prizes": 3566.07,
+      "salePrice": null,
+      "estimatedValue": 21005.13,
+      "result": -82706.44,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Weterynarz",
+          "costs": 795.79
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 162.9
+        },
+        {
+          "year": 2018,
+          "category": "Treningi",
+          "costs": 140
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 3136.88
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 783.63
+        },
+        {
+          "year": 2019,
+          "category": "Specjaliści",
+          "costs": 712.98
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 746.80
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 670
+        },
+        {
+          "year": 2019,
+          "category": "Sprzęt",
+          "costs": 184.85
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 2152.41
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 355.40
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 160
+        },
+        {
+          "year": 2020,
+          "category": "Leki",
+          "costs": 1385.10
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 322.14
+        },
+        {
+          "year": 2020,
+          "category": "Pensjonat",
+          "costs": 210.14
+        },
+        {
+          "year": 2020,
+          "category": "Suplementy",
+          "costs": 1803.44
+        },
+        {
+          "year": 2020,
+          "category": "Ściółka",
+          "costs": 1538.92
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 1993.14
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 439.11
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 434.7
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 423.43
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 260
+        },
+        {
+          "year": 2021,
+          "category": "Inne",
+          "costs": 1546.21
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 171.61
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 2306.07
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 237.21
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 384.50
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 537.13
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 592.94
+        },
+        {
+          "year": 2022,
+          "category": "Pasza",
+          "costs": 987.34
+        },
+        {
+          "year": 2022,
+          "category": "Pielęgnacja",
+          "costs": 7.29
+        },
+        {
+          "year": 2022,
+          "category": "Ściółka",
+          "costs": 315.42
+        },
+        {
+          "year": 2022,
+          "category": "Usługi",
+          "costs": 1559.71
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 627.79
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 422.29
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 635.51
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 350
+        },
+        {
+          "year": 2023,
+          "category": "Leki",
+          "costs": 1880.67
+        },
+        {
+          "year": 2023,
+          "category": "Pasza",
+          "costs": 1710.76
+        },
+        {
+          "year": 2023,
+          "category": "Pensjonat",
+          "costs": 521.48
+        },
+        {
+          "year": 2023,
+          "category": "Pielęgnacja",
+          "costs": 883.38
+        },
+        {
+          "year": 2023,
+          "category": "Suplementy",
+          "costs": 277.73
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 3551.08
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 459.26
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 456.60
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 563.96
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 510
+        },
+        {
+          "year": 2024,
+          "category": "Pasza",
+          "costs": 132.61
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 206.29
+        },
+        {
+          "year": 2024,
+          "category": "Suplementy",
+          "costs": 85.38
+        },
+        {
+          "year": 2024,
+          "category": "Ściółka",
+          "costs": 292.84
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 188.93
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 495.19
+        },
+        {
+          "year": 2025,
+          "category": "Fizjoterapeuta",
+          "costs": 499.54
+        },
+        {
+          "year": 2025,
+          "category": "Specjaliści",
+          "costs": 1180.88
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 791.07
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 650
+        },
+        {
+          "year": 2025,
+          "category": "Inne",
+          "costs": 85.83
+        },
+        {
+          "year": 2025,
+          "category": "Sprzęt",
+          "costs": 1721.04
+        },
+        {
+          "year": 2025,
+          "category": "Suplementy",
+          "costs": 201.02
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 560.35
+        },
+        {
+          "year": 2026,
+          "category": "Specjaliści",
+          "costs": 564.08
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 516.80
+        },
+        {
+          "year": 2026,
+          "category": "Leki",
+          "costs": 930.87
+        },
+        {
+          "year": 2026,
+          "category": "Pielęgnacja",
+          "costs": 1647.07
+        },
+        {
+          "year": 2026,
+          "category": "Suplementy",
+          "costs": 209.69
+        },
+        {
+          "year": 2026,
+          "category": "Usługi",
+          "costs": 319.79
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "horseName": "Iskra",
+      "status": "Active",
+      "purchasePrice": 54412.37,
+      "costs": 39357.55,
+      "prizes": 1555.50,
+      "salePrice": null,
+      "estimatedValue": 12599.82,
+      "result": -92214.42,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Weterynarz",
+          "costs": 581.32
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 163.02
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 2388.23
+        },
+        {
+          "year": 2019,
+          "category": "Specjaliści",
+          "costs": 343.28
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 547.95
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 280
+        },
+        {
+          "year": 2019,
+          "category": "Inne",
+          "costs": 805.62
+        },
+        {
+          "year": 2019,
+          "category": "Ściółka",
+          "costs": 2598.55
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 690.25
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 977.69
+        },
+        {
+          "year": 2020,
+          "category": "Fizjoterapeuta",
+          "costs": 254.89
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 201.08
+        },
+        {
+          "year": 2020,
+          "category": "Leki",
+          "costs": 958.18
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 78.24
+        },
+        {
+          "year": 2020,
+          "category": "Pensjonat",
+          "costs": 210.14
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 1797.14
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 710.92
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 920.96
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 561.04
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 665.44
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 220
+        },
+        {
+          "year": 2021,
+          "category": "Suplementy",
+          "costs": 1506.65
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 445.11
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 1754.79
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 710.24
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 462.81
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 218.92
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 300
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 581.96
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 3578.87
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 357.03
+        },
+        {
+          "year": 2023,
+          "category": "Fizjoterapeuta",
+          "costs": 297.87
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 652.89
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 240
+        },
+        {
+          "year": 2023,
+          "category": "Suplementy",
+          "costs": 62.56
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 153.49
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 1033.93
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 535.66
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 230
+        },
+        {
+          "year": 2024,
+          "category": "Inne",
+          "costs": 761.24
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 206.29
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 2394.76
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 423.59
+        },
+        {
+          "year": 2025,
+          "category": "Fizjoterapeuta",
+          "costs": 486.11
+        },
+        {
+          "year": 2025,
+          "category": "Specjaliści",
+          "costs": 312.16
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 662.00
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 710
+        },
+        {
+          "year": 2025,
+          "category": "Inne",
+          "costs": 85.83
+        },
+        {
+          "year": 2025,
+          "category": "Suplementy",
+          "costs": 201.02
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 812.33
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 841.44
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 423.89
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 686.23
+        },
+        {
+          "year": 2026,
+          "category": "Inne",
+          "costs": 1273.94
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "horseName": "Kasztan",
+      "status": "Sold",
+      "purchasePrice": 22031.95,
+      "costs": 29445.48,
+      "prizes": 4264.04,
+      "salePrice": 25853.47,
+      "estimatedValue": 71119.25,
+      "result": -21359.92,
+      "isFinal": true,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Weterynarz",
+          "costs": 1105.99
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 61.37
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 413.27
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 409.75
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 182.36
+        },
+        {
+          "year": 2019,
+          "category": "Specjaliści",
+          "costs": 343.61
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 406.96
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 270
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 3892.16
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 726.11
+        },
+        {
+          "year": 2020,
+          "category": "Specjaliści",
+          "costs": 545.46
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 340.68
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 600
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 400.38
+        },
+        {
+          "year": 2020,
+          "category": "Sprzęt",
+          "costs": 332.58
+        },
+        {
+          "year": 2020,
+          "category": "Suplementy",
+          "costs": 391.78
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 1712.64
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 180.55
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 794.12
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 610.75
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 480
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 216.65
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 1402.03
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 830.49
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 507.7
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 502.12
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 210
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 38.12
+        },
+        {
+          "year": 2022,
+          "category": "Pasza",
+          "costs": 36.69
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 2136.95
+        },
+        {
+          "year": 2023,
+          "category": "Specjaliści",
+          "costs": 609.78
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 898.50
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 630
+        },
+        {
+          "year": 2023,
+          "category": "Sprzęt",
+          "costs": 149.11
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 93.6
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 187.78
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 244.58
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 94.01
+        },
+        {
+          "year": 2024,
+          "category": "Leki",
+          "costs": 274.4
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 386.53
+        },
+        {
+          "year": 2024,
+          "category": "Ściółka",
+          "costs": 1065.67
+        },
+        {
+          "year": 2024,
+          "category": "Usługi",
+          "costs": 301.57
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 378.07
+        },
+        {
+          "year": 2025,
+          "category": "Specjaliści",
+          "costs": 778.25
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 283.54
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 370
+        },
+        {
+          "year": 2025,
+          "category": "Inne",
+          "costs": 183.79
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 12.65
+        },
+        {
+          "year": 2025,
+          "category": "Ściółka",
+          "costs": 94.23
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 612.48
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 181.97
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 459.17
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 588.82
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 140
+        },
+        {
+          "year": 2026,
+          "category": "Pielęgnacja",
+          "costs": 122.17
+        },
+        {
+          "year": 2026,
+          "category": "Ściółka",
+          "costs": 223.54
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "horseName": "Luna",
+      "status": "Active",
+      "purchasePrice": 37546.75,
+      "costs": 36573.41,
+      "prizes": 4832.13,
+      "salePrice": null,
+      "estimatedValue": 15548.14,
+      "result": -69288.03,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Pasza",
+          "costs": 206.38
+        },
+        {
+          "year": 2018,
+          "category": "Suplementy",
+          "costs": 364.27
+        },
+        {
+          "year": 2018,
+          "category": "Ściółka",
+          "costs": 75.18
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 1293.02
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 518.91
+        },
+        {
+          "year": 2019,
+          "category": "Specjaliści",
+          "costs": 350.87
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 343.20
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 508.00
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 695.21
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 289.62
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 1986.73
+        },
+        {
+          "year": 2020,
+          "category": "Pensjonat",
+          "costs": 210.14
+        },
+        {
+          "year": 2020,
+          "category": "Suplementy",
+          "costs": 391.76
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 1151.79
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 427.18
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 451.51
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 467.00
+        },
+        {
+          "year": 2021,
+          "category": "Inne",
+          "costs": 1988.24
+        },
+        {
+          "year": 2021,
+          "category": "Ściółka",
+          "costs": 415.76
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 216.65
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 3694.56
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 268.29
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 199.97
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 450
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 340.58
+        },
+        {
+          "year": 2022,
+          "category": "Pielęgnacja",
+          "costs": 7.29
+        },
+        {
+          "year": 2022,
+          "category": "Suplementy",
+          "costs": 463.95
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 1613.51
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 227.69
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 789.31
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 440
+        },
+        {
+          "year": 2023,
+          "category": "Pensjonat",
+          "costs": 521.47
+        },
+        {
+          "year": 2023,
+          "category": "Usługi",
+          "costs": 308.32
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 2900.72
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 474.83
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 217.48
+        },
+        {
+          "year": 2024,
+          "category": "Specjaliści",
+          "costs": 554.32
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 261.21
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 180
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 386.53
+        },
+        {
+          "year": 2024,
+          "category": "Sprzęt",
+          "costs": 1303.28
+        },
+        {
+          "year": 2024,
+          "category": "Suplementy",
+          "costs": 85.38
+        },
+        {
+          "year": 2024,
+          "category": "Ściółka",
+          "costs": 292.84
+        },
+        {
+          "year": 2024,
+          "category": "Usługi",
+          "costs": 301.57
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 353.79
+        },
+        {
+          "year": 2025,
+          "category": "Fizjoterapeuta",
+          "costs": 477.11
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 1164.31
+        },
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 86.18
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 1348
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 2282.77
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 364.83
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 222
+        },
+        {
+          "year": 2026,
+          "category": "Specjaliści",
+          "costs": 474.5
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 541.66
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 280
+        },
+        {
+          "year": 2026,
+          "category": "Pielęgnacja",
+          "costs": 122.17
+        },
+        {
+          "year": 2026,
+          "category": "Usługi",
+          "costs": 221.57
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "horseName": "Rubin",
+      "status": "Active",
+      "purchasePrice": 31730.6,
+      "costs": 39839.38,
+      "prizes": 6454.32,
+      "salePrice": null,
+      "estimatedValue": 39930.29,
+      "result": -65115.66,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Fizjoterapeuta",
+          "costs": 246.34
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 301.95
+        },
+        {
+          "year": 2018,
+          "category": "Usługi",
+          "costs": 1285.40
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 2209.84
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 573.61
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 443.57
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 370
+        },
+        {
+          "year": 2019,
+          "category": "Ściółka",
+          "costs": 591.76
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 1187.05
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 321.51
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 422.44
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 350
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 78.24
+        },
+        {
+          "year": 2020,
+          "category": "Sprzęt",
+          "costs": 1888.89
+        },
+        {
+          "year": 2020,
+          "category": "Suplementy",
+          "costs": 391.76
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 3296.15
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 239.34
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 323.7
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 511.42
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 190
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 388.26
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 1476.36
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 297.18
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 387.09
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 409.48
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 285.90
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 279.50
+        },
+        {
+          "year": 2022,
+          "category": "Ściółka",
+          "costs": 315.41
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 2551.70
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 372.69
+        },
+        {
+          "year": 2023,
+          "category": "Fizjoterapeuta",
+          "costs": 478.09
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 292.80
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 300
+        },
+        {
+          "year": 2023,
+          "category": "Inne",
+          "costs": 699.18
+        },
+        {
+          "year": 2023,
+          "category": "Pensjonat",
+          "costs": 302.37
+        },
+        {
+          "year": 2023,
+          "category": "Pielęgnacja",
+          "costs": 377.49
+        },
+        {
+          "year": 2023,
+          "category": "Ściółka",
+          "costs": 1937.23
+        },
+        {
+          "year": 2023,
+          "category": "Usługi",
+          "costs": 308.29
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 2060.80
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 599.15
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 230.57
+        },
+        {
+          "year": 2024,
+          "category": "Specjaliści",
+          "costs": 248.9
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 766.68
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 290
+        },
+        {
+          "year": 2024,
+          "category": "Sprzęt",
+          "costs": 434.95
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 3153.46
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 204.56
+        },
+        {
+          "year": 2025,
+          "category": "Fizjoterapeuta",
+          "costs": 156.01
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 525.48
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 420
+        },
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 86.18
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 43.79
+        },
+        {
+          "year": 2025,
+          "category": "Sprzęt",
+          "costs": 543.97
+        },
+        {
+          "year": 2025,
+          "category": "Suplementy",
+          "costs": 201.02
+        },
+        {
+          "year": 2025,
+          "category": "Ściółka",
+          "costs": 94.23
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 283.77
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 479.29
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 527.17
+        },
+        {
+          "year": 2026,
+          "category": "Specjaliści",
+          "costs": 527.85
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 520.58
+        },
+        {
+          "year": 2026,
+          "category": "Sprzęt",
+          "costs": 660.76
+        },
+        {
+          "year": 2026,
+          "category": "Usługi",
+          "costs": 98.22
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+      "horseName": "Sowa",
+      "status": "Deceased",
+      "purchasePrice": 38218.72,
+      "costs": 35540.01,
+      "prizes": 4916.54,
+      "salePrice": 0,
+      "estimatedValue": null,
+      "result": -68842.19,
+      "isFinal": true,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 72.4
+        },
+        {
+          "year": 2018,
+          "category": "Treningi",
+          "costs": 240
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 2138.04
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 243.37
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 344.45
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 450
+        },
+        {
+          "year": 2019,
+          "category": "Pasza",
+          "costs": 1794.59
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 121.28
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 927.49
+        },
+        {
+          "year": 2020,
+          "category": "Fizjoterapeuta",
+          "costs": 159.94
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 388.54
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 500
+        },
+        {
+          "year": 2020,
+          "category": "Pielęgnacja",
+          "costs": 1021.52
+        },
+        {
+          "year": 2020,
+          "category": "Sprzęt",
+          "costs": 332.58
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 4134.75
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 633.95
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 228.92
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 871.53
+        },
+        {
+          "year": 2021,
+          "category": "Pensjonat",
+          "costs": 1787.06
+        },
+        {
+          "year": 2021,
+          "category": "Ściółka",
+          "costs": 415.76
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 388.26
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 1659.22
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 402.42
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 57.42
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 430
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 241.38
+        },
+        {
+          "year": 2022,
+          "category": "Suplementy",
+          "costs": 463.94
+        },
+        {
+          "year": 2022,
+          "category": "Ściółka",
+          "costs": 315.41
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 2017.29
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 325.74
+        },
+        {
+          "year": 2023,
+          "category": "Fizjoterapeuta",
+          "costs": 406.06
+        },
+        {
+          "year": 2023,
+          "category": "Specjaliści",
+          "costs": 758.66
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 785.30
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 530
+        },
+        {
+          "year": 2023,
+          "category": "Pasza",
+          "costs": 1655.37
+        },
+        {
+          "year": 2023,
+          "category": "Pielęgnacja",
+          "costs": 377.49
+        },
+        {
+          "year": 2023,
+          "category": "Suplementy",
+          "costs": 62.56
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 2008.71
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 185.55
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 204.23
+        },
+        {
+          "year": 2024,
+          "category": "Specjaliści",
+          "costs": 551.09
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 414.87
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 180.24
+        },
+        {
+          "year": 2024,
+          "category": "Suplementy",
+          "costs": 85.38
+        },
+        {
+          "year": 2024,
+          "category": "Ściółka",
+          "costs": 292.84
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 1194.34
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 644.85
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 12.65
+        },
+        {
+          "year": 2025,
+          "category": "Sprzęt",
+          "costs": 509.5
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 371.01
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 282.21
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 209.07
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 167.45
+        },
+        {
+          "year": 2026,
+          "category": "Ściółka",
+          "costs": 223.54
+        },
+        {
+          "year": 2026,
+          "category": "Usługi",
+          "costs": 319.79
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+      "horseName": "Tango",
+      "status": "Sold",
+      "purchasePrice": 49019.31,
+      "costs": 51441.72,
+      "prizes": 3987.92,
+      "salePrice": 61671.55,
+      "estimatedValue": 39658.53,
+      "result": -34801.56,
+      "isFinal": true,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Weterynarz",
+          "costs": 2153.06
+        },
+        {
+          "year": 2018,
+          "category": "Fizjoterapeuta",
+          "costs": 165.13
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 63.31
+        },
+        {
+          "year": 2018,
+          "category": "Treningi",
+          "costs": 780
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 1522.14
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 740.08
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 274.99
+        },
+        {
+          "year": 2019,
+          "category": "Specjaliści",
+          "costs": 446.34
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 296.64
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 750
+        },
+        {
+          "year": 2019,
+          "category": "Pasza",
+          "costs": 699.4
+        },
+        {
+          "year": 2019,
+          "category": "Pielęgnacja",
+          "costs": 913.7
+        },
+        {
+          "year": 2019,
+          "category": "Sprzęt",
+          "costs": 184.85
+        },
+        {
+          "year": 2019,
+          "category": "Usługi",
+          "costs": 1248.08
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 1440.71
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 1488.64
+        },
+        {
+          "year": 2020,
+          "category": "Specjaliści",
+          "costs": 829.85
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 92.75
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 280
+        },
+        {
+          "year": 2020,
+          "category": "Leki",
+          "costs": 1201.72
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 400.38
+        },
+        {
+          "year": 2020,
+          "category": "Pensjonat",
+          "costs": 1491.39
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 3598.42
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 307.42
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 572.8
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 421.54
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 300
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 2882.35
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 261.13
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 305.46
+        },
+        {
+          "year": 2022,
+          "category": "Pielęgnacja",
+          "costs": 7.29
+        },
+        {
+          "year": 2022,
+          "category": "Sprzęt",
+          "costs": 1819.37
+        },
+        {
+          "year": 2022,
+          "category": "Ściółka",
+          "costs": 315.41
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 2004.17
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 513.39
+        },
+        {
+          "year": 2023,
+          "category": "Fizjoterapeuta",
+          "costs": 659.88
+        },
+        {
+          "year": 2023,
+          "category": "Specjaliści",
+          "costs": 497.92
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 955.41
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 110
+        },
+        {
+          "year": 2023,
+          "category": "Pensjonat",
+          "costs": 521.47
+        },
+        {
+          "year": 2023,
+          "category": "Suplementy",
+          "costs": 62.56
+        },
+        {
+          "year": 2023,
+          "category": "Ściółka",
+          "costs": 1190.07
+        },
+        {
+          "year": 2023,
+          "category": "Usługi",
+          "costs": 1047.60
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 1671.40
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 213.37
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 158.76
+        },
+        {
+          "year": 2024,
+          "category": "Specjaliści",
+          "costs": 747.79
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 525.67
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 570
+        },
+        {
+          "year": 2024,
+          "category": "Pasza",
+          "costs": 291.15
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 206.29
+        },
+        {
+          "year": 2024,
+          "category": "Ściółka",
+          "costs": 2742.56
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 3495.66
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 249
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 673.26
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 300
+        },
+        {
+          "year": 2025,
+          "category": "Inne",
+          "costs": 85.83
+        },
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 463.86
+        },
+        {
+          "year": 2025,
+          "category": "Suplementy",
+          "costs": 201.02
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 983.49
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 286.91
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 233.67
+        },
+        {
+          "year": 2026,
+          "category": "Suplementy",
+          "costs": 1301.67
+        },
+        {
+          "year": 2026,
+          "category": "Ściółka",
+          "costs": 223.54
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "horseName": "Wicher",
+      "status": "Active",
+      "purchasePrice": 14562.76,
+      "costs": 35125.91,
+      "prizes": 4699.08,
+      "salePrice": null,
+      "estimatedValue": 32334.91,
+      "result": -44989.59,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2018,
+          "category": "Weterynarz",
+          "costs": 160.69
+        },
+        {
+          "year": 2018,
+          "category": "Zawody",
+          "costs": 131.04
+        },
+        {
+          "year": 2019,
+          "category": "Weterynarz",
+          "costs": 2223.96
+        },
+        {
+          "year": 2019,
+          "category": "Kowal",
+          "costs": 802.20
+        },
+        {
+          "year": 2019,
+          "category": "Fizjoterapeuta",
+          "costs": 692.58
+        },
+        {
+          "year": 2019,
+          "category": "Specjaliści",
+          "costs": 694.79
+        },
+        {
+          "year": 2019,
+          "category": "Zawody",
+          "costs": 560.78
+        },
+        {
+          "year": 2019,
+          "category": "Treningi",
+          "costs": 460
+        },
+        {
+          "year": 2019,
+          "category": "Pasza",
+          "costs": 1355.51
+        },
+        {
+          "year": 2019,
+          "category": "Sprzęt",
+          "costs": 184.85
+        },
+        {
+          "year": 2020,
+          "category": "Weterynarz",
+          "costs": 772.64
+        },
+        {
+          "year": 2020,
+          "category": "Kowal",
+          "costs": 180.22
+        },
+        {
+          "year": 2020,
+          "category": "Fizjoterapeuta",
+          "costs": 473.39
+        },
+        {
+          "year": 2020,
+          "category": "Specjaliści",
+          "costs": 298.96
+        },
+        {
+          "year": 2020,
+          "category": "Zawody",
+          "costs": 180.14
+        },
+        {
+          "year": 2020,
+          "category": "Treningi",
+          "costs": 320
+        },
+        {
+          "year": 2020,
+          "category": "Inne",
+          "costs": 665
+        },
+        {
+          "year": 2020,
+          "category": "Pasza",
+          "costs": 322.14
+        },
+        {
+          "year": 2020,
+          "category": "Pensjonat",
+          "costs": 210.14
+        },
+        {
+          "year": 2020,
+          "category": "Pielęgnacja",
+          "costs": 166.6
+        },
+        {
+          "year": 2020,
+          "category": "Sprzęt",
+          "costs": 332.58
+        },
+        {
+          "year": 2020,
+          "category": "Ściółka",
+          "costs": 1175.64
+        },
+        {
+          "year": 2021,
+          "category": "Weterynarz",
+          "costs": 674.58
+        },
+        {
+          "year": 2021,
+          "category": "Kowal",
+          "costs": 348.03
+        },
+        {
+          "year": 2021,
+          "category": "Fizjoterapeuta",
+          "costs": 279.81
+        },
+        {
+          "year": 2021,
+          "category": "Specjaliści",
+          "costs": 311.08
+        },
+        {
+          "year": 2021,
+          "category": "Zawody",
+          "costs": 330.87
+        },
+        {
+          "year": 2021,
+          "category": "Treningi",
+          "costs": 640
+        },
+        {
+          "year": 2021,
+          "category": "Suplementy",
+          "costs": 519.98
+        },
+        {
+          "year": 2021,
+          "category": "Ściółka",
+          "costs": 415.76
+        },
+        {
+          "year": 2021,
+          "category": "Usługi",
+          "costs": 171.61
+        },
+        {
+          "year": 2022,
+          "category": "Weterynarz",
+          "costs": 530.23
+        },
+        {
+          "year": 2022,
+          "category": "Kowal",
+          "costs": 361.31
+        },
+        {
+          "year": 2022,
+          "category": "Fizjoterapeuta",
+          "costs": 783.01
+        },
+        {
+          "year": 2022,
+          "category": "Specjaliści",
+          "costs": 595.05
+        },
+        {
+          "year": 2022,
+          "category": "Zawody",
+          "costs": 292.60
+        },
+        {
+          "year": 2022,
+          "category": "Treningi",
+          "costs": 140
+        },
+        {
+          "year": 2022,
+          "category": "Leki",
+          "costs": 378.70
+        },
+        {
+          "year": 2022,
+          "category": "Ściółka",
+          "costs": 315.41
+        },
+        {
+          "year": 2023,
+          "category": "Weterynarz",
+          "costs": 994.44
+        },
+        {
+          "year": 2023,
+          "category": "Kowal",
+          "costs": 623.01
+        },
+        {
+          "year": 2023,
+          "category": "Fizjoterapeuta",
+          "costs": 246.85
+        },
+        {
+          "year": 2023,
+          "category": "Zawody",
+          "costs": 700.10
+        },
+        {
+          "year": 2023,
+          "category": "Treningi",
+          "costs": 370
+        },
+        {
+          "year": 2023,
+          "category": "Inne",
+          "costs": 804.81
+        },
+        {
+          "year": 2023,
+          "category": "Leki",
+          "costs": 601.11
+        },
+        {
+          "year": 2023,
+          "category": "Suplementy",
+          "costs": 62.56
+        },
+        {
+          "year": 2023,
+          "category": "Usługi",
+          "costs": 308.29
+        },
+        {
+          "year": 2024,
+          "category": "Weterynarz",
+          "costs": 604.94
+        },
+        {
+          "year": 2024,
+          "category": "Kowal",
+          "costs": 688.78
+        },
+        {
+          "year": 2024,
+          "category": "Fizjoterapeuta",
+          "costs": 375.35
+        },
+        {
+          "year": 2024,
+          "category": "Zawody",
+          "costs": 813.40
+        },
+        {
+          "year": 2024,
+          "category": "Treningi",
+          "costs": 90
+        },
+        {
+          "year": 2024,
+          "category": "Leki",
+          "costs": 274.4
+        },
+        {
+          "year": 2024,
+          "category": "Pielęgnacja",
+          "costs": 1699.83
+        },
+        {
+          "year": 2024,
+          "category": "Sprzęt",
+          "costs": 40.22
+        },
+        {
+          "year": 2025,
+          "category": "Weterynarz",
+          "costs": 2893.77
+        },
+        {
+          "year": 2025,
+          "category": "Kowal",
+          "costs": 524.77
+        },
+        {
+          "year": 2025,
+          "category": "Zawody",
+          "costs": 293.82
+        },
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 90
+        },
+        {
+          "year": 2025,
+          "category": "Inne",
+          "costs": 85.83
+        },
+        {
+          "year": 2025,
+          "category": "Pensjonat",
+          "costs": 12.65
+        },
+        {
+          "year": 2025,
+          "category": "Ściółka",
+          "costs": 491.80
+        },
+        {
+          "year": 2025,
+          "category": "Usługi",
+          "costs": 328.71
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 870.78
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 147.21
+        },
+        {
+          "year": 2026,
+          "category": "Specjaliści",
+          "costs": 151.91
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 214.69
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 270
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "purchasePrice": 386724.66,
+    "costs": 474648.79,
+    "prizes": 49583.99,
+    "salePrice": 87525.02,
+    "result": -724264.44
+  }
+}

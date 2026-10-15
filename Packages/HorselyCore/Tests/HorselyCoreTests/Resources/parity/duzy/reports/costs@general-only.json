@@ -1,0 +1,131 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Category",
+  "rows": [
+    {
+      "group": "Inne",
+      "horseId": null,
+      "category": "Inne",
+      "month": null,
+      "costs": 1400.22,
+      "income": 0
+    },
+    {
+      "group": "Leki",
+      "horseId": null,
+      "category": "Leki",
+      "month": null,
+      "costs": 1999.75,
+      "income": 0
+    },
+    {
+      "group": "Pensjonat",
+      "horseId": null,
+      "category": "Pensjonat",
+      "month": null,
+      "costs": 991.68,
+      "income": 0
+    },
+    {
+      "group": "Sprzęt",
+      "horseId": null,
+      "category": "Sprzęt",
+      "month": null,
+      "costs": 684.82,
+      "income": 0
+    },
+    {
+      "group": "Suplementy",
+      "horseId": null,
+      "category": "Suplementy",
+      "month": null,
+      "costs": 648.4,
+      "income": 0
+    },
+    {
+      "group": "Ściółka",
+      "horseId": null,
+      "category": "Ściółka",
+      "month": null,
+      "costs": 493.3,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 6218.17,
+  "totalCosts": 6218.17,
+  "totalIncome": 0,
+  "balance": -6218.17,
+  "months": [
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-06",
+    "2026-08",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-02",
+      "category": "Sprzęt",
+      "costs": 684.82
+    },
+    {
+      "month": "2026-03",
+      "category": "Ściółka",
+      "costs": 493.3
+    },
+    {
+      "month": "2026-04",
+      "category": "Inne",
+      "costs": 1400.22
+    },
+    {
+      "month": "2026-06",
+      "category": "Pensjonat",
+      "costs": 991.68
+    },
+    {
+      "month": "2026-08",
+      "category": "Leki",
+      "costs": 1999.75
+    },
+    {
+      "month": "2026-09",
+      "category": "Suplementy",
+      "costs": 648.4
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Inne",
+      "costs": 1400.22,
+      "income": 0
+    },
+    {
+      "category": "Leki",
+      "costs": 1999.75,
+      "income": 0
+    },
+    {
+      "category": "Pensjonat",
+      "costs": 991.68,
+      "income": 0
+    },
+    {
+      "category": "Sprzęt",
+      "costs": 684.82,
+      "income": 0
+    },
+    {
+      "category": "Suplementy",
+      "costs": 648.4,
+      "income": 0
+    },
+    {
+      "category": "Ściółka",
+      "costs": 493.3,
+      "income": 0
+    }
+  ]
+}

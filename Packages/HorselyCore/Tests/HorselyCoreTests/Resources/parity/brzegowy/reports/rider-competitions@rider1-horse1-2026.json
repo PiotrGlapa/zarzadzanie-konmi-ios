@@ -1,0 +1,15 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": "01a13e2c-e7df-7125-99ff-1732f8da1a22",
+  "riderName": "Marta Lis",
+  "competitions": [],
+  "total": {
+    "competitions": 0,
+    "starts": 0,
+    "totalCosts": 0,
+    "totalPrizes": 0,
+    "balance": 0
+  },
+  "groups": []
+}

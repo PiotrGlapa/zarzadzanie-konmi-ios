@@ -1,0 +1,16 @@
+{
+  "horseId": "01a13e2c-e7f2-756c-8a5e-0f65478dcd75",
+  "totalCount": 1,
+  "items": [
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e837-7ea4-b62b-d834c1d35a42",
+      "date": "2025-12-31",
+      "title": "Siano zimowe",
+      "summary": "Pasza",
+      "cost": 66.66,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7f2-756c-8a5e-0f65478dcd75"
+    }
+  ]
+}

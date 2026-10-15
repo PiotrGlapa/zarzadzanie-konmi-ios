@@ -1,0 +1,6 @@
+﻿Koń;Status;Zakup;Koszty;Nagrody;Sprzedaż;Wynik;Wartość (ocena własna);Uwagi
+Błyskawica;Kontuzjowany;12000,00;244,90;0,00;;-12244,90;;"strata; wynik dotychczasowy — koń niesprzedany"
+
+Razem;;12000,00;244,90;0,00;0,00;-12244,90;;strata
+
+Wynik = sprzedaż + nagrody − zakup − koszty (z całej historii konia). Wartość konia to tylko ocena własna właściciela i nie wchodzi do wyniku.

@@ -1,0 +1,15 @@
+* text=auto
+
+# Pliki wzorcowe programu skopiowane z Androida są porównywane bajt w bajt (BOM, CRLF) — Git nie może zmieniać końców linii.
+Packages/HorselyCore/Tests/HorselyCoreTests/Resources/** -text
+
+# Skrypty i konfiguracja uruchamiane na runnerze macOS muszą mieć końce linii LF także po wyjęciu na Windows.
+*.sh text eol=lf
+*.yml text eol=lf
+*.plist text eol=lf
+*.xcstrings text eol=lf
+*.ps1 text eol=lf
+
+# Pliki binarne
+*.png binary
+*.p8 binary

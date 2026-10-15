@@ -1,0 +1,80 @@
+{
+  "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+  "horseName": "Bursztyn",
+  "range": "Year",
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "rows": [
+    {
+      "typeId": "01a13e2d-40b6-73bc-a619-f2161a6bd73a",
+      "typeName": "Lonża",
+      "paletteIndex": 3,
+      "count": 1,
+      "totalMinutes": 81,
+      "duration": {
+        "min": 81,
+        "average": 81,
+        "max": 81
+      },
+      "intensity": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "rating": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "obstacleHeight": null,
+      "totalCost": 190
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 1,
+    "totalMinutes": 81,
+    "duration": {
+      "min": 81,
+      "average": 81,
+      "max": 81
+    },
+    "intensity": {
+      "min": 1,
+      "average": 1,
+      "max": 1
+    },
+    "rating": {
+      "min": 1,
+      "average": 1,
+      "max": 1
+    },
+    "obstacleHeight": null,
+    "totalCost": 190
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-73bc-a619-f2161a6bd73a",
+      "points": [
+        {
+          "date": "2026-02-09",
+          "value": 81
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-73bc-a619-f2161a6bd73a",
+      "points": [
+        {
+          "date": "2026-02-09",
+          "value": 1
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

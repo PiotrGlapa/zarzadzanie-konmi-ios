@@ -1,0 +1,17 @@
+﻿Koń;Kategoria;Koszty;Przychody
+Grom;Weterynarz;1600,75;0,00
+Grom;Kowal;300,00;0,00
+Grom;Zawody;270,30;1700,00
+Grom;Treningi;270,00;0,00
+Grom;Pasza;57,51;0,00
+Grom;Suplementy;1234,56;0,00
+Iskra;Weterynarz;180,00;0,00
+Iskra;Zawody;80,00;0,00
+Iskra;Treningi;90,00;0,00
+Iskra;Pasza;57,50;0,00
+Mgiełka;Weterynarz;95,50;0,00
+Ogólne (stajnia);Pasza;800,00;0,00
+
+Razem;;5036,12;1700,00
+Ogólne (stajnia);;800,00;
+Saldo;;;-3336,12

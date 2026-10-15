@@ -1,0 +1,117 @@
+# Projekt Xcode generuje XcodeGen (SPECYFIKACJA_MOBILE_IOS.md 9.7): `xcodegen generate`. Plik `.xcodeproj` nie trafia do repozytorium.
+# Zmienna środowiska APPLE_TEAM_ID (zmienna repozytorium GitHub) ustawia DEVELOPMENT_TEAM; numer kompilacji w CI nadpisuje
+# CURRENT_PROJECT_VERSION wartością GITHUB_RUN_NUMBER (contracts/ci-release.md §3).
+name: Horsely
+
+options:
+  bundleIdPrefix: pl.glapa
+  deploymentTarget:
+    iOS: "18.0"
+  developmentLanguage: pl
+  createIntermediateGroups: true
+  groupSortPosition: top
+  minimumXcodeGenVersion: 2.40.0
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_TREAT_WARNINGS_AS_ERRORS: YES
+    GCC_TREAT_WARNINGS_AS_ERRORS: YES
+    MARKETING_VERSION: "2.0.1"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ${APPLE_TEAM_ID}
+    CODE_SIGN_STYLE: Automatic
+    TARGETED_DEVICE_FAMILY: "1"
+    SUPPORTS_MACCATALYST: NO
+    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+
+packages:
+  HorselyCore:
+    path: Packages/HorselyCore
+  HorselyKit:
+    path: Packages/HorselyKit
+
+targets:
+  Horsely:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+        excludes:
+          - Info.plist
+          - Horsely.entitlements
+          - Resources/android/**
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely
+        PRODUCT_NAME: Horsely
+        INFOPLIST_FILE: App/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: App/Horsely.entitlements
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+        SWIFT_EMIT_LOC_STRINGS: NO
+    dependencies:
+      - package: HorselyCore
+      - package: HorselyKit
+      - target: HorselyShare
+        embed: true
+
+  HorselyShare:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ShareExtension
+        excludes:
+          - Info.plist
+          - HorselyShare.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely.ShareExtension
+        PRODUCT_NAME: HorselyShare
+        INFOPLIST_FILE: ShareExtension/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        CODE_SIGN_ENTITLEMENTS: ShareExtension/HorselyShare.entitlements
+        SKIP_INSTALL: YES
+
+  AppSnapshotTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/AppSnapshotTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely.AppSnapshotTests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: Horsely
+
+  AppUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/AppUITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely.AppUITests
+        GENERATE_INFOPLIST_FILE: YES
+    dependencies:
+      - target: Horsely
+
+schemes:
+  Horsely:
+    build:
+      targets:
+        Horsely: all
+        HorselyShare: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - AppSnapshotTests
+        - AppUITests
+    archive:
+      config: Release

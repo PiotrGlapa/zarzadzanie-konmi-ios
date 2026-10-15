@@ -1,0 +1,22 @@
+{
+  "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48",
+  "horseName": "Błyskawica",
+  "range": "Week",
+  "from": "2026-09-21",
+  "to": "2026-09-27",
+  "rows": [],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 0,
+    "totalMinutes": 0,
+    "duration": null,
+    "intensity": null,
+    "rating": null,
+    "obstacleHeight": null,
+    "totalCost": 0
+  },
+  "series": [],
+  "isEmpty": true
+}

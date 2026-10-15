@@ -1,0 +1,15 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+  "riderName": "Anna Wrona",
+  "rows": [],
+  "total": {
+    "count": 0,
+    "totalMinutes": 0,
+    "averageRating": null,
+    "totalCost": 0
+  },
+  "groups": [],
+  "groupedBy": "Horse"
+}

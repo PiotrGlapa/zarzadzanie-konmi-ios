@@ -1,0 +1,148 @@
+# Wydanie do TestFlight (contracts/ci-release.md §3): pełne testy, archiwum, podpis w chmurze Apple i wysyłka.
+#   - tag v*            wydanie pełnego zakresu (np. v2.0.1)
+#   - workflow_dispatch kompilacja częściowa dla właściciela (grupa „Deweloper”, dystrybucja automatyczna)
+# Grupa „Właściciele” jest uzupełniana ręcznie w App Store Connect po liście kontrolnej (quickstart.md §7).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      group:
+        description: Grupa TestFlight (kompilacja częściowa)
+        type: choice
+        options: [Deweloper]
+        default: Deweloper
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    # Najpierw tani sprawdzian na Linuksie: brak sekretu kończy przebieg od razu, z listą nazw, bez minut macOS (konstytucja).
+    name: Sprawdź sekrety
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+      IOS_BUNDLE_ID: ${{ vars.IOS_BUNDLE_ID }}
+      IOS_APP_GROUP: ${{ vars.IOS_APP_GROUP }}
+      ASC_APP_ID: ${{ vars.ASC_APP_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash scripts/ci/check-secrets.sh
+
+  test:
+    name: Testy przed wydaniem
+    needs: secrets
+    uses: ./.github/workflows/ci.yml
+    with:
+      ui-tests: true
+
+  release:
+    name: Archiwum i wysyłka do TestFlight
+    needs: [secrets, test]
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      XCODE_VERSION: "16.4"
+      APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+      ASC_APP_ID: ${{ vars.ASC_APP_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wybierz Xcode
+        run: |
+          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app"
+          xcodebuild -version
+
+      - name: Zainstaluj XcodeGen
+        run: brew install xcodegen
+
+      - name: Wygeneruj projekt Xcode
+        run: xcodegen generate
+
+      - name: Zapisz klucz API App Store Connect
+        id: key
+        run: bash scripts/ci/write-api-key.sh
+
+      - name: Archiwum (Release, podpis automatyczny)
+        id: archive
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild archive \
+            -project Horsely.xcodeproj -scheme Horsely -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/Horsely.xcarchive" \
+            CURRENT_PROJECT_VERSION="$GITHUB_RUN_NUMBER" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "${{ steps.key.outputs.key_file }}" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            | tee build/archive.log | tail -n 40
+
+      - name: Eksport i wysyłka do App Store Connect
+        id: upload
+        run: |
+          set -o pipefail
+          sed "s/\${APPLE_TEAM_ID}/${APPLE_TEAM_ID}/" scripts/ci/ExportOptions.plist > "$RUNNER_TEMP/ExportOptions.plist"
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/Horsely.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "${{ steps.key.outputs.key_file }}" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            | tee build/export.log | tail -n 40
+
+      - name: Podsumowanie przebiegu
+        if: always()
+        run: |
+          version="$(sed -n 's/^ *MARKETING_VERSION: *"\{0,1\}\([0-9.]*\)"\{0,1\} *$/\1/p' project.yml | head -n 1)"
+          if [ "${{ steps.upload.outcome }}" = "success" ]; then
+            result="wysłano do TestFlight"
+          elif [ "${{ steps.archive.outcome }}" = "failure" ]; then
+            result="BŁĄD: archiwum (podpisywanie lub kompilacja)"
+          elif [ "${{ steps.upload.outcome }}" = "failure" ]; then
+            result="BŁĄD: eksport lub wysyłka do App Store Connect"
+          else
+            result="NIE WYKONANO (wcześniejszy krok zakończył się błędem)"
+          fi
+          {
+            echo "## Wydanie Horsely"
+            echo
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Wersja | ${version} |"
+            echo "| Numer kompilacji | ${GITHUB_RUN_NUMBER} |"
+            echo "| Wynik wysyłki | ${result} |"
+            echo "| Wyzwalacz | ${GITHUB_EVENT_NAME} (${GITHUB_REF_NAME}) |"
+            echo "| Grupa TestFlight | ${{ inputs.group || 'Deweloper' }} |"
+            echo "| TestFlight | https://appstoreconnect.apple.com/apps/${ASC_APP_ID}/testflight/ios |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Artefakt — dzienniki archiwum i eksportu
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-logs
+          path: build/*.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Usuń klucz API
+        if: always()
+        run: rm -f "$RUNNER_TEMP/AuthKey.p8"

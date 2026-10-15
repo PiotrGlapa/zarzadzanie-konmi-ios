@@ -1,0 +1,207 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Horse",
+  "rows": [
+    {
+      "group": "Grom",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 1600.75,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "category": "Kowal",
+      "month": null,
+      "costs": 300,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "category": "Zawody",
+      "month": null,
+      "costs": 270.3,
+      "income": 1700
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "category": "Treningi",
+      "month": null,
+      "costs": 270,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "category": "Pasza",
+      "month": null,
+      "costs": 57.51,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "category": "Suplementy",
+      "month": null,
+      "costs": 1234.56,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 180,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+      "category": "Zawody",
+      "month": null,
+      "costs": 80,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+      "category": "Treningi",
+      "month": null,
+      "costs": 90,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+      "category": "Pasza",
+      "month": null,
+      "costs": 57.5,
+      "income": 0
+    },
+    {
+      "group": "Mgiełka",
+      "horseId": "01a10c22-11c1-7e40-84a7-c24a6cb0d4e1",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 95.5,
+      "income": 0
+    },
+    {
+      "group": "Ogólne (stajnia)",
+      "horseId": null,
+      "category": "Pasza",
+      "month": null,
+      "costs": 800,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 800,
+  "totalCosts": 5036.12,
+  "totalIncome": 1700,
+  "balance": -3336.12,
+  "months": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-01",
+      "category": "Weterynarz",
+      "costs": 350
+    },
+    {
+      "month": "2026-02",
+      "category": "Kowal",
+      "costs": 300
+    },
+    {
+      "month": "2026-02",
+      "category": "Pasza",
+      "costs": 115.01
+    },
+    {
+      "month": "2026-03",
+      "category": "Weterynarz",
+      "costs": 180
+    },
+    {
+      "month": "2026-04",
+      "category": "Pasza",
+      "costs": 800
+    },
+    {
+      "month": "2026-05",
+      "category": "Zawody",
+      "costs": 200.3
+    },
+    {
+      "month": "2026-06",
+      "category": "Weterynarz",
+      "costs": 95.5
+    },
+    {
+      "month": "2026-06",
+      "category": "Zawody",
+      "costs": 150
+    },
+    {
+      "month": "2026-07",
+      "category": "Weterynarz",
+      "costs": 1250.75
+    },
+    {
+      "month": "2026-08",
+      "category": "Suplementy",
+      "costs": 1234.56
+    },
+    {
+      "month": "2026-09",
+      "category": "Treningi",
+      "costs": 360
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 1876.25,
+      "income": 0
+    },
+    {
+      "category": "Kowal",
+      "costs": 300,
+      "income": 0
+    },
+    {
+      "category": "Zawody",
+      "costs": 350.3,
+      "income": 1700
+    },
+    {
+      "category": "Treningi",
+      "costs": 360,
+      "income": 0
+    },
+    {
+      "category": "Pasza",
+      "costs": 915.01,
+      "income": 0
+    },
+    {
+      "category": "Suplementy",
+      "costs": 1234.56,
+      "income": 0
+    }
+  ]
+}

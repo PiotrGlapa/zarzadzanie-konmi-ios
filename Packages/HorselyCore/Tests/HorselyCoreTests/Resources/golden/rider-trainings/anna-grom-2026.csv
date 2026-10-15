@@ -1,0 +1,8 @@
+﻿Data;Koń;Rodzaj treningu;Czas (min);Intensywność;Ocena;Trener;Koszt
+01.09.2026;Grom;Ujeżdżenie;45;Średnia;4;"Jan Kowalski; trener";120,00
+03.09.2026;Grom;Skoki;75;Ciężka;5;"Jan Kowalski; trener";150,00
+
+Grom (treningów: 2);;;120;;4,5;;270,00
+Razem (treningów: 2);;;120;;4,5;;270,00
+
+"Treningi bez jeźdźca nie są uwzględnione. Koszt jest sumą kosztów wpisanych w treningach; średnia ocena liczona jest tylko z ocenionych treningów."

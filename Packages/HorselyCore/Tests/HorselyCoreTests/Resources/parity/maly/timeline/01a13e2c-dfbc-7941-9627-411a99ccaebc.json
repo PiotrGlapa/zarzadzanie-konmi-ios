@@ -1,0 +1,86 @@
+{
+  "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+  "totalCount": 8,
+  "items": [
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2c-e207-72ea-8534-5c7e5ebff5c3",
+      "date": "2026-09-20",
+      "title": "Zawody regionalne 2026",
+      "summary": "L · 3. miejsce",
+      "cost": 125.5,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2c-e2c0-7440-9287-8d92e1fb1b91",
+      "date": "2026-09-14",
+      "title": "Obserwacja",
+      "summary": "Lekko sztywny na lewą stronę.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2c-e029-7c9c-b47b-76d3f6bce105",
+      "date": "2026-09-10",
+      "title": "Szczepienie",
+      "summary": "Equilis Prequenza",
+      "cost": 250.5,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e2ae-785e-b000-ec3d22a4999b",
+      "date": "2026-09-08",
+      "title": "Siano",
+      "summary": "Pasza",
+      "cost": 50.01,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2c-e133-70e5-ba93-9a92dc5de16d",
+      "date": "2026-09-05",
+      "title": "Fizjoterapia",
+      "summary": "Sztywność grzbietu",
+      "cost": 200,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e26f-7a8a-89c0-0f8f0713efd4",
+      "date": "2026-09-03",
+      "title": "Owies",
+      "summary": "Pasza",
+      "cost": 162.5,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2c-e107-7f7d-9c60-8b5a0aa95a7c",
+      "date": "2026-09-01",
+      "title": "Kucie pełne",
+      "summary": null,
+      "cost": 300,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2c-e188-7c8b-a7e8-78bba1e705ab",
+      "date": "2026-08-20",
+      "title": "Dentysta",
+      "summary": "Kontrola",
+      "cost": 220,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc"
+    }
+  ]
+}

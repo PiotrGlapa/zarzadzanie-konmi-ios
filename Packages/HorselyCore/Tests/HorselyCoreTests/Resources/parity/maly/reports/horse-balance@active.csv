@@ -1,0 +1,7 @@
+﻿Koń;Status;Zakup;Koszty;Nagrody;Sprzedaż;Wynik;Wartość (ocena własna);Uwagi
+Grom;Aktywny;20000,00;1428,51;300,00;;-21128,51;25000,00;"strata; wynik dotychczasowy — koń niesprzedany"
+Iskra;Aktywny;;980,00;0,00;;-980,00;;"strata; brak ceny zakupu; wynik dotychczasowy — koń niesprzedany"
+
+Razem;;20000,00;2408,51;300,00;0,00;-22108,51;;strata
+
+Wynik = sprzedaż + nagrody − zakup − koszty (z całej historii konia). Wartość konia to tylko ocena własna właściciela i nie wchodzi do wyniku.

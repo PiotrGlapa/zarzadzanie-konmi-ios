@@ -1,0 +1,56 @@
+{
+  "horseId": "01a13e2c-e7e8-7f8e-bace-5cba44f8d5ea",
+  "totalCount": 5,
+  "items": [
+    {
+      "entryType": "Note",
+      "id": "01a13e2c-e886-78c4-9c19-c5e1968f20cd",
+      "date": "2026-09-20",
+      "title": "Źrebak — obserwacja",
+      "summary": "Zażółć gęślą jaźń.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7e8-7f8e-bace-5cba44f8d5ea"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2c-e850-7927-982e-ec6d3878fef6",
+      "date": "2026-09-14",
+      "title": "Korekcja",
+      "summary": null,
+      "cost": 100,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7e8-7f8e-bace-5cba44f8d5ea"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e827-75cb-8a2b-33a2795e6658",
+      "date": "2026-09-03",
+      "title": "Drobiazg",
+      "summary": "Inne",
+      "cost": 0.01,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7e8-7f8e-bace-5cba44f8d5ea"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e822-7e28-a01b-7887c79abcc9",
+      "date": "2026-09-02",
+      "title": "Suplement",
+      "summary": "Suplementy",
+      "cost": 14.45,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7e8-7f8e-bace-5cba44f8d5ea"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e81a-77e9-b7d5-2183b596d84a",
+      "date": "2026-09-01",
+      "title": "Siano",
+      "summary": "Pasza",
+      "cost": 50.01,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7e8-7f8e-bace-5cba44f8d5ea"
+    }
+  ]
+}

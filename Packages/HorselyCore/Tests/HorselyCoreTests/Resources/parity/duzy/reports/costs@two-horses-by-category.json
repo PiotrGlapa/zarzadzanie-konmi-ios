@@ -1,0 +1,195 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Category",
+  "rows": [
+    {
+      "group": "Weterynarz",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 1112.66,
+      "income": 0
+    },
+    {
+      "group": "Kowal",
+      "horseId": null,
+      "category": "Kowal",
+      "month": null,
+      "costs": 139.47,
+      "income": 0
+    },
+    {
+      "group": "Fizjoterapeuta",
+      "horseId": null,
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 166.54,
+      "income": 0
+    },
+    {
+      "group": "Zawody",
+      "horseId": null,
+      "category": "Zawody",
+      "month": null,
+      "costs": 634.06,
+      "income": 715.03
+    },
+    {
+      "group": "Treningi",
+      "horseId": null,
+      "category": "Treningi",
+      "month": null,
+      "costs": 410,
+      "income": 0
+    },
+    {
+      "group": "Pielęgnacja",
+      "horseId": null,
+      "category": "Pielęgnacja",
+      "month": null,
+      "costs": 1549.72,
+      "income": 0
+    },
+    {
+      "group": "Ściółka",
+      "horseId": null,
+      "category": "Ściółka",
+      "month": null,
+      "costs": 2383.27,
+      "income": 0
+    },
+    {
+      "group": "Usługi",
+      "horseId": null,
+      "category": "Usługi",
+      "month": null,
+      "costs": 221.57,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 0,
+  "totalCosts": 6617.29,
+  "totalIncome": 715.03,
+  "balance": -5902.26,
+  "months": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-01",
+      "category": "Zawody",
+      "costs": 229.68
+    },
+    {
+      "month": "2026-02",
+      "category": "Treningi",
+      "costs": 410
+    },
+    {
+      "month": "2026-03",
+      "category": "Weterynarz",
+      "costs": 167.63
+    },
+    {
+      "month": "2026-04",
+      "category": "Weterynarz",
+      "costs": 448.59
+    },
+    {
+      "month": "2026-04",
+      "category": "Fizjoterapeuta",
+      "costs": 166.54
+    },
+    {
+      "month": "2026-04",
+      "category": "Zawody",
+      "costs": 230.42
+    },
+    {
+      "month": "2026-05",
+      "category": "Kowal",
+      "costs": 139.47
+    },
+    {
+      "month": "2026-06",
+      "category": "Ściółka",
+      "costs": 1936.15
+    },
+    {
+      "month": "2026-07",
+      "category": "Pielęgnacja",
+      "costs": 1549.72
+    },
+    {
+      "month": "2026-07",
+      "category": "Usługi",
+      "costs": 221.57
+    },
+    {
+      "month": "2026-08",
+      "category": "Weterynarz",
+      "costs": 496.44
+    },
+    {
+      "month": "2026-08",
+      "category": "Zawody",
+      "costs": 173.96
+    },
+    {
+      "month": "2026-09",
+      "category": "Ściółka",
+      "costs": 447.12
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 1112.66,
+      "income": 0
+    },
+    {
+      "category": "Kowal",
+      "costs": 139.47,
+      "income": 0
+    },
+    {
+      "category": "Fizjoterapeuta",
+      "costs": 166.54,
+      "income": 0
+    },
+    {
+      "category": "Zawody",
+      "costs": 634.06,
+      "income": 715.03
+    },
+    {
+      "category": "Treningi",
+      "costs": 410,
+      "income": 0
+    },
+    {
+      "category": "Pielęgnacja",
+      "costs": 1549.72,
+      "income": 0
+    },
+    {
+      "category": "Ściółka",
+      "costs": 2383.27,
+      "income": 0
+    },
+    {
+      "category": "Usługi",
+      "costs": 221.57,
+      "income": 0
+    }
+  ]
+}

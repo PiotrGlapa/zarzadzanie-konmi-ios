@@ -1,0 +1,7 @@
+﻿Koń;Status;Zakup;Koszty;Nagrody;Sprzedaż;Wynik;Wartość (ocena własna);Uwagi
+Źrebak Łatek;Aktywny;;164,46;0,00;;-164,46;;"strata; brak ceny zakupu; wynik dotychczasowy — koń niesprzedany"
+Żółtko;Aktywny;;1775,67;500,75;;-1274,92;;"strata; brak ceny zakupu; wynik dotychczasowy — koń niesprzedany"
+
+Razem;;0,00;1940,13;500,75;0,00;-1439,38;;strata
+
+Wynik = sprzedaż + nagrody − zakup − koszty (z całej historii konia). Wartość konia to tylko ocena własna właściciela i nie wchodzi do wyniku.

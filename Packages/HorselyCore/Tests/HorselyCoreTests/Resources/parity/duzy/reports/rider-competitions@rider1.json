@@ -1,0 +1,1868 @@
+{
+  "from": null,
+  "to": null,
+  "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+  "riderName": "Anna Wrona",
+  "competitions": [
+    {
+      "competitionId": "01a13e2d-44d3-7c57-8563-7e5720730a06",
+      "name": "Mistrzostwa Okręgu 2018",
+      "dateFrom": "2018-11-06",
+      "dateTo": null,
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-44d6-7ab2-a87e-9091f4e5fcb4",
+          "date": "2018-11-06",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "Western",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 15,
+          "participantsCount": 20,
+          "entryFee": 72.4,
+          "otherCosts": null,
+          "prizeMoney": 327.73,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-48ba-768f-a47c-ccaf32e358a3",
+      "name": "Mistrzostwa Okręgu 2018",
+      "dateFrom": "2018-11-15",
+      "dateTo": "2018-11-16",
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-48bd-79cd-bc4e-cc09c809cbc0",
+          "date": "2018-11-15",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 12,
+          "participantsCount": 20,
+          "entryFee": 63.31,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-41c0-7760-b6f8-108cdf45aee5",
+      "name": "Zawody regionalne 2018",
+      "dateFrom": "2018-12-28",
+      "dateTo": "2018-12-29",
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-41c3-7c39-9836-f86a4142ad17",
+          "date": "2018-12-28",
+          "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+          "horseName": "Rubin",
+          "disciplineName": "Rajdy",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 12,
+          "participantsCount": 20,
+          "entryFee": 176.42,
+          "otherCosts": null,
+          "prizeMoney": 405.14,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4918-772f-95a8-a38b1cc435fc",
+      "name": "Towarzyskie 2019",
+      "dateFrom": "2019-04-28",
+      "dateTo": "2019-04-29",
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-491b-7c2a-ae18-46b30d9f889a",
+          "date": "2019-04-28",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Inne",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 5,
+          "participantsCount": 20,
+          "entryFee": 139,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-491c-7e5b-adbe-24d1f9b19379",
+          "date": "2019-04-28",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Inne",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 1,
+          "participantsCount": 20,
+          "entryFee": 73.45,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4c22-7b68-8461-e01090187c28",
+      "name": "Towarzyskie 2019",
+      "dateFrom": "2019-05-27",
+      "dateTo": "2019-05-28",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4c25-7ef8-8bcb-ba8df7f42de4",
+          "date": "2019-05-27",
+          "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+          "horseName": "Wicher",
+          "disciplineName": "Skoki",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 113.01,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-440e-776d-a642-45833bc98e8b",
+      "name": "Mistrzostwa Okręgu 2019",
+      "dateFrom": "2019-07-20",
+      "dateTo": null,
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4412-7ab9-91c6-07df77764b8f",
+          "date": "2019-07-20",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "WKKW",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 8,
+          "participantsCount": 20,
+          "entryFee": 159.18,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4c50-7f99-a949-776bcc12f17e",
+      "name": "Mistrzostwa Okręgu 2019",
+      "dateFrom": "2019-08-05",
+      "dateTo": "2019-08-06",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4c53-723c-81bd-30ef21141213",
+          "date": "2019-08-05",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Inne",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 163.54,
+          "otherCosts": null,
+          "prizeMoney": 841.11,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-43ae-7701-98cd-7720d6f79ef4",
+      "name": "Mistrzostwa Okręgu 2019",
+      "dateFrom": "2019-11-24",
+      "dateTo": "2019-11-25",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-43b9-7a90-a797-fb3128dc1e67",
+          "date": "2019-11-24",
+          "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+          "horseName": "Grom",
+          "disciplineName": "Powożenie",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 96.72,
+          "otherCosts": null,
+          "prizeMoney": 855.1,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-43b1-72a5-a141-29d74902ebd3",
+          "date": "2019-11-24",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Western",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 12,
+          "participantsCount": 20,
+          "entryFee": 62.57,
+          "otherCosts": null,
+          "prizeMoney": 452.82,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-453b-7660-a5d7-9ab30a2dc96e",
+      "name": "Zawody regionalne 2019",
+      "dateFrom": "2019-11-26",
+      "dateTo": null,
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-453e-7697-9c0e-1e9e80928f1f",
+          "date": "2019-11-26",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "Inne",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 118.05,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4324-7126-a6ba-1886a94f62c2",
+      "name": "Halowy Puchar 2020",
+      "dateFrom": "2020-02-29",
+      "dateTo": "2020-03-01",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-4328-7387-8121-bef6234c35c5",
+          "date": "2020-02-29",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "Rajdy",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 15,
+          "participantsCount": 20,
+          "entryFee": 56.36,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4cb5-77be-b8ea-58cf6d3872e9",
+      "name": "Zawody regionalne 2020",
+      "dateFrom": "2020-03-18",
+      "dateTo": null,
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-4cbb-73ab-9152-062c4e6015a6",
+          "date": "2020-03-18",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "WKKW",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 67.67,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4cb8-7aff-8ac6-5d781222bc26",
+          "date": "2020-03-18",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "Skoki",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 15,
+          "participantsCount": 20,
+          "entryFee": 190.75,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-45ff-77f1-9c01-86d8d5be2408",
+      "name": "Mistrzostwa Okręgu 2020",
+      "dateFrom": "2020-05-03",
+      "dateTo": "2020-05-04",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4605-709a-b9f2-9b153aaed33b",
+          "date": "2020-05-03",
+          "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+          "horseName": "Rubin",
+          "disciplineName": "Skoki",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 4,
+          "participantsCount": 20,
+          "entryFee": 110.03,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4317-7f29-9648-df021a4dc541",
+      "name": "Mistrzostwa Okręgu 2020",
+      "dateFrom": "2020-05-31",
+      "dateTo": null,
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-431d-7727-9ab0-a242a6a27b67",
+          "date": "2020-05-31",
+          "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+          "horseName": "Bursztyn",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 137.38,
+          "otherCosts": null,
+          "prizeMoney": 461.19,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4a9f-7d61-a0f6-da933ddb2bd6",
+      "name": "Zawody regionalne 2020",
+      "dateFrom": "2020-06-23",
+      "dateTo": null,
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4aa6-7d12-8b5c-f178748e52a4",
+          "date": "2020-06-23",
+          "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+          "horseName": "Grom",
+          "disciplineName": "Rajdy",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 10,
+          "participantsCount": 20,
+          "entryFee": 161.9,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4ab3-7ad4-9f89-9cc274d7e472",
+      "name": "Towarzyskie 2020",
+      "dateFrom": "2020-07-24",
+      "dateTo": "2020-07-25",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-4ab6-785d-be42-e242d69ad405",
+          "date": "2020-07-24",
+          "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+          "horseName": "Grom",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 4,
+          "participantsCount": 20,
+          "entryFee": 180.41,
+          "otherCosts": null,
+          "prizeMoney": 481.46,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4366-7118-8652-0eae2e4dd1db",
+      "name": "Mistrzostwa Okręgu 2020",
+      "dateFrom": "2020-07-27",
+      "dateTo": "2020-07-28",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4369-7eb1-8613-fca3b0bff5c3",
+          "date": "2020-07-27",
+          "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+          "horseName": "Fokus",
+          "disciplineName": "WKKW",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 193.01,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-436b-775f-bf95-f4064ace81c6",
+          "date": "2020-07-27",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "Rajdy",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 9,
+          "participantsCount": 20,
+          "entryFee": 104.44,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-42fc-72d4-9bae-a669e520a2c5",
+      "name": "Halowy Puchar 2021",
+      "dateFrom": "2021-02-11",
+      "dateTo": null,
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-4300-7ce0-8863-608a3e7bc4b4",
+          "date": "2021-02-11",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "Rajdy",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 13,
+          "participantsCount": 20,
+          "entryFee": 144.36,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-44ab-7462-a394-a1c106b237cc",
+      "name": "Towarzyskie 2021",
+      "dateFrom": "2021-09-16",
+      "dateTo": null,
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-44b0-7883-9210-ab8f5eac66f9",
+          "date": "2021-09-16",
+          "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+          "horseName": "Iskra",
+          "disciplineName": "Powożenie",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 71.9,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4419-769d-854c-f06a58c82994",
+      "name": "Halowy Puchar 2021",
+      "dateFrom": "2021-09-17",
+      "dateTo": "2021-09-18",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-441c-75a5-a48f-c716444e0104",
+          "date": "2021-09-17",
+          "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+          "horseName": "Fokus",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 10,
+          "participantsCount": 20,
+          "entryFee": 67.26,
+          "otherCosts": null,
+          "prizeMoney": 735.04,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-441f-7acd-be7f-f9f8c11c11a0",
+          "date": "2021-09-17",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "Ujeżdżenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 2,
+          "participantsCount": 20,
+          "entryFee": 124.96,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4420-76e8-8e15-bb0b3f6d03d9",
+          "date": "2021-09-17",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Rajdy",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 13,
+          "participantsCount": 20,
+          "entryFee": 82.01,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-43eb-794e-8142-33f09bf5e732",
+      "name": "Towarzyskie 2021",
+      "dateFrom": "2021-10-24",
+      "dateTo": "2021-10-25",
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-43ef-7a63-a944-8875ce96f212",
+          "date": "2021-10-24",
+          "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+          "horseName": "Iskra",
+          "disciplineName": "Western",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 139.36,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-466f-7efb-b43c-cf7ac6cbbb2f",
+      "name": "Mistrzostwa Okręgu 2021",
+      "dateFrom": "2021-11-16",
+      "dateTo": null,
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-4675-75c9-a29d-d4ef5af1fb62",
+          "date": "2021-11-16",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Rajdy",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 5,
+          "participantsCount": 20,
+          "entryFee": 155.61,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4673-76c0-96ff-940ce41fc537",
+          "date": "2021-11-16",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "Powożenie",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 8,
+          "participantsCount": 20,
+          "entryFee": 197.78,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4b52-7172-b52f-969b8f8f695c",
+      "name": "Zawody regionalne 2021",
+      "dateFrom": "2021-11-21",
+      "dateTo": null,
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4b59-72ee-9b68-c86496c2b4cc",
+          "date": "2021-11-21",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "Inne",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 4,
+          "participantsCount": 20,
+          "entryFee": 57.59,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4b5b-779a-803d-23deb52fd96a",
+          "date": "2021-11-21",
+          "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+          "horseName": "Fokus",
+          "disciplineName": "Ujeżdżenie",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 9,
+          "participantsCount": 20,
+          "entryFee": 193.4,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-45b7-7bbb-b8fd-acfd1b2dbc42",
+      "name": "Halowy Puchar 2021",
+      "dateFrom": "2021-11-22",
+      "dateTo": "2021-11-23",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-45bc-7f45-b68a-77d1b2ed8fca",
+          "date": "2021-11-22",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Rajdy",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 14,
+          "participantsCount": 20,
+          "entryFee": 123.27,
+          "otherCosts": null,
+          "prizeMoney": 453.13,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-42c1-75b9-a6d9-e18fb70aea7b",
+      "name": "Mistrzostwa Okręgu 2022",
+      "dateFrom": "2022-01-22",
+      "dateTo": "2022-01-23",
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-42c5-7edc-970d-f5050ded4c16",
+          "date": "2022-01-22",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "WKKW",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 199.97,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-446c-7d06-9195-6a089ce75538",
+      "name": "Towarzyskie 2022",
+      "dateFrom": "2022-01-26",
+      "dateTo": null,
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-446f-79ae-b1a0-3b9db06c588a",
+          "date": "2022-01-26",
+          "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+          "horseName": "Rubin",
+          "disciplineName": "Skoki",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 10,
+          "participantsCount": 20,
+          "entryFee": 77.89,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4783-7f17-984a-51d09a69b017",
+      "name": "Mistrzostwa Okręgu 2022",
+      "dateFrom": "2022-04-14",
+      "dateTo": "2022-04-15",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-478a-710d-81c7-2e7d23683708",
+          "date": "2022-04-14",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Skoki",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 2,
+          "participantsCount": 20,
+          "entryFee": 160.12,
+          "otherCosts": null,
+          "prizeMoney": 161.58,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-42cf-7a69-973d-98e851300956",
+      "name": "Halowy Puchar 2022",
+      "dateFrom": "2022-07-27",
+      "dateTo": "2022-07-28",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-42d1-7679-9c24-297a9e234454",
+          "date": "2022-07-27",
+          "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+          "horseName": "Kasztan",
+          "disciplineName": "Rajdy",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 12,
+          "participantsCount": 20,
+          "entryFee": 76.49,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-47d1-72e7-8e86-af1128c3e2f7",
+      "name": "Towarzyskie 2022",
+      "dateFrom": "2022-10-04",
+      "dateTo": null,
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-47d6-7941-ba55-1f5f30eea862",
+          "date": "2022-10-04",
+          "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+          "horseName": "Fokus",
+          "disciplineName": "Western",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 8,
+          "participantsCount": 20,
+          "entryFee": 134.08,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-47d4-750a-bbea-895911d73a45",
+          "date": "2022-10-04",
+          "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+          "horseName": "Kasztan",
+          "disciplineName": "Inne",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 8,
+          "participantsCount": 20,
+          "entryFee": 154.19,
+          "otherCosts": null,
+          "prizeMoney": 411.41,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-47d9-7712-9ce7-e52224eee7f1",
+          "date": "2022-10-04",
+          "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+          "horseName": "Wicher",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 188.67,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-44c2-79f5-b1bc-69b1c54c9735",
+      "name": "Halowy Puchar 2022",
+      "dateFrom": "2022-10-05",
+      "dateTo": "2022-10-06",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-44c6-72b2-b31f-ea38d201b03c",
+          "date": "2022-10-05",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Ujeżdżenie",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 8,
+          "participantsCount": 20,
+          "entryFee": 75.07,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4aa9-7bfa-a83f-a97fc979f00e",
+      "name": "Halowy Puchar 2022",
+      "dateFrom": "2022-12-18",
+      "dateTo": "2022-12-19",
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-4aaf-7fba-baf7-7ade14421930",
+          "date": "2022-12-18",
+          "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+          "horseName": "Grom",
+          "disciplineName": "Powożenie",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 10,
+          "participantsCount": 20,
+          "entryFee": 94.91,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4aac-7bc9-919d-19af13e1b727",
+          "date": "2022-12-18",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "WKKW",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 8,
+          "participantsCount": 20,
+          "entryFee": 173.59,
+          "otherCosts": null,
+          "prizeMoney": 199.9,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-48ec-7f93-ba10-c704ea611f11",
+      "name": "Zawody regionalne 2023",
+      "dateFrom": "2023-01-07",
+      "dateTo": "2023-01-08",
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-48f0-7e8c-878d-50dd8bd16d6d",
+          "date": "2023-01-07",
+          "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+          "horseName": "Grom",
+          "disciplineName": "Inne",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 2,
+          "participantsCount": 20,
+          "entryFee": 85.04,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-48ee-7f0e-bf46-82273931fcc0",
+          "date": "2023-01-07",
+          "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+          "horseName": "Kasztan",
+          "disciplineName": "Inne",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 15,
+          "participantsCount": 20,
+          "entryFee": 183.6,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4a7c-7707-b862-05ce53fc888e",
+      "name": "Mistrzostwa Okręgu 2023",
+      "dateFrom": "2023-06-09",
+      "dateTo": null,
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4a7f-7bdb-86b2-9883129af78e",
+          "date": "2023-06-09",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 12,
+          "participantsCount": 20,
+          "entryFee": 177.43,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4a82-7b4d-8de3-28fc28d47acb",
+          "date": "2023-06-09",
+          "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+          "horseName": "Kasztan",
+          "disciplineName": "Skoki",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 9,
+          "participantsCount": 20,
+          "entryFee": 132.72,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-43c4-7e84-920c-6bb4fceaf844",
+      "name": "Zawody regionalne 2023",
+      "dateFrom": "2023-07-16",
+      "dateTo": null,
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-43c7-79c8-86cf-709108863c44",
+          "date": "2023-07-16",
+          "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+          "horseName": "Bursztyn",
+          "disciplineName": "WKKW",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 3,
+          "participantsCount": 20,
+          "entryFee": 149.62,
+          "otherCosts": null,
+          "prizeMoney": 150,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-43ca-734e-a981-b1a3ab5146ff",
+          "date": "2023-07-16",
+          "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+          "horseName": "Iskra",
+          "disciplineName": "Inne",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 4,
+          "participantsCount": 20,
+          "entryFee": 115.72,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-42e2-76d0-9767-8c3f3e889e54",
+      "name": "Halowy Puchar 2023",
+      "dateFrom": "2023-07-20",
+      "dateTo": "2023-07-21",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-42e8-7009-b3d9-f2e3a42d3172",
+          "date": "2023-07-20",
+          "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+          "horseName": "Rubin",
+          "disciplineName": "Rajdy",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 135.99,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4809-7576-ae71-55c1b74ae308",
+      "name": "Halowy Puchar 2023",
+      "dateFrom": "2023-07-27",
+      "dateTo": "2023-07-28",
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-4811-7053-8e3e-a43a2dccfda0",
+          "date": "2023-07-27",
+          "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+          "horseName": "Bursztyn",
+          "disciplineName": "Ujeżdżenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 99.43,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-480f-7190-9060-c05228b2c4b2",
+          "date": "2023-07-27",
+          "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+          "horseName": "Wicher",
+          "disciplineName": "Inne",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 14,
+          "participantsCount": 20,
+          "entryFee": 166.73,
+          "otherCosts": null,
+          "prizeMoney": 680.07,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-418a-793b-9d73-4c9196f2ff04",
+      "name": "Halowy Puchar 2023",
+      "dateFrom": "2023-08-17",
+      "dateTo": null,
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-418f-7220-a3cf-2d26dfc218c6",
+          "date": "2023-08-17",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "Skoki",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 2,
+          "participantsCount": 20,
+          "entryFee": 157.83,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-418e-71af-b02f-5eb1afa076e5",
+          "date": "2023-08-17",
+          "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+          "horseName": "Fokus",
+          "disciplineName": "Skoki",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 13,
+          "participantsCount": 20,
+          "entryFee": 50.24,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4354-74ce-bed0-e7a325618fca",
+      "name": "Zawody regionalne 2023",
+      "dateFrom": "2023-09-06",
+      "dateTo": "2023-09-07",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4359-7564-b670-18468420bc11",
+          "date": "2023-09-06",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "Western",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 166.73,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4acb-7764-87c4-f92da5e8408b",
+      "name": "Mistrzostwa Okręgu 2023",
+      "dateFrom": "2023-09-15",
+      "dateTo": null,
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4ad1-7955-a5f1-0d9054e7606e",
+          "date": "2023-09-15",
+          "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+          "horseName": "Wicher",
+          "disciplineName": "Ujeżdżenie",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 132.95,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4744-723b-8a28-59a06d3b947e",
+      "name": "Mistrzostwa Okręgu 2023",
+      "dateFrom": "2023-10-01",
+      "dateTo": "2023-10-02",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4749-74fb-821c-01c496b54597",
+          "date": "2023-10-01",
+          "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+          "horseName": "Kasztan",
+          "disciplineName": "Skoki",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 74.37,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4747-7260-aee3-e0ac0f030d3c",
+          "date": "2023-10-01",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Western",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 2,
+          "participantsCount": 20,
+          "entryFee": 182.2,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4ae8-7693-a4f4-9a47d6c814b4",
+      "name": "Mistrzostwa Okręgu 2023",
+      "dateFrom": "2023-10-02",
+      "dateTo": "2023-10-03",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4aeb-7f96-8afc-b41fbed4af40",
+          "date": "2023-10-02",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Skoki",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 77.91,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-46c5-7124-980c-e42eef380ffb",
+      "name": "Zawody regionalne 2023",
+      "dateFrom": "2023-11-30",
+      "dateTo": "2023-12-01",
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-46c7-7ca7-9cbf-29e64f571845",
+          "date": "2023-11-30",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "Ujeżdżenie",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 3,
+          "participantsCount": 20,
+          "entryFee": 109.36,
+          "otherCosts": null,
+          "prizeMoney": 349.39,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4772-7914-b27e-0ee492b37dbb",
+      "name": "Mistrzostwa Okręgu 2023",
+      "dateFrom": "2023-12-11",
+      "dateTo": null,
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-4776-7844-a3d8-cd921b048dba",
+          "date": "2023-12-11",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "Powożenie",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 164.11,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4220-777c-b4db-d9bf635b3791",
+      "name": "Zawody regionalne 2024",
+      "dateFrom": "2024-02-13",
+      "dateTo": null,
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4224-7f33-89a8-63892e37f1a7",
+          "date": "2024-02-13",
+          "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+          "horseName": "Iskra",
+          "disciplineName": "Skoki",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 4,
+          "participantsCount": 20,
+          "entryFee": 92.14,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4476-72db-92e7-32ebb79788bc",
+      "name": "Zawody regionalne 2024",
+      "dateFrom": "2024-05-02",
+      "dateTo": null,
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-447a-71d7-8693-e4241c0aec1b",
+          "date": "2024-05-02",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "WKKW",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 142.93,
+          "otherCosts": null,
+          "prizeMoney": 897.19,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-44ef-7c88-beac-fc944e9b3e14",
+      "name": "Towarzyskie 2024",
+      "dateFrom": "2024-06-14",
+      "dateTo": null,
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-44f6-7e5b-9c30-fcdff5ebf58a",
+          "date": "2024-06-14",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "WKKW",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 10,
+          "participantsCount": 20,
+          "entryFee": 87.46,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4b60-75b3-aa47-3c683ce81622",
+      "name": "Zawody regionalne 2024",
+      "dateFrom": "2024-07-09",
+      "dateTo": null,
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-4b63-735a-87ec-5a7f52fd01de",
+          "date": "2024-07-09",
+          "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+          "horseName": "Fokus",
+          "disciplineName": "Western",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 9,
+          "participantsCount": 20,
+          "entryFee": 115.13,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-422f-78dc-b230-56b92ebce1bb",
+      "name": "Halowy Puchar 2024",
+      "dateFrom": "2024-09-11",
+      "dateTo": null,
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-4235-7c6e-bb03-b3d2d6c7d1e2",
+          "date": "2024-09-11",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "WKKW",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 15,
+          "participantsCount": 20,
+          "entryFee": 65.57,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4232-7c22-8c19-e4f220fc5e94",
+          "date": "2024-09-11",
+          "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+          "horseName": "Iskra",
+          "disciplineName": "Western",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 149.23,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4845-70bb-9632-7d3f1428e9a6",
+      "name": "Halowy Puchar 2024",
+      "dateFrom": "2024-09-11",
+      "dateTo": "2024-09-12",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4847-7bd2-9520-1540c52f4f5b",
+          "date": "2024-09-11",
+          "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+          "horseName": "Grom",
+          "disciplineName": "Rajdy",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 80.08,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-42ef-7776-a90d-2d61b323d81e",
+      "name": "Towarzyskie 2024",
+      "dateFrom": "2024-12-30",
+      "dateTo": "2024-12-31",
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-42f2-7ace-987a-cc5e8b6c3988",
+          "date": "2024-12-30",
+          "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+          "horseName": "Hades",
+          "disciplineName": "Inne",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 10,
+          "participantsCount": 20,
+          "entryFee": 69.29,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-42f7-73bd-b428-128c30f27baa",
+          "date": "2024-12-30",
+          "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+          "horseName": "Iskra",
+          "disciplineName": "Inne",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 120.63,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4542-7193-bd78-8c5e370ce6c3",
+      "name": "Halowy Puchar 2025",
+      "dateFrom": "2025-01-29",
+      "dateTo": "2025-01-30",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4548-7682-b932-fd96d9ba248a",
+          "date": "2025-01-29",
+          "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+          "horseName": "Fokus",
+          "disciplineName": "Skoki",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 12,
+          "participantsCount": 20,
+          "entryFee": 107.54,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-49f7-7fbe-95dd-96994e16f3b2",
+      "name": "Halowy Puchar 2025",
+      "dateFrom": "2025-03-04",
+      "dateTo": null,
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4a01-7083-885a-f142455fa258",
+          "date": "2025-03-04",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "WKKW",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 3,
+          "participantsCount": 20,
+          "entryFee": 70.86,
+          "otherCosts": null,
+          "prizeMoney": 363.41,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4b26-7387-bc90-fea546c9d73b",
+      "name": "Towarzyskie 2025",
+      "dateFrom": "2025-08-14",
+      "dateTo": "2025-08-15",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2d-4b30-738a-a9bc-36da6231ade0",
+          "date": "2025-08-14",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "Rajdy",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 13,
+          "participantsCount": 20,
+          "entryFee": 91.83,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4bb7-742d-8809-000acebfecf5",
+      "name": "Zawody regionalne 2025",
+      "dateFrom": "2025-08-15",
+      "dateTo": "2025-08-16",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-4bbe-7c70-8a16-5de758e4aeb3",
+          "date": "2025-08-15",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "Western",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 8,
+          "participantsCount": 20,
+          "entryFee": 168.88,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4864-7cbd-98ad-a779bfb415e2",
+      "name": "Towarzyskie 2025",
+      "dateFrom": "2025-08-26",
+      "dateTo": "2025-08-27",
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-4868-71bb-a1b0-0ccd7064f9bd",
+          "date": "2025-08-26",
+          "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+          "horseName": "Luna",
+          "disciplineName": "Inne",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 13,
+          "participantsCount": 20,
+          "entryFee": 114.02,
+          "otherCosts": null,
+          "prizeMoney": 552.82,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-4869-7920-8275-30418d522079",
+          "date": "2025-08-26",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 14,
+          "participantsCount": 20,
+          "entryFee": 89.72,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-490b-7891-b978-8a604a0d856b",
+      "name": "Zawody regionalne 2025",
+      "dateFrom": "2025-08-31",
+      "dateTo": null,
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-490f-7ab3-9bac-0f9059ece587",
+          "date": "2025-08-31",
+          "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+          "horseName": "Sowa",
+          "disciplineName": "Powożenie",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 6,
+          "participantsCount": 20,
+          "entryFee": 189.04,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4d5e-7a7f-8579-e2dfb2a3b610",
+      "name": "Zawody regionalne 2025",
+      "dateFrom": "2025-09-18",
+      "dateTo": null,
+      "city": "Warszawa",
+      "starts": [
+        {
+          "startId": "01a13e2d-4d67-7ea9-b3e5-e84ad9ee3744",
+          "date": "2025-09-18",
+          "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+          "horseName": "Iskra",
+          "disciplineName": "Powożenie",
+          "className": "LL",
+          "resultStatus": "Completed",
+          "placement": 3,
+          "participantsCount": 20,
+          "entryFee": 164.85,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4895-7915-8dec-fa9db1482676",
+      "name": "Zawody regionalne 2025",
+      "dateFrom": "2025-10-24",
+      "dateTo": "2025-10-25",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-489c-706e-b92b-999ac06afff2",
+          "date": "2025-10-24",
+          "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+          "horseName": "Rubin",
+          "disciplineName": "Ujeżdżenie",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 14,
+          "participantsCount": 20,
+          "entryFee": 175.97,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-489a-700a-99c3-8d41aa8997bc",
+          "date": "2025-10-24",
+          "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+          "horseName": "Tango",
+          "disciplineName": "Powożenie",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 4,
+          "participantsCount": 20,
+          "entryFee": 84.89,
+          "otherCosts": null,
+          "prizeMoney": 955.57,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-487c-7a6c-b960-98da616601d8",
+      "name": "Towarzyskie 2025",
+      "dateFrom": "2025-11-20",
+      "dateTo": "2025-11-21",
+      "city": "Leszno",
+      "starts": [
+        {
+          "startId": "01a13e2d-4880-7ff5-9457-78dc98c90cf9",
+          "date": "2025-11-20",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "Ujeżdżenie",
+          "className": "C",
+          "resultStatus": "Completed",
+          "placement": 2,
+          "participantsCount": 20,
+          "entryFee": 127.24,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-41eb-75cc-aa20-254730faf163",
+      "name": "Mistrzostwa Okręgu 2026",
+      "dateFrom": "2026-01-11",
+      "dateTo": "2026-01-12",
+      "city": "Sopot",
+      "starts": [
+        {
+          "startId": "01a13e2d-41ee-7d42-96ba-ddc82f391164",
+          "date": "2026-01-11",
+          "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+          "horseName": "Dama",
+          "disciplineName": "Ujeżdżenie",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 9,
+          "participantsCount": 20,
+          "entryFee": 81.81,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2d-41f2-7547-91c6-f91281300e3f",
+          "date": "2026-01-11",
+          "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+          "horseName": "Kasztan",
+          "disciplineName": "WKKW",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 11,
+          "participantsCount": 20,
+          "entryFee": 181.02,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a13e2d-4967-7c20-acd9-df51d115b203",
+      "name": "Mistrzostwa Okręgu 2026",
+      "dateFrom": "2026-08-24",
+      "dateTo": "2026-08-25",
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a13e2d-496c-74ad-b8f6-ac374de4f446",
+          "date": "2026-08-24",
+          "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+          "horseName": "Grom",
+          "disciplineName": "Powożenie",
+          "className": "N",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 20,
+          "entryFee": 179.12,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    }
+  ],
+  "total": {
+    "competitions": 60,
+    "starts": 82,
+    "totalCosts": 10243.31,
+    "totalPrizes": 9734.06,
+    "balance": -509.25
+  },
+  "groups": []
+}

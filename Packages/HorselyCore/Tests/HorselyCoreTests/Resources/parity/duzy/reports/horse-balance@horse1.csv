@@ -1,0 +1,6 @@
+﻿Koń;Status;Zakup;Koszty;Nagrody;Sprzedaż;Wynik;Wartość (ocena własna);Uwagi
+Bursztyn;Aktywny;56903,01;38267,42;3040,85;;-92129,58;14107,88;"strata; wynik dotychczasowy — koń niesprzedany"
+
+Razem;;56903,01;38267,42;3040,85;0,00;-92129,58;;strata
+
+Wynik = sprzedaż + nagrody − zakup − koszty (z całej historii konia). Wartość konia to tylko ocena własna właściciela i nie wchodzi do wyniku.

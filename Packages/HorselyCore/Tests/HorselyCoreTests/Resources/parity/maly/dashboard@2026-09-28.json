@@ -1,0 +1,187 @@
+{
+  "overdue": [],
+  "upcoming": [
+    {
+      "id": "01a13e2c-e329-7cea-9464-2deef753f9c0",
+      "version": 1,
+      "createdAt": "2026-09-28T10:00:00Z",
+      "updatedAt": "2026-09-28T10:00:00Z",
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom",
+      "kind": "Other",
+      "dueDate": "2026-10-02",
+      "title": "Przegląd siodła",
+      "specialistTypeId": null,
+      "specialistTypeName": null,
+      "notes": null,
+      "status": "Open",
+      "sourceType": null,
+      "sourceId": null,
+      "completedByType": null,
+      "completedById": null,
+      "completedAt": null,
+      "isOverdue": false
+    },
+    {
+      "id": "01a13e2c-e153-7912-a2df-ad09d5b3577d",
+      "version": 1,
+      "createdAt": "2026-09-28T10:00:00Z",
+      "updatedAt": "2026-09-28T10:00:00Z",
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom",
+      "kind": "Physio",
+      "dueDate": "2026-10-05",
+      "title": "Fizjoterapeuta — Grom",
+      "specialistTypeId": null,
+      "specialistTypeName": null,
+      "notes": null,
+      "status": "Open",
+      "sourceType": "PhysioVisit",
+      "sourceId": "01a13e2c-e133-70e5-ba93-9a92dc5de16d",
+      "completedByType": null,
+      "completedById": null,
+      "completedAt": null,
+      "isOverdue": false
+    }
+  ],
+  "laterThisMonth": [],
+  "horses": [
+    {
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "name": "Grom",
+      "nextReminderId": "01a13e2c-e329-7cea-9464-2deef753f9c0",
+      "nextReminderDate": "2026-10-02",
+      "nextReminderTitle": "Przegląd siodła",
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+      "name": "Iskra",
+      "nextReminderId": "01a13e2c-e33b-7cf6-bfe8-30339afe58c4",
+      "nextReminderDate": "2026-10-20",
+      "nextReminderTitle": "Odrobaczanie jesienne",
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    }
+  ],
+  "recentEntries": [
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2c-e257-7407-9707-3032eda96c37",
+      "date": "2026-09-21",
+      "title": "Zawody regionalne 2026",
+      "summary": "P · 7. miejsce",
+      "cost": 80,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+      "horseName": "Iskra"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2c-e207-72ea-8534-5c7e5ebff5c3",
+      "date": "2026-09-20",
+      "title": "Zawody regionalne 2026",
+      "summary": "L · 3. miejsce",
+      "cost": 125.5,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2c-e2d3-794f-97ed-33371755f819",
+      "date": "2026-09-15",
+      "title": "Zmiana paszy",
+      "summary": "Zmniejszona dawka owsa.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+      "horseName": "Iskra"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2c-e2c0-7440-9287-8d92e1fb1b91",
+      "date": "2026-09-14",
+      "title": "Obserwacja",
+      "summary": "Lekko sztywny na lewą stronę.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2c-e0f7-73fb-943c-44dc10cfe8cf",
+      "date": "2026-09-12",
+      "title": "Kontrola",
+      "summary": "Kontrola okresowa",
+      "cost": 120,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+      "horseName": "Iskra"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2c-e029-7c9c-b47b-76d3f6bce105",
+      "date": "2026-09-10",
+      "title": "Szczepienie",
+      "summary": "Equilis Prequenza",
+      "cost": 250.5,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e2ae-785e-b000-ec3d22a4999b",
+      "date": "2026-09-08",
+      "title": "Siano",
+      "summary": "Pasza",
+      "cost": 100.01,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2c-e17d-7dcb-90a4-9033f2c0d326",
+      "date": "2026-09-06",
+      "title": "Fizjoterapia",
+      "summary": "Sztywność grzbietu",
+      "cost": 150,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+      "horseName": "Iskra"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2c-e133-70e5-ba93-9a92dc5de16d",
+      "date": "2026-09-05",
+      "title": "Fizjoterapia",
+      "summary": "Sztywność grzbietu",
+      "cost": 200,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e26f-7a8a-89c0-0f8f0713efd4",
+      "date": "2026-09-03",
+      "title": "Owies",
+      "summary": "Pasza",
+      "cost": 162.5,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom"
+    }
+  ],
+  "costsThisMonth": 1868.50,
+  "costsPreviousMonth": 620,
+  "horizonDays": 7
+}

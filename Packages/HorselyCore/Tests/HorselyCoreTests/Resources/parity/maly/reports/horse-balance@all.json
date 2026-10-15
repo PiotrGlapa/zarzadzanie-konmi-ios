@@ -1,0 +1,106 @@
+{
+  "rows": [
+    {
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom",
+      "status": "Active",
+      "purchasePrice": 20000,
+      "costs": 1428.51,
+      "prizes": 300,
+      "salePrice": null,
+      "estimatedValue": 25000,
+      "result": -21128.51,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 250.5
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 300
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 200
+        },
+        {
+          "year": 2026,
+          "category": "Specjaliści",
+          "costs": 220
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 125.5
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 120
+        },
+        {
+          "year": 2026,
+          "category": "Pasza",
+          "costs": 212.51
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+      "horseName": "Iskra",
+      "status": "Active",
+      "purchasePrice": null,
+      "costs": 980,
+      "prizes": 0,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": -980,
+      "isFinal": false,
+      "purchaseMissing": true,
+      "breakdown": [
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 120
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 180
+        },
+        {
+          "year": 2026,
+          "category": "Fizjoterapeuta",
+          "costs": 150
+        },
+        {
+          "year": 2026,
+          "category": "Specjaliści",
+          "costs": 400
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 80
+        },
+        {
+          "year": 2026,
+          "category": "Pasza",
+          "costs": 50
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "purchasePrice": 20000,
+    "costs": 2408.51,
+    "prizes": 300,
+    "salePrice": 0,
+    "result": -22108.51
+  }
+}

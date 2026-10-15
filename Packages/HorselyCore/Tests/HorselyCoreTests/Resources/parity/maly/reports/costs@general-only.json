@@ -1,0 +1,36 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Category",
+  "rows": [
+    {
+      "group": "Sprzęt",
+      "horseId": null,
+      "category": "Sprzęt",
+      "month": null,
+      "costs": 79.99,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 79.99,
+  "totalCosts": 79.99,
+  "totalIncome": 0,
+  "balance": -79.99,
+  "months": [
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-09",
+      "category": "Sprzęt",
+      "costs": 79.99
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Sprzęt",
+      "costs": 79.99,
+      "income": 0
+    }
+  ]
+}

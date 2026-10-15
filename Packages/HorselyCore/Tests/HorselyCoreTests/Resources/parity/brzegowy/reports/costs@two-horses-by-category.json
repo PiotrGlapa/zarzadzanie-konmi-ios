@@ -1,0 +1,72 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Category",
+  "rows": [
+    {
+      "group": "Weterynarz",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 180,
+      "income": 0
+    },
+    {
+      "group": "Leki",
+      "horseId": null,
+      "category": "Leki",
+      "month": null,
+      "costs": 64.9,
+      "income": 0
+    },
+    {
+      "group": "Suplementy",
+      "horseId": null,
+      "category": "Suplementy",
+      "month": null,
+      "costs": 14.45,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 0,
+  "totalCosts": 259.35,
+  "totalIncome": 0,
+  "balance": -259.35,
+  "months": [
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-09",
+      "category": "Weterynarz",
+      "costs": 180
+    },
+    {
+      "month": "2026-09",
+      "category": "Leki",
+      "costs": 64.9
+    },
+    {
+      "month": "2026-09",
+      "category": "Suplementy",
+      "costs": 14.45
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 180,
+      "income": 0
+    },
+    {
+      "category": "Leki",
+      "costs": 64.9,
+      "income": 0
+    },
+    {
+      "category": "Suplementy",
+      "costs": 14.45,
+      "income": 0
+    }
+  ]
+}

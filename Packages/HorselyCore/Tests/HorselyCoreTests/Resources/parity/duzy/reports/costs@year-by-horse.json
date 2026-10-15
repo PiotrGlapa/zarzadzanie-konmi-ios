@@ -1,0 +1,930 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Horse",
+  "rows": [
+    {
+      "group": "Bursztyn",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 616.22,
+      "income": 0
+    },
+    {
+      "group": "Bursztyn",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 166.54,
+      "income": 0
+    },
+    {
+      "group": "Bursztyn",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "category": "Zawody",
+      "month": null,
+      "costs": 323.56,
+      "income": 209.65
+    },
+    {
+      "group": "Bursztyn",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "category": "Treningi",
+      "month": null,
+      "costs": 190,
+      "income": 0
+    },
+    {
+      "group": "Bursztyn",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "category": "Pielęgnacja",
+      "month": null,
+      "costs": 1549.72,
+      "income": 0
+    },
+    {
+      "group": "Bursztyn",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "category": "Ściółka",
+      "month": null,
+      "costs": 2159.73,
+      "income": 0
+    },
+    {
+      "group": "Bursztyn",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "category": "Usługi",
+      "month": null,
+      "costs": 221.57,
+      "income": 0
+    },
+    {
+      "group": "Dama",
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 496.44,
+      "income": 0
+    },
+    {
+      "group": "Dama",
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "category": "Kowal",
+      "month": null,
+      "costs": 139.47,
+      "income": 0
+    },
+    {
+      "group": "Dama",
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "category": "Zawody",
+      "month": null,
+      "costs": 310.50,
+      "income": 505.38
+    },
+    {
+      "group": "Dama",
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "category": "Treningi",
+      "month": null,
+      "costs": 220,
+      "income": 0
+    },
+    {
+      "group": "Dama",
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "category": "Ściółka",
+      "month": null,
+      "costs": 223.54,
+      "income": 0
+    },
+    {
+      "group": "Fokus",
+      "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 467.64,
+      "income": 0
+    },
+    {
+      "group": "Fokus",
+      "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+      "category": "Kowal",
+      "month": null,
+      "costs": 399.86,
+      "income": 0
+    },
+    {
+      "group": "Fokus",
+      "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+      "category": "Zawody",
+      "month": null,
+      "costs": 183.83,
+      "income": 1053.41
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 1905.96,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Kowal",
+      "month": null,
+      "costs": 536.01,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 255.72,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Specjaliści",
+      "month": null,
+      "costs": 454.88,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Zawody",
+      "month": null,
+      "costs": 372.40,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Treningi",
+      "month": null,
+      "costs": 230,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Ściółka",
+      "month": null,
+      "costs": 223.54,
+      "income": 0
+    },
+    {
+      "group": "Grom",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "category": "Usługi",
+      "month": null,
+      "costs": 98.25,
+      "income": 0
+    },
+    {
+      "group": "Hades",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 560.35,
+      "income": 0
+    },
+    {
+      "group": "Hades",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "category": "Specjaliści",
+      "month": null,
+      "costs": 564.08,
+      "income": 0
+    },
+    {
+      "group": "Hades",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "category": "Zawody",
+      "month": null,
+      "costs": 516.80,
+      "income": 457.98
+    },
+    {
+      "group": "Hades",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "category": "Leki",
+      "month": null,
+      "costs": 930.87,
+      "income": 0
+    },
+    {
+      "group": "Hades",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "category": "Pielęgnacja",
+      "month": null,
+      "costs": 1647.07,
+      "income": 0
+    },
+    {
+      "group": "Hades",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "category": "Suplementy",
+      "month": null,
+      "costs": 209.69,
+      "income": 0
+    },
+    {
+      "group": "Hades",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "category": "Usługi",
+      "month": null,
+      "costs": 319.79,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 841.44,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "category": "Kowal",
+      "month": null,
+      "costs": 423.89,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "category": "Zawody",
+      "month": null,
+      "costs": 686.23,
+      "income": 0
+    },
+    {
+      "group": "Iskra",
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "category": "Inne",
+      "month": null,
+      "costs": 1273.94,
+      "income": 0
+    },
+    {
+      "group": "Kasztan",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "category": "Kowal",
+      "month": null,
+      "costs": 181.97,
+      "income": 0
+    },
+    {
+      "group": "Kasztan",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 459.17,
+      "income": 0
+    },
+    {
+      "group": "Kasztan",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "category": "Zawody",
+      "month": null,
+      "costs": 588.82,
+      "income": 900.77
+    },
+    {
+      "group": "Kasztan",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "category": "Treningi",
+      "month": null,
+      "costs": 140,
+      "income": 0
+    },
+    {
+      "group": "Kasztan",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "category": "Pielęgnacja",
+      "month": null,
+      "costs": 122.17,
+      "income": 0
+    },
+    {
+      "group": "Kasztan",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "category": "Ściółka",
+      "month": null,
+      "costs": 223.54,
+      "income": 0
+    },
+    {
+      "group": "Luna",
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 364.83,
+      "income": 0
+    },
+    {
+      "group": "Luna",
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 222,
+      "income": 0
+    },
+    {
+      "group": "Luna",
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "category": "Specjaliści",
+      "month": null,
+      "costs": 474.5,
+      "income": 0
+    },
+    {
+      "group": "Luna",
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "category": "Zawody",
+      "month": null,
+      "costs": 541.66,
+      "income": 634.15
+    },
+    {
+      "group": "Luna",
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "category": "Treningi",
+      "month": null,
+      "costs": 280,
+      "income": 0
+    },
+    {
+      "group": "Luna",
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "category": "Pielęgnacja",
+      "month": null,
+      "costs": 122.17,
+      "income": 0
+    },
+    {
+      "group": "Luna",
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "category": "Usługi",
+      "month": null,
+      "costs": 221.57,
+      "income": 0
+    },
+    {
+      "group": "Rubin",
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 479.29,
+      "income": 0
+    },
+    {
+      "group": "Rubin",
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 527.17,
+      "income": 0
+    },
+    {
+      "group": "Rubin",
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "category": "Specjaliści",
+      "month": null,
+      "costs": 527.85,
+      "income": 0
+    },
+    {
+      "group": "Rubin",
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "category": "Zawody",
+      "month": null,
+      "costs": 520.58,
+      "income": 2336.79
+    },
+    {
+      "group": "Rubin",
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "category": "Sprzęt",
+      "month": null,
+      "costs": 660.76,
+      "income": 0
+    },
+    {
+      "group": "Rubin",
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "category": "Usługi",
+      "month": null,
+      "costs": 98.22,
+      "income": 0
+    },
+    {
+      "group": "Sowa",
+      "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+      "category": "Kowal",
+      "month": null,
+      "costs": 282.21,
+      "income": 0
+    },
+    {
+      "group": "Sowa",
+      "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 209.07,
+      "income": 0
+    },
+    {
+      "group": "Sowa",
+      "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+      "category": "Zawody",
+      "month": null,
+      "costs": 167.45,
+      "income": 0
+    },
+    {
+      "group": "Sowa",
+      "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+      "category": "Ściółka",
+      "month": null,
+      "costs": 223.54,
+      "income": 0
+    },
+    {
+      "group": "Sowa",
+      "horseId": "01a13e2d-40f2-7833-9436-bacda6d80e33",
+      "category": "Usługi",
+      "month": null,
+      "costs": 319.79,
+      "income": 0
+    },
+    {
+      "group": "Tango",
+      "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+      "category": "Kowal",
+      "month": null,
+      "costs": 286.91,
+      "income": 0
+    },
+    {
+      "group": "Tango",
+      "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+      "category": "Zawody",
+      "month": null,
+      "costs": 233.67,
+      "income": 0
+    },
+    {
+      "group": "Tango",
+      "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+      "category": "Suplementy",
+      "month": null,
+      "costs": 1301.67,
+      "income": 0
+    },
+    {
+      "group": "Tango",
+      "horseId": "01a13e2d-40fd-70e0-b28b-9575b0367d44",
+      "category": "Ściółka",
+      "month": null,
+      "costs": 223.54,
+      "income": 0
+    },
+    {
+      "group": "Wicher",
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 870.78,
+      "income": 0
+    },
+    {
+      "group": "Wicher",
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "category": "Kowal",
+      "month": null,
+      "costs": 147.21,
+      "income": 0
+    },
+    {
+      "group": "Wicher",
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "category": "Specjaliści",
+      "month": null,
+      "costs": 151.91,
+      "income": 0
+    },
+    {
+      "group": "Wicher",
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "category": "Zawody",
+      "month": null,
+      "costs": 214.69,
+      "income": 0
+    },
+    {
+      "group": "Wicher",
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "category": "Treningi",
+      "month": null,
+      "costs": 270,
+      "income": 0
+    },
+    {
+      "group": "Ogólne (stajnia)",
+      "horseId": null,
+      "category": "Inne",
+      "month": null,
+      "costs": 1400.22,
+      "income": 0
+    },
+    {
+      "group": "Ogólne (stajnia)",
+      "horseId": null,
+      "category": "Leki",
+      "month": null,
+      "costs": 1999.75,
+      "income": 0
+    },
+    {
+      "group": "Ogólne (stajnia)",
+      "horseId": null,
+      "category": "Pensjonat",
+      "month": null,
+      "costs": 991.68,
+      "income": 0
+    },
+    {
+      "group": "Ogólne (stajnia)",
+      "horseId": null,
+      "category": "Sprzęt",
+      "month": null,
+      "costs": 684.82,
+      "income": 0
+    },
+    {
+      "group": "Ogólne (stajnia)",
+      "horseId": null,
+      "category": "Suplementy",
+      "month": null,
+      "costs": 648.4,
+      "income": 0
+    },
+    {
+      "group": "Ogólne (stajnia)",
+      "horseId": null,
+      "category": "Ściółka",
+      "month": null,
+      "costs": 493.3,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 6218.17,
+  "totalCosts": 37596.41,
+  "totalIncome": 6098.13,
+  "balance": -31498.28,
+  "months": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-01",
+      "category": "Kowal",
+      "costs": 181.97
+    },
+    {
+      "month": "2026-01",
+      "category": "Fizjoterapeuta",
+      "costs": 477.72
+    },
+    {
+      "month": "2026-01",
+      "category": "Zawody",
+      "costs": 1242.22
+    },
+    {
+      "month": "2026-01",
+      "category": "Suplementy",
+      "costs": 209.69
+    },
+    {
+      "month": "2026-02",
+      "category": "Weterynarz",
+      "costs": 1133.25
+    },
+    {
+      "month": "2026-02",
+      "category": "Fizjoterapeuta",
+      "costs": 177.24
+    },
+    {
+      "month": "2026-02",
+      "category": "Zawody",
+      "costs": 160.1
+    },
+    {
+      "month": "2026-02",
+      "category": "Treningi",
+      "costs": 410
+    },
+    {
+      "month": "2026-02",
+      "category": "Sprzęt",
+      "costs": 1310.74
+    },
+    {
+      "month": "2026-03",
+      "category": "Weterynarz",
+      "costs": 1272.19
+    },
+    {
+      "month": "2026-03",
+      "category": "Kowal",
+      "costs": 161.35
+    },
+    {
+      "month": "2026-03",
+      "category": "Fizjoterapeuta",
+      "costs": 187.62
+    },
+    {
+      "month": "2026-03",
+      "category": "Specjaliści",
+      "costs": 679.76
+    },
+    {
+      "month": "2026-03",
+      "category": "Ściółka",
+      "costs": 493.3
+    },
+    {
+      "month": "2026-04",
+      "category": "Weterynarz",
+      "costs": 1156.37
+    },
+    {
+      "month": "2026-04",
+      "category": "Fizjoterapeuta",
+      "costs": 166.54
+    },
+    {
+      "month": "2026-04",
+      "category": "Zawody",
+      "costs": 457.06
+    },
+    {
+      "month": "2026-04",
+      "category": "Inne",
+      "costs": 2674.16
+    },
+    {
+      "month": "2026-04",
+      "category": "Pielęgnacja",
+      "costs": 244.34
+    },
+    {
+      "month": "2026-04",
+      "category": "Suplementy",
+      "costs": 1301.67
+    },
+    {
+      "month": "2026-05",
+      "category": "Weterynarz",
+      "costs": 467.64
+    },
+    {
+      "month": "2026-05",
+      "category": "Kowal",
+      "costs": 979.62
+    },
+    {
+      "month": "2026-05",
+      "category": "Fizjoterapeuta",
+      "costs": 209.07
+    },
+    {
+      "month": "2026-05",
+      "category": "Specjaliści",
+      "costs": 929.38
+    },
+    {
+      "month": "2026-05",
+      "category": "Zawody",
+      "costs": 1070.59
+    },
+    {
+      "month": "2026-05",
+      "category": "Treningi",
+      "costs": 140
+    },
+    {
+      "month": "2026-05",
+      "category": "Pielęgnacja",
+      "costs": 1647.07
+    },
+    {
+      "month": "2026-05",
+      "category": "Sprzęt",
+      "costs": 34.84
+    },
+    {
+      "month": "2026-06",
+      "category": "Weterynarz",
+      "costs": 870.79
+    },
+    {
+      "month": "2026-06",
+      "category": "Kowal",
+      "costs": 120.86
+    },
+    {
+      "month": "2026-06",
+      "category": "Fizjoterapeuta",
+      "costs": 459.17
+    },
+    {
+      "month": "2026-06",
+      "category": "Specjaliści",
+      "costs": 564.08
+    },
+    {
+      "month": "2026-06",
+      "category": "Leki",
+      "costs": 930.87
+    },
+    {
+      "month": "2026-06",
+      "category": "Pensjonat",
+      "costs": 991.68
+    },
+    {
+      "month": "2026-06",
+      "category": "Ściółka",
+      "costs": 1936.15
+    },
+    {
+      "month": "2026-06",
+      "category": "Usługi",
+      "costs": 392.91
+    },
+    {
+      "month": "2026-07",
+      "category": "Kowal",
+      "costs": 147.21
+    },
+    {
+      "month": "2026-07",
+      "category": "Treningi",
+      "costs": 500
+    },
+    {
+      "month": "2026-07",
+      "category": "Pielęgnacja",
+      "costs": 1549.72
+    },
+    {
+      "month": "2026-07",
+      "category": "Usługi",
+      "costs": 886.28
+    },
+    {
+      "month": "2026-08",
+      "category": "Weterynarz",
+      "costs": 861.27
+    },
+    {
+      "month": "2026-08",
+      "category": "Kowal",
+      "costs": 541.27
+    },
+    {
+      "month": "2026-08",
+      "category": "Zawody",
+      "costs": 1730.22
+    },
+    {
+      "month": "2026-08",
+      "category": "Treningi",
+      "costs": 280
+    },
+    {
+      "month": "2026-08",
+      "category": "Leki",
+      "costs": 1999.75
+    },
+    {
+      "month": "2026-09",
+      "category": "Weterynarz",
+      "costs": 841.44
+    },
+    {
+      "month": "2026-09",
+      "category": "Kowal",
+      "costs": 265.25
+    },
+    {
+      "month": "2026-09",
+      "category": "Fizjoterapeuta",
+      "costs": 162.31
+    },
+    {
+      "month": "2026-09",
+      "category": "Suplementy",
+      "costs": 648.4
+    },
+    {
+      "month": "2026-09",
+      "category": "Ściółka",
+      "costs": 1341.28
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 6602.95,
+      "income": 0
+    },
+    {
+      "category": "Kowal",
+      "costs": 2397.53,
+      "income": 0
+    },
+    {
+      "category": "Fizjoterapeuta",
+      "costs": 1839.67,
+      "income": 0
+    },
+    {
+      "category": "Specjaliści",
+      "costs": 2173.22,
+      "income": 0
+    },
+    {
+      "category": "Zawody",
+      "costs": 4660.19,
+      "income": 6098.13
+    },
+    {
+      "category": "Treningi",
+      "costs": 1330,
+      "income": 0
+    },
+    {
+      "category": "Inne",
+      "costs": 2674.16,
+      "income": 0
+    },
+    {
+      "category": "Leki",
+      "costs": 2930.62,
+      "income": 0
+    },
+    {
+      "category": "Pensjonat",
+      "costs": 991.68,
+      "income": 0
+    },
+    {
+      "category": "Pielęgnacja",
+      "costs": 3441.13,
+      "income": 0
+    },
+    {
+      "category": "Sprzęt",
+      "costs": 1345.58,
+      "income": 0
+    },
+    {
+      "category": "Suplementy",
+      "costs": 2159.76,
+      "income": 0
+    },
+    {
+      "category": "Ściółka",
+      "costs": 3770.73,
+      "income": 0
+    },
+    {
+      "category": "Usługi",
+      "costs": 1279.19,
+      "income": 0
+    }
+  ]
+}

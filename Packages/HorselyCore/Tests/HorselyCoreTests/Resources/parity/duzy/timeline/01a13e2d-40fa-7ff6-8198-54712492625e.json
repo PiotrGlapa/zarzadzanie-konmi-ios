@@ -1,0 +1,1386 @@
+{
+  "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+  "totalCount": 138,
+  "items": [
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4c30-7369-a0f7-efbabf89c7be",
+      "date": "2026-08-25",
+      "title": "Towarzyskie 2026",
+      "summary": "C · 15. miejsce",
+      "cost": 62.69,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4970-720d-a078-159442637daa",
+      "date": "2026-08-24",
+      "title": "Mistrzostwa Okręgu 2026",
+      "summary": "C · 5. miejsce",
+      "cost": 133.48,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-427e-79c8-b983-d9b697f930b0",
+      "date": "2026-07-23",
+      "title": "Siano",
+      "summary": "Usługi",
+      "cost": 221.57,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4bca-7ec6-928f-f6919b97bca0",
+      "date": "2026-06-26",
+      "title": "Ściółka",
+      "summary": "Leki",
+      "cost": 930.87,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-4382-77d5-aef5-e9002929cf7a",
+      "date": "2026-06-14",
+      "title": "Siodlarz",
+      "summary": "Dopasowanie siodła",
+      "cost": 564.08,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4709-7274-ae7a-6c525508f15d",
+      "date": "2026-06-05",
+      "title": "Owies",
+      "summary": "Usługi",
+      "cost": 98.22,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-438d-72da-a02f-f60feb78c79b",
+      "date": "2026-05-21",
+      "title": "Mistrzostwa Okręgu 2026",
+      "summary": "L · 8. miejsce",
+      "cost": 160.53,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-49f1-749f-9632-d1eb8fc9bf27",
+      "date": "2026-05-02",
+      "title": "Marchew",
+      "summary": "Pielęgnacja",
+      "cost": 1647.07,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4ba5-777b-b493-ed900b14459d",
+      "date": "2026-04-20",
+      "title": "Trening",
+      "summary": "Zmniejszona dawka owsa.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4c92-7313-8f81-3d48821fb1f3",
+      "date": "2026-04-02",
+      "title": "Po kulawiźnie",
+      "summary": "Chętny do pracy, dobra forma.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4521-7684-83d0-73bcb7ff9a53",
+      "date": "2026-03-01",
+      "title": "Nagła",
+      "summary": "Kolka",
+      "cost": 233.78,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4a75-7867-8341-949f603c79e1",
+      "date": "2026-02-25",
+      "title": "Nagła",
+      "summary": "Kulawizna prawej przedniej",
+      "cost": 326.57,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4466-7bd3-be15-fe5f1431f9ac",
+      "date": "2026-02-21",
+      "title": "Mistrzostwa Okręgu 2026",
+      "summary": "C · 12. miejsce",
+      "cost": 160.1,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4cfa-7427-9af0-a1fc0f36ed49",
+      "date": "2026-01-19",
+      "title": "Witaminy",
+      "summary": "Suplementy",
+      "cost": 209.69,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-456a-7b10-a0f9-a74ef68fc1c4",
+      "date": "2025-12-01",
+      "title": "Zabieg",
+      "summary": "Kontrola po leczeniu · Stan dobry, bez zmian chorobowych",
+      "cost": 188.93,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-473a-70d5-949a-c47d4eecc923",
+      "date": "2025-11-26",
+      "title": "Towarzyskie 2025",
+      "summary": "C · 1. miejsce",
+      "cost": 163.15,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4648-7957-a488-05322ec23d9d",
+      "date": "2025-11-18",
+      "title": "Korekcja",
+      "summary": "Kopyta w dobrym stanie",
+      "cost": 140.14,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4b82-7751-8ea4-54e25dac8f4f",
+      "date": "2025-11-02",
+      "title": "Halowy Puchar 2025",
+      "summary": "P · 9. miejsce",
+      "cost": 181.75,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2d-49c7-77f8-ad0d-4d5201343b3f",
+      "date": "2025-10-27",
+      "title": "Fizjoterapia",
+      "summary": "Napięcie szyi",
+      "cost": 291.97,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-43e9-79be-b3b6-d74e03d6556e",
+      "date": "2025-10-14",
+      "title": "Zmiana paszy",
+      "summary": "Zmniejszona dawka owsa.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4274-7c7d-a4e0-2ec81255cf3b",
+      "date": "2025-09-05",
+      "title": "Po kulawiźnie",
+      "summary": "Zmniejszona dawka owsa.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-452a-771f-a364-ed1be3206be7",
+      "date": "2025-08-28",
+      "title": "Marchew",
+      "summary": "Suplementy",
+      "cost": 201.02,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4b2d-72a7-8ca2-64e802d981ba",
+      "date": "2025-08-14",
+      "title": "Towarzyskie 2025",
+      "summary": "P · 9. miejsce",
+      "cost": 147.45,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-4823-7ef8-bbfb-3ddcd9bed28f",
+      "date": "2025-07-13",
+      "title": "Osteopata",
+      "summary": "Ocena kopyt",
+      "cost": 257.91,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-478f-7021-b4d7-94c8b8598df4",
+      "date": "2025-07-10",
+      "title": "Inny",
+      "summary": "Dopasowanie siodła",
+      "cost": 283.17,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-425f-7fa9-887f-44bf8c677861",
+      "date": "2025-06-08",
+      "title": "Sieczka",
+      "summary": "Sprzęt",
+      "cost": 1721.04,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-49ee-73a8-bddf-91d3553205be",
+      "date": "2025-04-29",
+      "title": "Siano",
+      "summary": "Inne",
+      "cost": 85.83,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-4d2a-735b-8f70-7ec19ab2d1d7",
+      "date": "2025-04-13",
+      "title": "Osteopata",
+      "summary": "Ocena kopyt",
+      "cost": 461.76,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4da5-77a6-9045-4f3651c3ace0",
+      "date": "2025-04-02",
+      "title": "Po kulawiźnie",
+      "summary": "Lekko sztywny na lewą stronę.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2d-4a3e-72dd-a479-7b2c7bec5e79",
+      "date": "2025-03-22",
+      "title": "Fizjoterapia",
+      "summary": "Rehabilitacja po kulawiźnie",
+      "cost": 207.57,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-45ca-75e1-8bed-17c08fc61322",
+      "date": "2025-03-18",
+      "title": "Osteopata",
+      "summary": "Dopasowanie siodła",
+      "cost": 178.04,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4ae0-722a-b5e3-4ec546f1b257",
+      "date": "2025-03-17",
+      "title": "Korekcja",
+      "summary": null,
+      "cost": 355.05,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-49fa-784f-bbc5-0c0af5b42087",
+      "date": "2025-03-04",
+      "title": "Halowy Puchar 2025",
+      "summary": "P · 12. miejsce",
+      "cost": 79.29,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4549-7ce7-8015-33acdbe3e5fe",
+      "date": "2025-01-29",
+      "title": "Halowy Puchar 2025",
+      "summary": "C · 3. miejsce",
+      "cost": 53.95,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4431-7769-af48-81284475f76f",
+      "date": "2025-01-20",
+      "title": "Mistrzostwa Okręgu 2025",
+      "summary": "LL · 15. miejsce",
+      "cost": 165.48,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-42f2-7ace-987a-cc5e8b6c3988",
+      "date": "2024-12-30",
+      "title": "Towarzyskie 2024",
+      "summary": "N · 10. miejsce",
+      "cost": 69.29,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4b50-76ce-8d38-0dd60c4d26a9",
+      "date": "2024-12-18",
+      "title": "Zabieg",
+      "summary": "Ocena zębów",
+      "cost": 494.97,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2d-419c-7712-8b33-0ed7946e4da6",
+      "date": "2024-09-28",
+      "title": "Fizjoterapia",
+      "summary": "Rehabilitacja po kulawiźnie",
+      "cost": 204.68,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2d-4591-72a6-9ac5-95387213e129",
+      "date": "2024-09-25",
+      "title": "Fizjoterapia",
+      "summary": "Napięcie szyi",
+      "cost": 251.92,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4c9d-71ba-9149-922fae2afb28",
+      "date": "2024-09-18",
+      "title": "Badanie",
+      "summary": "Zapalenie spojówek · Stan dobry, bez zmian chorobowych",
+      "cost": 671.46,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4235-7c6e-bb03-b3d2d6c7d1e2",
+      "date": "2024-09-11",
+      "title": "Halowy Puchar 2024",
+      "summary": "LL · 15. miejsce",
+      "cost": 65.57,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4bd7-769f-ba05-f809bf94d644",
+      "date": "2024-07-31",
+      "title": "Siano",
+      "summary": "Pielęgnacja",
+      "cost": 206.29,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-46b8-7c72-b451-803368e04c27",
+      "date": "2024-07-24",
+      "title": "Sieczka",
+      "summary": "Pasza",
+      "cost": 132.61,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-48b9-7d6b-bb12-d7106e7daa53",
+      "date": "2024-07-16",
+      "title": "Halowy Puchar 2024",
+      "summary": "N · 7. miejsce",
+      "cost": 161.01,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4b66-77f7-b189-49930389663f",
+      "date": "2024-07-09",
+      "title": "Zawody regionalne 2024",
+      "summary": "LL · 2. miejsce",
+      "cost": 157.44,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4c11-7798-b300-f9477e003b02",
+      "date": "2024-06-27",
+      "title": "Kontrola",
+      "summary": "Kaszel",
+      "cost": 364.04,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4449-7c6e-818d-e94751032d36",
+      "date": "2024-06-25",
+      "title": "Sieczka",
+      "summary": "Suplementy",
+      "cost": 85.38,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-46d7-7610-93e8-91e468636bac",
+      "date": "2024-06-15",
+      "title": "Szczepienie",
+      "summary": "Equilis Prequenza Te",
+      "cost": 808.76,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4d31-7b5c-8e95-219b9cb03f44",
+      "date": "2024-06-14",
+      "title": "Korekcja",
+      "summary": null,
+      "cost": 329.22,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4bee-78a4-a6e6-afc18ff1203a",
+      "date": "2024-05-27",
+      "title": "Towarzyskie 2024",
+      "summary": "LL · 7. miejsce",
+      "cost": 110.65,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-41a6-79ac-8601-e879f49d012a",
+      "date": "2024-05-21",
+      "title": "Kucie tył",
+      "summary": null,
+      "cost": 130.04,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-49e8-7ce4-932c-ec86c9500324",
+      "date": "2024-05-18",
+      "title": "Zabieg",
+      "summary": "Kontrola okresowa · Stan dobry, bez zmian chorobowych",
+      "cost": 139.45,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4d53-71f6-817d-772375fbf727",
+      "date": "2024-03-23",
+      "title": "Marchew",
+      "summary": "Ściółka",
+      "cost": 292.84,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4d20-706f-a135-83111d3046e1",
+      "date": "2024-01-19",
+      "title": "Kontrola",
+      "summary": "Obrzęk stawu skokowego",
+      "cost": 346.4,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4ba1-76e1-af7c-9f6b510d4733",
+      "date": "2024-01-11",
+      "title": "Szczepienie",
+      "summary": "Equilis Prequenza Te",
+      "cost": 726,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-46d3-7a2b-bf1a-41dd191a2f5d",
+      "date": "2023-11-16",
+      "title": "Towarzyskie 2023",
+      "summary": "C · 4. miejsce",
+      "cost": 115.84,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4acf-74f0-a1e9-53e86f397d08",
+      "date": "2023-09-15",
+      "title": "Mistrzostwa Okręgu 2023",
+      "summary": "LL · 14. miejsce",
+      "cost": 63.83,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4815-7d42-b3d9-ce13a6f72756",
+      "date": "2023-07-27",
+      "title": "Halowy Puchar 2023",
+      "summary": "L · 13. miejsce",
+      "cost": 143.41,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4b90-7fc1-bf6b-42662465a1d1",
+      "date": "2023-07-01",
+      "title": "Elektrolity",
+      "summary": "Pielęgnacja",
+      "cost": 505.89,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4cc3-7dc8-8d26-ba190962b100",
+      "date": "2023-06-21",
+      "title": "Marchew",
+      "summary": "Pensjonat",
+      "cost": 521.48,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4871-7c1d-9910-a192565dfe49",
+      "date": "2023-06-14",
+      "title": "Nagła",
+      "summary": "Kolka",
+      "cost": 372.64,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4a7f-7bdb-86b2-9883129af78e",
+      "date": "2023-06-09",
+      "title": "Mistrzostwa Okręgu 2023",
+      "summary": "N · 12. miejsce",
+      "cost": 177.43,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4cc6-7392-89e5-c05cca5e29db",
+      "date": "2023-06-08",
+      "title": "Marchew",
+      "summary": "Pasza",
+      "cost": 1710.76,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-44f7-772b-ba89-a43c878c55a0",
+      "date": "2023-05-17",
+      "title": "Zabieg",
+      "summary": "Ocena zębów",
+      "cost": 86.69,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-458b-71e3-a91d-0d5c627792e5",
+      "date": "2023-05-12",
+      "title": "Halowy Puchar 2023",
+      "summary": "C · 12. miejsce",
+      "cost": 64.04,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4c95-7e38-a5cc-8693a048777c",
+      "date": "2023-04-25",
+      "title": "Kucie pełne",
+      "summary": null,
+      "cost": 422.29,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4a51-7702-b994-d400f3a5f750",
+      "date": "2023-04-22",
+      "title": "Siano",
+      "summary": "Pielęgnacja",
+      "cost": 377.49,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-46a8-73cf-ab61-b76d1eee2243",
+      "date": "2023-02-24",
+      "title": "Marchew",
+      "summary": "Leki",
+      "cost": 1880.67,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4bb3-73ad-a8cc-7b36de6102d1",
+      "date": "2023-02-19",
+      "title": "Towarzyskie 2023",
+      "summary": "N · 10. miejsce",
+      "cost": 70.96,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-41e4-7f88-ac1c-3a4efd627918",
+      "date": "2023-01-23",
+      "title": "Szczotka",
+      "summary": "Suplementy",
+      "cost": 277.73,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-478e-74f1-875f-ef3bc5c94d61",
+      "date": "2023-01-19",
+      "title": "Nagła",
+      "summary": "Obrzęk stawu skokowego",
+      "cost": 168.46,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-43c2-7203-a649-46875374472c",
+      "date": "2022-12-23",
+      "title": "Trening",
+      "summary": "Chętny do pracy, dobra forma.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2d-430b-70d1-bc9e-cd01950b7bd3",
+      "date": "2022-10-15",
+      "title": "Fizjoterapia",
+      "summary": "Napięcie szyi",
+      "cost": 175.41,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-44c6-72b2-b31f-ea38d201b03c",
+      "date": "2022-10-05",
+      "title": "Halowy Puchar 2022",
+      "summary": "LL · 8. miejsce",
+      "cost": 75.07,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-47d7-7cff-9b84-61e91765df64",
+      "date": "2022-10-04",
+      "title": "Towarzyskie 2022",
+      "summary": "L · 8. miejsce",
+      "cost": 186.25,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4cbf-7b20-a0fb-41c517b86575",
+      "date": "2022-09-11",
+      "title": "Nagła",
+      "summary": "Kontrola po leczeniu · Stan dobry, bez zmian chorobowych",
+      "cost": 679.44,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4451-752b-a932-d0fe9edb9961",
+      "date": "2022-08-31",
+      "title": "Kucie przód",
+      "summary": null,
+      "cost": 237.21,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-42d4-7a10-ad65-5507494270d3",
+      "date": "2022-07-27",
+      "title": "Halowy Puchar 2022",
+      "summary": "L · 1. miejsce",
+      "cost": 171.5,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-47eb-71cb-9dbc-221f008e5ceb",
+      "date": "2022-07-21",
+      "title": "Sieczka",
+      "summary": "Ściółka",
+      "cost": 315.41,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4883-7879-92a6-2778098362c5",
+      "date": "2022-06-29",
+      "title": "Szczotka",
+      "summary": "Pasza",
+      "cost": 927.72,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-420f-7788-9126-140239f13976",
+      "date": "2022-06-27",
+      "title": "Szczepienie",
+      "summary": "Equilis Prequenza Te",
+      "cost": 811.36,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-468a-7571-a06d-f2d6ec43c602",
+      "date": "2022-06-25",
+      "title": "Inny",
+      "summary": "Ocena kopyt",
+      "cost": 537.13,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-478a-710d-81c7-2e7d23683708",
+      "date": "2022-04-14",
+      "title": "Mistrzostwa Okręgu 2022",
+      "summary": "LL · 2. miejsce",
+      "cost": 160.12,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2d-4886-7024-a5d2-9f34d980a9f4",
+      "date": "2022-03-15",
+      "title": "Fizjoterapia",
+      "summary": "Rehabilitacja po kulawiźnie",
+      "cost": 209.09,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-470e-7354-b038-d304da8b3b98",
+      "date": "2022-03-11",
+      "title": "Siano",
+      "summary": "Pasza",
+      "cost": 59.62,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4335-74d8-85bf-ee956ef6ef4c",
+      "date": "2022-02-23",
+      "title": "Ściółka",
+      "summary": "Pielęgnacja",
+      "cost": 7.29,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-429c-7600-90d0-18806ac0a2b7",
+      "date": "2022-01-17",
+      "title": "Odrobaczanie",
+      "summary": "Utrata apetytu",
+      "cost": 815.27,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4794-7cf5-b7fe-161e2572487d",
+      "date": "2022-01-05",
+      "title": "Witaminy",
+      "summary": "Usługi",
+      "cost": 1559.71,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-43ce-7120-a86f-51b15981e496",
+      "date": "2021-11-25",
+      "title": "Zabieg",
+      "summary": "Rana na łopatce · Stan dobry, bez zmian chorobowych",
+      "cost": 117.01,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4395-72bf-a2df-fe8e12391082",
+      "date": "2021-11-25",
+      "title": "Podkucie specjalistyczne",
+      "summary": null,
+      "cost": 439.11,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4b56-7d85-bd0e-1b03262857fd",
+      "date": "2021-11-21",
+      "title": "Zawody regionalne 2021",
+      "summary": "LL · 12. miejsce",
+      "cost": 110.27,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4675-75c9-a29d-d4ef5af1fb62",
+      "date": "2021-11-16",
+      "title": "Mistrzostwa Okręgu 2021",
+      "summary": "LL · 5. miejsce",
+      "cost": 155.61,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-46d5-75c4-982b-0a2af79fe93a",
+      "date": "2021-10-11",
+      "title": "Obserwacja",
+      "summary": "Lekko sztywny na lewą stronę.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4c15-7f63-bd10-8cac2ddc44d5",
+      "date": "2021-09-27",
+      "title": "Marchew",
+      "summary": "Inne",
+      "cost": 1546.21,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-44b5-765e-b79d-682cd9fb9d7b",
+      "date": "2021-09-16",
+      "title": "Towarzyskie 2021",
+      "summary": "C · 9. miejsce",
+      "cost": 93.88,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4b5e-7e1e-b4d7-c892c8badc37",
+      "date": "2021-09-12",
+      "title": "Szczepienie",
+      "summary": "Equilis Prequenza Te",
+      "cost": 420.88,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4306-7cb7-a491-da9fe1cd11b6",
+      "date": "2021-08-12",
+      "title": "Zmiana paszy",
+      "summary": "Stępa 20 minut, kłus bez uwag.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-42b4-75a6-aaae-71ae3295cd12",
+      "date": "2021-06-19",
+      "title": "Mistrzostwa Okręgu 2021",
+      "summary": "C · 4. miejsce",
+      "cost": 63.67,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-45d1-75b0-ba57-5d6c93ea3458",
+      "date": "2021-05-17",
+      "title": "Dentysta",
+      "summary": "Dopasowanie siodła",
+      "cost": 434.7,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-45da-70e7-8151-aa4b741f53c3",
+      "date": "2021-05-13",
+      "title": "Obserwacja",
+      "summary": "Chętny do pracy, dobra forma.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-46af-7d14-9da3-3626e1ba0efd",
+      "date": "2021-04-30",
+      "title": "Szczepienie",
+      "summary": "ProteqFlu · Stan dobry, bez zmian chorobowych",
+      "cost": 808.53,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-449b-7c1b-bbe3-fb9c90025a8a",
+      "date": "2021-03-16",
+      "title": "Zabieg",
+      "summary": "Kontrola okresowa",
+      "cost": 557.67,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-44dc-793c-9b55-afe71a0671eb",
+      "date": "2021-03-01",
+      "title": "Siano",
+      "summary": "Usługi",
+      "cost": 171.61,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4d51-7182-9e6f-b57c40a9a30f",
+      "date": "2021-01-06",
+      "title": "Nagła",
+      "summary": "Ocena zębów",
+      "cost": 89.05,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4d2e-794e-8077-11f32a4b2b69",
+      "date": "2020-12-20",
+      "title": "Siano",
+      "summary": "Ściółka",
+      "cost": 1538.92,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4392-70cf-8d70-dab0878b51f6",
+      "date": "2020-12-18",
+      "title": "Elektrolity",
+      "summary": "Suplementy",
+      "cost": 1803.44,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4ca2-7d8c-a1cc-774d8c2f4c8d",
+      "date": "2020-11-25",
+      "title": "Zabieg",
+      "summary": "Zapalenie spojówek",
+      "cost": 779.47,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4271-7a8d-a603-996ecf5b4f72",
+      "date": "2020-08-23",
+      "title": "Towarzyskie 2020",
+      "summary": "N · 10. miejsce",
+      "cost": 60.07,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4d95-72eb-b2b3-aa5a939a2051",
+      "date": "2020-08-15",
+      "title": "Zmiana paszy",
+      "summary": "Zmniejszona dawka owsa.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4217-70b3-a1e9-37d53a69af85",
+      "date": "2020-08-02",
+      "title": "Obserwacja",
+      "summary": "Chętny do pracy, dobra forma.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-471a-7244-af1f-13dd96654f83",
+      "date": "2020-07-30",
+      "title": "Smar do kopyt",
+      "summary": "Leki",
+      "cost": 958.18,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-436a-7013-aab9-e58753d31270",
+      "date": "2020-07-27",
+      "title": "Mistrzostwa Okręgu 2020",
+      "summary": "L · 11. miejsce",
+      "cost": 160.58,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4ab9-7f07-b7c4-9edda9a10bbf",
+      "date": "2020-07-24",
+      "title": "Towarzyskie 2020",
+      "summary": "P · 6. miejsce",
+      "cost": 67.08,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4294-7a37-818e-52ff8fa4a7ac",
+      "date": "2020-07-19",
+      "title": "Odrobaczanie",
+      "summary": "Kaszel",
+      "cost": 535.04,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-435d-7edd-92a2-955a2e94643b",
+      "date": "2020-06-30",
+      "title": "Szczepienie",
+      "summary": "ProteqFlu · Stan dobry, bez zmian chorobowych",
+      "cost": 837.9,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4699-706f-9479-108ae1c742fc",
+      "date": "2020-05-19",
+      "title": "Ściółka",
+      "summary": "Pensjonat",
+      "cost": 210.14,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-46d8-72d6-8304-e95f2b8b2a2b",
+      "date": "2020-04-06",
+      "title": "Derka",
+      "summary": "Pasza",
+      "cost": 322.14,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4cbb-73ab-9152-062c4e6015a6",
+      "date": "2020-03-18",
+      "title": "Zawody regionalne 2020",
+      "summary": "L · 6. miejsce",
+      "cost": 67.67,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-428d-775e-a9e2-092d8d8c5803",
+      "date": "2020-03-07",
+      "title": "Nowe siodło",
+      "summary": "Stępa 20 minut, kłus bez uwag.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-4564-7771-b176-03ca254b8dec",
+      "date": "2020-02-25",
+      "title": "Szczotka",
+      "summary": "Leki",
+      "cost": 426.91,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4584-734e-a969-08a2fe2beca1",
+      "date": "2019-12-09",
+      "title": "Kucie przód",
+      "summary": null,
+      "cost": 448.44,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-43b1-72a5-a141-29d74902ebd3",
+      "date": "2019-11-24",
+      "title": "Mistrzostwa Okręgu 2019",
+      "summary": "N · 12. miejsce",
+      "cost": 62.57,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-46bc-7de1-95c9-33d4719a2af0",
+      "date": "2019-11-23",
+      "title": "Kontrola",
+      "summary": "Kulawizna prawej przedniej · Stan dobry, bez zmian chorobowych",
+      "cost": 496.91,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-41f3-7725-add2-a72f2587dea9",
+      "date": "2019-11-06",
+      "title": "Podkucie specjalistyczne",
+      "summary": "Kopyta w dobrym stanie",
+      "cost": 335.19,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-4d6f-7714-b81b-fefbdaafd3e1",
+      "date": "2019-08-23",
+      "title": "Inny",
+      "summary": "Kontrola zębów",
+      "cost": 411.79,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2d-415e-7125-9817-e8e282aae1db",
+      "date": "2019-08-11",
+      "title": "Osteopata",
+      "summary": "Ocena kopyt",
+      "cost": 301.19,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4c53-723c-81bd-30ef21141213",
+      "date": "2019-08-05",
+      "title": "Mistrzostwa Okręgu 2019",
+      "summary": "N · 11. miejsce",
+      "cost": 163.54,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4413-7cf9-973a-083b7d99eb87",
+      "date": "2019-07-20",
+      "title": "Mistrzostwa Okręgu 2019",
+      "summary": "L · 7. miejsce",
+      "cost": 190.72,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-48a3-7545-8139-27f7a77d2de6",
+      "date": "2019-06-28",
+      "title": "Smar do kopyt",
+      "summary": "Sprzęt",
+      "cost": 184.85,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4497-7532-909a-dcab305dd71c",
+      "date": "2019-06-12",
+      "title": "Zabieg",
+      "summary": "Badanie przed zakupem",
+      "cost": 819.3,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4c29-71eb-b00b-1ab20e09febb",
+      "date": "2019-05-27",
+      "title": "Towarzyskie 2019",
+      "summary": "L · 2. miejsce",
+      "cost": 190.97,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-413a-7e25-92e4-9a2b6da52420",
+      "date": "2019-05-22",
+      "title": "Nagła",
+      "summary": "Kaszel · Stan dobry, bez zmian chorobowych",
+      "cost": 558.59,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-491b-7c2a-ae18-46b30d9f889a",
+      "date": "2019-04-28",
+      "title": "Towarzyskie 2019",
+      "summary": "L · 5. miejsce",
+      "cost": 139,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-49ce-73ca-ab26-c313e30475b9",
+      "date": "2019-02-16",
+      "title": "Szczepienie",
+      "summary": "Equip FT",
+      "cost": 842.85,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4a23-7a5d-9ed9-6dbc7d5e0e2d",
+      "date": "2019-01-31",
+      "title": "Zabieg",
+      "summary": "Zapalenie spojówek",
+      "cost": 419.23,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-420d-78bc-a1d7-ae8fc2d32f8d",
+      "date": "2018-12-26",
+      "title": "Kontrola",
+      "summary": "Kontrola okresowa",
+      "cost": 110.15,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-448b-719f-88cf-b4c13ad6eb0e",
+      "date": "2018-11-13",
+      "title": "Zabieg",
+      "summary": "Sztywność grzbietu",
+      "cost": 685.64,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4c0d-7225-8ce5-aef91d61c4d0",
+      "date": "2018-10-31",
+      "title": "Towarzyskie 2018",
+      "summary": "C · 4. miejsce",
+      "cost": 162.9,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e"
+    }
+  ]
+}

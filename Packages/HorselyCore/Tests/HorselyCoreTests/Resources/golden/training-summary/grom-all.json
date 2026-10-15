@@ -1,0 +1,206 @@
+{
+  "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+  "horseName": "Grom",
+  "range": "All",
+  "from": "2025-12-20",
+  "to": "2026-09-10",
+  "rows": [
+    {
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "typeName": "Ujeżdżenie",
+      "paletteIndex": 0,
+      "count": 2,
+      "totalMinutes": 105,
+      "duration": {
+        "min": 45,
+        "average": 52.5,
+        "max": 60
+      },
+      "intensity": {
+        "min": 2,
+        "average": 2,
+        "max": 2
+      },
+      "rating": {
+        "min": 3,
+        "average": 3.5,
+        "max": 4
+      },
+      "obstacleHeight": null,
+      "totalCost": 220
+    },
+    {
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "typeName": "Skoki",
+      "paletteIndex": 1,
+      "count": 1,
+      "totalMinutes": 75,
+      "duration": {
+        "min": 75,
+        "average": 75,
+        "max": 75
+      },
+      "intensity": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "rating": {
+        "min": 5,
+        "average": 5,
+        "max": 5
+      },
+      "obstacleHeight": {
+        "min": 110,
+        "average": 110,
+        "max": 110
+      },
+      "totalCost": 150
+    },
+    {
+      "typeId": "01a10c22-0f7f-7e37-81c9-70cec7055e50",
+      "typeName": "Teren",
+      "paletteIndex": 2,
+      "count": 1,
+      "totalMinutes": 0,
+      "duration": null,
+      "intensity": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "rating": null,
+      "obstacleHeight": null,
+      "totalCost": 0
+    },
+    {
+      "typeId": "01a10c22-0f7f-72b5-945e-1c916e84675c",
+      "typeName": "Lonża",
+      "paletteIndex": 3,
+      "count": 1,
+      "totalMinutes": 30,
+      "duration": {
+        "min": 30,
+        "average": 30,
+        "max": 30
+      },
+      "intensity": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "rating": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "obstacleHeight": null,
+      "totalCost": 0
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 5,
+    "totalMinutes": 210,
+    "duration": {
+      "min": 30,
+      "average": 52.5,
+      "max": 75
+    },
+    "intensity": {
+      "min": 1,
+      "average": 1.8,
+      "max": 3
+    },
+    "rating": {
+      "min": 3,
+      "average": 3.8,
+      "max": 5
+    },
+    "obstacleHeight": null,
+    "totalCost": 370
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "points": [
+        {
+          "date": "2025-12-01",
+          "value": 60
+        },
+        {
+          "date": "2026-09-01",
+          "value": 45
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "points": [
+        {
+          "date": "2025-12-01",
+          "value": 3
+        },
+        {
+          "date": "2026-09-01",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-01",
+          "value": 75
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-01",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "parameter": "ObstacleHeight",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-01",
+          "value": 110
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a10c22-0f7f-72b5-945e-1c916e84675c",
+      "points": [
+        {
+          "date": "2026-08-01",
+          "value": 30
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a10c22-0f7f-72b5-945e-1c916e84675c",
+      "points": [
+        {
+          "date": "2026-08-01",
+          "value": 3
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

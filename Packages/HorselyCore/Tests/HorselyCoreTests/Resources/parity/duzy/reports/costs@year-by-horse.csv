@@ -1,0 +1,78 @@
+﻿Koń;Kategoria;Koszty;Przychody
+Bursztyn;Weterynarz;616,22;0,00
+Bursztyn;Fizjoterapeuta;166,54;0,00
+Bursztyn;Zawody;323,56;209,65
+Bursztyn;Treningi;190,00;0,00
+Bursztyn;Pielęgnacja;1549,72;0,00
+Bursztyn;Ściółka;2159,73;0,00
+Bursztyn;Usługi;221,57;0,00
+Dama;Weterynarz;496,44;0,00
+Dama;Kowal;139,47;0,00
+Dama;Zawody;310,50;505,38
+Dama;Treningi;220,00;0,00
+Dama;Ściółka;223,54;0,00
+Fokus;Weterynarz;467,64;0,00
+Fokus;Kowal;399,86;0,00
+Fokus;Zawody;183,83;1053,41
+Grom;Weterynarz;1905,96;0,00
+Grom;Kowal;536,01;0,00
+Grom;Fizjoterapeuta;255,72;0,00
+Grom;Specjaliści;454,88;0,00
+Grom;Zawody;372,40;0,00
+Grom;Treningi;230,00;0,00
+Grom;Ściółka;223,54;0,00
+Grom;Usługi;98,25;0,00
+Hades;Weterynarz;560,35;0,00
+Hades;Specjaliści;564,08;0,00
+Hades;Zawody;516,80;457,98
+Hades;Leki;930,87;0,00
+Hades;Pielęgnacja;1647,07;0,00
+Hades;Suplementy;209,69;0,00
+Hades;Usługi;319,79;0,00
+Iskra;Weterynarz;841,44;0,00
+Iskra;Kowal;423,89;0,00
+Iskra;Zawody;686,23;0,00
+Iskra;Inne;1273,94;0,00
+Kasztan;Kowal;181,97;0,00
+Kasztan;Fizjoterapeuta;459,17;0,00
+Kasztan;Zawody;588,82;900,77
+Kasztan;Treningi;140,00;0,00
+Kasztan;Pielęgnacja;122,17;0,00
+Kasztan;Ściółka;223,54;0,00
+Luna;Weterynarz;364,83;0,00
+Luna;Fizjoterapeuta;222,00;0,00
+Luna;Specjaliści;474,50;0,00
+Luna;Zawody;541,66;634,15
+Luna;Treningi;280,00;0,00
+Luna;Pielęgnacja;122,17;0,00
+Luna;Usługi;221,57;0,00
+Rubin;Weterynarz;479,29;0,00
+Rubin;Fizjoterapeuta;527,17;0,00
+Rubin;Specjaliści;527,85;0,00
+Rubin;Zawody;520,58;2336,79
+Rubin;Sprzęt;660,76;0,00
+Rubin;Usługi;98,22;0,00
+Sowa;Kowal;282,21;0,00
+Sowa;Fizjoterapeuta;209,07;0,00
+Sowa;Zawody;167,45;0,00
+Sowa;Ściółka;223,54;0,00
+Sowa;Usługi;319,79;0,00
+Tango;Kowal;286,91;0,00
+Tango;Zawody;233,67;0,00
+Tango;Suplementy;1301,67;0,00
+Tango;Ściółka;223,54;0,00
+Wicher;Weterynarz;870,78;0,00
+Wicher;Kowal;147,21;0,00
+Wicher;Specjaliści;151,91;0,00
+Wicher;Zawody;214,69;0,00
+Wicher;Treningi;270,00;0,00
+Ogólne (stajnia);Inne;1400,22;0,00
+Ogólne (stajnia);Leki;1999,75;0,00
+Ogólne (stajnia);Pensjonat;991,68;0,00
+Ogólne (stajnia);Sprzęt;684,82;0,00
+Ogólne (stajnia);Suplementy;648,40;0,00
+Ogólne (stajnia);Ściółka;493,30;0,00
+
+Razem;;37596,41;6098,13
+Ogólne (stajnia);;6218,17;
+Saldo;;;-31498,28

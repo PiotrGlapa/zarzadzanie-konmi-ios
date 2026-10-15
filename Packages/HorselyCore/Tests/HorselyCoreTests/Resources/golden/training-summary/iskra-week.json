@@ -1,0 +1,138 @@
+{
+  "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+  "horseName": "Iskra",
+  "range": "Week",
+  "from": "2026-09-21",
+  "to": "2026-09-27",
+  "rows": [
+    {
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "typeName": "Ujeżdżenie",
+      "paletteIndex": 0,
+      "count": 1,
+      "totalMinutes": 125,
+      "duration": {
+        "min": 125,
+        "average": 125,
+        "max": 125
+      },
+      "intensity": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "rating": {
+        "min": 2,
+        "average": 2,
+        "max": 2
+      },
+      "obstacleHeight": null,
+      "totalCost": 0
+    },
+    {
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "typeName": "Skoki",
+      "paletteIndex": 1,
+      "count": 1,
+      "totalMinutes": 50,
+      "duration": {
+        "min": 50,
+        "average": 50,
+        "max": 50
+      },
+      "intensity": {
+        "min": 2,
+        "average": 2,
+        "max": 2
+      },
+      "rating": {
+        "min": 4,
+        "average": 4,
+        "max": 4
+      },
+      "obstacleHeight": {
+        "min": 90,
+        "average": 90,
+        "max": 90
+      },
+      "totalCost": 90
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 2,
+    "totalMinutes": 175,
+    "duration": {
+      "min": 50,
+      "average": 87.5,
+      "max": 125
+    },
+    "intensity": {
+      "min": 2,
+      "average": 2.5,
+      "max": 3
+    },
+    "rating": {
+      "min": 2,
+      "average": 3,
+      "max": 4
+    },
+    "obstacleHeight": null,
+    "totalCost": 90
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "points": [
+        {
+          "date": "2026-09-23",
+          "value": 125
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "points": [
+        {
+          "date": "2026-09-23",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-22",
+          "value": 50
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-22",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "parameter": "ObstacleHeight",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-22",
+          "value": 90
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

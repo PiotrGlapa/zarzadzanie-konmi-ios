@@ -1,0 +1,17 @@
+report;case;query
+costs;year-by-month;/reports/costs?from=2026-01-01&to=2026-12-31&groupBy=month
+costs;year-by-horse;/reports/costs?from=2026-01-01&to=2026-12-31&groupBy=horse
+costs;year-by-category;/reports/costs?from=2026-01-01&to=2026-12-31&groupBy=category
+costs;grom-feed-by-month;/reports/costs?from=2026-01-01&to=2026-12-31&horseIds=01a10c22-1161-7280-b4ae-13b9809a258c&categories=Pasza&groupBy=month
+costs;general-only;/reports/costs?from=2026-01-01&to=2026-12-31&horseIds=general&groupBy=category
+horse-balance;all;/reports/horse-balance?status=Active,Sold,Deceased,Leased
+horse-balance;active;/reports/horse-balance?status=Active
+horse-balance;grom;/reports/horse-balance?horseIds=01a10c22-1161-7280-b4ae-13b9809a258c
+training-summary;grom-all;/reports/training-summary?horseId=01a10c22-1161-7280-b4ae-13b9809a258c&range=all
+training-summary;grom-month-2026-09;/reports/training-summary?horseId=01a10c22-1161-7280-b4ae-13b9809a258c&range=month&date=2026-09-15
+training-summary;iskra-week;/reports/training-summary?horseId=01a10c22-11b8-75b4-a407-8f1a83e02cc0&range=week&date=2026-09-23
+rider-trainings;all-riders;/reports/rider-trainings?from=2025-01-01&to=2026-12-31
+rider-trainings;anna;/reports/rider-trainings?riderId=01a10c22-11ca-70af-b699-d8f67950fa5a
+rider-trainings;anna-grom-2026;/reports/rider-trainings?riderId=01a10c22-11ca-70af-b699-d8f67950fa5a&horseId=01a10c22-1161-7280-b4ae-13b9809a258c&from=2026-01-01&to=2026-12-31
+rider-competitions;all-riders;/reports/rider-competitions?
+rider-competitions;anna;/reports/rider-competitions?riderId=01a10c22-11ca-70af-b699-d8f67950fa5a

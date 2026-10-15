@@ -1,0 +1,36 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Category",
+  "rows": [
+    {
+      "group": "Ściółka",
+      "horseId": null,
+      "category": "Ściółka",
+      "month": null,
+      "costs": 60.00,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 60.00,
+  "totalCosts": 60.00,
+  "totalIncome": 0,
+  "balance": -60.00,
+  "months": [
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-09",
+      "category": "Ściółka",
+      "costs": 60.00
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Ściółka",
+      "costs": 60.00,
+      "income": 0
+    }
+  ]
+}

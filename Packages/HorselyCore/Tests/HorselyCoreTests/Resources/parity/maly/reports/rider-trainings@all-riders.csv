@@ -1,0 +1,8 @@
+﻿Jeździec;Data;Koń;Rodzaj treningu;Czas (min);Intensywność;Ocena;Trener;Koszt
+Anna Wrona;15.09.2026;Grom;Skoki;60;Ciężka;4;Magdalena Zielińska;120,00
+Anna Wrona;16.09.2026;Iskra;Ujeżdżenie;45;Średnia;3;;
+
+Anna Wrona (treningów: 2);;;;105;;3,5;;120,00
+Razem (treningów: 2);;;;105;;3,5;;120,00
+
+"Treningi bez jeźdźca nie są uwzględnione. Koszt jest sumą kosztów wpisanych w treningach; średnia ocena liczona jest tylko z ocenionych treningów."

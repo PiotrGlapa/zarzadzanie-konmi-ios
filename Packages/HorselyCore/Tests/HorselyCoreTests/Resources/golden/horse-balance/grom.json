@@ -1,0 +1,61 @@
+{
+  "rows": [
+    {
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "status": "Active",
+      "purchasePrice": 40000,
+      "costs": 3833.12,
+      "prizes": 1700,
+      "salePrice": null,
+      "estimatedValue": 60000,
+      "result": -42133.12,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2025,
+          "category": "Treningi",
+          "costs": 100
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 1600.75
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 300
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 270.3
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 270
+        },
+        {
+          "year": 2026,
+          "category": "Pasza",
+          "costs": 57.51
+        },
+        {
+          "year": 2026,
+          "category": "Suplementy",
+          "costs": 1234.56
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "purchasePrice": 40000,
+    "costs": 3833.12,
+    "prizes": 1700,
+    "salePrice": 0,
+    "result": -42133.12
+  }
+}

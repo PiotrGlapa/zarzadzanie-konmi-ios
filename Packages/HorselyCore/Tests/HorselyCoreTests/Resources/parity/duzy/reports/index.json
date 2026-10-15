@@ -1,0 +1,191 @@
+[
+  {
+    "report": "costs",
+    "case": "year-by-month",
+    "query": "/api/v1/reports/costs?from=2026-01-01&to=2026-12-31&groupBy=month",
+    "json": "costs@year-by-month.json",
+    "csv": "costs@year-by-month.csv"
+  },
+  {
+    "report": "costs",
+    "case": "year-by-horse",
+    "query": "/api/v1/reports/costs?from=2026-01-01&to=2026-12-31&groupBy=horse",
+    "json": "costs@year-by-horse.json",
+    "csv": "costs@year-by-horse.csv"
+  },
+  {
+    "report": "costs",
+    "case": "year-by-category",
+    "query": "/api/v1/reports/costs?from=2026-01-01&to=2026-12-31&groupBy=category",
+    "json": "costs@year-by-category.json",
+    "csv": "costs@year-by-category.csv"
+  },
+  {
+    "report": "costs",
+    "case": "all-time-by-month",
+    "query": "/api/v1/reports/costs?groupBy=month",
+    "json": "costs@all-time-by-month.json",
+    "csv": "costs@all-time-by-month.csv"
+  },
+  {
+    "report": "costs",
+    "case": "horse1-feed-by-month",
+    "query": "/api/v1/reports/costs?from=2026-01-01&to=2026-12-31&horseIds=01a13e2d-40e5-7f94-b57a-3cdded631da6&categories=Pasza&groupBy=month",
+    "json": "costs@horse1-feed-by-month.json",
+    "csv": "costs@horse1-feed-by-month.csv"
+  },
+  {
+    "report": "costs",
+    "case": "two-horses-by-category",
+    "query": "/api/v1/reports/costs?from=2026-01-01&to=2026-12-31&horseIds=01a13e2d-40e5-7f94-b57a-3cdded631da6,01a13e2d-40f5-7335-9758-652c68393e30&groupBy=category",
+    "json": "costs@two-horses-by-category.json",
+    "csv": "costs@two-horses-by-category.csv"
+  },
+  {
+    "report": "costs",
+    "case": "general-only",
+    "query": "/api/v1/reports/costs?from=2026-01-01&to=2026-12-31&horseIds=general&groupBy=category",
+    "json": "costs@general-only.json",
+    "csv": "costs@general-only.csv"
+  },
+  {
+    "report": "horse-balance",
+    "case": "all",
+    "query": "/api/v1/reports/horse-balance",
+    "json": "horse-balance@all.json",
+    "csv": "horse-balance@all.csv"
+  },
+  {
+    "report": "horse-balance",
+    "case": "active",
+    "query": "/api/v1/reports/horse-balance?status=Active",
+    "json": "horse-balance@active.json",
+    "csv": "horse-balance@active.csv"
+  },
+  {
+    "report": "horse-balance",
+    "case": "injured",
+    "query": "/api/v1/reports/horse-balance?status=Injured",
+    "json": "horse-balance@injured.json",
+    "csv": "horse-balance@injured.csv"
+  },
+  {
+    "report": "horse-balance",
+    "case": "horse1",
+    "query": "/api/v1/reports/horse-balance?horseIds=01a13e2d-40e5-7f94-b57a-3cdded631da6",
+    "json": "horse-balance@horse1.json",
+    "csv": "horse-balance@horse1.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse1-all",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40e5-7f94-b57a-3cdded631da6&range=all",
+    "json": "training-summary@horse1-all.json",
+    "csv": "training-summary@horse1-all.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse1-month-2026-09",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40e5-7f94-b57a-3cdded631da6&range=month&date=2026-09-15",
+    "json": "training-summary@horse1-month-2026-09.json",
+    "csv": "training-summary@horse1-month-2026-09.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse1-week-2026-09-23",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40e5-7f94-b57a-3cdded631da6&range=week&date=2026-09-23",
+    "json": "training-summary@horse1-week-2026-09-23.json",
+    "csv": "training-summary@horse1-week-2026-09-23.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse1-year-2026",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40e5-7f94-b57a-3cdded631da6&range=year&date=2026-06-01",
+    "json": "training-summary@horse1-year-2026.json",
+    "csv": "training-summary@horse1-year-2026.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse2-all",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40f5-7335-9758-652c68393e30&range=all",
+    "json": "training-summary@horse2-all.json",
+    "csv": "training-summary@horse2-all.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse2-month-2026-09",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40f5-7335-9758-652c68393e30&range=month&date=2026-09-15",
+    "json": "training-summary@horse2-month-2026-09.json",
+    "csv": "training-summary@horse2-month-2026-09.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse2-week-2026-09-23",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40f5-7335-9758-652c68393e30&range=week&date=2026-09-23",
+    "json": "training-summary@horse2-week-2026-09-23.json",
+    "csv": "training-summary@horse2-week-2026-09-23.csv"
+  },
+  {
+    "report": "training-summary",
+    "case": "horse2-year-2026",
+    "query": "/api/v1/reports/training-summary?horseId=01a13e2d-40f5-7335-9758-652c68393e30&range=year&date=2026-06-01",
+    "json": "training-summary@horse2-year-2026.json",
+    "csv": "training-summary@horse2-year-2026.csv"
+  },
+  {
+    "report": "rider-trainings",
+    "case": "all-riders",
+    "query": "/api/v1/reports/rider-trainings",
+    "json": "rider-trainings@all-riders.json",
+    "csv": "rider-trainings@all-riders.csv"
+  },
+  {
+    "report": "rider-trainings",
+    "case": "all-riders-2026",
+    "query": "/api/v1/reports/rider-trainings?from=2026-01-01&to=2026-12-31",
+    "json": "rider-trainings@all-riders-2026.json",
+    "csv": "rider-trainings@all-riders-2026.csv"
+  },
+  {
+    "report": "rider-competitions",
+    "case": "all-riders",
+    "query": "/api/v1/reports/rider-competitions",
+    "json": "rider-competitions@all-riders.json",
+    "csv": "rider-competitions@all-riders.csv"
+  },
+  {
+    "report": "rider-competitions",
+    "case": "all-riders-2026",
+    "query": "/api/v1/reports/rider-competitions?from=2026-01-01&to=2026-12-31",
+    "json": "rider-competitions@all-riders-2026.json",
+    "csv": "rider-competitions@all-riders-2026.csv"
+  },
+  {
+    "report": "rider-trainings",
+    "case": "rider1",
+    "query": "/api/v1/reports/rider-trainings?riderId=01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+    "json": "rider-trainings@rider1.json",
+    "csv": "rider-trainings@rider1.csv"
+  },
+  {
+    "report": "rider-trainings",
+    "case": "rider1-horse1-2026",
+    "query": "/api/v1/reports/rider-trainings?riderId=01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0&from=2026-01-01&to=2026-12-31&horseId=01a13e2d-40e5-7f94-b57a-3cdded631da6",
+    "json": "rider-trainings@rider1-horse1-2026.json",
+    "csv": "rider-trainings@rider1-horse1-2026.csv"
+  },
+  {
+    "report": "rider-competitions",
+    "case": "rider1",
+    "query": "/api/v1/reports/rider-competitions?riderId=01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+    "json": "rider-competitions@rider1.json",
+    "csv": "rider-competitions@rider1.csv"
+  },
+  {
+    "report": "rider-competitions",
+    "case": "rider1-horse1-2026",
+    "query": "/api/v1/reports/rider-competitions?riderId=01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0&from=2026-01-01&to=2026-12-31&horseId=01a13e2d-40e5-7f94-b57a-3cdded631da6",
+    "json": "rider-competitions@rider1-horse1-2026.json",
+    "csv": "rider-competitions@rider1-horse1-2026.csv"
+  }
+]

@@ -1,0 +1,163 @@
+{
+  "from": null,
+  "to": null,
+  "groupBy": "Month",
+  "rows": [
+    {
+      "group": "2026-08",
+      "horseId": null,
+      "category": "Specjaliści",
+      "month": "2026-08",
+      "costs": 620,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": "2026-09",
+      "costs": 370.5,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Kowal",
+      "month": "2026-09",
+      "costs": 480,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Fizjoterapeuta",
+      "month": "2026-09",
+      "costs": 350,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Zawody",
+      "month": "2026-09",
+      "costs": 205.5,
+      "income": 300
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Treningi",
+      "month": "2026-09",
+      "costs": 120,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Pasza",
+      "month": "2026-09",
+      "costs": 262.51,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Sprzęt",
+      "month": "2026-09",
+      "costs": 79.99,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 79.99,
+  "totalCosts": 2488.50,
+  "totalIncome": 300,
+  "balance": -2188.50,
+  "months": [
+    "2026-08",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-08",
+      "category": "Specjaliści",
+      "costs": 620
+    },
+    {
+      "month": "2026-09",
+      "category": "Weterynarz",
+      "costs": 370.5
+    },
+    {
+      "month": "2026-09",
+      "category": "Kowal",
+      "costs": 480
+    },
+    {
+      "month": "2026-09",
+      "category": "Fizjoterapeuta",
+      "costs": 350
+    },
+    {
+      "month": "2026-09",
+      "category": "Zawody",
+      "costs": 205.5
+    },
+    {
+      "month": "2026-09",
+      "category": "Treningi",
+      "costs": 120
+    },
+    {
+      "month": "2026-09",
+      "category": "Pasza",
+      "costs": 262.51
+    },
+    {
+      "month": "2026-09",
+      "category": "Sprzęt",
+      "costs": 79.99
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 370.5,
+      "income": 0
+    },
+    {
+      "category": "Kowal",
+      "costs": 480,
+      "income": 0
+    },
+    {
+      "category": "Fizjoterapeuta",
+      "costs": 350,
+      "income": 0
+    },
+    {
+      "category": "Specjaliści",
+      "costs": 620,
+      "income": 0
+    },
+    {
+      "category": "Zawody",
+      "costs": 205.5,
+      "income": 300
+    },
+    {
+      "category": "Treningi",
+      "costs": 120,
+      "income": 0
+    },
+    {
+      "category": "Pasza",
+      "costs": 262.51,
+      "income": 0
+    },
+    {
+      "category": "Sprzęt",
+      "costs": 79.99,
+      "income": 0
+    }
+  ]
+}

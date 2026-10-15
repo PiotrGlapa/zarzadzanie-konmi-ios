@@ -1,0 +1,154 @@
+{
+  "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+  "horseName": "Grom",
+  "range": "Month",
+  "from": "2026-09-01",
+  "to": "2026-09-30",
+  "rows": [
+    {
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "typeName": "Ujeżdżenie",
+      "paletteIndex": 0,
+      "count": 1,
+      "totalMinutes": 45,
+      "duration": {
+        "min": 45,
+        "average": 45,
+        "max": 45
+      },
+      "intensity": {
+        "min": 2,
+        "average": 2,
+        "max": 2
+      },
+      "rating": {
+        "min": 4,
+        "average": 4,
+        "max": 4
+      },
+      "obstacleHeight": null,
+      "totalCost": 120
+    },
+    {
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "typeName": "Skoki",
+      "paletteIndex": 1,
+      "count": 1,
+      "totalMinutes": 75,
+      "duration": {
+        "min": 75,
+        "average": 75,
+        "max": 75
+      },
+      "intensity": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "rating": {
+        "min": 5,
+        "average": 5,
+        "max": 5
+      },
+      "obstacleHeight": {
+        "min": 110,
+        "average": 110,
+        "max": 110
+      },
+      "totalCost": 150
+    },
+    {
+      "typeId": "01a10c22-0f7f-7e37-81c9-70cec7055e50",
+      "typeName": "Teren",
+      "paletteIndex": 2,
+      "count": 1,
+      "totalMinutes": 0,
+      "duration": null,
+      "intensity": {
+        "min": 1,
+        "average": 1,
+        "max": 1
+      },
+      "rating": null,
+      "obstacleHeight": null,
+      "totalCost": 0
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 3,
+    "totalMinutes": 120,
+    "duration": {
+      "min": 45,
+      "average": 60,
+      "max": 75
+    },
+    "intensity": {
+      "min": 1,
+      "average": 2,
+      "max": 3
+    },
+    "rating": {
+      "min": 4,
+      "average": 4.5,
+      "max": 5
+    },
+    "obstacleHeight": null,
+    "totalCost": 270
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "points": [
+        {
+          "date": "2026-09-01",
+          "value": 45
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a10c22-0f7f-7328-83e8-a5ac24acfb17",
+      "points": [
+        {
+          "date": "2026-09-01",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "parameter": "Duration",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-03",
+          "value": 75
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-03",
+          "value": 5
+        }
+      ]
+    },
+    {
+      "parameter": "ObstacleHeight",
+      "typeId": "01a10c22-0f7f-774e-89a4-cfb638155166",
+      "points": [
+        {
+          "date": "2026-09-03",
+          "value": 110
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

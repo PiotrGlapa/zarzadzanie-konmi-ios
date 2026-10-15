@@ -1,0 +1,57 @@
+{
+  "from": null,
+  "to": null,
+  "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+  "riderName": "Anna Wrona",
+  "competitions": [
+    {
+      "competitionId": "01a13e2c-e1bb-721d-b74f-8aa68a7882b8",
+      "name": "Zawody regionalne 2026",
+      "dateFrom": "2026-09-20",
+      "dateTo": "2026-09-21",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2c-e207-72ea-8534-5c7e5ebff5c3",
+          "date": "2026-09-20",
+          "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+          "horseName": "Grom",
+          "disciplineName": "Skoki",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 3,
+          "participantsCount": 20,
+          "entryFee": 100,
+          "otherCosts": 25.5,
+          "prizeMoney": 300,
+          "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+          "riderName": "Anna Wrona"
+        },
+        {
+          "startId": "01a13e2c-e257-7407-9707-3032eda96c37",
+          "date": "2026-09-21",
+          "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+          "horseName": "Iskra",
+          "disciplineName": "Ujeżdżenie",
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 7,
+          "participantsCount": 15,
+          "entryFee": 80,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    }
+  ],
+  "total": {
+    "competitions": 1,
+    "starts": 2,
+    "totalCosts": 205.5,
+    "totalPrizes": 300,
+    "balance": 94.5
+  },
+  "groups": []
+}

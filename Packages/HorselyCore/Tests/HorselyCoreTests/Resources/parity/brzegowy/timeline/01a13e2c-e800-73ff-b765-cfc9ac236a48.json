@@ -1,0 +1,36 @@
+{
+  "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48",
+  "totalCount": 3,
+  "items": [
+    {
+      "entryType": "Note",
+      "id": "01a13e2c-e896-71c3-a4e7-8497258330b3",
+      "date": "2026-09-22",
+      "title": "Kontuzja",
+      "summary": "Odpoczynek, zimne okłady.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e891-71a0-9f7c-8bf344f5fb6b",
+      "date": "2026-09-22",
+      "title": "Maść na ścięgna",
+      "summary": "Leki",
+      "cost": 64.9,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2c-e88e-78cb-84c7-d54c56bd42aa",
+      "date": "2026-09-21",
+      "title": "Nagła",
+      "summary": "Kontuzja ścięgna",
+      "cost": 180,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+  "riderName": "Anna Wrona",
+  "rows": [
+    {
+      "trainingId": "01a13e2c-e2e4-70da-b19b-ed7c0b2fdf0d",
+      "date": "2026-09-15",
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom",
+      "typeName": "Skoki",
+      "durationMinutes": 60,
+      "intensity": "Hard",
+      "rating": 4,
+      "trainerName": "Magdalena Zielińska",
+      "cost": 120,
+      "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+      "riderName": "Anna Wrona"
+    }
+  ],
+  "total": {
+    "count": 1,
+    "totalMinutes": 60,
+    "averageRating": 4,
+    "totalCost": 120
+  },
+  "groups": [
+    {
+      "key": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "name": "Grom",
+      "count": 1,
+      "totalMinutes": 60,
+      "averageRating": 4,
+      "totalCost": 120
+    }
+  ],
+  "groupedBy": "Horse"
+}

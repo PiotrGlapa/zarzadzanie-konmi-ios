@@ -1,0 +1,53 @@
+{
+  "from": null,
+  "to": null,
+  "riderContactId": null,
+  "riderName": null,
+  "rows": [
+    {
+      "trainingId": "01a13e2c-e2e4-70da-b19b-ed7c0b2fdf0d",
+      "date": "2026-09-15",
+      "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+      "horseName": "Grom",
+      "typeName": "Skoki",
+      "durationMinutes": 60,
+      "intensity": "Hard",
+      "rating": 4,
+      "trainerName": "Magdalena Zielińska",
+      "cost": 120,
+      "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+      "riderName": "Anna Wrona"
+    },
+    {
+      "trainingId": "01a13e2c-e31d-7245-adee-00f837f4584e",
+      "date": "2026-09-16",
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+      "horseName": "Iskra",
+      "typeName": "Ujeżdżenie",
+      "durationMinutes": 45,
+      "intensity": "Medium",
+      "rating": 3,
+      "trainerName": null,
+      "cost": null,
+      "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+      "riderName": "Anna Wrona"
+    }
+  ],
+  "total": {
+    "count": 2,
+    "totalMinutes": 105,
+    "averageRating": 3.5,
+    "totalCost": 120
+  },
+  "groups": [
+    {
+      "key": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+      "name": "Anna Wrona",
+      "count": 2,
+      "totalMinutes": 105,
+      "averageRating": 3.5,
+      "totalCost": 120
+    }
+  ],
+  "groupedBy": "Rider"
+}

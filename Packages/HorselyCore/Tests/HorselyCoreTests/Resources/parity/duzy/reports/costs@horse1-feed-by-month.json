@@ -1,0 +1,13 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Month",
+  "rows": [],
+  "generalPurchasesTotal": 0,
+  "totalCosts": 0,
+  "totalIncome": 0,
+  "balance": 0,
+  "months": [],
+  "monthlyCosts": [],
+  "categoryTotals": []
+}

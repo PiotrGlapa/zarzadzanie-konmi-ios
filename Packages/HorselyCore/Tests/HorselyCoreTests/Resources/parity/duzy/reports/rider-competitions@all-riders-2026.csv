@@ -1,0 +1,36 @@
+﻿Jeździec;Zawody;Data;Koń;Dyscyplina;Klasa;Wynik;Wpisowe;Pozostałe koszty;Nagroda
+Katarzyna Sowa;Zawody regionalne 2026;01.01.2026;Iskra;Inne;L;15. miejsce;168,04;;
+Marta Lis (trener i jeździec);Zawody regionalne 2026;01.01.2026;Bursztyn;WKKW;LL;2. miejsce;147,87;;
+Marta Lis (trener i jeździec);Zawody regionalne 2026;01.01.2026;Luna;Inne;P;2. miejsce;187,30;;
+Anna Wrona;Mistrzostwa Okręgu 2026;11.01.2026;Dama;Ujeżdżenie;L;9. miejsce;81,81;;
+Anna Wrona;Mistrzostwa Okręgu 2026;11.01.2026;Kasztan;WKKW;N;11. miejsce;181,02;;
+Marta Lis (trener i jeździec);Mistrzostwa Okręgu 2026;11.01.2026;Iskra;Ujeżdżenie;LL;15. miejsce;197,40;;
+Tomasz Orzeł;Mistrzostwa Okręgu 2026;11.01.2026;Wicher;Western;N;8. miejsce;119,67;;
+Marta Lis (trener i jeździec);Zawody regionalne 2026;06.04.2026;Luna;Rajdy;LL;8. miejsce;141,68;;
+Tomasz Orzeł;Zawody regionalne 2026;15.04.2026;Tango;WKKW;LL;7. miejsce;84,96;;
+Marta Lis (trener i jeździec);Zawody regionalne 2026;16.05.2026;Tango;Powożenie;P;12. miejsce;148,71;;
+Marta Lis (trener i jeździec);Zawody regionalne 2026;16.05.2026;Wicher;WKKW;L;13. miejsce;95,02;;
+Tomasz Orzeł;Zawody regionalne 2026;16.05.2026;Kasztan;Western;N;2. miejsce;77,67;;
+Marta Lis (trener i jeździec);Mistrzostwa Okręgu 2026;21.05.2026;Iskra;WKKW;C;12. miejsce;156,19;;
+Tomasz Orzeł;Mistrzostwa Okręgu 2026;21.05.2026;Luna;Ujeżdżenie;N;6. miejsce;102,72;;
+Anna Wrona;Mistrzostwa Okręgu 2026;24.08.2026;Grom;Powożenie;N;7. miejsce;179,12;;
+Katarzyna Sowa;Mistrzostwa Okręgu 2026;24.08.2026;Fokus;Western;C;13. miejsce;75,59;;840,81
+Katarzyna Sowa;Mistrzostwa Okręgu 2026;24.08.2026;Kasztan;Western;C;4. miejsce;161,14;;900,77
+Katarzyna Sowa;Mistrzostwa Okręgu 2026;24.08.2026;Rubin;Inne;L;4. miejsce;199,17;;729,06
+Marta Lis (trener i jeździec);Mistrzostwa Okręgu 2026;24.08.2026;Hades;Skoki;C;5. miejsce;133,48;;
+Katarzyna Sowa;Towarzyskie 2026;25.08.2026;Fokus;Inne;N;14. miejsce;108,24;;212,60
+Katarzyna Sowa;Towarzyskie 2026;25.08.2026;Kasztan;Skoki;L;2. miejsce;117,80;;
+Marta Lis (trener i jeździec);Towarzyskie 2026;25.08.2026;Hades;Powożenie;C;15. miejsce;62,69;;
+Marta Lis (trener i jeździec);Halowy Puchar 2026;26.08.2026;Grom;Western;P;9. miejsce;193,28;;
+Tomasz Orzeł;Halowy Puchar 2026;26.08.2026;Luna;Rajdy;C;6. miejsce;109,96;;634,15
+
+Anna Wrona (zawodów: 2, startów: 3);;;;;;;441,95;0,00;0,00
+Katarzyna Sowa (zawodów: 3, startów: 6);;;;;;;829,98;0,00;2683,24
+Marta Lis (trener i jeździec) (zawodów: 8, startów: 10);;;;;;;1463,62;0,00;0,00
+Tomasz Orzeł (zawodów: 5, startów: 5);;;;;;;494,98;0,00;634,15
+Razem (zawodów: 9, startów: 24);;;;;;;3230,53;0,00;3317,39
+Koszty;;;;;;;;;3230,53
+Nagrody;;;;;;;;;3317,39
+Bilans;;;;;;;;;86,86
+
+"Starty bez jeźdźca nie są uwzględnione. Koszty = wpisowe + pozostałe koszty; bilans = nagrody − koszty."

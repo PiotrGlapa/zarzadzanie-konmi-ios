@@ -1,0 +1,8 @@
+﻿Jeździec;Data;Koń;Rodzaj treningu;Czas (min);Intensywność;Ocena;Trener;Koszt
+Ósmak Jeździec;18.09.2026;Błyskawica;Skoki;35;Średnia;3;;
+Ósmak Jeździec;27.09.2026;Żółtko;Skoki;40;Lekka;5;Ćwik Trener;150,50
+
+Ósmak Jeździec (treningów: 2);;;;75;;4,0;;150,50
+Razem (treningów: 2);;;;75;;4,0;;150,50
+
+"Treningi bez jeźdźca nie są uwzględnione. Koszt jest sumą kosztów wpisanych w treningach; średnia ocena liczona jest tylko z ocenionych treningów."

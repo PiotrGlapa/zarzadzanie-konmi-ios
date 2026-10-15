@@ -1,0 +1,41 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+  "riderName": "Anna Wrona",
+  "competitions": [
+    {
+      "competitionId": "01a13e2c-e1bb-721d-b74f-8aa68a7882b8",
+      "name": "Zawody regionalne 2026",
+      "dateFrom": "2026-09-20",
+      "dateTo": "2026-09-21",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a13e2c-e207-72ea-8534-5c7e5ebff5c3",
+          "date": "2026-09-20",
+          "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+          "horseName": "Grom",
+          "disciplineName": "Skoki",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 3,
+          "participantsCount": 20,
+          "entryFee": 100,
+          "otherCosts": 25.5,
+          "prizeMoney": 300,
+          "riderContactId": "01a13e2c-df93-76e6-a92f-f81a20cd8e55",
+          "riderName": "Anna Wrona"
+        }
+      ]
+    }
+  ],
+  "total": {
+    "competitions": 1,
+    "starts": 1,
+    "totalCosts": 125.5,
+    "totalPrizes": 300,
+    "balance": 174.5
+  },
+  "groups": []
+}

@@ -1,0 +1,6 @@
+﻿Rodzaj treningu;Liczba treningów;Łączny czas (min);Koszt;Czas (min) — minimum;Czas (min) — średnia;Czas (min) — maksimum;Intensywność — minimum;Intensywność — średnia;Intensywność — maksimum;Ocena — minimum;Ocena — średnia;Ocena — maksimum;Wysokość przeszkód (cm) — minimum;Wysokość przeszkód (cm) — średnia;Wysokość przeszkód (cm) — maksimum
+Skoki;1;35;0,00;35;35,0;35;Średnia;2,0;Średnia;3;3,0;3;90;90,0;90
+
+Razem;1;35;0,00;35;35,0;35;Średnia;2,0;Średnia;3;3,0;3;;;
+
+Statystyki liczone są tylko z treningów, w których dany parametr jest wpisany. Intensywność: lekka = 1, średnia = 2, ciężka = 3. Wysokość przeszkód dotyczy tylko treningów „Skoki”.

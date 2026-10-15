@@ -1,0 +1,199 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Month",
+  "rows": [
+    {
+      "group": "2026-01",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": "2026-01",
+      "costs": 350,
+      "income": 0
+    },
+    {
+      "group": "2026-02",
+      "horseId": null,
+      "category": "Kowal",
+      "month": "2026-02",
+      "costs": 300,
+      "income": 0
+    },
+    {
+      "group": "2026-02",
+      "horseId": null,
+      "category": "Pasza",
+      "month": "2026-02",
+      "costs": 115.01,
+      "income": 0
+    },
+    {
+      "group": "2026-03",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": "2026-03",
+      "costs": 180,
+      "income": 0
+    },
+    {
+      "group": "2026-04",
+      "horseId": null,
+      "category": "Pasza",
+      "month": "2026-04",
+      "costs": 800,
+      "income": 0
+    },
+    {
+      "group": "2026-05",
+      "horseId": null,
+      "category": "Zawody",
+      "month": "2026-05",
+      "costs": 200.3,
+      "income": 500
+    },
+    {
+      "group": "2026-06",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": "2026-06",
+      "costs": 95.5,
+      "income": 0
+    },
+    {
+      "group": "2026-06",
+      "horseId": null,
+      "category": "Zawody",
+      "month": "2026-06",
+      "costs": 150,
+      "income": 1200
+    },
+    {
+      "group": "2026-07",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": "2026-07",
+      "costs": 1250.75,
+      "income": 0
+    },
+    {
+      "group": "2026-08",
+      "horseId": null,
+      "category": "Suplementy",
+      "month": "2026-08",
+      "costs": 1234.56,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Treningi",
+      "month": "2026-09",
+      "costs": 360,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 800,
+  "totalCosts": 5036.12,
+  "totalIncome": 1700,
+  "balance": -3336.12,
+  "months": [
+    "2026-01",
+    "2026-02",
+    "2026-03",
+    "2026-04",
+    "2026-05",
+    "2026-06",
+    "2026-07",
+    "2026-08",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-01",
+      "category": "Weterynarz",
+      "costs": 350
+    },
+    {
+      "month": "2026-02",
+      "category": "Kowal",
+      "costs": 300
+    },
+    {
+      "month": "2026-02",
+      "category": "Pasza",
+      "costs": 115.01
+    },
+    {
+      "month": "2026-03",
+      "category": "Weterynarz",
+      "costs": 180
+    },
+    {
+      "month": "2026-04",
+      "category": "Pasza",
+      "costs": 800
+    },
+    {
+      "month": "2026-05",
+      "category": "Zawody",
+      "costs": 200.3
+    },
+    {
+      "month": "2026-06",
+      "category": "Weterynarz",
+      "costs": 95.5
+    },
+    {
+      "month": "2026-06",
+      "category": "Zawody",
+      "costs": 150
+    },
+    {
+      "month": "2026-07",
+      "category": "Weterynarz",
+      "costs": 1250.75
+    },
+    {
+      "month": "2026-08",
+      "category": "Suplementy",
+      "costs": 1234.56
+    },
+    {
+      "month": "2026-09",
+      "category": "Treningi",
+      "costs": 360
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 1876.25,
+      "income": 0
+    },
+    {
+      "category": "Kowal",
+      "costs": 300,
+      "income": 0
+    },
+    {
+      "category": "Zawody",
+      "costs": 350.3,
+      "income": 1700
+    },
+    {
+      "category": "Treningi",
+      "costs": 360,
+      "income": 0
+    },
+    {
+      "category": "Pasza",
+      "costs": 915.01,
+      "income": 0
+    },
+    {
+      "category": "Suplementy",
+      "costs": 1234.56,
+      "income": 0
+    }
+  ]
+}

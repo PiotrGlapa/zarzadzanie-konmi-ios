@@ -1,0 +1,101 @@
+{
+  "from": null,
+  "to": null,
+  "riderContactId": null,
+  "riderName": null,
+  "competitions": [
+    {
+      "competitionId": "01a10c22-1311-77a3-95e8-ee7139857a08",
+      "name": "Puchar; jesień",
+      "dateFrom": "2026-05-09",
+      "dateTo": "2026-05-10",
+      "city": "Poznań",
+      "starts": [
+        {
+          "startId": "01a10c22-134b-7a4f-b5ac-eda6bd1e744a",
+          "date": "2026-05-10",
+          "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+          "horseName": "Grom",
+          "disciplineName": "Ujeżdżenie",
+          "className": "L",
+          "resultStatus": "Completed",
+          "placement": 2,
+          "participantsCount": 10,
+          "entryFee": 100.1,
+          "otherCosts": 20.2,
+          "prizeMoney": 500,
+          "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+          "riderName": "Anna Nowak"
+        },
+        {
+          "startId": "01a10c22-138b-7f52-8c1e-2fe6e619a74c",
+          "date": "2026-05-09",
+          "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+          "horseName": "Iskra",
+          "disciplineName": "Ujeżdżenie",
+          "className": null,
+          "resultStatus": null,
+          "placement": null,
+          "participantsCount": null,
+          "entryFee": 80,
+          "otherCosts": null,
+          "prizeMoney": null,
+          "riderContactId": "01a10c22-11e4-750f-b2a1-9cdf756e9191",
+          "riderName": "Ewa Wiśniewska"
+        }
+      ]
+    },
+    {
+      "competitionId": "01a10c22-1340-7b18-a70b-aa4855c371f5",
+      "name": "Mistrzostwa",
+      "dateFrom": "2026-06-20",
+      "dateTo": null,
+      "city": "Kraków",
+      "starts": [
+        {
+          "startId": "01a10c22-1390-7733-ab15-4cd3e809e28f",
+          "date": "2026-06-20",
+          "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+          "horseName": "Grom",
+          "disciplineName": null,
+          "className": "P",
+          "resultStatus": "Completed",
+          "placement": 1,
+          "participantsCount": 14,
+          "entryFee": 150,
+          "otherCosts": null,
+          "prizeMoney": 1200,
+          "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+          "riderName": "Anna Nowak"
+        }
+      ]
+    }
+  ],
+  "total": {
+    "competitions": 2,
+    "starts": 3,
+    "totalCosts": 350.3,
+    "totalPrizes": 1700,
+    "balance": 1349.7
+  },
+  "groups": [
+    {
+      "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+      "riderName": "Anna Nowak",
+      "competitions": 2,
+      "starts": 2,
+      "totalCosts": 270.3,
+      "totalPrizes": 1700,
+      "balance": 1429.7
+    },
+    {
+      "riderContactId": "01a10c22-11e4-750f-b2a1-9cdf756e9191",
+      "riderName": "Ewa Wiśniewska",
+      "competitions": 1,
+      "starts": 1,
+      "totalCosts": 80,
+      "totalPrizes": 0,
+      "balance": -80
+    }
+  ]
+}

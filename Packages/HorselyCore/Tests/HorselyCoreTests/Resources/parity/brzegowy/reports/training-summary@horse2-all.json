@@ -1,0 +1,22 @@
+{
+  "horseId": "01a13e2c-e7f7-7d76-b248-841988f94d89",
+  "horseName": "Ósemka",
+  "range": "All",
+  "from": null,
+  "to": null,
+  "rows": [],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 0,
+    "totalMinutes": 0,
+    "duration": null,
+    "intensity": null,
+    "rating": null,
+    "obstacleHeight": null,
+    "totalCost": 0
+  },
+  "series": [],
+  "isEmpty": true
+}

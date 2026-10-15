@@ -1,0 +1,117 @@
+{
+  "from": "2025-01-01",
+  "to": "2026-12-31",
+  "riderContactId": null,
+  "riderName": null,
+  "rows": [
+    {
+      "trainingId": "01a10c22-139e-776a-a238-9dfe5266919b",
+      "date": "2025-12-20",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "typeName": "Ujeżdżenie",
+      "durationMinutes": 60,
+      "intensity": "Medium",
+      "rating": 3,
+      "trainerName": null,
+      "cost": 100,
+      "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+      "riderName": "Anna Nowak"
+    },
+    {
+      "trainingId": "01a10c22-13d5-751c-8a67-7b83b7486793",
+      "date": "2026-09-01",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "typeName": "Ujeżdżenie",
+      "durationMinutes": 45,
+      "intensity": "Medium",
+      "rating": 4,
+      "trainerName": "Jan Kowalski; trener",
+      "cost": 120,
+      "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+      "riderName": "Anna Nowak"
+    },
+    {
+      "trainingId": "01a10c22-13db-7fc9-a8c7-69a6fd1fe22b",
+      "date": "2026-09-03",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "typeName": "Skoki",
+      "durationMinutes": 75,
+      "intensity": "Hard",
+      "rating": 5,
+      "trainerName": "Jan Kowalski; trener",
+      "cost": 150,
+      "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+      "riderName": "Anna Nowak"
+    },
+    {
+      "trainingId": "01a10c22-13e6-7290-9254-11d666e5a95a",
+      "date": "2026-09-10",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "typeName": "Teren",
+      "durationMinutes": null,
+      "intensity": "Light",
+      "rating": null,
+      "trainerName": null,
+      "cost": null,
+      "riderContactId": "01a10c22-11e4-750f-b2a1-9cdf756e9191",
+      "riderName": "Ewa Wiśniewska"
+    },
+    {
+      "trainingId": "01a10c22-13e9-719a-bc30-41e2dfc9fc7b",
+      "date": "2026-09-22",
+      "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+      "horseName": "Iskra",
+      "typeName": "Skoki",
+      "durationMinutes": 50,
+      "intensity": "Medium",
+      "rating": 4,
+      "trainerName": "Anna Nowak",
+      "cost": 90,
+      "riderContactId": "01a10c22-11e4-750f-b2a1-9cdf756e9191",
+      "riderName": "Ewa Wiśniewska"
+    },
+    {
+      "trainingId": "01a10c22-13ec-78de-bf04-bec4d5f2cfc8",
+      "date": "2026-09-23",
+      "horseId": "01a10c22-11b8-75b4-a407-8f1a83e02cc0",
+      "horseName": "Iskra",
+      "typeName": "Ujeżdżenie",
+      "durationMinutes": 125,
+      "intensity": "Hard",
+      "rating": 2,
+      "trainerName": null,
+      "cost": null,
+      "riderContactId": "01a10c22-11e4-750f-b2a1-9cdf756e9191",
+      "riderName": "Ewa Wiśniewska"
+    }
+  ],
+  "total": {
+    "count": 6,
+    "totalMinutes": 355,
+    "averageRating": 3.6,
+    "totalCost": 460
+  },
+  "groups": [
+    {
+      "key": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+      "name": "Anna Nowak",
+      "count": 3,
+      "totalMinutes": 180,
+      "averageRating": 4,
+      "totalCost": 370
+    },
+    {
+      "key": "01a10c22-11e4-750f-b2a1-9cdf756e9191",
+      "name": "Ewa Wiśniewska",
+      "count": 3,
+      "totalMinutes": 175,
+      "averageRating": 3,
+      "totalCost": 90
+    }
+  ],
+  "groupedBy": "Rider"
+}

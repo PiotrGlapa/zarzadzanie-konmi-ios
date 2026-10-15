@@ -1,0 +1,80 @@
+{
+  "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+  "horseName": "Dama",
+  "range": "Year",
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "rows": [
+    {
+      "typeId": "01a13e2d-40b6-7061-bd68-7e7fadae677b",
+      "typeName": "Spacer",
+      "paletteIndex": 5,
+      "count": 1,
+      "totalMinutes": 27,
+      "duration": {
+        "min": 27,
+        "average": 27,
+        "max": 27
+      },
+      "intensity": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "rating": {
+        "min": 4,
+        "average": 4,
+        "max": 4
+      },
+      "obstacleHeight": null,
+      "totalCost": 220
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 1,
+    "totalMinutes": 27,
+    "duration": {
+      "min": 27,
+      "average": 27,
+      "max": 27
+    },
+    "intensity": {
+      "min": 3,
+      "average": 3,
+      "max": 3
+    },
+    "rating": {
+      "min": 4,
+      "average": 4,
+      "max": 4
+    },
+    "obstacleHeight": null,
+    "totalCost": 220
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2d-40b6-7061-bd68-7e7fadae677b",
+      "points": [
+        {
+          "date": "2026-02-02",
+          "value": 27
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2d-40b6-7061-bd68-7e7fadae677b",
+      "points": [
+        {
+          "date": "2026-02-02",
+          "value": 4
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

@@ -13,10 +13,16 @@ xcuserdata/
 *.dSYM.zip
 *.dSYM
 
-# Swift Package Manager
+# Swift Package Manager (katalog Packages/ zawiera nasze pakiety HorselyCore i HorselyKit — nie ignorować)
 .build/
 .swiftpm/
-Packages/
+
+# Projekt Xcode generuje XcodeGen z project.yml (SPECYFIKACJA_MOBILE_IOS.md 9.7) — nie trafia do repozytorium
+*.xcodeproj/
+
+# Dane i zrzuty lokalne (zrzuty z CI są artefaktami przebiegu)
+fixtures/*.local
+screenshots/
 
 # CocoaPods
 Pods/

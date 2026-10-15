@@ -1,0 +1,94 @@
+{
+  "horseId": "01a13e2c-dfbc-7941-9627-411a99ccaebc",
+  "horseName": "Grom",
+  "range": "Month",
+  "from": "2026-09-01",
+  "to": "2026-09-30",
+  "rows": [
+    {
+      "typeId": "01a13e2c-dcfd-76c9-ba36-945256c8b3ce",
+      "typeName": "Skoki",
+      "paletteIndex": 1,
+      "count": 1,
+      "totalMinutes": 60,
+      "duration": {
+        "min": 60,
+        "average": 60,
+        "max": 60
+      },
+      "intensity": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "rating": {
+        "min": 4,
+        "average": 4,
+        "max": 4
+      },
+      "obstacleHeight": {
+        "min": 100,
+        "average": 100,
+        "max": 100
+      },
+      "totalCost": 120
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 1,
+    "totalMinutes": 60,
+    "duration": {
+      "min": 60,
+      "average": 60,
+      "max": 60
+    },
+    "intensity": {
+      "min": 3,
+      "average": 3,
+      "max": 3
+    },
+    "rating": {
+      "min": 4,
+      "average": 4,
+      "max": 4
+    },
+    "obstacleHeight": null,
+    "totalCost": 120
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2c-dcfd-76c9-ba36-945256c8b3ce",
+      "points": [
+        {
+          "date": "2026-09-15",
+          "value": 60
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2c-dcfd-76c9-ba36-945256c8b3ce",
+      "points": [
+        {
+          "date": "2026-09-15",
+          "value": 4
+        }
+      ]
+    },
+    {
+      "parameter": "ObstacleHeight",
+      "typeId": "01a13e2c-dcfd-76c9-ba36-945256c8b3ce",
+      "points": [
+        {
+          "date": "2026-09-15",
+          "value": 100
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

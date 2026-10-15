@@ -1,0 +1,133 @@
+# Kompilacja i testy (contracts/ci-release.md §2). PR: pakiety, kompilacja symulatora, zgodność tekstów, testy migawkowe.
+# Push na main i wywołanie z wydania: dodatkowo testy UI na iPhone 15 Pro (iOS 18) i zrzuty ekranów.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+    inputs:
+      ui-tests:
+        description: Uruchom testy UI (wydanie)
+        type: boolean
+        default: true
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  # Jawny wybór Xcode (SDK iOS 18) na obrazie macos-15; zmiana wersji tylko tutaj i w release.yml.
+  XCODE_VERSION: "16.4"
+  APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+  SIMULATOR_DESTINATION: platform=iOS Simulator,name=iPhone 15 Pro,OS=latest
+  # Symulator: podpis doraźny (ad hoc) z uprawnieniami, bez konta Apple.
+  SIMULATOR_SIGNING: CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM=
+
+jobs:
+  test:
+    name: Testy
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      RUN_UI_TESTS: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || inputs.ui-tests == true }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wybierz Xcode
+        run: |
+          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app"
+          xcodebuild -version
+          swift --version
+
+      - name: Pamięć podręczna pakietów SPM
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            Packages/HorselyCore/.build
+            Packages/HorselyKit/.build
+          key: spm-${{ runner.os }}-${{ env.XCODE_VERSION }}-${{ hashFiles('Packages/*/Package.swift', 'Packages/*/Package.resolved') }}
+          restore-keys: spm-${{ runner.os }}-${{ env.XCODE_VERSION }}-
+
+      - name: Zainstaluj XcodeGen
+        run: brew install xcodegen
+
+      - name: Zgodność tekstów z Androidem (Localizable.xcstrings)
+        run: pwsh -NoProfile -File scripts/sync-strings.ps1 -Check
+
+      - name: Testy HorselyCore
+        working-directory: Packages/HorselyCore
+        run: swift test
+
+      - name: Testy HorselyKit
+        working-directory: Packages/HorselyKit
+        run: swift test
+
+      - name: Wygeneruj projekt Xcode
+        run: xcodegen generate
+
+      - name: Kompilacja aplikacji i rozszerzenia (symulator)
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild build-for-testing \
+            -project Horsely.xcodeproj -scheme Horsely \
+            -destination "$SIMULATOR_DESTINATION" \
+            -derivedDataPath build/DerivedData \
+            -resultBundlePath build/build.xcresult \
+            $SIMULATOR_SIGNING | tee build/build.log | tail -n 40
+        shell: bash
+
+      - name: Testy migawkowe i zgodności tekstów (AppSnapshotTests)
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -project Horsely.xcodeproj -scheme Horsely \
+            -destination "$SIMULATOR_DESTINATION" \
+            -derivedDataPath build/DerivedData \
+            -only-testing:AppSnapshotTests \
+            -resultBundlePath build/snapshot-tests.xcresult \
+            $SIMULATOR_SIGNING | tail -n 40
+
+      - name: Testy UI (iPhone 15 Pro, iOS 18)
+        if: env.RUN_UI_TESTS == 'true'
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -project Horsely.xcodeproj -scheme Horsely \
+            -destination "$SIMULATOR_DESTINATION" \
+            -derivedDataPath build/DerivedData \
+            -only-testing:AppUITests \
+            -resultBundlePath build/ui-tests.xcresult \
+            $SIMULATOR_SIGNING | tail -n 40
+
+      - name: Wyciągnij zrzuty ekranów z wyników testów UI
+        if: env.RUN_UI_TESTS == 'true' && always()
+        run: |
+          mkdir -p screenshots/ios
+          if [ -d build/ui-tests.xcresult ]; then
+            xcrun xcresulttool export attachments --path build/ui-tests.xcresult --output-path screenshots/ios
+          fi
+
+      - name: Artefakt — wyniki testów (.xcresult)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcresult
+          path: build/*.xcresult
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Artefakt — zrzuty ekranów iOS
+        if: env.RUN_UI_TESTS == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/ios
+          if-no-files-found: ignore
+          retention-days: 14

@@ -1,0 +1,53 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": null,
+  "riderName": null,
+  "rows": [
+    {
+      "trainingId": "01a13e2c-e889-77ba-bcb6-390d12c7b10d",
+      "date": "2026-09-18",
+      "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48",
+      "horseName": "Błyskawica",
+      "typeName": "Skoki",
+      "durationMinutes": 35,
+      "intensity": "Medium",
+      "rating": 3,
+      "trainerName": null,
+      "cost": null,
+      "riderContactId": "01a13e2c-e7dc-7d40-a545-34df4365a0bf",
+      "riderName": "Ósmak Jeździec"
+    },
+    {
+      "trainingId": "01a13e2c-e87a-7e8e-9d07-b4c3141d5540",
+      "date": "2026-09-27",
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3",
+      "horseName": "Żółtko",
+      "typeName": "Skoki",
+      "durationMinutes": 40,
+      "intensity": "Light",
+      "rating": 5,
+      "trainerName": "Ćwik Trener",
+      "cost": 150.5,
+      "riderContactId": "01a13e2c-e7dc-7d40-a545-34df4365a0bf",
+      "riderName": "Ósmak Jeździec"
+    }
+  ],
+  "total": {
+    "count": 2,
+    "totalMinutes": 75,
+    "averageRating": 4,
+    "totalCost": 150.5
+  },
+  "groups": [
+    {
+      "key": "01a13e2c-e7dc-7d40-a545-34df4365a0bf",
+      "name": "Ósmak Jeździec",
+      "count": 2,
+      "totalMinutes": 75,
+      "averageRating": 4,
+      "totalCost": 150.5
+    }
+  ],
+  "groupedBy": "Rider"
+}

@@ -1,0 +1,36 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Category",
+  "rows": [
+    {
+      "group": "Pasza",
+      "horseId": null,
+      "category": "Pasza",
+      "month": null,
+      "costs": 800,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 800,
+  "totalCosts": 800,
+  "totalIncome": 0,
+  "balance": -800,
+  "months": [
+    "2026-04"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-04",
+      "category": "Pasza",
+      "costs": 800
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Pasza",
+      "costs": 800,
+      "income": 0
+    }
+  ]
+}

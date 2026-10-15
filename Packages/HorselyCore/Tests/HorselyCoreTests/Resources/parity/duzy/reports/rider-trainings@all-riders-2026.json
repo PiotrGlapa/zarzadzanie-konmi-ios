@@ -1,0 +1,147 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": null,
+  "riderName": null,
+  "rows": [
+    {
+      "trainingId": "01a13e2d-4d32-76ec-9f77-228218a8e7e9",
+      "date": "2026-04-11",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "horseName": "Kasztan",
+      "typeName": "Ujeżdżenie",
+      "durationMinutes": 41,
+      "intensity": "Light",
+      "rating": 1,
+      "trainerName": null,
+      "cost": null,
+      "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+      "riderName": "Anna Wrona"
+    },
+    {
+      "trainingId": "01a13e2d-4b88-78c1-97bf-e9a000fe3e8f",
+      "date": "2026-07-29",
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "horseName": "Wicher",
+      "typeName": "Teren",
+      "durationMinutes": 53,
+      "intensity": "Light",
+      "rating": 1,
+      "trainerName": "Magdalena Zielińska (trener)",
+      "cost": 270,
+      "riderContactId": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+      "riderName": "Anna Wrona"
+    },
+    {
+      "trainingId": "01a13e2d-4796-7e7e-9401-396e31689519",
+      "date": "2026-02-11",
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "horseName": "Bursztyn",
+      "typeName": "Lonża",
+      "durationMinutes": 81,
+      "intensity": "Light",
+      "rating": 1,
+      "trainerName": "Robert Szymański (trener)",
+      "cost": 190,
+      "riderContactId": "01a13e2d-40da-7c89-8f4c-80afa9b55c10",
+      "riderName": "Katarzyna Sowa"
+    },
+    {
+      "trainingId": "01a13e2d-4d07-7c5e-bebc-5513fe70373d",
+      "date": "2026-05-07",
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "horseName": "Kasztan",
+      "typeName": "Inne",
+      "durationMinutes": 78,
+      "intensity": "Light",
+      "rating": 3,
+      "trainerName": "Robert Szymański (trener)",
+      "cost": 140,
+      "riderContactId": "01a13e2d-40da-7c89-8f4c-80afa9b55c10",
+      "riderName": "Katarzyna Sowa"
+    },
+    {
+      "trainingId": "01a13e2d-4bc8-737f-975b-9e66bd81bb49",
+      "date": "2026-02-21",
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "horseName": "Grom",
+      "typeName": "Zajeżdżanie",
+      "durationMinutes": 76,
+      "intensity": "Medium",
+      "rating": 1,
+      "trainerName": null,
+      "cost": null,
+      "riderContactId": "01a13e2d-40dd-7218-ab3b-df0de2128fe4",
+      "riderName": "Marta Lis (trener i jeździec)"
+    },
+    {
+      "trainingId": "01a13e2d-42eb-7dd2-a15c-bd36f6d5edb6",
+      "date": "2026-03-27",
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "horseName": "Hades",
+      "typeName": "Gimnastyka",
+      "durationMinutes": 28,
+      "intensity": "Medium",
+      "rating": 3,
+      "trainerName": null,
+      "cost": null,
+      "riderContactId": "01a13e2d-40dd-7218-ab3b-df0de2128fe4",
+      "riderName": "Marta Lis (trener i jeździec)"
+    },
+    {
+      "trainingId": "01a13e2d-4a06-75b0-8af2-674d83cf0022",
+      "date": "2026-02-05",
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "horseName": "Dama",
+      "typeName": "Spacer",
+      "durationMinutes": 27,
+      "intensity": "Hard",
+      "rating": 4,
+      "trainerName": "Marta Lis (trener i jeździec)",
+      "cost": 220,
+      "riderContactId": "01a13e2d-40dc-7d5f-8bed-cd5a8ef9c220",
+      "riderName": "Tomasz Orzeł"
+    }
+  ],
+  "total": {
+    "count": 7,
+    "totalMinutes": 384,
+    "averageRating": 2,
+    "totalCost": 820
+  },
+  "groups": [
+    {
+      "key": "01a13e2d-40d9-7fe2-b2df-b923b0fdc3e0",
+      "name": "Anna Wrona",
+      "count": 2,
+      "totalMinutes": 94,
+      "averageRating": 1,
+      "totalCost": 270
+    },
+    {
+      "key": "01a13e2d-40da-7c89-8f4c-80afa9b55c10",
+      "name": "Katarzyna Sowa",
+      "count": 2,
+      "totalMinutes": 159,
+      "averageRating": 2,
+      "totalCost": 330
+    },
+    {
+      "key": "01a13e2d-40dd-7218-ab3b-df0de2128fe4",
+      "name": "Marta Lis (trener i jeździec)",
+      "count": 2,
+      "totalMinutes": 104,
+      "averageRating": 2,
+      "totalCost": 0
+    },
+    {
+      "key": "01a13e2d-40dc-7d5f-8bed-cd5a8ef9c220",
+      "name": "Tomasz Orzeł",
+      "count": 1,
+      "totalMinutes": 27,
+      "averageRating": 4,
+      "totalCost": 220
+    }
+  ],
+  "groupedBy": "Rider"
+}

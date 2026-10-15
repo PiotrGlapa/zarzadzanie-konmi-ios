@@ -1,0 +1,51 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": null,
+  "riderName": null,
+  "competitions": [
+    {
+      "competitionId": "01a13e2c-e867-7127-be89-a70a484513c6",
+      "name": "Mistrzostwa Łódzkie",
+      "dateFrom": "2026-09-26",
+      "dateTo": "2026-09-27",
+      "city": "Łódź",
+      "starts": [
+        {
+          "startId": "01a13e2c-e86f-79b2-afc9-8b2cf49bcdcb",
+          "date": "2026-09-26",
+          "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3",
+          "horseName": "Żółtko",
+          "disciplineName": null,
+          "className": null,
+          "resultStatus": "Completed",
+          "placement": 1,
+          "participantsCount": 12,
+          "entryFee": 50.5,
+          "otherCosts": 10.25,
+          "prizeMoney": 500.75,
+          "riderContactId": "01a13e2c-e7dc-7d40-a545-34df4365a0bf",
+          "riderName": "Ósmak Jeździec"
+        }
+      ]
+    }
+  ],
+  "total": {
+    "competitions": 1,
+    "starts": 1,
+    "totalCosts": 60.75,
+    "totalPrizes": 500.75,
+    "balance": 440.00
+  },
+  "groups": [
+    {
+      "riderContactId": "01a13e2c-e7dc-7d40-a545-34df4365a0bf",
+      "riderName": "Ósmak Jeździec",
+      "competitions": 1,
+      "starts": 1,
+      "totalCosts": 60.75,
+      "totalPrizes": 500.75,
+      "balance": 440.00
+    }
+  ]
+}

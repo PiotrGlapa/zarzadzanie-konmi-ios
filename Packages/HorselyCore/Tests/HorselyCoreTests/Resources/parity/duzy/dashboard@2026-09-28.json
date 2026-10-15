@@ -1,0 +1,221 @@
+{
+  "overdue": [],
+  "upcoming": [],
+  "laterThisMonth": [],
+  "horses": [
+    {
+      "horseId": "01a13e2d-40e5-7f94-b57a-3cdded631da6",
+      "name": "Bursztyn",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40f5-7335-9758-652c68393e30",
+      "name": "Dama",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40f7-702e-822f-f178018abd11",
+      "name": "Fokus",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "name": "Grom",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40fa-7ff6-8198-54712492625e",
+      "name": "Hades",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "name": "Iskra",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "name": "Luna",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "name": "Rubin",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    },
+    {
+      "horseId": "01a13e2d-40ef-7542-b2f2-b9d9e6a957f4",
+      "name": "Wicher",
+      "nextReminderId": null,
+      "nextReminderDate": null,
+      "nextReminderTitle": null,
+      "isNextReminderOverdue": false,
+      "photoAttachmentId": null,
+      "monthsWithoutPassport": null,
+      "status": "Active"
+    }
+  ],
+  "recentEntries": [
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2d-4bcf-719b-8ea2-a6c1112a1717",
+      "date": "2026-09-26",
+      "title": "Fizjoterapia",
+      "summary": "Napięcie szyi",
+      "cost": 162.31,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40ff-7c52-92b8-0aab082f1cad",
+      "horseName": "Rubin"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2d-4d35-7c6f-aa41-858dc9527564",
+      "date": "2026-09-23",
+      "title": "Zmiana paszy",
+      "summary": "Zmniejszona dawka owsa.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-4165-780b-bd84-93e0d33eab0a",
+      "date": "2026-09-12",
+      "title": "Badanie",
+      "summary": "Utrata apetytu",
+      "cost": 841.44,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "horseName": "Iskra"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2d-482f-71a8-bc85-d8f8acd1f9e0",
+      "date": "2026-09-09",
+      "title": "Sieczka",
+      "summary": "Ściółka",
+      "cost": 1341.28,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2d-4480-7d7e-b8d4-044f8043a98c",
+      "date": "2026-09-03",
+      "title": "Kucie tył",
+      "summary": null,
+      "cost": 265.25,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2d-42df-7413-b2ae-e1f29183bffe",
+      "date": "2026-08-30",
+      "title": "Nagła",
+      "summary": "Kolka",
+      "cost": 364.83,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "horseName": "Luna"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-417c-7233-927a-b17906764d56",
+      "date": "2026-08-26",
+      "title": "Halowy Puchar 2026",
+      "summary": "N · 3. miejsce",
+      "cost": 164.6,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40e3-73d4-b84f-952878de239a",
+      "horseName": "Iskra"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-417b-742c-9156-54a524434d8f",
+      "date": "2026-08-26",
+      "title": "Halowy Puchar 2026",
+      "summary": "C · 6. miejsce",
+      "cost": 109.96,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40fc-7bec-a3cb-4f8de8699ec5",
+      "horseName": "Luna"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4179-79c6-859c-b51fb3ad5f0c",
+      "date": "2026-08-26",
+      "title": "Halowy Puchar 2026",
+      "summary": "P · 9. miejsce",
+      "cost": 193.28,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40e1-73a0-a702-17cab8ab4387",
+      "horseName": "Grom"
+    },
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2d-4178-73f2-89f7-d6367b02bd7f",
+      "date": "2026-08-26",
+      "title": "Halowy Puchar 2026",
+      "summary": "L · 2. miejsce",
+      "cost": 51.19,
+      "attachmentCount": 0,
+      "horseId": "01a13e2d-40ed-7531-bce9-851815c9ff2a",
+      "horseName": "Kasztan"
+    }
+  ],
+  "costsThisMonth": 3258.68,
+  "costsPreviousMonth": 5412.51,
+  "horizonDays": 7
+}

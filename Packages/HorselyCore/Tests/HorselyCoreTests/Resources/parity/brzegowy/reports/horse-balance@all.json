@@ -1,0 +1,185 @@
+{
+  "rows": [
+    {
+      "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48",
+      "horseName": "Błyskawica",
+      "status": "Injured",
+      "purchasePrice": 12000,
+      "costs": 244.9,
+      "prizes": 0,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": -12244.9,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 180
+        },
+        {
+          "year": 2026,
+          "category": "Leki",
+          "costs": 64.9
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2c-e7f2-756c-8a5e-0f65478dcd75",
+      "horseName": "Ćma",
+      "status": "Deceased",
+      "purchasePrice": 3000,
+      "costs": 66.67,
+      "prizes": 0,
+      "salePrice": 0,
+      "estimatedValue": null,
+      "result": -3066.67,
+      "isFinal": true,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 66.67
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2c-e7fc-70aa-b5d3-32e51512210a",
+      "horseName": "Łabędź Ąę",
+      "status": "Leased",
+      "purchasePrice": null,
+      "costs": 0,
+      "prizes": 0,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": 0,
+      "isFinal": false,
+      "purchaseMissing": true,
+      "breakdown": []
+    },
+    {
+      "horseId": "01a13e2c-e7f7-7d76-b248-841988f94d89",
+      "horseName": "Ósemka",
+      "status": "Sold",
+      "purchasePrice": 8000,
+      "costs": 81.11,
+      "prizes": 0,
+      "salePrice": 12000.99,
+      "estimatedValue": null,
+      "result": 3919.88,
+      "isFinal": true,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 66.66
+        },
+        {
+          "year": 2026,
+          "category": "Suplementy",
+          "costs": 14.45
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2c-e7e8-7f8e-bace-5cba44f8d5ea",
+      "horseName": "Źrebak Łatek",
+      "status": "Active",
+      "purchasePrice": null,
+      "costs": 164.46,
+      "prizes": 0,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": -164.46,
+      "isFinal": false,
+      "purchaseMissing": true,
+      "breakdown": [
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 100
+        },
+        {
+          "year": 2026,
+          "category": "Inne",
+          "costs": 0.01
+        },
+        {
+          "year": 2026,
+          "category": "Pasza",
+          "costs": 50.01
+        },
+        {
+          "year": 2026,
+          "category": "Suplementy",
+          "costs": 14.44
+        }
+      ]
+    },
+    {
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3",
+      "horseName": "Żółtko",
+      "status": "Active",
+      "purchasePrice": null,
+      "costs": 1775.67,
+      "prizes": 500.75,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": -1274.92,
+      "isFinal": false,
+      "purchaseMissing": true,
+      "breakdown": [
+        {
+          "year": 2025,
+          "category": "Pasza",
+          "costs": 66.66
+        },
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 99.99
+        },
+        {
+          "year": 2026,
+          "category": "Kowal",
+          "costs": 333.33
+        },
+        {
+          "year": 2026,
+          "category": "Zawody",
+          "costs": 60.75
+        },
+        {
+          "year": 2026,
+          "category": "Treningi",
+          "costs": 150.5
+        },
+        {
+          "year": 2026,
+          "category": "Pasza",
+          "costs": 50
+        },
+        {
+          "year": 2026,
+          "category": "Sprzęt",
+          "costs": 1000
+        },
+        {
+          "year": 2026,
+          "category": "Suplementy",
+          "costs": 14.44
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "purchasePrice": 23000,
+    "costs": 2332.81,
+    "prizes": 500.75,
+    "salePrice": 12000.99,
+    "result": -12831.07
+  }
+}

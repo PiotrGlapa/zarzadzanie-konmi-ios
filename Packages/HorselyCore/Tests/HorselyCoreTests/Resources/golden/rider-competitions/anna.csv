@@ -1,0 +1,10 @@
+﻿Zawody;Data;Koń;Dyscyplina;Klasa;Wynik;Wpisowe;Pozostałe koszty;Nagroda
+"Puchar; jesień";10.05.2026;Grom;Ujeżdżenie;L;2. miejsce;100,10;20,20;500,00
+Mistrzostwa;20.06.2026;Grom;;P;1. miejsce;150,00;;1200,00
+
+Razem (zawodów: 2, startów: 2);;;;;;250,10;20,20;1700,00
+Koszty;;;;;;;;270,30
+Nagrody;;;;;;;;1700,00
+Bilans;;;;;;;;1429,70
+
+"Starty bez jeźdźca nie są uwzględnione. Koszty = wpisowe + pozostałe koszty; bilans = nagrody − koszty."

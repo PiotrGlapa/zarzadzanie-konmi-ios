@@ -1,0 +1,86 @@
+{
+  "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3",
+  "totalCount": 8,
+  "items": [
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2c-e86f-79b2-afc9-8b2cf49bcdcb",
+      "date": "2026-09-26",
+      "title": "Mistrzostwa Łódzkie",
+      "summary": "1. miejsce",
+      "cost": 60.75,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2c-e84b-7584-8bf5-178ea7dce3d1",
+      "date": "2026-09-14",
+      "title": "Kucie pełne",
+      "summary": null,
+      "cost": 333.33,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2c-e83d-751b-93ca-978327d3cdd7",
+      "date": "2026-09-14",
+      "title": "Kontrola",
+      "summary": "Kontrola",
+      "cost": 99.99,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e82d-7325-b76b-025f4bf2f14d",
+      "date": "2026-09-04",
+      "title": "Derka",
+      "summary": "Sprzęt",
+      "cost": 1000,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e827-75cb-8a2b-33a2795e6658",
+      "date": "2026-09-03",
+      "title": "Drobiazg",
+      "summary": "Inne",
+      "cost": 0,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e822-7e28-a01b-7887c79abcc9",
+      "date": "2026-09-02",
+      "title": "Suplement",
+      "summary": "Suplementy",
+      "cost": 14.44,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e81a-77e9-b7d5-2183b596d84a",
+      "date": "2026-09-01",
+      "title": "Siano",
+      "summary": "Pasza",
+      "cost": 50,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e837-7ea4-b62b-d834c1d35a42",
+      "date": "2025-12-31",
+      "title": "Siano zimowe",
+      "summary": "Pasza",
+      "cost": 66.67,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e7ee-757f-93e0-e4794f2a6ac3"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "rows": [
+    {
+      "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48",
+      "horseName": "Błyskawica",
+      "status": "Injured",
+      "purchasePrice": 12000,
+      "costs": 244.9,
+      "prizes": 0,
+      "salePrice": null,
+      "estimatedValue": null,
+      "result": -12244.9,
+      "isFinal": false,
+      "purchaseMissing": false,
+      "breakdown": [
+        {
+          "year": 2026,
+          "category": "Weterynarz",
+          "costs": 180
+        },
+        {
+          "year": 2026,
+          "category": "Leki",
+          "costs": 64.9
+        }
+      ]
+    }
+  ],
+  "totals": {
+    "purchasePrice": 12000,
+    "costs": 244.9,
+    "prizes": 0,
+    "salePrice": 0,
+    "result": -12244.9
+  }
+}

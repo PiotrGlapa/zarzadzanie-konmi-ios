@@ -1,0 +1,80 @@
+{
+  "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+  "horseName": "Iskra",
+  "range": "Month",
+  "from": "2026-09-01",
+  "to": "2026-09-30",
+  "rows": [
+    {
+      "typeId": "01a13e2c-dcfd-702c-8395-5b50c59140b3",
+      "typeName": "Ujeżdżenie",
+      "paletteIndex": 0,
+      "count": 1,
+      "totalMinutes": 45,
+      "duration": {
+        "min": 45,
+        "average": 45,
+        "max": 45
+      },
+      "intensity": {
+        "min": 2,
+        "average": 2,
+        "max": 2
+      },
+      "rating": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "obstacleHeight": null,
+      "totalCost": 0
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 1,
+    "totalMinutes": 45,
+    "duration": {
+      "min": 45,
+      "average": 45,
+      "max": 45
+    },
+    "intensity": {
+      "min": 2,
+      "average": 2,
+      "max": 2
+    },
+    "rating": {
+      "min": 3,
+      "average": 3,
+      "max": 3
+    },
+    "obstacleHeight": null,
+    "totalCost": 0
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2c-dcfd-702c-8395-5b50c59140b3",
+      "points": [
+        {
+          "date": "2026-09-16",
+          "value": 45
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2c-dcfd-702c-8395-5b50c59140b3",
+      "points": [
+        {
+          "date": "2026-09-16",
+          "value": 3
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

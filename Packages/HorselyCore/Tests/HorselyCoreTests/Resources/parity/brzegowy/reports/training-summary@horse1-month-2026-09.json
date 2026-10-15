@@ -1,0 +1,94 @@
+{
+  "horseId": "01a13e2c-e800-73ff-b765-cfc9ac236a48",
+  "horseName": "Błyskawica",
+  "range": "Month",
+  "from": "2026-09-01",
+  "to": "2026-09-30",
+  "rows": [
+    {
+      "typeId": "01a13e2c-e67d-74e8-9d01-0c7b64ddfd33",
+      "typeName": "Skoki",
+      "paletteIndex": 1,
+      "count": 1,
+      "totalMinutes": 35,
+      "duration": {
+        "min": 35,
+        "average": 35,
+        "max": 35
+      },
+      "intensity": {
+        "min": 2,
+        "average": 2,
+        "max": 2
+      },
+      "rating": {
+        "min": 3,
+        "average": 3,
+        "max": 3
+      },
+      "obstacleHeight": {
+        "min": 90,
+        "average": 90,
+        "max": 90
+      },
+      "totalCost": 0
+    }
+  ],
+  "total": {
+    "typeId": null,
+    "typeName": "Razem",
+    "paletteIndex": -1,
+    "count": 1,
+    "totalMinutes": 35,
+    "duration": {
+      "min": 35,
+      "average": 35,
+      "max": 35
+    },
+    "intensity": {
+      "min": 2,
+      "average": 2,
+      "max": 2
+    },
+    "rating": {
+      "min": 3,
+      "average": 3,
+      "max": 3
+    },
+    "obstacleHeight": null,
+    "totalCost": 0
+  },
+  "series": [
+    {
+      "parameter": "Duration",
+      "typeId": "01a13e2c-e67d-74e8-9d01-0c7b64ddfd33",
+      "points": [
+        {
+          "date": "2026-09-18",
+          "value": 35
+        }
+      ]
+    },
+    {
+      "parameter": "Rating",
+      "typeId": "01a13e2c-e67d-74e8-9d01-0c7b64ddfd33",
+      "points": [
+        {
+          "date": "2026-09-18",
+          "value": 3
+        }
+      ]
+    },
+    {
+      "parameter": "ObstacleHeight",
+      "typeId": "01a13e2c-e67d-74e8-9d01-0c7b64ddfd33",
+      "points": [
+        {
+          "date": "2026-09-18",
+          "value": 90
+        }
+      ]
+    }
+  ],
+  "isEmpty": false
+}

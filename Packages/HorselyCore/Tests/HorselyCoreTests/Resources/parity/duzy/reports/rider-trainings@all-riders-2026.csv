@@ -1,0 +1,16 @@
+﻿Jeździec;Data;Koń;Rodzaj treningu;Czas (min);Intensywność;Ocena;Trener;Koszt
+Anna Wrona;11.04.2026;Kasztan;Ujeżdżenie;41;Lekka;1;;
+Anna Wrona;29.07.2026;Wicher;Teren;53;Lekka;1;Magdalena Zielińska (trener);270,00
+Katarzyna Sowa;11.02.2026;Bursztyn;Lonża;81;Lekka;1;Robert Szymański (trener);190,00
+Katarzyna Sowa;07.05.2026;Kasztan;Inne;78;Lekka;3;Robert Szymański (trener);140,00
+Marta Lis (trener i jeździec);21.02.2026;Grom;Zajeżdżanie;76;Średnia;1;;
+Marta Lis (trener i jeździec);27.03.2026;Hades;Gimnastyka;28;Średnia;3;;
+Tomasz Orzeł;05.02.2026;Dama;Spacer;27;Ciężka;4;Marta Lis (trener i jeździec);220,00
+
+Anna Wrona (treningów: 2);;;;94;;1,0;;270,00
+Katarzyna Sowa (treningów: 2);;;;159;;2,0;;330,00
+Marta Lis (trener i jeździec) (treningów: 2);;;;104;;2,0;;0,00
+Tomasz Orzeł (treningów: 1);;;;27;;4,0;;220,00
+Razem (treningów: 7);;;;384;;2,0;;820,00
+
+"Treningi bez jeźdźca nie są uwzględnione. Koszt jest sumą kosztów wpisanych w treningach; średnia ocena liczona jest tylko z ocenionych treningów."

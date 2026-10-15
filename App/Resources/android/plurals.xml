@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Liczby mnogie po polsku: one / few / many / other. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="pl">
+    <plurals name="queue_operations_need_fix">
+        <item quantity="one">%d operacja wymaga poprawy</item>
+        <item quantity="few">%d operacje wymagają poprawy</item>
+        <item quantity="many">%d operacji wymaga poprawy</item>
+        <item quantity="other">%d operacji wymaga poprawy</item>
+    </plurals>
+    <plurals name="foal_months_without_passport">
+        <item quantity="one">źrebak, bez paszportu od %d mies.</item>
+        <item quantity="few">źrebak, bez paszportu od %d mies.</item>
+        <item quantity="many">źrebak, bez paszportu od %d mies.</item>
+        <item quantity="other">źrebak, bez paszportu od %d mies.</item>
+    </plurals>
+</resources>

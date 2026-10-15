@@ -1,0 +1,48 @@
+﻿Data;Koń;Rodzaj treningu;Czas (min);Intensywność;Ocena;Trener;Koszt
+02.11.2018;Tango;Spacer;33;Ciężka;1;Magdalena Zielińska (trener);210,00
+23.05.2019;Hades;Teren;50;Ciężka;2;Marta Lis (trener i jeździec);270,00
+03.06.2019;Hades;Lonża;23;Średnia;3;Marta Lis (trener i jeździec);140,00
+29.06.2019;Tango;Lonża;32;Lekka;1;Magdalena Zielińska (trener);230,00
+03.08.2019;Dama;Wszechstronny;87;Lekka;1;;
+13.09.2019;Sowa;Wszechstronny;72;Średnia;1;Robert Szymański (trener);250,00
+21.06.2020;Fokus;Skoki;80;Średnia;5;;
+16.08.2020;Sowa;Spacer;81;Lekka;5;Magdalena Zielińska (trener);280,00
+16.01.2021;Luna;Wszechstronny;62;Średnia;2;;
+19.01.2021;Grom;Gimnastyka;33;Średnia;3;Magdalena Zielińska (trener);240,00
+03.03.2021;Dama;Skoki;83;Lekka;1;Magdalena Zielińska (trener);270,00
+10.04.2021;Hades;Gimnastyka;41;Ciężka;3;Marta Lis (trener i jeździec);260,00
+07.09.2021;Wicher;Spacer;63;Lekka;5;Magdalena Zielińska (trener);150,00
+09.02.2022;Fokus;Skoki;70;Lekka;5;Marta Lis (trener i jeździec);220,00
+20.02.2022;Luna;Karuzela;87;Ciężka;4;Robert Szymański (trener);220,00
+06.09.2022;Fokus;Ujeżdżenie;54;Ciężka;2;Magdalena Zielińska (trener);280,00
+27.10.2022;Wicher;Gimnastyka;33;Lekka;1;;
+19.02.2023;Iskra;Ujeżdżenie;47;Lekka;2;Robert Szymański (trener);240,00
+06.03.2023;Kasztan;Ujeżdżenie;85;Średnia;3;Marta Lis (trener i jeździec);140,00
+29.03.2023;Sowa;Wszechstronny;38;Ciężka;1;Magdalena Zielińska (trener);150,00
+15.05.2023;Hades;Ujeżdżenie;16;Średnia;4;Magdalena Zielińska (trener);190,00
+21.06.2023;Sowa;Karuzela;37;Średnia;2;Marta Lis (trener i jeździec);270,00
+14.10.2023;Kasztan;Skoki;45;Lekka;4;Marta Lis (trener i jeździec);270,00
+30.12.2023;Wicher;Wszechstronny;38;Ciężka;3;Robert Szymański (trener);290,00
+25.02.2024;Dama;Zajeżdżanie;24;Lekka;1;;
+13.08.2024;Hades;Karuzela;66;Średnia;1;Robert Szymański (trener);170,00
+26.06.2025;Wicher;Zajeżdżanie;42;Lekka;3;Magdalena Zielińska (trener);90,00
+14.10.2025;Bursztyn;Lonża;74;Ciężka;1;Robert Szymański (trener);250,00
+28.10.2025;Hades;Karuzela;69;Ciężka;5;;
+04.12.2025;Tango;Lonża;87;Średnia;5;Magdalena Zielińska (trener);140,00
+11.04.2026;Kasztan;Ujeżdżenie;41;Lekka;1;;
+29.07.2026;Wicher;Teren;53;Lekka;1;Magdalena Zielińska (trener);270,00
+
+Bursztyn (treningów: 1);;;74;;1,0;;250,00
+Dama (treningów: 3);;;194;;1,0;;270,00
+Fokus (treningów: 3);;;204;;4,0;;500,00
+Grom (treningów: 1);;;33;;3,0;;240,00
+Hades (treningów: 6);;;265;;3,0;;1030,00
+Iskra (treningów: 1);;;47;;2,0;;240,00
+Kasztan (treningów: 3);;;171;;2,7;;410,00
+Luna (treningów: 2);;;149;;3,0;;220,00
+Sowa (treningów: 4);;;228;;2,3;;950,00
+Tango (treningów: 3);;;152;;2,3;;580,00
+Wicher (treningów: 5);;;229;;2,6;;800,00
+Razem (treningów: 32);;;1746;;2,6;;5490,00
+
+"Treningi bez jeźdźca nie są uwzględnione. Koszt jest sumą kosztów wpisanych w treningach; średnia ocena liczona jest tylko z ocenionych treningów."

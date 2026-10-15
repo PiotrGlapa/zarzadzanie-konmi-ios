@@ -1,0 +1,14 @@
+﻿Koń;Status;Zakup;Koszty;Nagrody;Sprzedaż;Wynik;Wartość (ocena własna);Uwagi
+Bursztyn;Aktywny;56903,01;38267,42;3040,85;;-92129,58;14107,88;"strata; wynik dotychczasowy — koń niesprzedany"
+Dama;Aktywny;16790,94;37328,50;1679,96;;-52439,48;34117,04;"strata; wynik dotychczasowy — koń niesprzedany"
+Fokus;Aktywny;10192,65;40454,68;4117,16;;-46530,17;52309,28;"strata; wynik dotychczasowy — koń niesprzedany"
+Grom;Aktywny;20630,06;39687,76;6470,42;;-53847,40;26580,88;"strata; wynik dotychczasowy — koń niesprzedany"
+Hades;Aktywny;34685,54;51586,97;3566,07;;-82706,44;21005,13;"strata; wynik dotychczasowy — koń niesprzedany"
+Iskra;Aktywny;54412,37;39357,55;1555,50;;-92214,42;12599,82;"strata; wynik dotychczasowy — koń niesprzedany"
+Luna;Aktywny;37546,75;36573,41;4832,13;;-69288,03;15548,14;"strata; wynik dotychczasowy — koń niesprzedany"
+Rubin;Aktywny;31730,60;39839,38;6454,32;;-65115,66;39930,29;"strata; wynik dotychczasowy — koń niesprzedany"
+Wicher;Aktywny;14562,76;35125,91;4699,08;;-44989,59;32334,91;"strata; wynik dotychczasowy — koń niesprzedany"
+
+Razem;;277454,68;358221,58;36415,49;0,00;-599260,77;;strata
+
+Wynik = sprzedaż + nagrody − zakup − koszty (z całej historii konia). Wartość konia to tylko ocena własna właściciela i nie wchodzi do wyniku.

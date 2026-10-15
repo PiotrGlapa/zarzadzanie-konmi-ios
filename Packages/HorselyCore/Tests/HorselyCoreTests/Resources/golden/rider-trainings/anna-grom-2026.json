@@ -1,0 +1,53 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+  "riderName": "Anna Nowak",
+  "rows": [
+    {
+      "trainingId": "01a10c22-13d5-751c-8a67-7b83b7486793",
+      "date": "2026-09-01",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "typeName": "Ujeżdżenie",
+      "durationMinutes": 45,
+      "intensity": "Medium",
+      "rating": 4,
+      "trainerName": "Jan Kowalski; trener",
+      "cost": 120,
+      "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+      "riderName": "Anna Nowak"
+    },
+    {
+      "trainingId": "01a10c22-13db-7fc9-a8c7-69a6fd1fe22b",
+      "date": "2026-09-03",
+      "horseId": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "horseName": "Grom",
+      "typeName": "Skoki",
+      "durationMinutes": 75,
+      "intensity": "Hard",
+      "rating": 5,
+      "trainerName": "Jan Kowalski; trener",
+      "cost": 150,
+      "riderContactId": "01a10c22-11ca-70af-b699-d8f67950fa5a",
+      "riderName": "Anna Nowak"
+    }
+  ],
+  "total": {
+    "count": 2,
+    "totalMinutes": 120,
+    "averageRating": 4.5,
+    "totalCost": 270
+  },
+  "groups": [
+    {
+      "key": "01a10c22-1161-7280-b4ae-13b9809a258c",
+      "name": "Grom",
+      "count": 2,
+      "totalMinutes": 120,
+      "averageRating": 4.5,
+      "totalCost": 270
+    }
+  ],
+  "groupedBy": "Horse"
+}

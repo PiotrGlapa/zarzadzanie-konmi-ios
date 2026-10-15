@@ -1,0 +1,212 @@
+{
+  "from": null,
+  "to": null,
+  "groupBy": "Month",
+  "rows": [
+    {
+      "group": "2025-12",
+      "horseId": null,
+      "category": "Pasza",
+      "month": "2025-12",
+      "costs": 199.99,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": "2026-09",
+      "costs": 279.99,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Kowal",
+      "month": "2026-09",
+      "costs": 433.33,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Zawody",
+      "month": "2026-09",
+      "costs": 60.75,
+      "income": 500.75
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Treningi",
+      "month": "2026-09",
+      "costs": 150.5,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Inne",
+      "month": "2026-09",
+      "costs": 0.01,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Leki",
+      "month": "2026-09",
+      "costs": 64.9,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Pasza",
+      "month": "2026-09",
+      "costs": 100.01,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Sprzęt",
+      "month": "2026-09",
+      "costs": 1000,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Suplementy",
+      "month": "2026-09",
+      "costs": 43.33,
+      "income": 0
+    },
+    {
+      "group": "2026-09",
+      "horseId": null,
+      "category": "Ściółka",
+      "month": "2026-09",
+      "costs": 60.00,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 60.00,
+  "totalCosts": 2392.81,
+  "totalIncome": 500.75,
+  "balance": -1892.06,
+  "months": [
+    "2025-12",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2025-12",
+      "category": "Pasza",
+      "costs": 199.99
+    },
+    {
+      "month": "2026-09",
+      "category": "Weterynarz",
+      "costs": 279.99
+    },
+    {
+      "month": "2026-09",
+      "category": "Kowal",
+      "costs": 433.33
+    },
+    {
+      "month": "2026-09",
+      "category": "Zawody",
+      "costs": 60.75
+    },
+    {
+      "month": "2026-09",
+      "category": "Treningi",
+      "costs": 150.5
+    },
+    {
+      "month": "2026-09",
+      "category": "Inne",
+      "costs": 0.01
+    },
+    {
+      "month": "2026-09",
+      "category": "Leki",
+      "costs": 64.9
+    },
+    {
+      "month": "2026-09",
+      "category": "Pasza",
+      "costs": 100.01
+    },
+    {
+      "month": "2026-09",
+      "category": "Sprzęt",
+      "costs": 1000
+    },
+    {
+      "month": "2026-09",
+      "category": "Suplementy",
+      "costs": 43.33
+    },
+    {
+      "month": "2026-09",
+      "category": "Ściółka",
+      "costs": 60.00
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 279.99,
+      "income": 0
+    },
+    {
+      "category": "Kowal",
+      "costs": 433.33,
+      "income": 0
+    },
+    {
+      "category": "Zawody",
+      "costs": 60.75,
+      "income": 500.75
+    },
+    {
+      "category": "Treningi",
+      "costs": 150.5,
+      "income": 0
+    },
+    {
+      "category": "Inne",
+      "costs": 0.01,
+      "income": 0
+    },
+    {
+      "category": "Leki",
+      "costs": 64.9,
+      "income": 0
+    },
+    {
+      "category": "Pasza",
+      "costs": 300.00,
+      "income": 0
+    },
+    {
+      "category": "Sprzęt",
+      "costs": 1000,
+      "income": 0
+    },
+    {
+      "category": "Suplementy",
+      "costs": 43.33,
+      "income": 0
+    },
+    {
+      "category": "Ściółka",
+      "costs": 60.00,
+      "income": 0
+    }
+  ]
+}

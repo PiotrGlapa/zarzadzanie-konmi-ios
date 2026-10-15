@@ -1,0 +1,11 @@
+﻿Koń;Status;Zakup;Koszty;Nagrody;Sprzedaż;Wynik;Wartość (ocena własna);Uwagi
+Błyskawica;Kontuzjowany;12000,00;244,90;0,00;;-12244,90;;"strata; wynik dotychczasowy — koń niesprzedany"
+Ćma;Padł;3000,00;66,67;0,00;0,00;-3066,67;;strata
+Łabędź Ąę;Wydzierżawiony;;0,00;0,00;;0,00;;"brak ceny zakupu; wynik dotychczasowy — koń niesprzedany"
+Ósemka;Sprzedany;8000,00;81,11;0,00;12000,99;3919,88;;zysk
+Źrebak Łatek;Aktywny;;164,46;0,00;;-164,46;;"strata; brak ceny zakupu; wynik dotychczasowy — koń niesprzedany"
+Żółtko;Aktywny;;1775,67;500,75;;-1274,92;;"strata; brak ceny zakupu; wynik dotychczasowy — koń niesprzedany"
+
+Razem;;23000,00;2332,81;500,75;12000,99;-12831,07;;strata
+
+Wynik = sprzedaż + nagrody − zakup − koszty (z całej historii konia). Wartość konia to tylko ocena własna właściciela i nie wchodzi do wyniku.

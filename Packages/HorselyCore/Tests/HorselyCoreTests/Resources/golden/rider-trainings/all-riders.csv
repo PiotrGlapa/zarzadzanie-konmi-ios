@@ -1,0 +1,13 @@
+﻿Jeździec;Data;Koń;Rodzaj treningu;Czas (min);Intensywność;Ocena;Trener;Koszt
+Anna Nowak;20.12.2025;Grom;Ujeżdżenie;60;Średnia;3;;100,00
+Anna Nowak;01.09.2026;Grom;Ujeżdżenie;45;Średnia;4;"Jan Kowalski; trener";120,00
+Anna Nowak;03.09.2026;Grom;Skoki;75;Ciężka;5;"Jan Kowalski; trener";150,00
+Ewa Wiśniewska;10.09.2026;Grom;Teren;;Lekka;;;
+Ewa Wiśniewska;22.09.2026;Iskra;Skoki;50;Średnia;4;Anna Nowak;90,00
+Ewa Wiśniewska;23.09.2026;Iskra;Ujeżdżenie;125;Ciężka;2;;
+
+Anna Nowak (treningów: 3);;;;180;;4,0;;370,00
+Ewa Wiśniewska (treningów: 3);;;;175;;3,0;;90,00
+Razem (treningów: 6);;;;355;;3,6;;460,00
+
+"Treningi bez jeźdźca nie są uwzględnione. Koszt jest sumą kosztów wpisanych w treningach; średnia ocena liczona jest tylko z ocenionych treningów."

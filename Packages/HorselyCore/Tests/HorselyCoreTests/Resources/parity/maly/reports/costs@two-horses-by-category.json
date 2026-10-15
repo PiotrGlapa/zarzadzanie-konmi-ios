@@ -1,0 +1,145 @@
+{
+  "from": "2026-01-01",
+  "to": "2026-12-31",
+  "groupBy": "Category",
+  "rows": [
+    {
+      "group": "Weterynarz",
+      "horseId": null,
+      "category": "Weterynarz",
+      "month": null,
+      "costs": 370.5,
+      "income": 0
+    },
+    {
+      "group": "Kowal",
+      "horseId": null,
+      "category": "Kowal",
+      "month": null,
+      "costs": 480,
+      "income": 0
+    },
+    {
+      "group": "Fizjoterapeuta",
+      "horseId": null,
+      "category": "Fizjoterapeuta",
+      "month": null,
+      "costs": 350,
+      "income": 0
+    },
+    {
+      "group": "Specjaliści",
+      "horseId": null,
+      "category": "Specjaliści",
+      "month": null,
+      "costs": 620,
+      "income": 0
+    },
+    {
+      "group": "Zawody",
+      "horseId": null,
+      "category": "Zawody",
+      "month": null,
+      "costs": 205.5,
+      "income": 300
+    },
+    {
+      "group": "Treningi",
+      "horseId": null,
+      "category": "Treningi",
+      "month": null,
+      "costs": 120,
+      "income": 0
+    },
+    {
+      "group": "Pasza",
+      "horseId": null,
+      "category": "Pasza",
+      "month": null,
+      "costs": 262.51,
+      "income": 0
+    }
+  ],
+  "generalPurchasesTotal": 0,
+  "totalCosts": 2408.51,
+  "totalIncome": 300,
+  "balance": -2108.51,
+  "months": [
+    "2026-08",
+    "2026-09"
+  ],
+  "monthlyCosts": [
+    {
+      "month": "2026-08",
+      "category": "Specjaliści",
+      "costs": 620
+    },
+    {
+      "month": "2026-09",
+      "category": "Weterynarz",
+      "costs": 370.5
+    },
+    {
+      "month": "2026-09",
+      "category": "Kowal",
+      "costs": 480
+    },
+    {
+      "month": "2026-09",
+      "category": "Fizjoterapeuta",
+      "costs": 350
+    },
+    {
+      "month": "2026-09",
+      "category": "Zawody",
+      "costs": 205.5
+    },
+    {
+      "month": "2026-09",
+      "category": "Treningi",
+      "costs": 120
+    },
+    {
+      "month": "2026-09",
+      "category": "Pasza",
+      "costs": 262.51
+    }
+  ],
+  "categoryTotals": [
+    {
+      "category": "Weterynarz",
+      "costs": 370.5,
+      "income": 0
+    },
+    {
+      "category": "Kowal",
+      "costs": 480,
+      "income": 0
+    },
+    {
+      "category": "Fizjoterapeuta",
+      "costs": 350,
+      "income": 0
+    },
+    {
+      "category": "Specjaliści",
+      "costs": 620,
+      "income": 0
+    },
+    {
+      "category": "Zawody",
+      "costs": 205.5,
+      "income": 300
+    },
+    {
+      "category": "Treningi",
+      "costs": 120,
+      "income": 0
+    },
+    {
+      "category": "Pasza",
+      "costs": 262.51,
+      "income": 0
+    }
+  ]
+}

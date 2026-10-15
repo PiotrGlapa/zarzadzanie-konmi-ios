@@ -1,0 +1,76 @@
+{
+  "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83",
+  "totalCount": 7,
+  "items": [
+    {
+      "entryType": "CompetitionStart",
+      "id": "01a13e2c-e257-7407-9707-3032eda96c37",
+      "date": "2026-09-21",
+      "title": "Zawody regionalne 2026",
+      "summary": "P · 7. miejsce",
+      "cost": 80,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83"
+    },
+    {
+      "entryType": "Note",
+      "id": "01a13e2c-e2d3-794f-97ed-33371755f819",
+      "date": "2026-09-15",
+      "title": "Zmiana paszy",
+      "summary": "Zmniejszona dawka owsa.",
+      "cost": null,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83"
+    },
+    {
+      "entryType": "VetVisit",
+      "id": "01a13e2c-e0f7-73fb-943c-44dc10cfe8cf",
+      "date": "2026-09-12",
+      "title": "Kontrola",
+      "summary": "Kontrola okresowa",
+      "cost": 120,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83"
+    },
+    {
+      "entryType": "Purchase",
+      "id": "01a13e2c-e2ae-785e-b000-ec3d22a4999b",
+      "date": "2026-09-08",
+      "title": "Siano",
+      "summary": "Pasza",
+      "cost": 50,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83"
+    },
+    {
+      "entryType": "PhysioVisit",
+      "id": "01a13e2c-e17d-7dcb-90a4-9033f2c0d326",
+      "date": "2026-09-06",
+      "title": "Fizjoterapia",
+      "summary": "Sztywność grzbietu",
+      "cost": 150,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83"
+    },
+    {
+      "entryType": "FarrierVisit",
+      "id": "01a13e2c-e128-743b-b83f-8345a61f2381",
+      "date": "2026-09-02",
+      "title": "Korekcja",
+      "summary": null,
+      "cost": 180,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83"
+    },
+    {
+      "entryType": "SpecialistVisit",
+      "id": "01a13e2c-e1ad-7758-98b0-6fbc6c231f9f",
+      "date": "2026-08-22",
+      "title": "Siodlarz",
+      "summary": "Kontrola",
+      "cost": 400,
+      "attachmentCount": 0,
+      "horseId": "01a13e2c-e007-7dc8-942d-c8b4cfb3cf83"
+    }
+  ]
+}
