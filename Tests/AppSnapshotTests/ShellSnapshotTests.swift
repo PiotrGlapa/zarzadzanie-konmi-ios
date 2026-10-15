@@ -1,3 +1,4 @@
+import HorselyCore
 import HorselyKit
 import SnapshotTesting
 import SwiftUI
