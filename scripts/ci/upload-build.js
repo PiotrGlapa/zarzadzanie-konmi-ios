@@ -49,6 +49,40 @@ async function api(method, route, body) {
   return text ? JSON.parse(text) : {};
 }
 
+// Po wysyłce: czeka (do 10 min) aż kompilacja pojawi się w TestFlight i wypisuje jej stan dla testerów wewnętrznych.
+// Nie przerywa przebiegu — wysyłka się udała; ostrzega, gdy stan wymaga działania właściciela (np. zgodność eksportowa).
+async function reportTestFlightState() {
+  for (let attempt = 0; attempt < 40; attempt++) {
+    const builds = await api(
+      'GET',
+      `/v1/builds?filter[app]=${ASC_APP_ID.trim()}&filter[version]=${buildNumber}&filter[preReleaseVersion.version]=${version}&limit=1`,
+    );
+    const build = builds.data[0];
+    if (build) {
+      const processing = build.attributes.processingState;
+      let internal = 'brak danych';
+      try {
+        const detail = await api('GET', `/v1/builds/${build.id}/buildBetaDetail`);
+        internal = detail.data.attributes.internalBuildState;
+      } catch {
+        /* stan testerów bywa jeszcze niedostępny */
+      }
+      console.log(`TestFlight: przetwarzanie ${processing}, stan dla testerów wewnętrznych ${internal}`);
+      if (processing === 'VALID') {
+        if (internal === 'MISSING_EXPORT_COMPLIANCE') {
+          console.log('::warning title=TestFlight::Kompilacja czeka na deklarację zgodności eksportowej (szyfrowanie) w App Store Connect.');
+        }
+        return;
+      }
+      if (processing === 'FAILED' || processing === 'INVALID') fail(`Kompilacja w TestFlight ma stan ${processing}.`);
+    } else {
+      console.log('TestFlight: kompilacja jeszcze niewidoczna');
+    }
+    await new Promise((resolve) => setTimeout(resolve, 15000));
+  }
+  console.log('::warning title=TestFlight::Kompilacja nie osiągnęła stanu VALID w 10 minut — sprawdź App Store Connect.');
+}
+
 async function main() {
   const file = fs.readFileSync(ipaPath);
   const md5 = crypto.createHash('md5').update(file).digest('hex');
@@ -106,6 +140,7 @@ async function main() {
     console.log(`Stan: ${state.state || 'nieznany'}`);
     if (state.state === 'COMPLETE') {
       console.log('Wysyłka zakończona — kompilacja przetwarzana w TestFlight.');
+      await reportTestFlightState();
       return;
     }
     if (state.state === 'FAILED') {
