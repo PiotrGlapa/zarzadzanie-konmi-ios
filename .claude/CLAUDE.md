@@ -1,0 +1,5 @@
+1. Używaj w komunikacji ze mną zawsze języka polskiego.
+2. Pracujemy na Windows bez Maca: kompilacja, testy, podpisywanie i wysyłka do TestFlight odbywają się wyłącznie w GitHub Actions (runnery macOS), projekt Xcode generuje XcodeGen z `project.yml` (SPECYFIKACJA_MOBILE_IOS.md 9.7, 9.8). Nie dodawaj `.xcodeproj` do repozytorium.
+3. Po przygotowaniu zmian nowej wersji (po zielonym przebiegu testów w CI na `main`) wydaj ją: tag `v<wersja>` → przebieg CI z archiwum, podpisem i wysyłką do TestFlight. Podaj wersję, numer kompilacji i wynik wysyłki (link do przebiegu `gh run`). Gdy brakuje sekretów podpisywania albo klucza API App Store Connect, powiedz to wprost — nigdy nie pomijaj wysyłki po cichu (konstytucja, SPECYFIKACJA_MOBILE_IOS.md 9.6).
+4. Przypominaj o wgraniu nowej kompilacji do TestFlight, gdy od ostatniej minęło 80 dni (kompilacje wygasają po 90 dniach).
+5. Aplikacja iOS ma być taka sama jak aplikacja na Androida 2.0.1 (repozytorium `../zarzadzanie_konmi_android`): teksty z `strings.xml` przez skrypt i test zgodności, ikony Material, kolory i układ wg SPECYFIKACJA_MOBILE_IOS.md 5.4. Zmiany zakresu wprowadzaj w obu specyfikacjach (zasada V).

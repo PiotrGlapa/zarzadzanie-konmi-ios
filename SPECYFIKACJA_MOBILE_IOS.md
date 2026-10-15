@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Wersja dokumentu** | 1.4 (2026-10-15) — uzupełniona tak, by sama opisywała pełny zakres aplikacji na Androida **2.0.1** (bez odwołań do dokumentów, których nie ma w repozytorium iOS): zakres 1.1 (stabilny stan połączenia, działy, ikony), 1.2 (wygląd i poprawki), 2.0 (tryby pracy, pełna praca offline, kosz, słowniki, kopia zapasowa, zdjęcie konia, kolory, blokada) i 2.0.1 (Horsely, „Kontuzjowany”, `capabilities`, dziennik diagnostyczny); wzorzec wyglądu (sekcja [5.4](#54-wzorzec-wyglądu)). Wersja 1.3 (2026-10-05) — uzgodniona z programem 1.6.1; decyzje z sesji wyjaśniającej 2026-10-05 |
+| **Wersja dokumentu** | 1.5 (2026-10-15) — decyzje z sesji wyjaśniającej 2026-10-15: dystrybucja wyłącznie przez TestFlight (testerzy wewnętrzni), iPhone 15 Pro jako urządzenie docelowe i iOS 18+, natywne komponenty iOS z ikonami Material jak na Androidzie, kopia zapasowa wymienna z Androidem, rdzeń przepisany w Swift, XcodeGen, budowanie w GitHub Actions bez Maca, testy migawkowe, szybkie akcje / udostępnianie / import kontaktu jako MUST (9.1, 9.5–9.8). Wersja 1.4 (2026-10-15) — uzupełniona tak, by sama opisywała pełny zakres aplikacji na Androida **2.0.1** (bez odwołań do dokumentów, których nie ma w repozytorium iOS): zakres 1.1 (stabilny stan połączenia, działy, ikony), 1.2 (wygląd i poprawki), 2.0 (tryby pracy, pełna praca offline, kosz, słowniki, kopia zapasowa, zdjęcie konia, kolory, blokada) i 2.0.1 (Horsely, „Kontuzjowany”, `capabilities`, dziennik diagnostyczny); wzorzec wyglądu (sekcja [5.4](#54-wzorzec-wyglądu)). Wersja 1.3 (2026-10-05) — uzgodniona z programem 1.6.1; decyzje z sesji wyjaśniającej 2026-10-05 |
 | **Zakres wersji 1.1 aplikacji** | stabilny stan połączenia (FR-M-POL-14…17, US1/8–8e), działy Treningi · Zakupy · Zawody (US11), nawigacja (5.2), ikony z programu (US12), pamięć 12 miesięcy dla działów (FR-M-SYN-01) |
 | **Zakres wersji 1.2 aplikacji** | poprawki (kafel konia → karta konia, zakupy i starty otwierają szczegóły, zawody całego bieżącego roku), ocena gwiazdkami, terminy i koszty w obszarach z tonami, linie między wierszami list, sekcje formularzy (5.1, 5.2, 5.4) |
 | **Zakres wersji 2.0 aplikacji** | tryb pracy wybierany przy pierwszym uruchomieniu (online / samodzielny), pełna praca offline z edycją i konfliktami (FR-SYN2-*), reguły programu w telefonie (FR-SAM-*), kosz i słowniki w trybie samodzielnym, kopia zapasowa (FR-KOP-*), zdjęcie konia (FR-ZDK-*), więcej kolorów i nowe ikony (FR-KOL-*), blokada aplikacji (FR-TRB-09) — sekcje [3.1](#31-historie-wersji-20) i [4.12](#412-wersja-20--tryby-pracy-praca-offline-kopia-zapasowa-kolory-zdjęcie-konia) |
@@ -22,8 +22,8 @@
 >
 > **Cel: ta sama aplikacja co na Androidzie.** Aplikacja na iOS MUST mieć te same funkcje, ekrany, teksty, kolory, ikony
 > i zachowanie co aplikacja na Androida 2.0.1; różnice dopuszcza wyłącznie sekcja [9](#9-wymagania-platformy-ios)
-> (mechanizmy systemu: Keychain zamiast Keystore, `BGTaskScheduler` zamiast WorkManagera, SF Symbols zamiast ikon Material
-> itp.). Przy rozbieżności między tym dokumentem a działaniem aplikacji na Androida 2.0.1 rozstrzyga ten dokument, a
+> (mechanizmy systemu: Keychain zamiast Keystore, `BGTaskScheduler` zamiast WorkManagera, natywne komponenty iOS zamiast
+> komponentów Material itp.; ikony Material są te same). Przy rozbieżności między tym dokumentem a działaniem aplikacji na Androida 2.0.1 rozstrzyga ten dokument, a
 > rozbieżność należy zgłosić i poprawić w obu dokumentach (zasada V konstytucji).
 >
 > **Materiały wzorcowe do skopiowania do repozytorium iOS** (z repozytorium `zarzadzanie_konmi_android`, wersja 2.0.1):
@@ -1055,7 +1055,7 @@ Identyfikatory: `FR-M-<obszar>-<nr>`. Słowa MUST/SHOULD jak w RFC 2119.
   (`GET /purchases?supplierId=`), treningami trenera lub jeźdźca (`GET /trainings?trainerId=` / `riderId=`) i startami
   jeźdźca (z połączeniem); historia wizyt — gdy program ją udostępni ([11.2](#112-zależności)).
 - **FR-M-KTK-03**: Dodanie kontaktu (nazwa, typy, firma, telefon, e‑mail, adres, specjalizacja, notatki), także
-  z poziomu formularza wpisu; edycja z połączeniem. SHOULD: import danych z książki adresowej telefonu przy dodawaniu. Usunięcie kontaktu
+  z poziomu formularza wpisu; edycja z połączeniem. Import danych z książki adresowej telefonu przy dodawaniu (MUST na iOS, bez zgody na kontakty — 9.5). Usunięcie kontaktu
   wskazanego jako trener lub jeździec program odrzuca (`409` `InUse`) — aplikacja MUST pokazać „Kontakt jest używany
   we wpisach — możesz go zarchiwizować” z akcją „Archiwizuj”.
 
@@ -1135,8 +1135,8 @@ Identyfikatory: `FR-M-<obszar>-<nr>`. Słowa MUST/SHOULD jak w RFC 2119.
 - **FR-M-UST-05**: O aplikacji: wersja aplikacji, autor systemu „Piotr Glapa”, wersja programu na komputerze,
   link do instrukcji, „Wyślij log diagnostyczny” (log bez treści wpisów i danych osobowych, udostępniany przez
   systemowe „Udostępnij”).
-- **FR-M-UST-06**: Aplikacja nie sprawdza nowych wersji w internecie (NFR-M-09; aktualizacje dostarcza TestFlight /
-  App Store). Gdy program
+- **FR-M-UST-06**: Aplikacja nie sprawdza nowych wersji w internecie (NFR-M-09; aktualizacje dostarcza
+  TestFlight — 9.6). Gdy program
   na komputerze (`appVersion` z `/system/info`) jest nowszy niż najnowsza wersja programu, z którą aplikację testowano
   (stała w aplikacji), aplikacja MUST pokazać — raz na wersję programu oraz w „O aplikacji” — informację „Program
   <wersja> — aplikacja testowana z <wersja>; sprawdź, czy jest nowa wersja aplikacji”; aplikacja działa dalej.
@@ -1156,7 +1156,7 @@ Identyfikatory: `FR-M-<obszar>-<nr>`. Słowa MUST/SHOULD jak w RFC 2119.
   (`strings.xml`, `plurals.xml`).
 - **FR-M-UI-05**: Po zapisie MUST pojawić się krótki komunikat („Zapisano” / „Zapisano — wyślę po połączeniu
   z komputerem”) z akcją „Cofnij” dla wpisów jeszcze niewysłanych.
-- **FR-M-UI-06**: SHOULD: skróty z ikony aplikacji „Dodaj notatkę”, „Kowal”, „Terminy” ([9.5](#95-integracje-systemowe)).
+- **FR-M-UI-06**: Skróty z ikony aplikacji „Dodaj notatkę”, „Kowal”, „Terminy” — MUST na iOS, jak na Androidzie ([9.5](#95-integracje-systemowe)).
 
 ### 4.12 Wersja 2.0 — tryby pracy, praca offline, kopia zapasowa, kolory, zdjęcie konia
 
@@ -1436,40 +1436,46 @@ Rozmiary w dp z Androida przenosi się 1:1 na punkty (pt).
 | Powodzenie | `#2E7D32` | `#81C784` | potwierdzenia |
 
 **Kolory i ikony rodzajów wpisów** (FR-KOL-01/02; ikona w kółku z tłem 12 % krycia koloru, pasek 4 pt po lewej w wierszach;
-ikony Material z Androida → odpowiedniki SF Symbols):
+ikony **Material Icons, wariant Outlined** — te same co w aplikacji na Androida; decyzja 2026-10-15):
 
-| Rodzaj | Jasny | Ciemny | Ikona (Android → iOS) |
+| Rodzaj | Jasny | Ciemny | Ikona Material (Outlined) |
 |---|---|---|---|
-| Wizyta weterynaryjna | `#1565C0` | `#90CAF9` | MedicalServices → `cross.case` |
-| Kowal | `#6D4C41` | `#BCAAA4` | Handyman → `hammer` |
-| Fizjoterapia | `#00796B` | `#80CBC4` | FitnessCenter → `dumbbell` |
-| Inny specjalista | `#5E35B1` | `#B39DDB` | Person → `person` |
-| Notatka | `#546E7A` | `#B0BEC5` | EditNote → `note.text` |
-| Zakup | `#A15C00` | `#FFCC80` | ShoppingCart → `cart` |
-| Zawody, start | `#B71C3C` | `#F48FB1` | EmojiEvents → `trophy` |
-| Trening | kolor główny | kolor główny | DirectionsRun → `figure.run` |
+| Wizyta weterynaryjna | `#1565C0` | `#90CAF9` | `medical_services` |
+| Kowal | `#6D4C41` | `#BCAAA4` | `handyman` |
+| Fizjoterapia | `#00796B` | `#80CBC4` | `fitness_center` |
+| Inny specjalista | `#5E35B1` | `#B39DDB` | `person` |
+| Notatka | `#546E7A` | `#B0BEC5` | `edit_note` |
+| Zakup | `#A15C00` | `#FFCC80` | `shopping_cart` |
+| Zawody, start | `#B71C3C` | `#F48FB1` | `emoji_events` |
+| Trening | kolor główny | kolor główny | `directions_run` |
 
 Terminy: kolor rodzaju (`Vet`, `Vaccination`, `Deworming` → weterynarz; `Farrier` → kowal; `Physio` → fizjoterapia;
 `Specialist` → specjalista; `Competition` → zawody; `Other` → notatka); ikony jak wpis tego rodzaju, poza: szczepienie —
-Vaccines → `syringe`, odrobaczanie — BugReport → `ladybug`, inne — Event → `calendar`.
+`vaccines`, odrobaczanie — `bug_report`, inne — `event`.
 
 **Kolory i ikony działów** (FR-KOL-03):
 
-| Dział | Jasny | Ciemny | Ikona (Android → iOS) |
+| Dział | Jasny | Ciemny | Ikona Material (Outlined) |
 |---|---|---|---|
-| Pulpit | `#3949AB` | `#9FA8DA` | Home → `house` |
+| Pulpit | `#3949AB` | `#9FA8DA` | `home` |
 | Konie | `#8D4A2B` | `#FFAB91` | głowa konia (własny rysunek) |
-| Terminy | `#00838F` | `#80DEEA` | Event → `calendar` |
-| Treningi | kolor główny | kolor główny | DirectionsRun → `figure.run` |
-| Zakupy | `#A15C00` | `#FFCC80` | ShoppingCart → `cart` |
-| Zawody | `#B71C3C` | `#F48FB1` | EmojiEvents → `trophy` |
-| Kontakty | `#1565C0` | `#90CAF9` | Contacts → `person.crop.rectangle.stack` |
-| Raporty | `#5E35B1` | `#B39DDB` | Assessment → `chart.bar.doc.horizontal` |
-| Kosz | `#616161` | `#BDBDBD` | Delete → `trash` |
-| Kopia zapasowa | `#00796B` | `#80CBC4` | Backup → `externaldrive.badge.icloud` |
-| Konflikty | ostrzeżenie | ostrzeżenie | Warning → `exclamationmark.triangle` |
-| Kolejka wysyłki, Słowniki, Ustawienia, O aplikacji, Więcej | tekst drugorzędny | tekst drugorzędny | CloudSync → `arrow.triangle.2.circlepath.icloud`, MenuBook → `book`, Settings → `gearshape`, Info → `info.circle`, MoreHoriz → `ellipsis` |
-| Kontuzja (plakietka, kafel, filtr) | ostrzeżenie | ostrzeżenie | Healing → `bandage` |
+| Terminy | `#00838F` | `#80DEEA` | `event` |
+| Treningi | kolor główny | kolor główny | `directions_run` |
+| Zakupy | `#A15C00` | `#FFCC80` | `shopping_cart` |
+| Zawody | `#B71C3C` | `#F48FB1` | `emoji_events` |
+| Kontakty | `#1565C0` | `#90CAF9` | `contacts` |
+| Raporty | `#5E35B1` | `#B39DDB` | `assessment` |
+| Kosz | `#616161` | `#BDBDBD` | `delete` |
+| Kopia zapasowa | `#00796B` | `#80CBC4` | `backup` |
+| Konflikty | ostrzeżenie | ostrzeżenie | `warning` |
+| Kolejka wysyłki, Słowniki, Ustawienia, O aplikacji, Więcej | tekst drugorzędny | tekst drugorzędny | `cloud_sync`, `menu_book`, `settings`, `info`, `more_horiz` |
+| Kontuzja (plakietka, kafel, filtr) | ostrzeżenie | ostrzeżenie | `healing` |
+| Ocena (gwiazdki), dodawanie, edycja | jak w 5.4 | | `star` / `star_outline`, `add`, `edit` |
+
+Źródło ikon Material: oficjalne pliki SVG Google (`material-design-icons`, licencja Apache 2.0, wariant Outlined, siatka
+24 × 24), w katalogu zasobów jako obrazy wektorowe szablonowe (barwione kolorem). **SF Symbols** — wyłącznie dla ikon
+systemowych iOS: wstecz, zamknij, udostępnij, menu „więcej” w pasku nawigacji, wyszukiwanie oraz ikony komunikatu
+połączenia (`wifi.exclamationmark`, `exclamationmark.octagon`).
 
 **Rysunki własne** (z plików Androida; przenieść do katalogu zasobów jako wektor, siatka 24 × 24, linia 1,5, końce i złącza
 zaokrąglone, bez wypełnienia, obraz szablonowy):
@@ -1718,7 +1724,8 @@ kontuzjowane; `status=all` — wszystkie. Pełny opis: `specs/009-horsely-2-0-0/
   program (100% zgodności co do grosza).
 - **SC-M-12** (iOS): Dla każdego ekranu z listy w [5.2](#52-struktura) i [5.4](#54-wzorzec-wyglądu) zrzut ekranu iOS i Androida
   2.0.1 na tych samych danych pokazuje te same elementy w tej samej kolejności, te same teksty, kolory (± odcień systemowy)
-  i ikony (SF Symbol odpowiadający ikonie Material z tabeli) — w motywie jasnym i ciemnym.
+  i ikony (te same ikony Material z tabeli) — w motywie jasnym i ciemnym. Zrzuty iOS powstają w CI na symulatorze
+  iPhone 15 Pro (motyw jasny, ciemny, tekst 200 %) jako artefakty, a kluczowe ekrany mają testy migawkowe (9.7).
 - **SC-M-13** (iOS): Kopia zapasowa utworzona na Androidzie 2.0.1 odtwarza się na iOS (i odwrotnie) z 100 % rekordów i
   zgodnymi `sha256` załączników, z hasłem i bez.
 
@@ -1755,9 +1762,10 @@ Kryteria wersji 2.0.1: **SC-001** pliki wzorcowe programu 2.0.0 (słowniki, koń
 
 | Aspekt | Ustalenie |
 |---|---|
-| Minimalna wersja | iOS 17 |
-| Urządzenia | iPhone; iPad z układem telefonu (bez osobnego układu dwukolumnowego) |
-| Urządzenie docelowe i odniesienia | **iPhone 15 Pro** — na nim aplikacja będzie uruchamiana; na nim mierzy się progi czasowe (NFR-M-01) i wykonuje testy na urządzeniu (Face ID, aparat i skaner QR, powiadomienia, praca w tle, VoiceOver, tekst 200 %). Układ MUST uwzględniać Dynamic Island i ekran 6,1″ (393 × 852 pt); działanie na innych iPhone'ach z iOS 17+ zapewnia układ adaptacyjny |
+| Minimalna wersja | **iOS 18** |
+| Urządzenia | Tylko iPhone (iPad poza zakresem — aplikacja nie jest oznaczona dla iPada) |
+| Urządzenie docelowe i odniesienia | **iPhone 15 Pro** — na nim aplikacja będzie uruchamiana; na nim mierzy się progi czasowe (NFR-M-01) i wykonuje ręczną listę kontrolną przed wydaniem (Face ID, aparat i skaner QR, powiadomienia, praca w tle, VoiceOver, tekst 200 %). Układ MUST uwzględniać Dynamic Island i ekran 6,1″ (393 × 852 pt) |
+| Inne iPhone'y | Aplikacja MUST działać poprawnie na każdym iPhonie z iOS 18+ (układ adaptacyjny, od ekranu 320 pt szerokości); progi wydajności wiążą tylko na iPhonie 15 Pro |
 | Orientacja | Pionowa; pozioma dozwolona dla podglądu zdjęć i wideo |
 
 ### 9.2 Zgody i opisy w `Info.plist`
@@ -1782,7 +1790,7 @@ dostęp do biblioteki zdjęć.
   adresy spoza zakresów lokalnych — VPN (np. Tailscale `100.x.y.z`), nazwa DynDNS, stały publiczny adres IP — MUST działać
   przez `https` w trybie zaufania z FR-M-POL-05; przy takim adresie z `http` aplikacja MUST pokazać wyjaśnienie, że trzeba
   włączyć HTTPS w programie.
-  Wyjątku `NSAllowsArbitraryLoads` MUST NOT być używany (wymóg App Review).
+  Wyjątku `NSAllowsArbitraryLoads` MUST NOT być używany (bezpieczeństwo; także na wypadek przyszłej publikacji w App Store).
 - **Certyfikat samopodpisany**: obsługa `URLSessionDelegate` `didReceive challenge` — akceptacja wyłącznie certyfikatu
   o odcisku SHA‑256 z parowania (FR-M-POL-05); weryfikacja nazwy hosta pomijana tylko dla przypiętego certyfikatu.
 - **Zaufany wystawca** (FR-M-POL-05): dla adresu potwierdzonego w tym trybie — domyślna ocena zaufania systemu
@@ -1826,25 +1834,35 @@ dostęp do biblioteki zdjęć.
 - **Rozszerzenie udostępniania (Share Extension)** dla obrazów, wideo, PDF i dokumentów (US4/6); rozszerzenie
   zapisuje plik do wspólnego kontenera (App Group) i dodaje operację do kolejki — nie łączy się samo z komputerem.
 - **Akcje kontaktu**: `tel:`, `sms:`, `mailto:`, Mapy Apple (`maps://`) dla adresu.
-- **Szybkie akcje** ikony (Home Screen Quick Actions): „Dodaj notatkę”, „Kowal”, „Terminy” — SHOULD.
+- **Szybkie akcje** ikony (Home Screen Quick Actions, `UIApplicationShortcutItem`): „Dodaj notatkę”, „Kowal”, „Terminy” — MUST.
+- **Import kontaktu** z książki adresowej przy dodawaniu kontaktu: `CNContactPickerViewController` (bez zgody na kontakty) — MUST.
 - **Wygląd**: komponenty systemowe zgodne z Human Interface Guidelines, ale kolory, ikony, kolejność elementów i teksty
   wg wzorca [5.4](#54-wzorzec-wyglądu) (identyczne z Androidem 2.0.1); motyw jasny/ciemny z wyborem w aplikacji
   (`preferredColorScheme`), Dynamic Type; kolor akcentu aplikacji (`AccentColor`) = kolor główny `#2E7D32` / `#81C784`.
-- **Ikony**: SF Symbols wg tabeli w [5.4](#54-wzorzec-wyglądu); głowa konia i podkowa — własne obrazy wektorowe.
+- **Ikony**: ikony Material (Outlined) wg tabeli w [5.4](#54-wzorzec-wyglądu) jako obrazy wektorowe; głowa konia i podkowa —
+  własne obrazy wektorowe; SF Symbols tylko dla ikon systemowych.
 - **Gest przesunięcia wstecz** i zamknięcie arkusza formularza MUST pytać o niezapisane zmiany (FR-M-WPI-07).
 - Zdjęcia z aparatu w formacie HEIC są dozwolone przez program; przy włączonym zmniejszaniu SHOULD wysyłać JPEG
   dla lepszej zgodności podglądu w programie na Windows.
 
 ### 9.6 Dystrybucja
 
-- Wymaga konta Apple Developer Program. Testy przez **TestFlight**, potem App Store (lub dystrybucja niepubliczna,
-  jeśli dostępna).
-- **App Review**: od wersji 2.0 aplikacja działa bez programu w **trybie samodzielnym** (FR-TRB-*), więc recenzent może
-  sprawdzić wszystkie funkcje bez serwera — osobny tryb demonstracyjny nie jest wymagany (ekran powitania MUST pozostać taki
-  jak na Androidzie). W notatkach dla recenzenta: opis trybu samodzielnego i działania z programem Horsely na Windows; SHOULD
-  dołączyć plik kopii zapasowej z danymi przykładowymi do odtworzenia („Odtwórz z kopii zapasowej”).
-- Nazwa w App Store: „Horsely – Zarządzanie Koniem, Trening i Budżet”; nazwa pod ikoną „Horsely” (FR-021).
-- Etykieta prywatności (App Privacy): „Dane niezbierane” — dane trafiają tylko do komputera użytkownika.
+Decyzje z 2026-10-15 (odpowiednik prywatnych wydań APK na Androidzie):
+
+- **Wyłącznie TestFlight, bez App Store.** Płatne konto Apple Developer Program; aplikacja w App Store Connect jako
+  „Horsely – Zarządzanie Koniem, Trening i Budżet” (nazwa pod ikoną „Horsely”, FR-021), nigdy nie wysyłana do przeglądu App Store.
+- **Testerzy wewnętrzni** — właściciel i współwłaściciele jako członkowie zespołu w App Store Connect (bez przeglądu Beta App
+  Review). Testerzy zewnętrzni poza zakresem.
+- **Ważność kompilacji**: kompilacja w TestFlight wygasa po 90 dniach — nowa kompilacja MUST trafić do TestFlight co najmniej
+  raz na 80 dni (także bez zmian funkcji), aby aplikacja nie przestała się uruchamiać. Wygaśnięcie nie usuwa danych z telefonu,
+  ale do czasu instalacji nowej kompilacji aplikacji nie da się otworzyć — stąd przypomnienie dla właściciela w procesie wydania.
+- **Wydanie**: tag `v<wersja>` na `main` po zielonych testach w CI → archiwum, podpis i wysyłka do TestFlight (9.8); wersja jest
+  uznana za wydaną po ręcznej liście kontrolnej na iPhone 15 Pro (`specs/…/checklists/validation.md`). Podsumowanie wydania
+  podaje wersję (`CFBundleShortVersionString`), numer kompilacji (`CFBundleVersion`) i wynik wysyłki; brak sekretów
+  podpisywania albo klucza API App Store Connect to jawna informacja dla właściciela — nigdy ciche pominięcie wysyłki.
+- Pierwsza wersja: **2.0.1** (FR-025); numer kompilacji rośnie przy każdej wysyłce (numer przebiegu CI).
+- Gdyby kiedyś aplikacja miała trafić do App Store: tryb samodzielny wystarcza recenzentowi bez serwera, a etykieta
+  prywatności to „Dane niezbierane” — poza zakresem obecnej wersji.
 
 ### 9.7 Wskazówki technologiczne (dla `/speckit-plan`)
 
@@ -1855,6 +1873,36 @@ VisionKit `DataScannerViewController`** (skaner QR), **PhotosUI**, **BackgroundT
 udostępnianie przez `ShareLink` / `UIActivityViewController`, zapis przez `fileExporter`,
 testy: Swift Testing / XCTest, `URLProtocol` jako zaślepka serwera, testy UI XCUITest. Generowanie klienta
 z `openapi.yaml` (np. Swift OpenAPI Generator) jest dopuszczalne.
+
+Ustalenia wiążące (2026-10-15):
+
+- **Rdzeń w Swift**: reguły programu, raporty, CSV/PDF, kolejka i synchronizacja przepisane w Swift (bez współdzielenia kodu
+  Kotlin); zgodność sprawdzają te same pliki wzorcowe co w aplikacji na Androida (`parity`, `golden`, kontrakty).
+- **Struktura projektu**: **XcodeGen** — projekt opisany w `project.yml` w repozytorium, `.xcodeproj` generowany (w CI i lokalnie
+  na Macu), nieprzechowywany w repozytorium. Logika w pakietach Swift Package Manager (testowalnych bez aplikacji), cele:
+  aplikacja, rozszerzenie udostępniania, testy jednostkowe, testy UI; wspólna grupa App Group dla aplikacji i rozszerzenia.
+- **Teksty**: skrypt w repozytorium iOS przepisuje `strings.xml` i `plurals.xml` z repozytorium Androida do `Localizable.xcstrings`
+  (z odmianą liczebników), a test w CI sprawdza zgodność kluczy i treści z kopią wzorcową — rozbieżność = błąd testu.
+- **Weryfikacja wyglądu**: testy migawkowe (np. `swift-snapshot-testing`) kluczowych ekranów z wzorcami w repozytorium oraz
+  zrzuty ekranów z symulatora iPhone 15 Pro (jasny, ciemny, tekst 200 %) zapisywane jako artefakty CI do porównania ze
+  zrzutami Androida (SC-M-12).
+
+### 9.8 Budowanie i CI (bez Maca)
+
+Rozwój odbywa się na Windows, bez lokalnego Maca — kompilacja, testy, podpisywanie i wysyłka wyłącznie w CI.
+
+- **GitHub Actions** w repozytorium `PiotrGlapa/zarzadzanie-konmi-ios`, runnery macOS z Xcode obsługującym iOS 18 SDK.
+- **Wyzwalacze** (oszczędność minut macOS, liczonych ×10):
+  - pull request i wypchnięcie na `main`: `xcodegen generate`, kompilacja, testy jednostkowe, testy UI i migawkowe na
+    symulatorze iPhone 15 Pro, zrzuty ekranów jako artefakty;
+  - tag `v*` albo ręczne uruchomienie (`workflow_dispatch`): to samo plus archiwum, podpis i wysyłka do TestFlight.
+- **Podpisywanie**: klucz API App Store Connect (sekrety repozytorium: identyfikator klucza, wystawcy i plik `.p8`) z
+  automatycznym zarządzaniem certyfikatami i profilami (`-allowProvisioningUpdates`) albo fastlane `match`; żadne sekrety
+  nie trafiają do repozytorium ani do logów.
+- **Brak sekretów** (np. w pull requeście z rozwidlenia) — przebieg testów działa, wysyłka kończy się jawnym błędem
+  z wyjaśnieniem.
+- Debugowanie na urządzeniu odbywa się przez kompilacje TestFlight i dziennik diagnostyczny aplikacji (FR-031); gdy pojawi
+  się Mac, ten sam `project.yml` pozwala pracować lokalnie w Xcode.
 
 ---
 
@@ -1918,7 +1966,8 @@ Poza zakresem obu części systemu (możliwe przyszłe rozszerzenia):
    zakładce karty konia (FR-M-KON-02).
 3c. **Decyzja 2026-10-05**: zmiany z punktów 2–3b nie są warunkiem wydania aplikacji — aplikacja działa z programem
    1.5.0+ i obejściami opisanymi w tym dokumencie.
-4. Dostęp do sklepu z aplikacjami lub dystrybucji testowej — patrz [sekcja 9](#9-wymagania-platformy-ios).
+4. Płatne konto Apple Developer Program i TestFlight, GitHub Actions z runnerami macOS (minuty ponad darmowy limit mogą
+   być płatne) — patrz [9.6](#96-dystrybucja) i [9.8](#98-budowanie-i-ci-bez-maca).
 5. Aplikacja na Androida (`SPECYFIKACJA_MOBILE_ANDROID.md`, specyfikacje `specs/001…005` w repozytorium
    `zarzadzanie_konmi_android`) ma ten sam zakres funkcji, identyfikatory wymagań i kryteria sukcesu; jest implementacją
    wzorcową (wersja 2.0.1) dla tekstów, ikon i plików wzorcowych. Zmiany zakresu należy wprowadzać w obu dokumentach.
