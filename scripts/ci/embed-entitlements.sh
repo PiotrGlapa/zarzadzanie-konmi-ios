@@ -13,7 +13,9 @@ appex="$app/PlugIns/HorselyShare.appex"
 
 tmp="$(mktemp -d)"
 sign() {
-  local bundle="$1" source="$2" out="$tmp/$(basename "$source")"
+  local bundle="$1"
+  local source="$2"
+  local out="$tmp/$(basename "$source")"
   # W pliku źródłowym $(AppIdentifierPrefix) to „<ID zespołu>.”
   sed "s/\$(AppIdentifierPrefix)/${APPLE_TEAM_ID}./g" "$source" > "$out"
   codesign --force --sign - --entitlements "$out" "$bundle"
