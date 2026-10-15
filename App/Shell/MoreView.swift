@@ -72,6 +72,7 @@ struct MoreView: View {
                 }
             }
             .background(HorselyColor.background)
+            .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle("nav_more")
             .navigationBarTitleDisplayMode(.large)
             .navigationDestination(for: MoreItem.Destination.self) { destination in

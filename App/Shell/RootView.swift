@@ -45,7 +45,9 @@ private struct TabPlaceholder: View {
     let title: LocalizedStringKey
 
     var body: some View {
-        HorselyColor.background
+        ScrollView { Color.clear.frame(height: 1) }
+            .background(HorselyColor.background)
+            .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.large)
     }
