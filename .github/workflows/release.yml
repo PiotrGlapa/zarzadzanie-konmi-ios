@@ -83,9 +83,10 @@ jobs:
         id: key
         run: bash scripts/ci/write-api-key.sh
 
-      # Archiwum bez podpisu: zespół nie ma zarejestrowanych urządzeń, a podpis deweloperski w archiwum wymaga profilu
-      # z urządzeniami. Podpis dystrybucyjny (certyfikat i profil zarządzane w chmurze Apple) nadaje dopiero eksport.
-      - name: Archiwum (Release, bez podpisu)
+      # Archiwum z podpisem doraźnym (uprawnienia trafiają do pliku wykonywalnego): zespół nie ma zarejestrowanych urządzeń,
+      # więc podpis deweloperski w archiwum jest niemożliwy. Podpis dystrybucyjny (certyfikat i profil zarządzane w chmurze
+      # Apple) nadaje dopiero eksport.
+      - name: Archiwum (Release, podpis doraźny)
         id: archive
         run: |
           set -o pipefail
@@ -115,6 +116,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/ipa" && unzip -q -o "$RUNNER_TEMP"/export-local/*.ipa -d "$RUNNER_TEMP/ipa"
           for app in "$RUNNER_TEMP"/ipa/Payload/Horsely.app "$RUNNER_TEMP"/ipa/Payload/Horsely.app/PlugIns/HorselyShare.appex; do
             entitlements="$(codesign -d --entitlements :- "$app" 2>/dev/null)"
+            echo "--- $app"; echo "$entitlements"
             echo "$entitlements" | grep -q "group.pl.glapa.horsely" \
               || { echo "::error title=Uprawnienia::Brak App Group w $app"; exit 1; }
             echo "$entitlements" | grep -q "keychain-access-groups" \
