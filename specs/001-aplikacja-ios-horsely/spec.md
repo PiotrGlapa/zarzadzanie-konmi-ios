@@ -38,12 +38,25 @@ obowiązkowe; budowanie bez Maca.
 - Q: Numer pierwszej wersji? → A: 2.0.1.
 - Q: Szybkie akcje, udostępnianie, import kontaktu? → A: Wszystkie obowiązkowe.
 - Q: Kto używa iPhone'a 15 Pro? → A: Córka właściciela, własnym Apple ID — ono jest testerem wewnętrznym.
+- Q: W którym trybie córka będzie na co dzień używać aplikacji na iPhonie 15 Pro? → A: Tryb online z programem Horsely
+  właściciela na komputerze (osobny klucz API dla jej telefonu).
+- Q: Czy córka ma dostawać w TestFlight także kompilacje częściowe, zanim powstanie pełny zakres 2.0.1? → A: Nie —
+  kompilacje częściowe tylko dla właściciela (osobna grupa testerów); córka dostaje kompilacje od wersji z trybem online
+  (US1–US3).
+- Q: Skąd mają pochodzić zrzuty ekranów aplikacji na Androida, z którymi porównujemy wygląd wersji na iOS? → A: Automatycznie —
+  test w repozytorium Androida generuje zrzuty kluczowych ekranów na wspólnych danych testowych (jasny, ciemny, tekst 200 %),
+  a CI iOS robi zrzuty tych samych ekranów na tych samych danych.
+- Q: Gdzie telefon córki będzie łączył się z programem: tylko przez domowe Wi‑Fi, czy także spoza domu? → A: Także spoza
+  domu — przez adres publiczny (DynDNS / stały IP) z HTTPS, sprawdzony przed pierwszą kompilacją dla córki.
 
 ## User Scenarios & Testing *(mandatory)*
 
 Historie są przyrostami realizacji. Każda opiera się na scenariuszach akceptacyjnych specyfikacji głównej (odwołania
-w nawiasach), które obowiązują w całości; poniżej tylko scenariusze kluczowe dla przyrostu. Kolejność: najpierw tryb
-samodzielny (działa bez komputera i bez sieci, więc daje używalną aplikację najszybciej), potem tryb online.
+w nawiasach), które obowiązują w całości; poniżej tylko scenariusze kluczowe dla przyrostu. Kolejność: US1 i US2 budują
+magazyn danych w telefonie, ekrany i reguły programu (potrzebne w obu trybach — w trybie online do pracy bez połączenia),
+ale **pierwszą wersją do codziennego użytku na iPhonie 15 Pro jest dopiero wersja z US3**, bo córka pracuje w trybie
+online na wspólnych danych stajni z programem właściciela. Dane wpisane wcześniej w trybie samodzielnym są testowe —
+przy przejściu na tryb online zostaną usunięte (FR-TRB-06).
 
 ### User Story 1 - Pierwsze uruchomienie i konie w trybie samodzielnym (Priority: P1)
 
@@ -51,8 +64,8 @@ Nowy użytkownik otwiera aplikację, wybiera „Nie, używaj samodzielnie”, do
 przegląda listę koni i kartę konia, ustawia zdjęcie konia z aparatu lub telefonu z kadrowaniem i zmienia status konia
 (także „Kontuzjowany”). Wszystko działa bez sieci.
 
-**Why this priority**: bez wyboru trybu i koni żadna inna funkcja nie ma sensu; tryb samodzielny nie wymaga komputera,
-więc jest najszybszą drogą do używalnej aplikacji na telefonie córki.
+**Why this priority**: bez wyboru trybu i koni żadna inna funkcja nie ma sensu; tryb samodzielny nie wymaga komputera
+ani sieci, więc pozwala zbudować i sprawdzić ekrany i dane w telefonie, zanim dołączy połączenie z programem (US3).
 
 **Independent Test**: świeża instalacja w trybie samolotowym → „Nie, używaj samodzielnie” → „Dalej” → pusty Pulpit
 „Dodaj pierwszego konia” → dodać 2 konie i źrebaka bez paszportu → ustawić zdjęcie z kadrowaniem → zmienić status na
@@ -107,8 +120,9 @@ programu i pozwala bez połączenia dodawać, poprawiać i usuwać; zmiany wycho
 rozstrzyga użytkownik. Stan połączenia jest stabilny (komunikat zwijany do ikonki), a z programem 2.0.0 aplikacja korzysta
 z jego możliwości (zmiany przyrostowe, `If-Match`, `Idempotency-Key`, zdjęcie konia, status „Kontuzjowany”).
 
-**Why this priority**: tryb online jest głównym trybem dla właściciela z programem na komputerze; bez niego aplikacja nie
-współpracuje z ewidencją stajni.
+**Why this priority**: tryb online jest trybem, w którym córka używa aplikacji na co dzień (wspólne dane stajni
+z programem właściciela); bez niego aplikacja nie współpracuje z ewidencją stajni. US1–US3 razem to pierwsza wersja do
+codziennego użytku.
 
 **Independent Test**: program 2.0.0 z API → skan kodu QR → dane jak w programie; tryb samolotowy → edycja wizyty, usunięcie
 treningu, „Przełóż” termin, nowy koń; w programie zmiana tej samej wizyty → powrót sieci → wszystko w programie, dla wizyty
@@ -125,6 +139,9 @@ konflikt do rozstrzygnięcia, kolejka pusta po decyzji; ten sam scenariusz z pro
    „Przyjmij z programu”, także zbiorczo z potwierdzeniem i liczbą.
 5. **Given** odpowiedź `401`/`403`/`429`, **When** aplikacja ją dostaje, **Then** wstrzymuje żądania do tego adresu według
    FR-M-POL-11…13 i nigdy sama nie doprowadza do zablokowania adresu telefonu.
+6. **Given** telefon córki w sieci komórkowej poza domem i adres publiczny programu (DynDNS albo stały IP, HTTPS, odcisk
+   certyfikatu z kodu QR), **When** dodaje wpis i odświeża dane, **Then** wpis trafia do programu, a dane się odświeżają —
+   tak samo jak w domowym Wi‑Fi (z uwzględnieniem ustawienia „tylko przez Wi‑Fi” dla załączników i odświeżania w tle).
 
 ---
 
@@ -340,11 +357,21 @@ Każde wymaganie obejmuje w całości wskazane wymagania specyfikacji głównej.
 
 **Dostarczanie**
 
-- **FR-025**: Każde wydanie MUST trafiać do testerów wewnętrznych przez TestFlight według 9.6 i 9.8 (wydanie z tagu wersji po
-  zielonych testach, nowa kompilacja co najmniej raz na 80 dni, jawna informacja o braku danych do podpisu); wersja jest
-  wydana po ręcznej liście kontrolnej na iPhone 15 Pro.
-- **FR-026**: Wygląd MUST być sprawdzany automatycznie zrzutami kluczowych ekranów (motyw jasny i ciemny, tekst 200 %)
-  porównywanymi z wzorcami (SC-M-12).
+- **FR-025**: Kompilacje MUST trafiać do testerów wewnętrznych przez TestFlight według 9.6 i 9.8 (po zielonych testach, nowa
+  kompilacja co najmniej raz na 80 dni, jawna informacja o braku danych do podpisu), w dwóch grupach:
+  - **„Deweloper”** (tylko właściciel) — każda kompilacja częściowa, wysyłana ręcznym uruchomieniem procesu, do sprawdzania
+    postępu na telefonie;
+  - **„Właściciele”** (córka i właściciel) — kompilacje od pierwszej wersji z US1–US3 (tryb online) wzwyż, każda po ręcznej
+    liście kontrolnej na iPhone 15 Pro; pierwsza z nich dopiero po sprawdzeniu na prawdziwym programie połączenia zarówno
+    w domowym Wi‑Fi, jak i spoza domu przez adres publiczny z HTTPS (US3/6).
+  Wszystkie kompilacje mają wersję 2.0.1 i rosnący numer kompilacji; tag `v2.0.1` (wydanie) powstaje dopiero przy pełnym
+  zakresie tej specyfikacji.
+- **FR-026**: Wygląd MUST być sprawdzany automatycznie (SC-M-12): wspólny zestaw danych testowych (konie, wpisy wszystkich
+  rodzajów, terminy przeterminowane i nadchodzące, koń kontuzjowany, źrebak bez paszportu) jest ładowany w obu aplikacjach;
+  aplikacja na Androida generuje z niego zrzuty kluczowych ekranów jako wzorce, a CI iOS robi zrzuty tych samych ekranów
+  na tych samych danych (motyw jasny i ciemny, tekst 200 %) i udostępnia je obok wzorców do porównania. Lista kluczowych
+  ekranów: Pulpit, Konie, karta konia (nagłówek i zakładki), formularz wpisu, Terminy, Treningi, Więcej, raport, Ustawienia,
+  ekran powitalny. Dodatkowo testy migawkowe iOS wykrywają każdą niezamierzoną zmianę wyglądu.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -395,8 +422,14 @@ Kluczowe:
 - Normatywne szczegóły (teksty komunikatów, wartości, kolory, ikony, formaty plików) są w specyfikacji głównej i w materiałach
   wzorcowych repozytorium Androida wskazanych w jej wstępie; ta specyfikacja ich nie powtarza.
 - Program Horsely (≥ 1.5.0, testowany 2.0.0) jest dostępny do testów trybu online; pliki wzorcowe reguł i CSV pochodzą z programu.
+- Córka używa aplikacji w trybie online, w domu i poza domem. Właściciel konfiguruje w programie HTTPS, „Dostęp spoza sieci
+  domowej”, adres publiczny (DynDNS albo stały IP z przekierowaniem portu) i klucz API dla telefonu córki ze zgodą na dostęp
+  spoza domu — przed pierwszą kompilacją dla córki (konfiguracja routera należy do właściciela).
 - Właściciel ma aktywne konto Apple Developer Program, rekord aplikacji w App Store Connect (`pl.glapa.horsely`), App Group
-  i sekrety repozytorium do podpisu i wysyłki (skonfigurowane 2026-10-15); córka jest testerką wewnętrzną.
+  i sekrety repozytorium do podpisu i wysyłki (skonfigurowane 2026-10-15); córka jest testerką wewnętrzną w grupie
+  „Właściciele”. Grupę „Deweloper” (tylko właściciel) trzeba jeszcze utworzyć w TestFlight.
+- Zrzuty wzorcowe Androida wymagają jednorazowego dodania w repozytorium `zarzadzanie_konmi_android` testu generującego zrzuty
+  kluczowych ekranów na wspólnym zestawie danych testowych — to zadanie po stronie repozytorium Androida (zależność FR-026).
 - Nie ma Maca — budowanie, testy i wysyłka odbywają się wyłącznie zdalnie (specyfikacja główna 9.8); weryfikacja na urządzeniu
   — przez kompilacje TestFlight i ręczną listę kontrolną.
 - Praca w tle na iOS działa „w miarę możliwości systemu”; kryteria czasowe odświeżania w tle z Androida są celem, nie wymaganiem.
