@@ -102,7 +102,7 @@ jobs:
             | tee build/archive.log | tail -n 40
           bash scripts/ci/embed-entitlements.sh "$RUNNER_TEMP/Horsely.xcarchive"
 
-      # Eksport z podpisem dystrybucyjnym (chmura Apple) do pliku .ipa. Wysyłkę wykonuje Transporter z własnym tokenem JWT, bo `xcodebuild -exportArchive`
+      # Eksport z podpisem dystrybucyjnym (chmura Apple) do pliku .ipa. Wysyłkę wykonuje scripts/ci/upload-build.js (API „build uploads”), bo `xcodebuild -exportArchive`
       # z destination=upload kończy się „No Accounts with App Store Connect Access” (Xcode 16.4 nie uwierzytelnia kluczem API
       # żądania konfiguracji sklepu, choć ten sam klucz działa w API i przy podpisywaniu) — research R19.
       - name: Eksport (podpis dystrybucyjny) i sprawdzenie uprawnień
@@ -133,11 +133,8 @@ jobs:
         id: upload
         run: |
           set -o pipefail
-          token="$(node scripts/ci/asc-jwt.js)"
-          echo "::add-mask::$token"
-          transporter="$(find "$(dirname "$(xcode-select -p)")" -name iTMSTransporter -type f 2>/dev/null | head -n 1)"
-          [ -x "$transporter" ] || { echo "::error title=Transporter::Nie znaleziono iTMSTransporter w Xcode"; exit 1; }
-          "$transporter" -m upload -assetType ios -jwt "$token" -assetFile "$(ls "$RUNNER_TEMP"/export/*.ipa)" -v informational 2>&1 | tee build/upload.log
+          version="$(awk -F'"' '/MARKETING_VERSION/ {print $2; exit}' project.yml)"
+          node scripts/ci/upload-build.js "$(ls "$RUNNER_TEMP"/export/*.ipa)" "$version" "$GITHUB_RUN_NUMBER" 2>&1 | tee build/upload.log
 
       - name: Podsumowanie przebiegu
         if: always()
