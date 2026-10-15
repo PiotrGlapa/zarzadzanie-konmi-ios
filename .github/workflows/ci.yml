@@ -24,7 +24,6 @@ env:
   # Jawny wybór Xcode (SDK iOS 18) na obrazie macos-15; zmiana wersji tylko tutaj i w release.yml.
   XCODE_VERSION: "16.4"
   APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
-  SIMULATOR_DESTINATION: platform=iOS Simulator,name=iPhone 15 Pro,OS=latest
   # Symulator: podpis doraźny (ad hoc) z uprawnieniami, bez konta Apple.
   SIMULATOR_SIGNING: CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM=
 
@@ -70,6 +69,9 @@ jobs:
 
       - name: Wygeneruj projekt Xcode
         run: xcodegen generate
+
+      - name: Utwórz symulator iPhone 15 Pro (iOS 18)
+        run: bash scripts/ci/create-simulator.sh
 
       - name: Kompilacja aplikacji i rozszerzenia (symulator)
         run: |
