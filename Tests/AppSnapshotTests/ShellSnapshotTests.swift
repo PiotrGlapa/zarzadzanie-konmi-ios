@@ -18,10 +18,10 @@ final class ShellSnapshotTests: XCTestCase {
             switch self {
             case .light: UITraitCollection(userInterfaceStyle: .light)
             case .dark: UITraitCollection(userInterfaceStyle: .dark)
-            case .xxxl: UITraitCollection(traitsFrom: [
-                UITraitCollection(userInterfaceStyle: .light),
-                UITraitCollection(preferredContentSizeCategory: .accessibilityExtraExtraExtraLarge),
-            ])
+            case .xxxl: UITraitCollection { traits in
+                traits.userInterfaceStyle = .light
+                traits.preferredContentSizeCategory = .accessibilityExtraExtraExtraLarge
+            }
             }
         }
 
