@@ -43,7 +43,7 @@ Kwoty: `Decimal` (dwa miejsca), daty: `LocalDate` (`yyyy-MM-dd`), data i czas wi
 | `queue_history` | `operationId`, `kind`, `outcome` (`Sent`/`AlreadyHandled`/`ConflictResolved`), `summary` (bez treści wpisów), `at` — 30 dni | `(at)` |
 | `conflict` | jak w Androidzie §2 (`kind`: `EditEdit`/`EditDelete`/`DeleteEdit`, `mine`, `theirs`, `theirsVersion`, `trashBatchId`, `resolution`) | `(resolvedAt)` |
 | `local_meta` | `key`, `value` — `changeCounter`, `sync.dataStamp`, `sync.nextUpdatedSince`, `sync.lastFullAt`, `sync.forceFull`, `program.capabilities`, `dictionaries.trainingTypes200Done` | — |
-| `address` | `id`, `url`, `order`, `trustMode` (`Pinned`/`TrustedIssuer`/`PlainHttpConfirmed`), `certSha256`, `issuerSummary`, `isRemote`, `lastOkAt`, `heldUntil`, `heldReason` | `(order)` |
+| `address` | `id`, `url`, `position` (kolejność; „order” to słowo zastrzeżone SQL), `trustMode` (`Pinned`/`TrustedIssuer`/`PlainHttpConfirmed`), `certSha256`, `issuerSummary`, `isRemote`, `lastOkAt`, `heldUntil`, `heldReason` | `(order)` |
 
 ## 3. Stany rekordu (`syncState`)
 

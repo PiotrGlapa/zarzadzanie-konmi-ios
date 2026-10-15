@@ -32,6 +32,9 @@ packages:
     path: Packages/HorselyCore
   HorselyKit:
     path: Packages/HorselyKit
+  SnapshotTesting:
+    url: https://github.com/pointfreeco/swift-snapshot-testing
+    from: 1.17.0
 
 targets:
   Horsely:
@@ -89,6 +92,9 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
     dependencies:
       - target: Horsely
+      - package: HorselyCore
+      - package: HorselyKit
+      - package: SnapshotTesting
 
   AppUITests:
     type: bundle.ui-testing

@@ -115,6 +115,15 @@ jobs:
             xcrun xcresulttool export attachments --path build/ui-tests.xcresult --output-path screenshots/ios
           fi
 
+      - name: Artefakt — wzorce migawek (zapisane przy pierwszym przebiegu)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: snapshots
+          path: Tests/AppSnapshotTests/__Snapshots__
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Artefakt — wyniki testów (.xcresult)
         if: always()
         uses: actions/upload-artifact@v4
