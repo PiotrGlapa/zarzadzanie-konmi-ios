@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<title>Zarządzanie końmi {{WERSJA}} — instrukcja obsługi</title>
+<style>
+  @font-face { font-family: "Ikony"; src: url("{{FONT}}") format("truetype"); }
+  :root {
+    --zielony: #2f7d5b; --zielony-ciemny: #1f5a41; --zielony-jasny: #eaf5ef; --zielony-tlo: #f5faf7;
+    --pomarancz: #ea580c; --pomarancz-jasny: #fff4ec; --tekst: #1f2a24; --szary: #5b6b62; --linia: #d6e6dc;
+  }
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", "Segoe UI Variable", Arial, sans-serif; color: var(--tekst); font-size: 10.5pt; line-height: 1.5; margin: 0; }
+  h1, h2, h3 { color: var(--zielony-ciemny); line-height: 1.25; }
+  h2 { font-size: 19pt; margin: 0 0 6px; }
+  h3 { font-size: 13pt; margin: 18px 0 6px; }
+  p { margin: 6px 0; }
+  .ic { font-family: "Ikony"; font-style: normal; font-weight: normal; font-size: 1.15em; vertical-align: -0.15em; color: var(--zielony); }
+  /* Horse head (1.5): the icon of the program is not in the font, so it is drawn inline (same outline as Icons.xaml) */
+  .kon { width: 1.15em; height: 1.15em; vertical-align: -0.2em; fill: none; stroke: var(--zielony); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .spis li .kon { width: 24px; height: 1.3em; flex: none; }
+  .naglowek .ikona .kon { width: 26px; height: 26px; vertical-align: 0; }
+  .rozdzial[data-highlight="true"] .naglowek .ikona .kon { stroke: var(--pomarancz); }
+  .przycisk { display: inline-block; border: 1px solid var(--linia); background: #fff; border-radius: 6px; padding: 0 7px; font-weight: 600; white-space: nowrap; }
+  .przycisk .ic { margin-right: 4px; }
+  kbd { border: 1px solid #b9c7bf; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; font-family: inherit; font-size: 0.9em; background: #fff; }
+
+  /* Okładka */
+  .okladka { height: 262mm; display: flex; flex-direction: column; justify-content: space-between; page-break-after: always;
+    background: linear-gradient(160deg, var(--zielony) 0%, var(--zielony-ciemny) 60%, #173f2e 100%); color: #fff; border-radius: 18px; padding: 26mm 18mm 18mm; }
+  .okladka .logo { width: 84px; height: 84px; background: #fff; border-radius: 20px; display: flex; align-items: center; justify-content: center; }
+  .okladka .logo img { width: 64px; height: 64px; }
+  .okladka h1 { color: #fff; font-size: 38pt; margin: 22px 0 4px; }
+  .okladka .podtytul { font-size: 18pt; opacity: 0.92; }
+  .okladka .opis { font-size: 12pt; max-width: 140mm; opacity: 0.9; margin-top: 18px; }
+  .okladka .metryka { display: flex; gap: 14px; flex-wrap: wrap; }
+  .okladka .metryka div { background: rgba(255,255,255,0.14); border-radius: 12px; padding: 10px 16px; font-size: 11pt; }
+  .okladka .metryka b { display: block; font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.8; font-weight: 600; }
+
+  /* Spis treści */
+  .spis { page-break-after: always; }
+  .spis ol { list-style: none; padding: 0; margin: 12px 0; counter-reset: rozdzial; }
+  .spis li { padding: 7px 12px; border-bottom: 1px solid var(--linia); display: flex; align-items: center; gap: 10px; font-size: 11pt; }
+  .spis li .ic { font-size: 1.3em; width: 24px; text-align: center; }
+  .spis li.czesc { background: var(--zielony-jasny); font-weight: 700; color: var(--zielony-ciemny); border-radius: 8px; border: 0; margin-top: 10px; }
+  .spis .gwiazdka { margin-left: auto; color: var(--pomarancz); font-weight: 700; font-size: 9pt; }
+
+  /* Rozdziały */
+  .rozdzial { page-break-before: always; }
+  .naglowek { display: flex; align-items: center; gap: 14px; border-bottom: 3px solid var(--zielony); padding-bottom: 8px; margin-bottom: 10px; }
+  .naglowek .ikona { width: 46px; height: 46px; border-radius: 12px; background: var(--zielony-jasny); display: flex; align-items: center; justify-content: center; }
+  .naglowek .ikona .ic { font-size: 26px; vertical-align: 0; }
+  .naglowek .miejsce { margin-left: auto; font-size: 9pt; color: var(--szary); text-align: right; }
+  .wprowadzenie { font-size: 11.5pt; color: #33443a; }
+
+  /* Wyróżnione funkcje */
+  .rozdzial[data-highlight="true"] .naglowek { border-bottom-color: var(--pomarancz); }
+  .rozdzial[data-highlight="true"] .naglowek .ikona { background: var(--pomarancz-jasny); }
+  .rozdzial[data-highlight="true"] .naglowek .ikona .ic { color: var(--pomarancz); }
+  .wstazka { display: none; }
+  .rozdzial[data-highlight="true"] .wstazka { display: inline-block; background: var(--pomarancz); color: #fff; font-size: 8.5pt; font-weight: 700; border-radius: 20px; padding: 2px 10px; margin-left: 8px; vertical-align: 4px; letter-spacing: 0.04em; }
+  .korzysci { display: none; }
+  .rozdzial[data-highlight="true"] .korzysci { display: block; background: var(--pomarancz-jasny); border: 1px solid #fbd3b7; border-left: 5px solid var(--pomarancz); border-radius: 10px; padding: 10px 14px; margin: 10px 0; }
+  .korzysci b.tytul { color: var(--pomarancz); display: block; margin-bottom: 2px; }
+  .korzysci ul { margin: 4px 0 0 18px; padding: 0; }
+
+  /* Zrzuty i legendy */
+  figure { margin: 10px 0 6px; page-break-inside: avoid; }
+  figure img { width: 100%; border: 1px solid var(--linia); border-radius: 10px; box-shadow: 0 2px 8px rgba(31,90,65,0.12); }
+  figcaption { font-size: 9pt; color: var(--szary); margin-top: 4px; text-align: center; }
+  .legenda { list-style: none; padding: 0; margin: 6px 0 12px; page-break-inside: avoid; }
+  .legenda li { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; border-bottom: 1px dashed var(--linia); }
+  .legenda .nr { flex: 0 0 22px; height: 22px; border-radius: 50%; background: var(--pomarancz); color: #fff; font-weight: 700; font-size: 9.5pt; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .rada { background: var(--zielony-tlo); border: 1px solid var(--linia); border-left: 5px solid var(--zielony); border-radius: 10px; padding: 8px 14px; margin: 10px 0; page-break-inside: avoid; }
+  .rada b.tytul { color: var(--zielony-ciemny); }
+  .kafle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+  .kafel { border: 1px solid var(--linia); border-radius: 12px; padding: 10px 12px; background: #fff; page-break-inside: avoid; }
+  .kafel.wyrozniony { border-color: #fbd3b7; background: var(--pomarancz-jasny); }
+  .kafel h4 { margin: 0 0 4px; color: var(--zielony-ciemny); font-size: 11pt; }
+  .kafel.wyrozniony h4 { color: var(--pomarancz); }
+  .stopka { margin-top: 18px; font-size: 8.5pt; color: var(--szary); border-top: 1px solid var(--linia); padding-top: 6px; display: flex; justify-content: space-between; }
+  table.skroty { border-collapse: collapse; width: 100%; margin: 8px 0; }
+  table.skroty td { border-bottom: 1px solid var(--linia); padding: 5px 8px; }
+  table.skroty td:first-child { width: 34%; }
+</style>
+</head>
+<body>
+
+<!-- ===================================================== OKŁADKA ===================================================== -->
+<section class="okladka">
+  <div>
+    <div class="logo"><img src="{{LOGO}}" alt=""></div>
+    <h1>Zarządzanie końmi</h1>
+    <div class="podtytul">Instrukcja obsługi programu</div>
+    <p class="opis">Wszystko o Twoich koniach w jednym miejscu: paszporty, wizyty, szczepienia, kowal, zawody, zakupy,
+      terminy z przypomnieniami i raporty kosztów — prosto, po polsku i na Twoim komputerze.</p>
+  </div>
+  <div class="metryka">
+    <div><b>Wersja programu</b>{{WERSJA}}</div>
+    <div><b>Autor programu</b>{{AUTOR}}</div>
+    <div><b>Data instrukcji</b>{{DATA}}</div>
+  </div>
+</section>
+
+<!-- ===================================================== SPIS TREŚCI ===================================================== -->
+<section class="spis">
+  <h2>Spis treści</h2>
+  <ol>
+    <li class="czesc">Część 1. Poznaj program</li>
+    <li><span class="ic">&#xF6AA;</span>Do czego służy program</li>
+    <li><span class="ic">&#xF481;</span>Okno programu i wyszukiwanie</li>
+    <li class="czesc">Część 2. Funkcje programu (w kolejności menu)</li>
+    <li><span class="ic">&#xF481;</span>Pulpit<span class="gwiazdka" data-star="terminy">★ warto poznać</span></li>
+    <li><svg class="kon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 6 L14.5 2.5 L16.2 5.2 C20.4 10 20.4 16 19.5 21.8 L12.2 21.8 C12.4 20 12 18 11 15.8 L9.8 17.4 C8.4 18.6 6.6 19 5 18.6 C3.6 18.2 2.8 16.8 3.4 15.6 C6 12 10.2 7.8 12.4 6 Z M10.6 10.4 L10.6 10.4 M5.1 15.9 L5.1 15.9"/></svg>Konie i karta konia</li>
+    <li><span class="ic">&#xE24F;</span>Terminy<span class="gwiazdka" data-star="terminy">★ warto poznać</span></li>
+    <li><span class="ic">&#xF837;</span>Zawody<span class="gwiazdka" data-star="zawody">★ warto poznać</span></li>
+    <li><span class="ic">&#xF67E;</span>Treningi<span class="gwiazdka" data-star="treningi">★ warto poznać</span></li>
+    <li><span class="ic">&#xF26B;</span>Zakupy</li>
+    <li><span class="ic">&#xF5A9;</span>Kontakty</li>
+    <li><span class="ic">&#xE2DE;</span>Raporty<span class="gwiazdka" data-star="raporty">★ warto poznać</span></li>
+    <li><span class="ic">&#xE16F;</span>Słowniki<span class="gwiazdka" data-star="konfiguracja">★ warto poznać</span></li>
+    <li><span class="ic">&#xF34D;</span>Kosz</li>
+    <li><span class="ic">&#xF6AA;</span>Ustawienia<span class="gwiazdka" data-star="konfiguracja">★ warto poznać</span></li>
+    <li class="czesc">Część 3. Na koniec</li>
+    <li><span class="ic">&#xF481;</span>Skróty klawiszowe i dobre rady</li>
+  </ol>
+</section>
+
+<!-- ===================================================== CZĘŚĆ 1 ===================================================== -->
+<section class="rozdzial">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF6AA;</span></div>
+    <div><h2>Do czego służy program</h2><div class="miejsce" style="text-align:left;margin:0">Część 1. Poznaj program</div></div></div>
+  <p class="wprowadzenie"><b>Zarządzanie końmi</b> to program na komputer z Windows, w którym zapiszesz całą historię swoich koni.
+    Zamiast zeszytów, karteczek i plików w różnych miejscach masz jedną, uporządkowaną ewidencję — z przypomnieniami,
+    które pilnują terminów za Ciebie.</p>
+
+  <h3>Co możesz zapisać</h3>
+  <div class="kafle">
+    <div class="kafel"><h4><svg class="kon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 6 L14.5 2.5 L16.2 5.2 C20.4 10 20.4 16 19.5 21.8 L12.2 21.8 C12.4 20 12 18 11 15.8 L9.8 17.4 C8.4 18.6 6.6 19 5 18.6 C3.6 18.2 2.8 16.8 3.4 15.6 C6 12 10.2 7.8 12.4 6 Z M10.6 10.4 L10.6 10.4 M5.1 15.9 L5.1 15.9"/></svg> Konie</h4>Dane z paszportu, zdjęcie, rodowód, status (także źrebięta bez paszportu).</div>
+    <div class="kafel"><h4><span class="ic">&#xF725;</span> Wizyty</h4>Weterynarz (z lekami i szczepieniami), kowal, fizjoterapeuta, dentysta, siodlarz i inni specjaliści.</div>
+    <div class="kafel" data-tile="zawody"><h4><span class="ic">&#xF837;</span> Zawody</h4>Starty, miejsca, wyniki, ocena, wpisowe i nagrody — ze statystykami każdego konia.</div>
+    <div class="kafel" data-tile="terminy"><h4><span class="ic">&#xE24F;</span> Terminarz</h4>Kolejne wizyty i szczepienia pojawiają się same; program przypomina o nich na pulpicie i w Windows.</div>
+    <div class="kafel" data-tile="treningi"><h4><span class="ic">&#xF67E;</span> Treningi</h4>Dziennik treningów i jazd każdego konia: rodzaj, czas, intensywność, ocena, trener, koszt, wysokość przeszkód — z podsumowaniem i wykresami postępów.</div>
+    <div class="kafel"><h4><span class="ic">&#xF26B;</span> Zakupy</h4>Pasza, sprzęt, pensjonat — dla jednego konia, kilku koni albo całej stajni, z kosztem dostawy.</div>
+    <div class="kafel" data-tile="raporty"><h4><span class="ic">&#xE2DE;</span> Raporty</h4>Ile kosztuje każdy koń i na co idą pieniądze — tabele, wykresy, eksport do Excela i PDF.</div>
+    <div class="kafel" data-tile="konfiguracja"><h4><span class="ic">&#xF6AA;</span> Konfiguracja</h4>Własne słowniki, godzina przypomnień, kopie zapasowe, motyw i dostęp z telefonu.</div>
+    <div class="kafel"><h4><span class="ic">&#xF481;</span> Pulpit</h4>Codzienny przegląd: co jest pilne, co się zbliża i ile wydałeś w tym miesiącu.</div>
+  </div>
+
+  <div class="rada"><b class="tytul">Twoje dane są u Ciebie.</b> Program działa bez internetu, a wszystkie informacje zapisuje na Twoim
+    komputerze. Kopie zapasowe robi sam — możesz je trzymać np. na dysku zewnętrznym albo w OneDrive.</div>
+
+  <h3>Jak czytać tę instrukcję</h3>
+  <p>Każdy rozdział odpowiada jednej pozycji menu po lewej stronie programu i jest ułożony w tej samej kolejności.
+    Na zrzutach ekranu ważne miejsca otoczone są <b style="color:var(--pomarancz)">pomarańczową ramką z numerem</b> — pod obrazkiem
+    znajdziesz opis każdego numeru. Małe ikony w tekście (np. <span class="ic">&#xE24F;</span>) wyglądają tak samo jak w programie.
+    Rozdziały oznaczone <span class="przycisk" style="color:var(--pomarancz);border-color:#fbd3b7">★ warto poznać</span>
+    opisują funkcje, które dają najwięcej korzyści.</p>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF481;</span></div>
+    <div><h2>Okno programu i wyszukiwanie</h2><div class="miejsce" style="text-align:left;margin:0">Część 1. Poznaj program</div></div></div>
+  <p class="wprowadzenie">Okno programu ma zawsze ten sam układ: menu po lewej, wyszukiwarkę u góry i obszar roboczy pośrodku.</p>
+  <figure><img src="{{IMG}}/01-okno.png" alt=""><figcaption>Główne okno programu</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Menu</b> — przechodzisz do kolejnych części programu: <span class="ic">&#xF481;</span> Pulpit,
+      <svg class="kon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 6 L14.5 2.5 L16.2 5.2 C20.4 10 20.4 16 19.5 21.8 L12.2 21.8 C12.4 20 12 18 11 15.8 L9.8 17.4 C8.4 18.6 6.6 19 5 18.6 C3.6 18.2 2.8 16.8 3.4 15.6 C6 12 10.2 7.8 12.4 6 Z M10.6 10.4 L10.6 10.4 M5.1 15.9 L5.1 15.9"/></svg> Konie, <span class="ic">&#xE24F;</span> Terminy, <span class="ic">&#xF837;</span> Zawody,
+      <span class="ic">&#xF26B;</span> Zakupy, <span class="ic">&#xF5A9;</span> Kontakty, <span class="ic">&#xE2DE;</span> Raporty,
+      a na dole <span class="ic">&#xE16F;</span> Słowniki, <span class="ic">&#xF34D;</span> Kosz i <span class="ic">&#xF6AA;</span> Ustawienia.</div></li>
+    <li><span class="nr">2</span><div><b>Wyszukiwarka</b> — szuka we wszystkich danych naraz. Kliknij ją albo naciśnij <kbd>Ctrl</kbd>+<kbd>K</kbd>.</div></li>
+    <li><span class="nr">3</span><div><b>Obszar roboczy</b> — tu pojawia się wybrana część programu. Formularze otwierają się w panelu po prawej stronie.</div></li>
+  </ul>
+  <h3>Wyszukiwanie</h3>
+  <figure><img src="{{IMG}}/22-wyszukiwanie.png" alt=""><figcaption>Wyniki wyszukiwania słowa „kulaw”</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Wpisz początek słowa — wielkość liter i polskie znaki nie mają znaczenia („kulaw” znajdzie „Kulawizna”).</div></li>
+    <li><span class="nr">2</span><div>Wyniki są pogrupowane: konie, kontakty, notatki, wizyty… Kliknięcie wyniku otwiera wpis, <kbd>Enter</kbd> otwiera pierwszy.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Program w tle.</b> Zamknięcie okna chowa program do ikony przy zegarze — przypomnienia i dostęp
+    z telefonu działają dalej. Aby całkiem zakończyć pracę, wybierz <b>Zakończ</b> w menu tej ikony.</div>
+</section>
+
+<!-- ===================================================== CZĘŚĆ 2 ===================================================== -->
+<section class="rozdzial" data-feature="terminy">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF481;</span></div>
+    <div><h2>Pulpit<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xF481;</span> Pulpit</div></div>
+  <p class="wprowadzenie">Pulpit to Twój codzienny przegląd. Od razu widzisz, co jest pilne, co się zbliża i ile wydałeś w tym miesiącu.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>Nie przegapisz szczepienia ani kowala: terminy przeterminowane są na czerwono, a nadchodzące
+    — w najbliższych 7 dniach. Jednym kliknięciem rejestrujesz wizytę albo przesuwasz termin.</div>
+  <figure><img src="{{IMG}}/02-pulpit.png" alt=""><figcaption>Pulpit — terminy</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Szybkie dodawanie</b> — <span class="przycisk"><span class="ic">&#xF725;</span>Weterynarz</span>
+      <span class="przycisk"><span class="ic">&#xF8C1;</span>Kowal</span> <span class="przycisk"><span class="ic">&#xF5B9;</span>Kilka koni</span>
+      <span class="przycisk"><span class="ic">&#xF212;</span>Termin</span> <span class="przycisk"><span class="ic">&#xF26B;</span>Zakup</span>
+      <span class="przycisk"><span class="ic">&#xF837;</span>Zawody</span> <span class="przycisk"><span class="ic">&#xF67E;</span>Trening</span> <span class="przycisk"><span class="ic">&#xF56F;</span>Notatka</span>.
+      „Kilka koni” zapisuje tę samą wizytę kowala od razu dla całej stajni.</div></li>
+    <li><span class="nr">2</span><div><b>Przeterminowane</b> — terminy, które już minęły (czerwone), od najstarszego.</div></li>
+    <li><span class="nr">3</span><div><b>Nadchodzące</b> — terminy z najbliższych dni (ile dni — ustawisz w Ustawieniach).</div></li>
+    <li><span class="nr">4</span><div><b>Akcje terminu</b>: <span class="przycisk"><span class="ic">&#xE4DC;</span>Zarejestruj wizytę</span> otwiera
+      formularz z uzupełnionym koniem, obok są: przełóż na inny dzień, oznacz jako zrealizowany (✓) i odrzuć (✕).</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/03-pulpit-dol.png" alt=""><figcaption>Pulpit — koszty i konie</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Koszty bieżącego miesiąca</b> z porównaniem do poprzedniego. Kliknięcie otwiera raport.</div></li>
+    <li><span class="nr">2</span><div><b>Kafelki koni</b> — najbliższy termin każdego konia; kliknięcie otwiera kartę konia.</div></li>
+    <li><span class="nr">3</span><div><b>Źrebię bez paszportu</b> — program pokazuje, od ilu miesięcy źrebię czeka na paszport
+      (od 12 miesięcy na pomarańczowo).</div></li>
+  </ul>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="konie">
+  <div class="naglowek"><div class="ikona"><svg class="kon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 6 L14.5 2.5 L16.2 5.2 C20.4 10 20.4 16 19.5 21.8 L12.2 21.8 C12.4 20 12 18 11 15.8 L9.8 17.4 C8.4 18.6 6.6 19 5 18.6 C3.6 18.2 2.8 16.8 3.4 15.6 C6 12 10.2 7.8 12.4 6 Z M10.6 10.4 L10.6 10.4 M5.1 15.9 L5.1 15.9"/></svg></div>
+    <div><h2>Konie i karta konia<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <svg class="kon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.4 6 L14.5 2.5 L16.2 5.2 C20.4 10 20.4 16 19.5 21.8 L12.2 21.8 C12.4 20 12 18 11 15.8 L9.8 17.4 C8.4 18.6 6.6 19 5 18.6 C3.6 18.2 2.8 16.8 3.4 15.6 C6 12 10.2 7.8 12.4 6 Z M10.6 10.4 L10.6 10.4 M5.1 15.9 L5.1 15.9"/></svg> Konie</div></div>
+  <p class="wprowadzenie">Lista wszystkich koni. Każdy koń ma swoją kartę, na której widać całą jego historię.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>Cała historia konia — wizyty, szczepienia, zawody, zakupy i zdjęcia — w jednym miejscu,
+    od źrebięcia po dziś.</div>
+  <figure><img src="{{IMG}}/04-konie.png" alt=""><figcaption>Lista koni</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Szukaj</b> po imieniu albo numerze paszportu.</div></li>
+    <li><span class="nr">2</span><div><b>Widok</b>: kafelki albo tabela.</div></li>
+    <li><span class="nr">3</span><div><b>Filtry</b>: „Pokaż wszystkie” pokazuje też konie sprzedane, padłe i wydzierżawione; „Tylko źrebięta” — same źrebięta.</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk"><span class="ic">&#xF10A;</span>Dodaj konia</span> — wystarczy imię i numer paszportu
+      (u źrebaka samo imię), resztę uzupełnisz później.</div></li>
+    <li><span class="nr">5</span><div>Kafelek konia — kliknij, aby otworzyć kartę konia. Od wersji 1.6 pod imieniem widać <b>imię stajenne</b> w cudzysłowie (np. „Gromek”),
+      jeśli koń je ma.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/05-karta-konia.png" alt=""><figcaption>Karta konia</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Edytuj</b> dane, <b>Zmień status</b> (sprzedany, padł, wydzierżawiony — historia zostaje) albo <b>Usuń</b> (do kosza).</div></li>
+    <li><span class="nr">2</span><div><b>Najbliższe terminy</b> i <b>koszty w tym roku</b> z podziałem na kategorie.</div></li>
+    <li><span class="nr">3</span><div><b>Zakładki</b>: oś czasu (wszystko od najnowszych), paszport z historią szczepień, wizyty, notatki, zakupy, zawody, załączniki.</div></li>
+    <li><span class="nr">4</span><div><b>Dodaj wpis</b> bezpośrednio dla tego konia: wizyta, kowal, fizjoterapia, specjalista, start w zawodach, zakup, notatka.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/07-formularz-konia.png" alt=""><figcaption>Nowy koń — źrebię bez paszportu</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Imię</b> — pole oznaczone gwiazdką * jest wymagane.</div></li>
+    <li><span class="nr">2</span><div><b>Źrebak</b> — zaznacz, jeśli koń nie ma jeszcze paszportu. Numer wpiszesz, gdy paszport zostanie wydany,
+      a potem odznaczysz „Źrebak” — cała historia zostaje przy koniu.</div></li>
+    <li><span class="nr">3</span><div><b>Zapisz</b> — dane zapisują się od razu, nie trzeba osobno zapisywać pliku.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Załączniki.</b> Do konia i każdego wpisu możesz dodać zdjęcia, skany i PDF — przeciągnij plik na formularz
+    albo wklej zrzut ekranu (<kbd>Ctrl</kbd>+<kbd>V</kbd>). Oryginał zostaje na miejscu, program przechowuje kopię.</div>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="terminy">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xE24F;</span></div>
+    <div><h2>Terminy<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xE24F;</span> Terminy</div></div>
+  <p class="wprowadzenie">Terminarz wszystkich koni: kowal, szczepienia, odrobaczanie, wizyty kontrolne, zawody i Twoje własne przypomnienia.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>
+    <ul><li>Terminy tworzą się same — wpisz w wizycie „Następna wizyta” (u kowala data podpowie się sama według interwału konia).</li>
+      <li>Gdy zarejestrujesz kolejną wizytę, termin zamknie się automatycznie.</li>
+      <li>Powiadomienie Windows przy starcie i raz dziennie o wybranej godzinie.</li></ul></div>
+  <figure><img src="{{IMG}}/08-terminy.png" alt=""><figcaption>Lista terminów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Filtry</b>: koń, rodzaj, status (domyślnie otwarte) i zakres dat.</div></li>
+    <li><span class="nr">2</span><div><b>Akcje</b>: zarejestruj wizytę, przełóż, zrealizowany, odrzuć, edytuj, usuń.</div></li>
+    <li><span class="nr">3</span><div><span class="przycisk"><span class="ic">&#xF212;</span>Termin</span> — dodaj własny termin, np. przegląd siodła.</div></li>
+  </ul>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="zawody">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF837;</span></div>
+    <div><h2>Zawody<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xF837;</span> Zawody</div></div>
+  <p class="wprowadzenie">Zawody i starty Twoich koni: gdzie, kiedy, w jakim konkursie, z jakim wynikiem — i ile to kosztowało.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>
+    <ul><li>Statystyki każdego konia: starty, zwycięstwa, podia, średnia ocena, nagrody i koszty.</li>
+      <li>Wpisowe i nagrody trafiają do raportu kosztów i przychodów.</li>
+      <li>Zawody w przyszłości same tworzą termin w terminarzu.</li></ul></div>
+  <figure><img src="{{IMG}}/09-zawody.png" alt=""><figcaption>Lista zawodów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Filtry</b>: dyscyplina i zakres dat.</div></li>
+    <li><span class="nr">2</span><div><b>Starty i najlepsze miejsce</b> w każdych zawodach.</div></li>
+    <li><span class="nr">3</span><div><span class="przycisk"><span class="ic">&#xF837;</span>Zawody</span> — dodaj zawody (także kilkudniowe).</div></li>
+    <li><span class="nr">4</span><div><b>Akcje w wierszu</b> (nowość 1.3): <b>Szczegóły</b>, <b>Edytuj</b> i <b>Usuń</b> — działają też z klawiatury (Enter, F2, Delete).
+      Zawody możesz poprawić od razu z listy, bez wchodzenia w szczegóły. Jeśli nowe daty pominęłyby start z wpisanym dniem, program nie zapisze zmiany
+      i poda, których startów to dotyczy (koń, klasa, dzień). Zmiana daty lub nazwy aktualizuje terminy startów w terminarzu.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/10-zawody-szczegoly.png" alt=""><figcaption>Szczegóły zawodów i starty</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Dane zawodów</b>: ranga, dyscyplina, organizator.</div></li>
+    <li><span class="nr">2</span><div><b>Starty</b> różnych koni: konkurs, jeździec (od wersji 1.5 wybierany z kontaktów typu „Jeździec”), miejsce, wynik i ocena w gwiazdkach.</div></li>
+    <li><span class="nr">3</span><div><span class="przycisk">+ Start</span> — dodaj start konia w tych zawodach.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/06-karta-zawody.png" alt=""><figcaption>Zakładka Zawody na karcie konia</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Zakładka <b>Zawody</b> na karcie konia.</div></li>
+    <li><span class="nr">2</span><div><b>Statystyki</b>: starty, zwycięstwa, podia, średnia ocena, nagrody i koszty — z filtrem dyscypliny i okresu.</div></li>
+    <li><span class="nr">3</span><div><b>Wyniki</b>: miejsce, wynik i Twoja ocena startu.</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk">+ Start</span> — dodaj start; zawody wybierzesz z listy albo utworzysz od razu. Przy każdym starcie jest też przycisk <b>Edytuj zawody</b>.</div></li>
+  </ul>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="treningi">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF67E;</span></div>
+    <div><h2>Treningi<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xF67E;</span> Treningi</div></div>
+  <p class="wprowadzenie">Dziennik treningów i jazd: co robił koń, jak długo, jak ciężko, z jakim trenerem, za ile i jak Ci poszło. Od wersji 1.4 z trenerem i kosztem treningu, od 1.5 z jeźdźcem wybieranym z kontaktów.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>
+    <ul><li>Widzisz, jak koń pracuje w czasie: ile treningów, ile godzin i jaka średnia ocena.</li>
+      <li>Raport <b>Podsumowanie treningów</b> liczy minimum, średnią i maksimum, a wykresy pokazują postępy.</li>
+      <li>Dla skoków zapiszesz wysokość przeszkód i zobaczysz, jak rośnie.</li>
+      <li><b>Nowość 1.4:</b> przy treningu wskażesz <b>trenera</b> i wpiszesz <b>koszt</b>, a pod listą od razu widzisz, ile treningów było i ile kosztowały.</li>
+      <li><b>Nowość 1.5:</b> jeździec to kontakt, więc jego treningi zbierzesz w jednym miejscu — w filtrze, w historii kontaktu i w raporcie <b>Treningi jeźdźca</b>.</li></ul></div>
+  <figure><img src="{{IMG}}/23-treningi.png" alt=""><figcaption>Lista treningów wszystkich koni</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Filtry</b>: koń, rodzaj treningu, <b>jeździec</b> (nowość 1.5), <b>trener</b> i zakres dat.</div></li>
+    <li><span class="nr">2</span><div><b>Czas i ocena</b> każdego treningu; pole wysokości widać tylko przy skokach.</div></li>
+    <li><span class="nr">3</span><div><b>Trener i koszt</b> (nowość 1.4). Kreska oznacza trening bez trenera, puste pole — trening bez kosztu.</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk"><span class="ic">&#xF67E;</span>Trening</span> — dodaj trening wybranego konia.</div></li>
+  </ul>
+  <h3>Ile treningów i ile kosztowały (nowość 1.4)</h3>
+  <p>Pod listą — tak samo jak pod listą zakupów — program podlicza treningi, które akurat widzisz. Ustaw filtr konia, miesiąca albo trenera,
+    a od razu odczytasz, ile zapłaciłeś.</p>
+  <figure><img src="{{IMG}}/29-treningi-podliczenie.png" alt=""><figcaption>Podliczenie pod listą treningów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Liczba treningów</b> i <b>Razem</b> — łączny koszt wyfiltrowanych treningów. Treningi bez kosztu liczą się do liczby, ale nie do sumy.</div></li>
+  </ul>
+  <h3>Trener i koszt treningu (nowość 1.4)</h3>
+  <figure><img src="{{IMG}}/24-formularz-treningu.png" alt=""><figcaption>Nowy trening</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Rodzaj treningu</b> (Ujeżdżenie, Skoki, Teren, Lonża, Karuzela, Spacer, Inne) — listę zmienisz w Słownikach. Dla rodzaju <b>Skoki</b> pojawia się pole <b>Wysokość przeszkód</b> (cm).</div></li>
+    <li><span class="nr">2</span><div><b>Czas</b> w minutach i <b>intensywność</b> (lekka, średnia, ciężka). Jeździec i trener są w następnym punkcie.</div></li>
+    <li><span class="nr">3</span><div><b>Jeździec</b> (nowość 1.5) — wybierz osobę z Kontaktów (na liście są tylko kontakty typu „Jeździec”). Nowego jeźdźca dodasz przyciskiem
+      <span class="przycisk"><span class="ic">&#xF10A;</span></span> bez wychodzenia z formularza — tak samo jak weterynarza przy wizycie. Jeźdźca nie wpisuje się już tekstem.</div></li>
+    <li><span class="nr">4</span><div><b>Trener</b> — tak samo, z kontaktów typu „Trener”. Ta sama osoba może być i jeźdźcem, i trenerem.</div></li>
+    <li><span class="nr">5</span><div><b>Koszt treningu</b> — jedna kwota za wszystko: trener, dojazd, hala. Jeśli płaciłeś w innej walucie, rozwiń „Zapłacono w walucie obcej”.</div></li>
+    <li><span class="nr">6</span><div><span class="przycisk">Zapisz</span> — wymagane są tylko koń, data (nie z przyszłości) i rodzaj. Jeździec, trener i koszt są nieobowiązkowe.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Program podpowiada jeźdźca, trenera i koszt.</b> Po wybraniu konia pola wypełniają się tak, jak w jego ostatnim treningu.
+    Jeśli tym razem było inaczej (np. jazda bez trenera), zmień je albo wyczyść przed zapisem — inaczej koszt doliczy się do raportów.</div>
+  <figure><img src="{{IMG}}/25-karta-treningi.png" alt=""><figcaption>Zakładka Treningi na karcie konia</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Zakładka <b>Treningi</b> na karcie konia.</div></li>
+    <li><span class="nr">2</span><div><b>Filtry</b>: rodzaj, jeździec, <b>trener</b> i zakres dat.</div></li>
+    <li><span class="nr">3</span><div><b>Łączny czas i średnia ocena</b> wyfiltrowanych treningów.</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk">Podsumowanie</span> otwiera raport <b>Podsumowanie treningów</b> tego konia.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/30-karta-treningi-podliczenie.png" alt=""><figcaption>Treningi konia — trener, koszt i podliczenie</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Trener i koszt</b> każdego treningu tego konia.</div></li>
+    <li><span class="nr">2</span><div><b>Liczba treningów i łączny koszt</b> — np. ile kosztowały treningi konia w wybranym miesiącu albo u wybranego trenera.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Koszt treningu jest kosztem konia.</b> Od wersji 1.4 wchodzi do raportu kosztów, kosztów na pulpicie i do bilansu konia
+    jako kategoria <b>Treningi</b>. Jeśli wcześniej wpisywałeś płatne treningi jako wizytę specjalisty albo zakup, nie wpisuj tej samej kwoty drugi raz.
+    Usunięty trening trafia do Kosza i można go przywrócić. Treningi nie tworzą terminów.</div>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="zakupy">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF26B;</span></div>
+    <div><h2>Zakupy<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xF26B;</span> Zakupy</div></div>
+  <p class="wprowadzenie">Pasza, suplementy, sprzęt, leki, pensjonat — wszystko, co kupujesz dla koni.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>Zakup dla kilku koni program dzieli po równo (co do grosza), a koszt dostawy dolicza sam.</div>
+  <figure><img src="{{IMG}}/11-zakupy.png" alt=""><figcaption>Lista zakupów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Filtry</b>: koń, kategoria, dostawca, okres. Na dole — suma wyfiltrowanych zakupów.</div></li>
+    <li><span class="nr">2</span><div><b>Kwota</b> — razem z kosztem dostawy (najedź myszką, by zobaczyć „w tym dostawa”).</div></li>
+    <li><span class="nr">3</span><div><b>Powtórz zakup</b> — kopia zakupu z dzisiejszą datą (np. comiesięczna pasza).</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk"><span class="ic">&#xF26B;</span>Zakup</span> — dodaj nowy zakup.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/12-formularz-zakupu.png" alt=""><figcaption>Nowy zakup z kosztem dostawy</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Ilość × cena</b> — program sam podpowie kwotę (20 × 25 zł = 500 zł).</div></li>
+    <li><span class="nr">2</span><div><b>Koszt dostawy</b> (nieobowiązkowy).</div></li>
+    <li><span class="nr">3</span><div><b>Razem</b> — kwota z dostawą; ta kwota trafia do raportów.</div></li>
+    <li><span class="nr">4</span><div><b>Dla kogo</b>: jeden koń, kilka koni (koszt dzielony po równo) albo cała stajnia.</div></li>
+  </ul>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="kontakty">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF5A9;</span></div>
+    <div><h2>Kontakty<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xF5A9;</span> Kontakty</div></div>
+  <p class="wprowadzenie">Książka adresowa: weterynarze, kowale, fizjoterapeuci, trenerzy, sklepy i organizatorzy zawodów.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>Karta kontaktu pokazuje wszystkie wizyty, treningi i zakupy u tej osoby i łączną kwotę.</div>
+  <figure><img src="{{IMG}}/13-kontakty.png" alt=""><figcaption>Kontakty</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Szukaj i filtruj</b> po typie; zarchiwizowane kontakty ukrywają się z list wyboru.</div></li>
+    <li><span class="nr">2</span><div><b>Telefon i e-mail</b> — kliknij, aby zadzwonić lub napisać.</div></li>
+    <li><span class="nr">3</span><div><span class="przycisk"><span class="ic">&#xF10A;</span>Dodaj kontakt</span>. Kontakt dodasz też wprost z formularza wizyty albo treningu (przycisk „+”).</div></li>
+  </ul>
+  <h3>Jeźdźcy (nowość 1.5)</h3>
+  <p>Kontakt może mieć też typ <b>Jeździec</b> — sam albo razem z innymi (ta sama osoba może być i trenerem, i jeźdźcem). Tylko takie kontakty wybierzesz
+    jako jeźdźca przy treningu i przy starcie w zawodach.</p>
+  <figure><img src="{{IMG}}/33-kontakty-jezdzcy.png" alt=""><figcaption>Kontakty — tylko jeźdźcy</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Wybierz typ <b>Jeździec</b>, aby zobaczyć samych jeźdźców.</div></li>
+    <li><span class="nr">2</span><div><b>Lista jeźdźców.</b> Otwórz kontakt, aby zobaczyć jego treningi i starty.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Po aktualizacji z 1.4 jeźdźców trzeba wybrać na nowo.</b> Dawne wpisy jeźdźców (tekst) program czyści i informuje, ile ich było —
+    dodaj kontakty typu „Jeździec” i wybierz je w treningach i startach. Dawną treść zachowuje kopia zapasowa sprzed aktualizacji.</div>
+  <h3>Trenerzy (nowość 1.4)</h3>
+  <p>Kontakt może mieć nowy typ <b>Trener</b> — sam albo razem z innymi typami. Tylko takie kontakty wybierzesz w polu „Trener” przy treningu.</p>
+  <figure><img src="{{IMG}}/31-kontakty-trenerzy.png" alt=""><figcaption>Kontakty — tylko trenerzy</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Wybierz typ <b>Trener</b>, aby zobaczyć samych trenerów.</div></li>
+    <li><span class="nr">2</span><div><b>Lista trenerów.</b> Otwórz kontakt, aby zobaczyć jego treningi z kosztami i łączną kwotą.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Trenera z treningami nie da się usunąć.</b> Jeśli już z nim nie pracujesz, zarchiwizuj kontakt — zniknie z list wyboru,
+    a dawne treningi nadal będą go pokazywać.</div>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="raporty">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xE2DE;</span></div>
+    <div><h2>Raporty<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xE2DE;</span> Raporty</div></div>
+  <p class="wprowadzenie">Koszty i przychody Twoich koni z dowolnego okresu — w tabeli i na wykresach. Od wersji 1.5 jest pięć raportów (w tym dwa raporty jeźdźca), każdy z eksportem do CSV i PDF.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>
+    <ul><li>Widać, ile kosztuje każdy koń i na co idą pieniądze (weterynarz, kowal, pasza, pensjonat…).</li>
+      <li>Zakupy dla kilku koni są podzielone, a zakupy dla całej stajni pokazane osobno.</li>
+      <li>Jednym kliknięciem eksport do Excela (CSV) albo do PDF.</li></ul></div>
+  <figure><img src="{{IMG}}/14-raporty.png" alt=""><figcaption>Raport kosztów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Filtry</b>: konie (wszystkie, wybrane, tylko stajnia), okres (bieżący miesiąc, rok, ostatnie 12 miesięcy…), grupowanie (koń, miesiąc, kategoria).</div></li>
+    <li><span class="nr">2</span><div><b>Kategorie</b> — zaznacz, które koszty mają być w raporcie. Od wersji 1.4 jest wśród nich kategoria <b>Treningi</b> z kosztami treningów.</div></li>
+    <li><span class="nr">3</span><div><b>Koszty miesięczne</b> z podziałem na kategorie.</div></li>
+    <li><span class="nr">4</span><div><b>Udział kategorii</b> w całości kosztów.</div></li>
+    <li><span class="nr">5</span><div><span class="przycisk"><span class="ic">&#xE54C;</span>Eksport CSV</span> (otwiera się w polskim Excelu)
+      i <span class="przycisk"><span class="ic">&#xF3AD;</span>Eksport PDF</span> (gotowy do wydruku).</div></li>
+  </ul>
+  <h3>Treningi jeźdźca i Zawody jeźdźca (nowość 1.5)</h3>
+  <p>Ile i jak jeździ wybrana osoba — albo wszyscy jeźdźcy naraz. Wybierz <b>jeźdźca</b> (albo „Wszyscy jeźdźcy”), a w razie potrzeby konia i okres.</p>
+  <figure><img src="{{IMG}}/34-raporty-jezdzca-treningi.png" alt=""><figcaption>Raport Treningi jeźdźca</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Zakładka <b>Treningi jeźdźca</b>.</div></li>
+    <li><span class="nr">2</span><div><b>Jeździec, koń i okres.</b> Przy „Wszyscy jeźdźcy” lista ma dodatkową kolumnę z jeźdźcem.</div></li>
+    <li><span class="nr">3</span><div><b>Podsumowanie</b>: liczba treningów, łączny czas, średnia ocena i koszt — także w podziale na konie.</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk"><span class="ic">&#xE54C;</span>Eksport CSV</span> i <span class="przycisk"><span class="ic">&#xF3AD;</span>Eksport PDF</span>.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/35-raporty-jezdzca-zawody.png" alt=""><figcaption>Raport Zawody jeźdźca</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Zakładka <b>Zawody jeźdźca</b>.</div></li>
+    <li><span class="nr">2</span><div>Każdy start z <b>wpisowym, pozostałymi kosztami i nagrodą</b>.</div></li>
+    <li><span class="nr">3</span><div><b>Podsumowanie</b>: liczba zawodów i startów, koszty, nagrody i bilans (nagrody − koszty).</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk"><span class="ic">&#xE54C;</span>Eksport CSV</span> i <span class="przycisk"><span class="ic">&#xF3AD;</span>Eksport PDF</span>.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Treningi i starty bez jeźdźca</b> nie są uwzględniane w raportach jeźdźca.</div>
+  <h3>Bilans konia (nowość 1.3)</h3>
+  <p>Ile koń naprawdę kosztował i zarobił: <b>wynik = sprzedaż + nagrody − zakup − koszty</b>, z całej historii konia. Ceny zakupu i sprzedaży
+    wpisujesz w formularzu konia (nie są wliczane do raportu kosztów). Koń, który padł, liczy się ze sprzedażą 0 zł. Od wersji 1.4 do kosztów konia wchodzą też koszty treningów.</p>
+  <figure><img src="{{IMG}}/26-raporty-bilans.png" alt=""><figcaption>Raport Bilans konia</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Zakładka <b>Bilans konia</b>.</div></li>
+    <li><span class="nr">2</span><div><b>Filtry</b>: status konia i koń. Nad tabelą są sumy dla wybranych koni.</div></li>
+    <li><span class="nr">3</span><div><b>Zakup, koszty, nagrody, sprzedaż i wynik</b> — zysk na zielono, strata na czerwono. Kliknięcie wiersza pokazuje koszty według lat i kategorii.
+      Wartość konia to Twoja własna ocena i nie wchodzi do wyniku; w uwagach zobaczysz, czy wynik jest już ostateczny.
+      Od wersji 1.6 kwoty i ich nagłówki są wyrównane do prawej, a kolumny kwot są wąskie — kwota stoi tuż pod swoim nagłówkiem.</div></li>
+    <li><span class="nr">4</span><div><span class="przycisk"><span class="ic">&#xE54C;</span>Eksport CSV</span> i <span class="przycisk"><span class="ic">&#xF3AD;</span>Eksport PDF</span>.</div></li>
+  </ul>
+  <h3>Podsumowanie treningów (nowość 1.3)</h3>
+  <p>Dla wybranego konia i okresu — <b>tydzień, miesiąc, rok albo wszystko</b> (strzałkami przechodzisz do poprzedniego i następnego okresu):
+    minimum, średnia i maksimum czasu, intensywności, oceny i wysokości przeszkód, osobno dla każdego rodzaju treningu oraz w wierszu „Razem”.
+    Od wersji 1.6 <b>łączny czas</b> jest podany w godzinach i minutach (np. „23 h 30 min”, „45 min”, a „—”, gdy żaden trening nie ma wpisanego czasu) —
+    na ekranie i w pliku PDF; plik CSV zostaje w minutach.</p>
+  <figure><img src="{{IMG}}/27-raporty-treningi.png" alt=""><figcaption>Raport Podsumowanie treningów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Zakładka <b>Podsumowanie treningów</b>.</div></li>
+    <li><span class="nr">2</span><div><b>Koń i okres</b>; obok widać daty okresu i strzałki do przechodzenia między okresami.</div></li>
+    <li><span class="nr">3</span><div><b>Statystyki</b> — liczone tylko z treningów, w których dany parametr wpisano.</div></li>
+    <li><span class="nr">4</span><div><b>Koszt</b> (nowość 1.4) — łączny koszt treningów każdego rodzaju i w wierszu „Razem”.</div></li>
+    <li><span class="nr">5</span><div><span class="przycisk"><span class="ic">&#xE54C;</span>Eksport CSV</span> i <span class="przycisk"><span class="ic">&#xF3AD;</span>Eksport PDF</span> (PDF zawiera też wykresy).</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/28-raporty-treningi-wykres.png" alt=""><figcaption>Wykres postępów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div>Wybierz <b>parametr</b> wykresu (czas, ocena albo wysokość przeszkód) i <b>rodzaj treningu</b> — albo „Wszystkie rodzaje”.</div></li>
+    <li><span class="nr">2</span><div>Przy wszystkich rodzajach każdy ma <b>swój kolor, kształt znacznika i styl linii</b>, więc da się je odróżnić także na wydruku czarno-białym.</div></li>
+  </ul>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="konfiguracja">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xE16F;</span></div>
+    <div><h2>Słowniki<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xE16F;</span> Słowniki</div></div>
+  <p class="wprowadzenie">Listy wyboru używane w formularzach: rodzaje wizyt, usługi kowalskie, kategorie zakupów, dyscypliny i inne.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>Dopasujesz program do swojej stajni: dodasz własną kategorię, zmienisz nazwę albo kolejność.</div>
+  <figure><img src="{{IMG}}/15-slowniki.png" alt=""><figcaption>Słowniki — kategorie zakupów</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Wybierz słownik</b> z listy.</div></li>
+    <li><span class="nr">2</span><div><b>Dodaj wartość</b> — wpisz nazwę i kliknij <span class="przycisk"><span class="ic">&#xF10A;</span>Dodaj</span>.</div></li>
+    <li><span class="nr">3</span><div>Nazwę zmienisz, wpisując ją w polu (tu: nowa kategoria „Pensjonat”).</div></li>
+    <li><span class="nr">4</span><div><b>Aktywna</b> (wyłączona wartość nie pojawia się w nowych wpisach), <b>w górę / w dół</b> i <b>usuń</b>
+      (tylko, gdy wartość nie jest nigdzie użyta).</div></li>
+  </ul>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="kosz">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF34D;</span></div>
+    <div><h2>Kosz<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xF34D;</span> Kosz</div></div>
+  <p class="wprowadzenie">Usunięte rekordy trafiają do kosza razem z powiązanymi (np. wizyta z lekami i załącznikami).</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>Nic nie ginie przez przypadek — wszystko można przywrócić.</div>
+  <figure><img src="{{IMG}}/16-kosz.png" alt=""><figcaption>Kosz</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Przywróć</b> albo <b>usuń trwale</b> (tego nie da się cofnąć — program zapyta o potwierdzenie).</div></li>
+    <li><span class="nr">2</span><div><span class="przycisk"><span class="ic">&#xE47F;</span>Opróżnij kosz</span> — usuwa trwale wszystko z kosza.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Cofnij.</b> Zaraz po usunięciu możesz też kliknąć <b>Cofnij</b> w komunikacie na dole okna.</div>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<section class="rozdzial" data-feature="konfiguracja">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF6AA;</span></div>
+    <div><h2>Ustawienia<span class="wstazka">★ WARTO POZNAĆ</span></h2></div><div class="miejsce">Menu: <span class="ic">&#xF6AA;</span> Ustawienia</div></div>
+  <p class="wprowadzenie">Tu dopasujesz program do siebie: wygląd, przypomnienia, kopie zapasowe, eksport danych i dostęp z telefonu.</p>
+  <div class="korzysci"><b class="tytul">Dlaczego warto</b>
+    <ul><li>Przypomnienia o wybranej godzinie i z wybranym wyprzedzeniem.</li>
+      <li>Automatyczne kopie zapasowe w bezpiecznym miejscu.</li>
+      <li>Dostęp do danych z telefonu w domowej sieci Wi-Fi.</li></ul></div>
+  <figure><img src="{{IMG}}/17-ustawienia.png" alt=""><figcaption>Ustawienia ogólne i przypomnienia</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Motyw</b>: jasny, ciemny albo zgodny z Windows.</div></li>
+    <li><span class="nr">2</span><div><b>Start z Windows</b>, start zminimalizowany i chowanie do zasobnika po zamknięciu okna.</div></li>
+    <li><span class="nr">3</span><div><b>Przypomnienia</b>: powiadomienia Windows, godzina dziennego przypomnienia i ile dni naprzód pokazywać terminy.</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/18-ustawienia-kopie.png" alt=""><figcaption>Kopie zapasowe</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Kopie automatyczne</b>: przy zamknięciu programu i raz dziennie (przechowywanych jest 14 ostatnich).</div></li>
+    <li><span class="nr">2</span><div><b>Folder kopii</b> — wybierz np. dysk zewnętrzny albo OneDrive.</div></li>
+    <li><span class="nr">3</span><div><span class="przycisk"><span class="ic">&#xF680;</span>Wykonaj kopię teraz</span> i <b>Przywróć z kopii…</b></div></li>
+  </ul>
+  <figure><img src="{{IMG}}/19-ustawienia-eksport.png" alt=""><figcaption>Eksport i import</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Eksport</b> — cała baza albo jeden koń, z wybranego okresu; plik JSON albo ZIP z załącznikami.</div></li>
+    <li><span class="nr">2</span><div><b>Import</b> — przeniesienie danych na inny komputer (zastępuje dane; wcześniej program robi kopię).</div></li>
+  </ul>
+  <figure><img src="{{IMG}}/20-ustawienia-api.png" alt=""><figcaption>Dostęp z telefonu (API)</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Włącz API</b> — domyślnie jest wyłączone.</div></li>
+    <li><span class="nr">2</span><div><b>Reguła zapory</b> i <b>dokumentacja</b> dla programistów aplikacji mobilnej.</div></li>
+    <li><span class="nr">3</span><div><b>Klucz dla urządzenia</b> — wpisz nazwę (np. „Telefon”) i kliknij <span class="przycisk"><span class="ic">&#xF4B7;</span>Generuj klucz</span>.
+      Klucz pokazuje się tylko raz, razem z kodem QR do zeskanowania.</div></li>
+  </ul>
+  <h3>Klucz dla telefonu z kodem QR</h3>
+  <p>Każde urządzenie dostaje własny klucz. Po kliknięciu <span class="przycisk"><span class="ic">&#xF4B7;</span>Generuj klucz</span> otwiera się okno z kluczem i kodem QR.</p>
+  <figure><img src="{{IMG}}/32-klucz-api.png" alt=""><figcaption>Nowy klucz API z kodem QR (klucz przykładowy)</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Klucz</b> i przycisk <span class="przycisk">Kopiuj</span> — przydaje się, gdy wpisujesz klucz ręcznie.</div></li>
+    <li><span class="nr">2</span><div><b>Kod QR</b> — zeskanuj go aplikacją w telefonie. Zawiera adres programu, klucz i odcisk certyfikatu, więc niczego nie trzeba przepisywać.</div></li>
+  </ul>
+  <div class="rada"><b class="tytul">Klucz widać tylko raz.</b> Po zamknięciu okna nie da się go odczytać ponownie. Jeśli go zgubisz albo stracisz telefon,
+    unieważnij klucz na liście kluczy i wygeneruj nowy.</div>
+  <figure><img src="{{IMG}}/21-ustawienia-autor.png" alt=""><figcaption>Autor i informacje o programie</figcaption></figure>
+  <ul class="legenda">
+    <li><span class="nr">1</span><div><b>Autor programu</b>: {{AUTOR}}. Niżej: wersja programu, wersja bazy i foldery z danymi.</div></li>
+    <li><span class="nr">2</span><div><b>Przebuduj indeks wyszukiwania</b> — gdyby wyniki wyszukiwania wydawały się niepełne.</div></li>
+  </ul>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+<!-- ===================================================== CZĘŚĆ 3 ===================================================== -->
+<section class="rozdzial">
+  <div class="naglowek"><div class="ikona"><span class="ic">&#xF481;</span></div>
+    <div><h2>Skróty klawiszowe i dobre rady</h2><div class="miejsce" style="text-align:left;margin:0">Część 3. Na koniec</div></div></div>
+  <table class="skroty">
+    <tr><td><kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>wyszukiwanie we wszystkich danych</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>N</kbd></td><td>nowy wpis na bieżącej liście</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>zapisz formularz</td></tr>
+    <tr><td><kbd>Esc</kbd></td><td>zamknij formularz (program zapyta o niezapisane zmiany)</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd></td><td>przejdź do filtra listy</td></tr>
+    <tr><td><kbd>Ctrl</kbd>+<kbd>V</kbd></td><td>wklej zrzut ekranu jako załącznik</td></tr>
+  </table>
+  <div class="rada"><b class="tytul">Aktualizacja programu.</b> Zainstaluj nową wersję na starej — dane zostają. Przy pierwszym uruchomieniu program
+    sam dostosuje bazę, a wcześniej zrobi kopię zapasową.</div>
+  <div class="rada"><b class="tytul">Gdzie są dane?</b> W folderze pokazanym w <b>Ustawienia → O programie</b>. Logi programu nie zawierają
+    treści wpisów ani danych osobowych.</div>
+  <div class="rada"><b class="tytul">Ikona przy zegarze.</b> Menu ikony pozwala szybko dodać wpis, zobaczyć nadchodzące terminy, włączyć
+    lub wyłączyć API, wykonać kopię zapasową i zakończyć program.</div>
+  <div class="stopka"><span>Zarządzanie końmi {{WERSJA}} · Instrukcja obsługi</span><span>Autor programu: {{AUTOR}}</span></div>
+</section>
+
+</body>
+</html>
