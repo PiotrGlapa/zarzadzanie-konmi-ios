@@ -21,8 +21,8 @@ permissions:
   contents: read
 
 env:
-  # Jawny wybór Xcode (SDK iOS 18) na obrazie macos-15; zmiana wersji tylko tutaj i w release.yml.
-  XCODE_VERSION: "16.4"
+  # Jawny wybór Xcode 26 (SDK iOS 26 wymagany przez App Store Connect) na obrazie macos-15; zmiana tylko tutaj i w release.yml.
+  XCODE_VERSION: "26"
   APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
   # Symulator: podpis doraźny (ad hoc) z uprawnieniami, bez konta Apple.
   SIMULATOR_SIGNING: CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY=- CODE_SIGNING_REQUIRED=NO DEVELOPMENT_TEAM=
@@ -39,8 +39,7 @@ jobs:
 
       - name: Wybierz Xcode
         run: |
-          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app"
-          xcodebuild -version
+          bash scripts/ci/select-xcode.sh
           swift --version
 
       - name: Pamięć podręczna pakietów SPM

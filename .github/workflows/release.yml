@@ -61,7 +61,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     env:
-      XCODE_VERSION: "16.4"
+      XCODE_VERSION: "26"
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       ASC_APP_ID: ${{ vars.ASC_APP_ID }}
       ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
@@ -72,8 +72,7 @@ jobs:
 
       - name: Wybierz Xcode
         run: |
-          sudo xcode-select -s "/Applications/Xcode_${XCODE_VERSION}.app"
-          xcodebuild -version
+          bash scripts/ci/select-xcode.sh
 
       - name: Zainstaluj XcodeGen
         run: brew install xcodegen
