@@ -173,9 +173,7 @@ final class RejectingTransport: ProgramTransport, @unchecked Sendable {
     }
 
     func send(_ request: URLRequest, to address: ServerAddress, bodyFile: URL?, download: Bool, progress: (@Sendable (Int64, Int64?) -> Void)?) async -> TransportOutcome {
-        lock.lock()
-        count += 1
-        lock.unlock()
+        lock.withLock { count += 1 }
         return .certificateRejected(.rejectChanged)
     }
 }

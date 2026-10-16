@@ -378,6 +378,7 @@ actor ProbeMemory {
 
 extension RecordStore {
     /// Zapis bez zwiększania licznika zmian (stan techniczny: adresy, kolejka, konflikty — nie dane użytkownika).
+    @discardableResult
     public func writeQuietly<T: Sendable>(_ block: @Sendable @escaping (RecordAccess) throws -> T) async throws -> T {
         try await database.writer.write { db in
             try block(RecordAccess(db: db, state: RecordAccess.WriteState()))

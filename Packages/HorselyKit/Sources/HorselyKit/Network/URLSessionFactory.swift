@@ -228,3 +228,51 @@ public final class URLSessionTransport: ProgramTransport {
         ]
     }
 }
+
+/// Sonda TLS adresu ręcznego bez odcisku (contracts/android/pairing-and-connection.md): uzgodnienie TLS bez wysłania żądania HTTP —
+/// zwraca „Wystawca: <CN>, dla: <nazwa>” do potwierdzenia albo `nil` (certyfikat nieważny / samopodpisany).
+public enum TLSProbe {
+    public static func issuer(of url: String, evaluator: TrustEvaluator = TrustEvaluator()) async -> String? {
+        guard let target = URL(string: url) else { return nil }
+        let delegate = ProbeDelegate(evaluator: evaluator)
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.timeoutIntervalForRequest = AddressOrder.connectTimeout * 3
+        let session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
+        defer { session.invalidateAndCancel() }
+        return await withCheckedContinuation { continuation in
+            delegate.continuation = continuation
+            session.dataTask(with: target).resume()
+        }
+    }
+
+    final class ProbeDelegate: NSObject, URLSessionTaskDelegate, @unchecked Sendable {
+        private let evaluator: TrustEvaluator
+        private let lock = NSLock()
+        var continuation: CheckedContinuation<String?, Never>?
+        private var summary: String?
+
+        init(evaluator: TrustEvaluator) {
+            self.evaluator = evaluator
+        }
+
+        func urlSession(_ session: URLSession, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+            if let trust = challenge.protectionSpace.serverTrust {
+                let found = evaluator.probeSummary(trust, host: challenge.protectionSpace.host)
+                lock.lock()
+                summary = found
+                lock.unlock()
+            }
+            // Żądanie nigdy nie wychodzi — przerywamy po ocenie certyfikatu.
+            completionHandler(.cancelAuthenticationChallenge, nil)
+        }
+
+        func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+            lock.lock()
+            let pending = continuation
+            continuation = nil
+            let found = summary
+            lock.unlock()
+            pending?.resume(returning: found)
+        }
+    }
+}
