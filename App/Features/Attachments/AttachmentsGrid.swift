@@ -18,18 +18,17 @@ struct AttachmentsSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.between) {
-            HStack {
-                Text("attachments_title").font(.headline).accessibilityAddTraits(.isHeader)
-                Spacer()
-                if working { ProgressView() }
-                Button {
-                    adding = true
-                } label: {
-                    Label { Text("attachments_add") } icon: { HIcon(name: "attach_file", size: 20) }
-                        .frame(minHeight: Spacing.minTouchTarget)
+            // Przy dużym tekście przycisk przechodzi pod tytuł (bez łamania słów).
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    title
+                    Spacer()
+                    addButton
                 }
-                .disabled(working)
-                .accessibilityIdentifier("attachments-add")
+                VStack(alignment: .leading, spacing: 4) {
+                    title
+                    addButton
+                }
             }
             if let attachments {
                 if attachments.isEmpty {
@@ -53,6 +52,24 @@ struct AttachmentsSection: View {
         .alert(message ?? "", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
             Button(tr("common_ok")) { message = nil }
         }
+    }
+
+    private var title: some View {
+        HStack(spacing: Spacing.between) {
+            Text("attachments_title").font(.headline).fixedSize().accessibilityAddTraits(.isHeader)
+            if working { ProgressView() }
+        }
+    }
+
+    private var addButton: some View {
+        Button {
+            adding = true
+        } label: {
+            Label { Text("attachments_add").fixedSize() } icon: { HIcon(name: "attach_file", size: 20) }
+                .frame(minHeight: Spacing.minTouchTarget)
+        }
+        .disabled(working)
+        .accessibilityIdentifier("attachments-add")
     }
 
     private func load() async {
