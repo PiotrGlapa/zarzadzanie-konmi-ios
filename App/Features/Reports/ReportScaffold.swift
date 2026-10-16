@@ -130,46 +130,8 @@ struct ReportScaffold<Charts: View, Filters: View>: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.beforeSection) {
-                VStack(alignment: .leading, spacing: 2) {
-                    ForEach(filterLines, id: \.self) { Text($0).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant) }
-                    if fromMemory {
-                        Text("sections_from_memory").font(.footnote).foregroundStyle(HorselyColor.warning)
-                    }
-                }
-                if loading {
-                    ProgressView().frame(maxWidth: .infinity).padding(.vertical, 32)
-                } else if let failure {
-                    InfoCard(tone: .warning) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("reports_needs_connection_title").font(.headline)
-                            Text(failure).font(.subheadline)
-                        }
-                    }
-                } else if let table {
-                    if isEmpty {
-                        InfoCard(tone: .neutral) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("reports_no_data_title").font(.headline)
-                                Text("reports_no_data_hint").font(.subheadline)
-                            }
-                        }
-                    }
-                    charts()
-                    ForEach(Array(table.rows.enumerated()), id: .offset) { index, row in
-                        ReportRowCard(columns: table.columns, cells: row, expanded: index == expandedRow)
-                    }
-                    if !table.totalRows.isEmpty {
-                        InfoCard(tone: .primary) {
-                            VStack(alignment: .leading, spacing: Spacing.between) {
-                                ForEach(Array(table.totalRows.enumerated()), id: \.offset) { _, row in
-                                    ReportTotalLine(columns: table.columns, cells: row)
-                                }
-                            }
-                        }
-                        .accessibilityIdentifier("report-totals")
-                    }
-                    ForEach(table.notes, id: \.self) { Text($0).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant) }
-                }
+                header
+                content
             }
             .padding(Spacing.screenEdge)
         }
@@ -185,15 +147,69 @@ struct ReportScaffold<Charts: View, Filters: View>: View {
                                  charts: pdfCharts)
             }
         }
-        .sheet(isPresented: $showingFilters) {
-            NavigationStack {
-                Form { filters() }
-                    .navigationTitle(tr("reports_filters"))
-                    .navigationBarTitleDisplayMode(.inline)
-                    .toolbar { ToolbarItem(placement: .confirmationAction) { Button(tr("reports_filters_done")) { showingFilters = false } } }
+        .sheet(isPresented: $showingFilters) { filterSheet }
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(filterLines, id: \.self) { Text($0).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant) }
+            if fromMemory {
+                Text("sections_from_memory").font(.footnote).foregroundStyle(HorselyColor.warning)
             }
-            .presentationDetents([.medium, .large])
         }
+    }
+
+    @ViewBuilder
+    private var content: some View {
+        if loading {
+            ProgressView().frame(maxWidth: .infinity).padding(.vertical, 32)
+        } else if let failure {
+            InfoCard(tone: .warning) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("reports_needs_connection_title").font(.headline)
+                    Text(failure).font(.subheadline)
+                }
+            }
+        } else if let table {
+            tableContent(table)
+        }
+    }
+
+    @ViewBuilder
+    private func tableContent(_ table: TabularReport) -> some View {
+        if isEmpty {
+            InfoCard(tone: .neutral) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("reports_no_data_title").font(.headline)
+                    Text("reports_no_data_hint").font(.subheadline)
+                }
+            }
+        }
+        charts()
+        ForEach(Array(table.rows.enumerated()), id: \.offset) { index, row in
+            ReportRowCard(columns: table.columns, cells: row, expanded: index == expandedRow)
+        }
+        if !table.totalRows.isEmpty {
+            InfoCard(tone: .primary) {
+                VStack(alignment: .leading, spacing: Spacing.between) {
+                    ForEach(Array(table.totalRows.enumerated()), id: \.offset) { _, row in
+                        ReportTotalLine(columns: table.columns, cells: row)
+                    }
+                }
+            }
+            .accessibilityIdentifier("report-totals")
+        }
+        ForEach(table.notes, id: \.self) { Text($0).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant) }
+    }
+
+    private var filterSheet: some View {
+        NavigationStack {
+            Form { filters() }
+                .navigationTitle(tr("reports_filters"))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button(tr("reports_filters_done")) { showingFilters = false } } }
+        }
+        .presentationDetents([.medium, .large])
     }
 }
 
