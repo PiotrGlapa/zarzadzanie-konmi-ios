@@ -20,7 +20,9 @@ struct ConflictsView: View {
                     Text("conflicts_intro").font(.subheadline).foregroundStyle(HorselyColor.onSurfaceVariant)
                     if let resultText { InfoCard(tone: .neutral) { Text(resultText).font(.subheadline) } }
                     DividedList(conflicts) { conflict in
-                        NavigationLink(value: conflict) {
+                        NavigationLink {
+                            ConflictDetailView(conflictId: conflict.id)
+                        } label: {
                             ConflictRow(conflict: conflict)
                         }
                         .buttonStyle(.plain)
@@ -47,7 +49,6 @@ struct ConflictsView: View {
         .background(HorselyColor.background)
         .navigationTitle(tr("conflicts_title"))
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(for: Conflict.self) { ConflictDetailView(conflictId: $0.id) }
         .connectionChrome()
         .alert(tr("conflicts_title"), isPresented: Binding(get: { confirm != nil }, set: { if !$0 { confirm = nil } })) {
             Button(tr("conflicts_confirm_yes")) {
