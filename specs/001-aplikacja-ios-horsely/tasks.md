@@ -223,14 +223,14 @@ Po tej fazie — pierwsza kompilacja dla grupy „Właściciele” (quickstart �
 
 **Independent Test**: spec.md US5.
 
-- [ ] T104 [P] [US5] Testy raportów na plikach `parity/*/reports` i CSV `golden/` w `Packages/HorselyCore/Tests/HorselyCoreTests/ReportsParityTests.swift` (wartości co do grosza i minuty, CSV bajt w bajt: UTF‑8 z BOM, `;`, przecinek, „Łączny czas (min)”, kategorie z programu w tym „Treningi”)
-- [ ] T105 [P] [US5] Test układu wiersza raportu w `Tests/AppSnapshotTests/ReportRowTests.swift` (FR-027/028: „Uwagi” z tekstem „strata; brak ceny zakupu; koń nie sprzedany (wynik bieżący)”, tekst 200 %, szerokość 320 pt)
-- [ ] T106 [P] [US5] `Packages/HorselyCore/Sources/HorselyCore/Reports/` (`CostReport.swift`, `HorseBalance.swift`, `TrainingSummary.swift`, `RiderTrainings.swift`, `RiderCompetitions.swift`, `CsvWriter.swift`, `ReportTexts.swift`, `ChartData.swift`)
-- [ ] T107 [US5] `Packages/HorselyKit/Sources/HorselyKit/Repositories/ReportRepository.swift` (online: `GET /reports/*` z pamięcią ostatnich 20; samodzielny / offline: wyliczenie lokalne z oznaczeniem „z pamięci”)
-- [ ] T108 [US5] `App/Features/Reports/ReportsListView.swift` i pięć ekranów raportów (arkusz filtrów, sumy, karty wierszy z „Więcej szczegółów”, `ViewThatFits` dla wierszy etykieta—wartość)
-- [ ] T109 [P] [US5] `App/Features/Reports/Charts/` (Swift Charts: słupkowy skumulowany po kategoriach, kołowy udziału, postępy z seriami wg `paletteIndex` i kształtami znaczników, legenda, opis dla VoiceOver)
-- [ ] T110 [US5] `App/Features/Reports/Export/PdfReportRenderer.swift` (A4, nagłówek z nazwą „Horsely”, filtrami i datą danych, tabela z sumami, wykresy przez `ImageRenderer`) i eksport CSV/PDF przez `ShareLink` / `fileExporter` z usuwaniem pliku tymczasowego; nazwa domyślna jak w programie; eksport z pamięci z datą pobrania
-- [ ] T111 [US5] Testy migawkowe `Tests/AppSnapshotTests/ReportsSnapshotTests.swift` (Koszty z wykresami, Bilans konia z rozwiniętym wierszem)
+- [X] T104 [P] [US5] Testy raportów na plikach `parity/*/reports` i CSV `golden/` w `Packages/HorselyCore/Tests/HorselyCoreTests/ReportsParityTests.swift` (wartości co do grosza i minuty, CSV bajt w bajt: UTF‑8 z BOM, `;`, przecinek, „Łączny czas (min)”, kategorie z programu w tym „Treningi”)
+- [X] T105 [P] [US5] Test układu wiersza raportu w `Tests/AppSnapshotTests/ReportRowTests.swift` (FR-027/028: „Uwagi” z tekstem „strata; brak ceny zakupu; koń nie sprzedany (wynik bieżący)”, tekst 200 %, szerokość 320 pt)
+- [X] T106 [P] [US5] `Packages/HorselyCore/Sources/HorselyCore/Reports/` (`CostReport.swift`, `HorseBalance.swift`, `TrainingSummary.swift`, `RiderTrainings.swift`, `RiderCompetitions.swift`, `CsvWriter.swift`, `ReportTexts.swift`, `ChartData.swift`) — zrealizowane jako `ReportModels.swift`, `LocalReports.swift`, `ReportTables.swift` (teksty, tabele, CSV) i `ChartData.swift`
+- [X] T107 [US5] `Packages/HorselyKit/Sources/HorselyKit/Repositories/ReportRepository.swift` (online: `GET /reports/*` z pamięcią ostatnich 20; samodzielny / offline: wyliczenie lokalne z oznaczeniem „z pamięci”)
+- [X] T108 [US5] `App/Features/Reports/ReportsListView.swift` i pięć ekranów raportów (arkusz filtrów, sumy, karty wierszy z „Więcej szczegółów”, `ViewThatFits` dla wierszy etykieta—wartość) — lista w `ReportScaffold.swift` (`ReportsListView`), ekrany w `CostReportView.swift`, `HorseBalanceReportView.swift`, `TrainingSummaryReportView.swift`, `RiderReportViews.swift`
+- [X] T109 [P] [US5] `App/Features/Reports/Charts/` (Swift Charts: słupkowy skumulowany po kategoriach, kołowy udziału, postępy z seriami wg `paletteIndex` i kształtami znaczników, legenda, opis dla VoiceOver)
+- [X] T110 [US5] `App/Features/Reports/Export/PdfReportRenderer.swift` (A4, nagłówek z nazwą „Horsely”, filtrami i datą danych, tabela z sumami, wykresy przez `ImageRenderer`) i eksport CSV/PDF przez `ShareLink` / `fileExporter` z usuwaniem pliku tymczasowego; nazwa domyślna jak w programie; eksport z pamięci z datą pobrania
+- [X] T111 [US5] Testy migawkowe `Tests/AppSnapshotTests/ReportsSnapshotTests.swift` (Koszty z wykresami, Bilans konia z rozwiniętym wierszem)
 
 ---
 
