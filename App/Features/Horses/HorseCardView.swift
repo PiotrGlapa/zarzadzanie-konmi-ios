@@ -185,7 +185,7 @@ struct HorseCardView: View {
         VStack(spacing: Spacing.beforeSection) {
             Text("horse_not_found").multilineTextAlignment(.center)
             Button(tr("horse_not_found_back")) { dismiss() }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.primaryFilled)
                 .tint(HorselyColor.primary)
                 .frame(minHeight: Spacing.minTouchTarget)
         }

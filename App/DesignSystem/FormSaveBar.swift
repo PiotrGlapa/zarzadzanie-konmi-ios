@@ -11,7 +11,7 @@ struct FormSaveBar: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity, minHeight: Spacing.minTouchTarget)
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(.primaryFilled)
         .tint(HorselyColor.primary)
         .disabled(isSaving)
         .padding(.horizontal, Spacing.screenEdge)

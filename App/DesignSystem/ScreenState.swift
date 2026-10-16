@@ -32,7 +32,7 @@ struct ScreenStateView<Value, Content: View>: View {
             VStack(spacing: Spacing.between) {
                 Text(message).multilineTextAlignment(.center)
                 Button(tr("common_retry"), action: retry)
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.primaryFilled)
                     .tint(HorselyColor.primary)
                     .frame(minHeight: Spacing.minTouchTarget)
             }

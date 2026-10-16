@@ -51,7 +51,7 @@ struct ModeChoiceView: View {
                 Button(action: next) {
                     Text("mode_choice_next").font(.headline).frame(maxWidth: .infinity, minHeight: Spacing.minTouchTarget)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.primaryFilled)
                 .tint(HorselyColor.primary)
                 .accessibilityIdentifier("mode-next")
 
@@ -131,7 +131,7 @@ private struct NotificationsRationaleView: View {
             } label: {
                 Text("mode_choice_next").font(.headline).frame(maxWidth: .infinity, minHeight: Spacing.minTouchTarget)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.primaryFilled)
             .tint(HorselyColor.primary)
             .disabled(asking)
             .accessibilityIdentifier("notifications-next")

@@ -59,7 +59,7 @@ struct DashboardView: View {
                 } label: {
                     Text("dashboard_add_first_horse_action").font(.headline).frame(maxWidth: .infinity, minHeight: Spacing.minTouchTarget)
                 }
-                .buttonStyle(.borderedProminent)
+                .buttonStyle(.primaryFilled)
                 .tint(HorselyColor.primary)
                 .accessibilityIdentifier("dashboard-add-first-horse")
             }
