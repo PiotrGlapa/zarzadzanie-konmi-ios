@@ -207,13 +207,13 @@ Po tej fazie — pierwsza kompilacja dla grupy „Właściciele” (quickstart �
 
 **Independent Test**: spec.md US4.
 
-- [ ] T097 [P] [US4] Testy filtrów i stopek działów w `Packages/HorselyCore/Tests/HorselyCoreTests/SectionsTests.swift` (okres domyślny 1 stycznia – 31 grudnia, „Wyczyść filtry”, liczba i suma zgodne z programem; „Powtórz zakup” z dzisiejszą datą)
-- [ ] T098 [P] [US4] Testy kontaktów w `Packages/HorselyCore/Tests/HorselyCoreTests/ContactRulesTests.swift` (wyszukiwanie nazwa/telefon/e‑mail, filtr typu bez zarchiwizowanych, `InUse` → „Kontakt jest używany we wpisach — możesz go zarchiwizować”)
-- [ ] T099 [US4] `App/Features/Trainings/TrainingsSectionView.swift` (wszystkie konie, arkusz filtrów okres/koń/rodzaj/trener/jeździec, „Treningów: N · Razem: kwota”, gwiazdki, wysokość przy skokach, „+”)
-- [ ] T100 [P] [US4] `App/Features/Purchases/PurchasesView.swift` (filtry okres/kategoria/dostawca/przypisanie, „Zakupów: N · Razem: kwota”, menu wiersza „Powtórz zakup”/„Usuń”, „+” z przypisaniem „Ogólne (stajnia)”)
-- [ ] T101 [P] [US4] `App/Features/Competitions/CompetitionsView.swift`, `CompetitionDetailView.swift` (lista z liczbą startów i najlepszym miejscem, szczegóły ze startami, „Dodaj start”, „Edytuj”, „Usuń” z komunikatem programu)
-- [ ] T102 [US4] `App/Features/Contacts/ContactsView.swift`, `ContactCardView.swift`, `ContactFormView.swift`: akcje zadzwoń/SMS/e‑mail/nawigacja (Mapy)/kopiuj, historia zakupów z sumą, treningi trenera i jeźdźca, starty jeźdźca, „Archiwizuj”, import przez `CNContactPickerViewController`
-- [ ] T103 [US4] Testy migawkowe `Tests/AppSnapshotTests/SectionsSnapshotTests.swift` (Treningi, Zakupy, Zawody, Kontakty)
+- [X] T097 [P] [US4] Testy filtrów i stopek działów w `Packages/HorselyCore/Tests/HorselyCoreTests/SectionsTests.swift` (okres domyślny 1 stycznia – 31 grudnia, „Wyczyść filtry”, liczba i suma zgodne z programem; „Powtórz zakup” z dzisiejszą datą)
+- [X] T098 [P] [US4] Testy kontaktów w `Packages/HorselyCore/Tests/HorselyCoreTests/ContactRulesTests.swift` (wyszukiwanie nazwa/telefon/e‑mail, filtr typu bez zarchiwizowanych, `InUse` → „Kontakt jest używany we wpisach — możesz go zarchiwizować”)
+- [X] T099 [US4] `App/Features/Trainings/TrainingsSectionView.swift` (wszystkie konie, arkusz filtrów okres/koń/rodzaj/trener/jeździec, „Treningów: N · Razem: kwota”, gwiazdki, wysokość przy skokach, „+”)
+- [X] T100 [P] [US4] `App/Features/Purchases/PurchasesView.swift` (filtry okres/kategoria/dostawca/przypisanie, „Zakupów: N · Razem: kwota”, menu wiersza „Powtórz zakup”/„Usuń”, „+” z przypisaniem „Ogólne (stajnia)”)
+- [X] T101 [P] [US4] `App/Features/Competitions/CompetitionsView.swift`, `CompetitionDetailView.swift` (lista z liczbą startów i najlepszym miejscem, szczegóły ze startami, „Dodaj start”, „Edytuj”, „Usuń” z komunikatem programu)
+- [X] T102 [US4] `App/Features/Contacts/ContactsView.swift`, `ContactCardView.swift`, `ContactFormView.swift`: akcje zadzwoń/SMS/e‑mail/nawigacja (Mapy)/kopiuj, historia zakupów z sumą, treningi trenera i jeźdźca, starty jeźdźca, „Archiwizuj”, import przez `CNContactPickerViewController` _Historia kontaktu i sumy działów liczone z danych w telefonie (w trybie online pełna kopia programu, FR-SYN2-08); przy braku połączenia stopka pokazuje „Podliczenie z pamięci”._
+- [X] T103 [US4] Testy migawkowe `Tests/AppSnapshotTests/SectionsSnapshotTests.swift` (Treningi, Zakupy, Zawody, Kontakty)
 
 ---
 
