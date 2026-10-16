@@ -135,6 +135,22 @@ public final class EntryRepository: Sendable {
         try await perform { $0.delete(type, id: id) }
     }
 
+    /// Licznik zmian magazynu jako strumień — widoki z danymi złożonymi z wielu rekordów odświeżają się, gdy rośnie.
+    public func observeChanges() -> AsyncThrowingStream<Int64, Error> {
+        let store = self.store
+        return AsyncThrowingStream { continuation in
+            let task = Task {
+                do {
+                    for try await counter in store.observeChanges() { continuation.yield(counter) }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
     // MARK: Odczyt
 
     func read<T: Sendable>(_ block: @escaping @Sendable (AccessRecordSource, LocalDate) throws -> T) async throws -> T {

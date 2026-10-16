@@ -95,7 +95,7 @@ final class AppEnvironment {
     /// Pętla odświeżania widoków po zmianach w magazynie; uruchamia ją `RootView`.
     func observeChanges() async {
         do {
-            for try await counter in store.observeChanges() { dataRevision = counter }
+            for try await counter in entries.observeChanges() { dataRevision = counter }
         } catch {
             log.log("storage", "Obserwacja zmian zatrzymana: \(error.localizedDescription)")
         }
