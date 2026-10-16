@@ -285,6 +285,7 @@ public struct RecordAccess {
 
 public enum StoreError: Error, Equatable {
     case corruptRow(String)
+    case notFound(String)
 }
 
 /// Magazyn lokalny rekordów (research R2, R3): jedna tabela rekordów w kształcie eksportu, niepodzielne zapisy, licznik zmian,

@@ -10,6 +10,8 @@ struct LaunchOptions: Equatable, Sendable {
     var fixture: String?
     var today: LocalDate?
     var mode: WorkMode?
+    /// `-UITestReset`: wyczyść zapamiętane ustawienia przed startem (świeża instalacja).
+    var reset = false
 
     init(arguments: [String]) {
         func value(after flag: String) -> String? {
@@ -19,9 +21,10 @@ struct LaunchOptions: Equatable, Sendable {
         fixture = value(after: "-UITestFixture")
         today = value(after: "-UITestToday").flatMap { LocalDate($0) }
         mode = value(after: "-UITestMode").flatMap { WorkMode(rawValue: $0) }
+        reset = arguments.contains("-UITestReset")
     }
 
-    var isTestRun: Bool { fixture != nil || today != nil || mode != nil }
+    var isTestRun: Bool { fixture != nil || today != nil || mode != nil || reset }
 }
 
 /// Kontener zależności aplikacji: magazyn, ustawienia, zegar, dziennik, router, tryb pracy i motyw.
@@ -33,7 +36,11 @@ final class AppEnvironment {
     @ObservationIgnored let log: DiagnosticLog
     @ObservationIgnored let store: RecordStore
     @ObservationIgnored let launchOptions: LaunchOptions
+    @ObservationIgnored let files: LocalFileStore
+    @ObservationIgnored let horses: HorseRepository
     let router = DeepLinkRouter()
+    /// Konie w pamięci aplikacji (lista, kafle, karta) razem z miniaturami zdjęć; uruchamia go `RootView`.
+    let horseDirectory: HorseDirectory
 
     /// Tryb pracy (FR-TRB-01); zapisywany w ustawieniach przy każdej zmianie.
     var workMode: WorkMode {
@@ -48,12 +55,18 @@ final class AppEnvironment {
     var queueCount = 0
     var conflictCount = 0
 
-    init(settings: SettingsStore, dates: any DateProvider, log: DiagnosticLog, store: RecordStore, launchOptions: LaunchOptions = LaunchOptions(arguments: [])) {
+    init(
+        settings: SettingsStore, dates: any DateProvider, log: DiagnosticLog, store: RecordStore, files: LocalFileStore,
+        launchOptions: LaunchOptions = LaunchOptions(arguments: [])
+    ) {
         self.settings = settings
         self.dates = dates
         self.log = log
         self.store = store
         self.launchOptions = launchOptions
+        self.files = files
+        self.horses = HorseRepository(store: store, files: files, dates: dates)
+        self.horseDirectory = HorseDirectory(repository: horses)
         self.workMode = settings.workMode
         self.theme = settings.theme
     }
@@ -72,10 +85,10 @@ final class AppEnvironment {
 
         let settings: SettingsStore
         if options.isTestRun {
-            // Przebieg testowy: ustawienia z osobnego, czyszczonego zestawu, żeby testy nie dziedziczyły stanu.
+            // Przebieg testowy: ustawienia z osobnego zestawu (czyszczonego przy `-UITestReset`), żeby testy nie dziedziczyły stanu.
             let suite = "horsely.uitest"
             let defaults = UserDefaults(suiteName: suite)
-            defaults?.removePersistentDomain(forName: suite)
+            if options.reset { defaults?.removePersistentDomain(forName: suite) }
             settings = SettingsStore(defaults: defaults)
             if let mode = options.mode { settings.workMode = mode }
         } else {
@@ -85,7 +98,22 @@ final class AppEnvironment {
         let database = openDatabase(options: options, directory: directory, log: log)
 
         let dates: any DateProvider = options.today.map { FixedDateProvider(today: $0) } ?? SystemDateProvider()
-        return AppEnvironment(settings: settings, dates: dates, log: log, store: RecordStore(database: database), launchOptions: options)
+        let files = makeFileStore(directory: directory, log: log)
+        return AppEnvironment(settings: settings, dates: dates, log: log, store: RecordStore(database: database), files: files, launchOptions: options)
+    }
+}
+
+/// Pliki załączników w kontenerze App Group; gdy katalog jest niedostępny — w katalogu tymczasowym (dane nie przetrwają).
+private func makeFileStore(directory: URL, log: DiagnosticLog) -> LocalFileStore {
+    do {
+        return try LocalFileStore(root: directory.appendingPathComponent("Files", isDirectory: true))
+    } catch {
+        log.log("storage", "Nie można otworzyć katalogu plików: \(error.localizedDescription)")
+    }
+    do {
+        return try LocalFileStore(root: FileManager.default.temporaryDirectory.appendingPathComponent("horsely-files-\(UUID().uuidString)"))
+    } catch {
+        fatalError("Katalog tymczasowy musi być dostępny: \(error)")
     }
 }
 
@@ -124,7 +152,8 @@ extension AppEnvironment {
     ) -> AppEnvironment {
         let log = DiagnosticLog(directory: FileManager.default.temporaryDirectory.appendingPathComponent("horsely-test-log-\(UUID().uuidString)"))
         let database = try! AppDatabase.inMemory()
-        let environment = AppEnvironment(settings: settings, dates: FixedDateProvider(today: today), log: log, store: RecordStore(database: database))
+        let files = try! LocalFileStore(root: FileManager.default.temporaryDirectory.appendingPathComponent("horsely-test-files-\(UUID().uuidString)"))
+        let environment = AppEnvironment(settings: settings, dates: FixedDateProvider(today: today), log: log, store: RecordStore(database: database), files: files)
         environment.queueCount = queueCount
         environment.conflictCount = conflictCount
         return environment

@@ -73,3 +73,7 @@ public enum RecordCodec {
         return encoder
     }
 }
+
+/// Konie i załączniki jako elementy list SwiftUI (`ForEach`, `List`).
+extension LocalHorse: Identifiable {}
+extension LocalAttachment: Identifiable {}

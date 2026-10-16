@@ -9,18 +9,30 @@ struct RootView: View {
 
     var body: some View {
         @Bindable var router = environment.router
-        TabView(selection: $router.selectedTab) {
-            tab(.dashboard, accent: .dashboard, title: "nav_dashboard", showsAdd: true)
-            tab(.horses, accent: .horses, title: "nav_horses", showsAdd: true)
-            tab(.reminders, accent: .reminders, title: "nav_reminders", showsAdd: true)
-            tab(.trainings, accent: .trainings, title: "nav_trainings", showsAdd: false)
-            MoreView()
-                .tabItem { TabLabel(title: "nav_more", icon: moreIcon) }
-                .badge(environment.queueCount)
-                .tag(AppTab.more)
+        Group {
+            if environment.workMode == .unset {
+                // Pierwsze uruchomienie: najpierw wybór trybu pracy (FR-TRB-02), potem karty.
+                ModeChoiceView()
+            } else {
+                TabView(selection: $router.selectedTab) {
+                    DashboardView()
+                        .tabItem { TabLabel(title: "nav_dashboard", icon: .section(.dashboard)) }
+                        .tag(AppTab.dashboard)
+                    HorsesView()
+                        .tabItem { TabLabel(title: "nav_horses", icon: .section(.horses)) }
+                        .tag(AppTab.horses)
+                    tab(.reminders, accent: .reminders, title: "nav_reminders", showsAdd: true)
+                    tab(.trainings, accent: .trainings, title: "nav_trainings", showsAdd: false)
+                    MoreView()
+                        .tabItem { TabLabel(title: "nav_more", icon: moreIcon) }
+                        .badge(environment.queueCount)
+                        .tag(AppTab.more)
+                }
+                .tint(HorselyColor.primary)
+            }
         }
-        .tint(HorselyColor.primary)
         .preferredColorScheme(environment.theme.colorScheme)
+        .task { await environment.horseDirectory.run() }
         .onOpenURL { url in
             environment.router.handle(url: url, mode: environment.workMode)
         }
