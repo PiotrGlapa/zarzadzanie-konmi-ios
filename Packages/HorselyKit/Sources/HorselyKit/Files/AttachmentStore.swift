@@ -272,7 +272,7 @@ public final class AttachmentStore: Sendable {
     public func attachments(ownerId: String) async throws -> [LocalAttachment] {
         try await store.read { access in
             try access.byOwner(.attachment, ownerId: ownerId).compactMap { try $0.record(as: LocalAttachment.self) }
-                .sorted { ($0.createdAt, $0.id) < ($1.createdAt, $1.id) }
+                .sorted { $0.createdAt != $1.createdAt ? $0.createdAt < $1.createdAt : Self.byName($0, $1) }
         }
     }
 
@@ -280,8 +280,13 @@ public final class AttachmentStore: Sendable {
     public func attachments(horseId: String) async throws -> [LocalAttachment] {
         try await store.read { access in
             try access.query(.attachment, horseId: horseId).compactMap { try $0.record(as: LocalAttachment.self) }
-                .sorted { ($0.createdAt, $0.id) > ($1.createdAt, $1.id) }
+                .sorted { $0.createdAt != $1.createdAt ? $0.createdAt > $1.createdAt : Self.byName($0, $1) }
         }
+    }
+
+    /// Ten sam czas dodania (kilka plików naraz) — alfabetycznie po nazwie, potem po `id`.
+    static func byName(_ lhs: LocalAttachment, _ rhs: LocalAttachment) -> Bool {
+        lhs.fileName != rhs.fileName ? PolishNames.isOrdered(lhs.fileName, before: rhs.fileName) : lhs.id < rhs.id
     }
 
     // MARK: Pliki
