@@ -41,6 +41,13 @@ struct EntryRepositoryTests {
         return input
     }
 
+    private func createNote(_ setup: Setup) async throws -> any LocalRecord {
+        let input = note(setup)
+        let result = try await setup.entries.perform { $0.createNote(input) }
+        guard let record = result.saved?.record else { throw ProblemMismatch() }
+        return record
+    }
+
     @Test func seedingAddsTheDefaultDictionariesOnce() async throws {
         let setup = try await makeSetup()
         defer { try? FileManager.default.removeItem(at: setup.directory) }
@@ -66,10 +73,11 @@ struct EntryRepositoryTests {
     @Test func undoOfAnEditRestoresThePreviousVersion() async throws {
         let setup = try await makeSetup()
         defer { try? FileManager.default.removeItem(at: setup.directory) }
-        let created = try #require(try await setup.entries.perform { [input = note(setup)] in $0.createNote(input) }.saved?.record)
-        let edited = try #require(
-            try await setup.entries.perform { [input = note(setup, title: "Po zmianie"), id = created.id] in $0.updateNote(id: id, input, expectedVersion: 1) }.saved
-        )
+        let created = try await createNote(setup)
+        let changed = note(setup, title: "Po zmianie")
+        let id = created.id
+        let result = try await setup.entries.perform { $0.updateNote(id: id, changed, expectedVersion: 1) }
+        let edited = try #require(result.saved)
         #expect((edited.record as? LocalNote)?.version == 2)
         try await setup.entries.undo(edited.undo)
         let back = try #require(try await setup.entries.record(.note, id: created.id) as? LocalNote)
@@ -93,8 +101,9 @@ struct EntryRepositoryTests {
     @Test func deletingMovesTheEntryToTheTrashAndUndoBringsItBack() async throws {
         let setup = try await makeSetup()
         defer { try? FileManager.default.removeItem(at: setup.directory) }
-        let created = try #require(try await setup.entries.perform { [input = note(setup)] in $0.createNote(input) }.saved?.record)
-        let removed = try #require(try await setup.entries.delete(.note, id: created.id).saved)
+        let created = try await createNote(setup)
+        let result = try await setup.entries.delete(.note, id: created.id)
+        let removed = try #require(result.saved)
         #expect(try await setup.entries.record(.note, id: created.id) == nil)
         #expect(try await setup.store.get(.note, id: created.id)?.isDeleted == true)
         try await setup.entries.undo(removed.undo)
@@ -110,7 +119,9 @@ struct EntryRepositoryTests {
         input.visitDate = today
         input.serviceId = service.id
         input.nextVisitDate = today.adding(days: 42)
-        let saved = try #require(try await setup.entries.perform { [input] in $0.createFarrierVisit(input) }.saved)
+        let visit = input
+        let result = try await setup.entries.perform { $0.createFarrierVisit(visit) }
+        let saved = try #require(result.saved)
         #expect(saved.effects.contains { $0.type == .reminder && $0.kind == .created })
         let open = try await setup.reminders.reminders(ReminderFilter(horseId: setup.horseId))
         #expect(open.count == 1 && open[0].dueDate == today.adding(days: 42))
@@ -121,7 +132,7 @@ struct EntryRepositoryTests {
     @Test func theDashboardAndTimelineReadTheStore() async throws {
         let setup = try await makeSetup()
         defer { try? FileManager.default.removeItem(at: setup.directory) }
-        _ = try await setup.entries.perform { [input = note(setup)] in $0.createNote(input) }
+        _ = try await createNote(setup)
         let dashboard = try await setup.entries.dashboard()
         #expect(dashboard.horses.map(\.name) == ["Grom"])
         #expect(dashboard.recentEntries.count == 1)
@@ -138,7 +149,8 @@ struct EntryRepositoryTests {
         input.kind = .other
         input.dueDate = today.adding(days: 3)
         input.title = "Wizyta"
-        let created = try #require(try await setup.reminders.create(input).saved?.record as? LocalReminder)
+        let createdResult = try await setup.reminders.create(input)
+        let created = try #require(createdResult.saved?.record as? LocalReminder)
         let item = try #require(try await setup.reminders.reminder(id: created.id))
         _ = try await setup.reminders.postpone(item, to: today.adding(days: 10))
         #expect(try await setup.reminders.reminder(id: created.id)?.dueDate == today.adding(days: 10))

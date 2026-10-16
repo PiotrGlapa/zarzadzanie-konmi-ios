@@ -161,6 +161,38 @@ public final class EntryRepository: Sendable {
         }
     }
 
+    /// Wszystkie pozycje słowników (także nieaktywne — istniejące wpisy mogą na nie wskazywać).
+    public func allDictionaryItems() async throws -> [LocalDictionaryItem] {
+        try await read { source, _ in
+            try source.records(.dictionary, as: LocalDictionaryItem.self).sorted { ($0.sortOrder, $0.value) < ($1.sortOrder, $1.value) }
+        }
+    }
+
+    /// Wszystkie kontakty poza koszem (także zarchiwizowane — istniejące wpisy mogą na nie wskazywać), po nazwie.
+    public func allContacts() async throws -> [LocalContact] {
+        try await read { source, _ in
+            try source.records(.contact, as: LocalContact.self).sorted { PolishNames.compare($0.name, $1.name) == .orderedAscending }
+        }
+    }
+
+    /// Zawody poza koszem, najnowsze na początku.
+    public func competitions() async throws -> [LocalCompetition] {
+        try await read { source, _ in
+            try source.records(.competition, as: LocalCompetition.self).sorted { ($0.dateFrom, $0.id) > ($1.dateFrom, $1.id) }
+        }
+    }
+
+    /// „Dodaj kontakt” z formularza wpisu: nowy kontakt o jednym typie. Nazwa wymagana, do 200 znaków (reguły kontaktów
+    /// z fazy US8 zastąpią ten skrót pełnym formularzem).
+    public func addContact(name: String, type: ContactType) async throws -> LocalContact? {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, trimmed.count <= 200 else { return nil }
+        let now = dates.now()
+        let contact = LocalContact(id: UUID().uuidString.lowercased(), createdAt: now, updatedAt: now, version: 1, name: trimmed, types: [type])
+        try await store.upsert([try StoredRecord.of(contact, syncState: .local)])
+        return contact
+    }
+
     /// Konie ostatnio używane we wpisach (najnowsze na początku) — wybór konia w „+”.
     public func recentHorseIds(limit: Int = 8) async throws -> [String] {
         try await read { source, _ in
