@@ -255,9 +255,9 @@ Po tej fazie — pierwsza kompilacja dla grupy „Właściciele” (quickstart �
 
 **Independent Test**: spec.md US7.
 
-- [ ] T118 [P] [US7] Testy planu powiadomień w `Packages/HorselyCore/Tests/HorselyCoreTests/ReminderDigestTests.swift` (przypadki `ReminderDigestTest`: treść „X przeterminowanych, Y na dziś i jutro”, brak powiadomienia bez terminów, dopisek przy danych > 7 dni, „Grom — kowal, dziś”, ukrycie szczegółów, limit ≤ 60 — 14 dni podsumowań + najbliższe terminy, koń kontuzjowany jak aktywny)
-- [ ] T119 [US7] `Packages/HorselyCore/Sources/HorselyCore/Notify/ReminderDigest.swift` i `Packages/HorselyKit/Sources/HorselyKit/Notifications/NotificationScheduler.swift` (`UNCalendarNotificationTrigger`, identyfikatory `daily-…`/`due-…`, przeliczenie po odświeżeniu i akcjach, dotknięcie → `horsely://`)
-- [ ] T120 [US7] `App/Features/Settings/NotificationSettingsView.swift` (włącz/wyłącz z prośbą o zgodę i wyjaśnieniem, godzina, w dniu terminu, ukrywanie szczegółów, instrukcja włączenia zgody po odmowie)
+- [X] T118 [P] [US7] Testy planu powiadomień w `Packages/HorselyCore/Tests/HorselyCoreTests/ReminderDigestTests.swift` (przypadki `ReminderDigestTest`: treść „X przeterminowanych, Y na dziś i jutro”, brak powiadomienia bez terminów, dopisek przy danych > 7 dni, „Grom — kowal, dziś”, ukrycie szczegółów, limit ≤ 60 — 14 dni podsumowań + najbliższe terminy, koń kontuzjowany jak aktywny)
+- [X] T119 [US7] `Packages/HorselyCore/Sources/HorselyCore/Notify/ReminderDigest.swift` i `Packages/HorselyKit/Sources/HorselyKit/Notifications/NotificationScheduler.swift` (`UNCalendarNotificationTrigger`, identyfikatory `daily-…`/`due-…`, przeliczenie po odświeżeniu i akcjach, dotknięcie → `horsely://`) — plan: 14 podsumowań dziennych liczonych na swój dzień + najbliższe terminy (≤ 60), test planisty `NotificationSchedulerTests.swift`
+- [X] T120 [US7] `App/Features/Settings/NotificationSettingsView.swift` (włącz/wyłącz z prośbą o zgodę i wyjaśnieniem, godzina, w dniu terminu, ukrywanie szczegółów, instrukcja włączenia zgody po odmowie)
 
 ---
 
