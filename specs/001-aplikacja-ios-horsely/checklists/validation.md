@@ -10,7 +10,9 @@ właściciel sprawdza całą funkcjonalność na zainstalowanej aplikacji; rozbi
 
 - Android → iOS: pliki utworzone kodem `BackupWriter` Androida 2.0.1 (bez hasła i z hasłem) odtwarzają się w iOS z tymi samymi
   rekordami, koszem i sumami `sha256` plików — test `BackupTests` w CI.
-- iOS → Android: kopie z iOS (artefakt CI `ios-backup`) odtworzone kodem `BackupReader` Androida 2.0.1 — wynik poniżej.
+- iOS → Android: kopie z iOS (artefakt CI `ios-backup`, przebieg 38965677621) odtworzone kodem `BackupReader` Androida 2.0.1
+  jednorazowym testem JVM (2026-10-16): `ios-2.0.1.zkkopia` i `ios-2.0.1-haslo.zkkopia` — format 2, schemat 1.5, 73 rekordy
+  (z koszem) i plik załącznika zgodne co do wersji, partii kosza i `sha256`. **OK**.
 
 ## Wydajność (T137) — do zmierzenia na iPhonie
 

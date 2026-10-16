@@ -295,12 +295,12 @@ Po tej fazie — pierwsza kompilacja dla grupy „Właściciele” (quickstart �
 
 ## Phase 12: Polish & Cross-Cutting
 
-- [ ] T135 [P] Przegląd dostępności wszystkich ekranów (VoiceOver, Dynamic Type do `accessibility5`, kontrast, cele ≥ 44 pt) wg contracts/android/screen-review.md (zasady E1–E8) — wynik w `specs/001-aplikacja-ios-horsely/checklists/accessibility.md`
-- [ ] T136 [P] Test listy zgód `Info.plist` w `Tests/AppSnapshotTests/InfoPlistPolicyTests.swift` (brak lokalizacji, kontaktów, biblioteki zdjęć, `NSAllowsArbitraryLoads`) i test „0 połączeń w trybie samodzielnym” (zaślepka `URLProtocol` zgłasza każde żądanie)
-- [ ] T137 Pomiary wydajności na iPhone 15 Pro wg quickstart.md §6 (dane `parity/duzy`, znaczniki w dzienniku) — wynik w `checklists/validation.md`
-- [ ] T138 Zależność zewnętrzna (repozytorium `zarzadzanie_konmi_android`): plik `fixtures/zrzuty.zkkopia` i test zrzutów Androida na tych samych danych i dacie 2026-10-05; skopiuj PNG do `Tests/Reference/android/` i plik do `fixtures/zrzuty.zkkopia` (contracts/test-fixtures.md)
-- [ ] T139 Zależność zewnętrzna (repozytorium `zarzadzanie_konmi_android`): test odtwarzania kopii utworzonej przez iOS (plik z artefaktu CI iOS) — FR-KOP-09 w obie strony
-- [ ] T140 Porównanie zrzutów iOS z Androidem dla wszystkich ekranów z contracts/test-fixtures.md §2; rozbieżności poprawione albo uzasadnione natywnym komponentem — wynik w `checklists/validation.md`
+- [X] T135 [P] Przegląd dostępności wszystkich ekranów (VoiceOver, Dynamic Type do `accessibility5`, kontrast, cele ≥ 44 pt) wg contracts/android/screen-review.md (zasady E1–E8) — wynik w `specs/001-aplikacja-ios-horsely/checklists/accessibility.md`
+- [X] T136 [P] Test listy zgód `Info.plist` w `Tests/AppSnapshotTests/InfoPlistPolicyTests.swift` (brak lokalizacji, kontaktów, biblioteki zdjęć, `NSAllowsArbitraryLoads`) i test „0 połączeń w trybie samodzielnym” (zaślepka `URLProtocol` zgłasza każde żądanie)
+- [ ] T137 Pomiary wydajności na iPhone 15 Pro wg quickstart.md §6 (dane `parity/duzy`, znaczniki w dzienniku) — wynik w `checklists/validation.md` — **do wykonania na telefonie** (bez Maca nie ma Instruments); procedura w `checklists/validation.md`
+- [X] T138 Zależność zewnętrzna (repozytorium `zarzadzanie_konmi_android`): plik `fixtures/zrzuty.zkkopia` i test zrzutów Androida na tych samych danych i dacie 2026-10-05; skopiuj PNG do `Tests/Reference/android/` i plik do `fixtures/zrzuty.zkkopia` (contracts/test-fixtures.md) — **pominięte na prośbę właściciela** (2026-10-16): funkcjonalność sprawdzana na zainstalowanej aplikacji, rozbieżności — wydanie poprawkowe
+- [X] T139 Zależność zewnętrzna (repozytorium `zarzadzanie_konmi_android`): test odtwarzania kopii utworzonej przez iOS (plik z artefaktu CI iOS) — FR-KOP-09 w obie strony — kopie z artefaktu CI odtworzone kodem `BackupReader` Androida 2.0.1 (jednorazowy test JVM), wynik w `checklists/validation.md`
+- [X] T140 Porównanie zrzutów iOS z Androidem dla wszystkich ekranów z contracts/test-fixtures.md §2; rozbieżności poprawione albo uzasadnione natywnym komponentem — wynik w `checklists/validation.md` — **pominięte na prośbę właściciela** (2026-10-16), patrz `checklists/validation.md`
 - [ ] T141 Lista kontrolna wydania z quickstart.md §7, tag `v2.0.1`, kompilacja w grupie „Właściciele”, zapis daty (przypomnienie po 80 dniach)
 
 ---
