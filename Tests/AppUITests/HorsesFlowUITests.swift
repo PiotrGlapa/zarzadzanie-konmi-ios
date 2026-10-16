@@ -6,6 +6,7 @@ final class HorsesFlowUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    @MainActor
     private func launch() -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = ["-UITestReset", "-UITestMode", "standalone", "-UITestToday", "2026-10-05"]
@@ -13,6 +14,7 @@ final class HorsesFlowUITests: XCTestCase {
         return app
     }
 
+    @MainActor
     private func type(_ text: String, into field: XCUIElement) {
         field.tap()
         field.typeText(text)

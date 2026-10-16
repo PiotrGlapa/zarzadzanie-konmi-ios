@@ -7,6 +7,7 @@ final class WelcomeStandaloneUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    @MainActor
     private func firstLaunch() -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments = ["-UITestReset", "-UITestToday", "2026-10-05"]
