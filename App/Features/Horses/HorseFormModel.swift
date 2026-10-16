@@ -44,16 +44,20 @@ final class HorseFormModel {
     init(horse: LocalHorse?) {
         self.horse = horse
         let draft = horse.map { HorseDraft(horse: $0) } ?? HorseDraft()
+        let interval = String(draft.farrierIntervalWeeks ?? defaultFarrierIntervalWeeks)
+        let purchasePrice = MoneyInput.format(horse?.purchasePrice)
+        let salePrice = MoneyInput.format(horse?.salePrice)
+        let estimatedValue = MoneyInput.format(horse?.estimatedValue)
         self.draft = draft
-        intervalText = String(draft.farrierIntervalWeeks ?? defaultFarrierIntervalWeeks)
-        purchasePriceText = MoneyInput.format(horse?.purchasePrice)
-        salePriceText = MoneyInput.format(horse?.salePrice)
-        estimatedValueText = MoneyInput.format(horse?.estimatedValue)
+        intervalText = interval
+        purchasePriceText = purchasePrice
+        salePriceText = salePrice
+        estimatedValueText = estimatedValue
         purchaseDate = horse?.purchaseDate
         saleDate = horse?.saleDate
         initial = Snapshot(
-            draft: draft, interval: intervalText, purchasePrice: purchasePriceText, salePrice: salePriceText, estimatedValue: estimatedValueText,
-            purchaseDate: purchaseDate, saleDate: saleDate
+            draft: draft, interval: interval, purchasePrice: purchasePrice, salePrice: salePrice, estimatedValue: estimatedValue,
+            purchaseDate: horse?.purchaseDate, saleDate: horse?.saleDate
         )
     }
 
