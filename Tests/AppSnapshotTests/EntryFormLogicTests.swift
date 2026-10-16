@@ -23,14 +23,13 @@ final class EntryFormLogicTests: XCTestCase {
         }
     }
 
-    func testEveryFieldHasAnExistingLabelKey() throws {
-        let url = try XCTUnwrap(Bundle.main.url(forResource: "Localizable", withExtension: "xcstrings"))
-        let text = try String(contentsOf: url, encoding: .utf8)
+    func testEveryFieldHasAnExistingLabelKey() {
         for kind in FormKind.allCases {
             for slot in FormSpec.sections(for: kind).flatMap(\.slots) {
                 let key = slot.field.labelKey(for: kind)
-                XCTAssertTrue(text.contains("\"\(key)\""), "brak tekstu \(key)")
+                XCTAssertNotEqual(tr(key), key, "brak tekstu \(key)")
             }
+            XCTAssertNotEqual(tr(kind.titleKey), kind.titleKey)
         }
     }
 
