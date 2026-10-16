@@ -355,12 +355,26 @@ public enum ReportTables {
             }
         }
         func sum(_ label: String, _ of: [RiderCompetitionStartRow]) -> [ReportValue?] {
-            [.text(label)] + [ReportValue?](repeating: nil, count: columns.count - 4)
-                + [.number(of.reduce(Money.zero) { $0 + ($1.entryFee ?? .zero) }), .number(of.reduce(Money.zero) { $0 + ($1.otherCosts ?? .zero) }),
-                   .number(of.reduce(Money.zero) { $0 + ($1.prizeMoney ?? .zero) })]
+            var fees = Money.zero
+            var other = Money.zero
+            var prizes = Money.zero
+            for start in of {
+                fees = fees + (start.entryFee ?? .zero)
+                other = other + (start.otherCosts ?? .zero)
+                prizes = prizes + (start.prizeMoney ?? .zero)
+            }
+            var cells: [ReportValue?] = [.text(label)]
+            cells += [ReportValue?](repeating: nil, count: columns.count - 4)
+            cells.append(.number(fees))
+            cells.append(.number(other))
+            cells.append(.number(prizes))
+            return cells
         }
         func labelled(_ label: String, _ value: Money) -> [ReportValue?] {
-            [.text(label)] + [ReportValue?](repeating: nil, count: columns.count - 2) + [.number(value)]
+            var cells: [ReportValue?] = [.text(label)]
+            cells += [ReportValue?](repeating: nil, count: columns.count - 2)
+            cells.append(.number(value))
+            return cells
         }
         let all = report.competitions.flatMap(\.starts)
         let totals = report.groups.map { group in

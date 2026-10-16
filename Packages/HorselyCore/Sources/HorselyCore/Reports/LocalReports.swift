@@ -4,6 +4,11 @@ import Foundation
 public struct ReportTargetNotFound: Error, Equatable, Sendable {
     public let what: String
     public let id: String
+
+    public init(what: String, id: String) {
+        self.what = what
+        self.id = id
+    }
 }
 
 /// Okres podsumowania treningów (`TrainingPeriods`).

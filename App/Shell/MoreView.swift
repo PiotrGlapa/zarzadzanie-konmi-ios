@@ -84,6 +84,7 @@ struct MoreView: View {
                 case .purchases: PurchasesView()
                 case .competitions: CompetitionsView()
                 case .contacts: ContactsView()
+                case .reports: ReportsListView()
                 default:
                     MorePlaceholder(titleKey: menu.sections.first { $0.destination == destination }?.titleKey
                         ?? menu.phone.first { $0.destination == destination }?.titleKey ?? "nav_more")

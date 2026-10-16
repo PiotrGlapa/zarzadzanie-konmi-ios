@@ -78,6 +78,7 @@ final class AppEnvironment {
     @ObservationIgnored let resolver: ConflictResolver
     @ObservationIgnored let pairing: PairingService
     @ObservationIgnored let connectionLog: ConnectionLog
+    @ObservationIgnored let reports: ReportRepository
     /// Jeden stan połączenia dla całej aplikacji (pasek, ikonka, podtytuł „Dane z …”).
     let connection: ConnectionStatus
     /// Rozwinięcie i zwinięcie komunikatu o połączeniu — wspólne dla wszystkich ekranów.
@@ -135,6 +136,7 @@ final class AppEnvironment {
         self.outbox = OutboxProcessor(store: store, client: client, capabilities: capabilitiesOf, log: { log.log("queue", $0) })
         self.resolver = ConflictResolver(store: store, client: client, capabilities: capabilitiesOf)
         self.pairing = PairingService(store: store, client: client, secrets: secretStore, files: files)
+        self.reports = ReportRepository(store: store, client: client, mode: currentMode, dates: dates)
     }
 
     /// Przygotowuje magazyn do pracy: w trybie samodzielnym wstawia domyślne słowniki (gdy ich jeszcze nie ma).

@@ -103,13 +103,23 @@ public enum ReportCharts {
             if grouped[row.category!] == nil { order.append(row.category!) }
             grouped[row.category!, default: []].append(row)
         }
-        let categories = order.enumerated()
-            .map { (offset: $0.offset, name: $0.element, rows: grouped[$0.element]!, total: grouped[$0.element]!.reduce(Money.zero) { $0 + $1.costs }) }
-            .sorted { $0.total != $1.total ? $0.total > $1.total : $0.offset < $1.offset }
-        let series = categories.map { category in
-            BarSeries(name: category.name, values: months.map { month in
-                category.rows.filter { ($0.month ?? $0.group) == month }.reduce(Money.zero) { $0 + $1.costs }
-            })
+        var categories: [CategoryGroup] = []
+        for (offset, name) in order.enumerated() {
+            let items = grouped[name] ?? []
+            var total = Money.zero
+            for item in items { total = total + item.costs }
+            categories.append(CategoryGroup(offset: offset, name: name, rows: items, total: total))
+        }
+        categories.sort { $0.total != $1.total ? $0.total > $1.total : $0.offset < $1.offset }
+        var series: [BarSeries] = []
+        for category in categories {
+            var values: [Money] = []
+            for month in months {
+                var sum = Money.zero
+                for row in category.rows where (row.month ?? row.group) == month { sum = sum + row.costs }
+                values.append(sum)
+            }
+            series.append(BarSeries(name: category.name, values: values))
         }
         return StackedBarChart(months: months, series: series)
     }
@@ -197,4 +207,12 @@ public enum ReportPeriod: String, CaseIterable, Sendable {
         case .custom: return nil
         }
     }
+}
+
+/// Kategoria wykresu słupkowego z sumą i kolejnością pierwszego wystąpienia.
+struct CategoryGroup {
+    let offset: Int
+    let name: String
+    let rows: [CostReportRow]
+    let total: Money
 }
