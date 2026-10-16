@@ -32,7 +32,7 @@ final class ReportRowTests: XCTestCase {
             let controller = UIHostingController(rootView: view.tint(HorselyColor.primary))
             assertSnapshot(
                 of: controller,
-                as: .image(drawHierarchyInKeyWindow: true, precision: 0.98, perceptualPrecision: 0.98, size: CGSize(width: 320, height: 1100), traits: variant.traits),
+                as: .image(drawHierarchyInKeyWindow: true, precision: 0.98, perceptualPrecision: 0.98, size: CGSize(width: 320, height: 1400), traits: variant.traits),
                 named: "report-row-expanded-\(variant.rawValue)"
             )
         }
