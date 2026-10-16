@@ -21,8 +21,10 @@ struct RootView: View {
                     HorsesView()
                         .tabItem { TabLabel(title: "nav_horses", icon: .section(.horses)) }
                         .tag(AppTab.horses)
-                    tab(.reminders, accent: .reminders, title: "nav_reminders", showsAdd: true)
-                    tab(.trainings, accent: .trainings, title: "nav_trainings", showsAdd: false)
+                    RemindersView()
+                        .tabItem { TabLabel(title: "nav_reminders", icon: .section(.reminders)) }
+                        .tag(AppTab.reminders)
+                    tab(.trainings, accent: .trainings, title: "nav_trainings")
                     MoreView()
                         .tabItem { TabLabel(title: "nav_more", icon: moreIcon) }
                         .badge(environment.queueCount)
@@ -34,6 +36,30 @@ struct RootView: View {
         .tint(HorselyColor.primary)
         .preferredColorScheme(environment.theme.colorScheme)
         .task { await environment.horseDirectory.run() }
+        .task { await environment.observeChanges() }
+        .task(id: environment.workMode) { await environment.prepareStore() }
+        .onChange(of: environment.router.pendingDestination) { _, destination in
+            if case let .newEntry(kind) = destination {
+                environment.router.pendingDestination = nil
+                if environment.workMode == .standalone { environment.router.entryRequest = EntryRequest(kind: FormKind(linkName: kind)) }
+            }
+        }
+        .sheet(item: $router.entryRequest) { request in
+            NewEntryView(request: request) { saved, edited in
+                environment.router.banner = BannerMessage(text: tr(edited ? "entry_updated" : "common_saved")) {
+                    Task { try? await environment.entries.undo(saved.undo) }
+                }
+            }
+            .environment(environment)
+        }
+        .overlay(alignment: .bottom) {
+            if let banner = environment.router.banner {
+                SaveBanner(message: banner.text, undo: banner.undo) { environment.router.banner = nil }
+                    .id(banner.id)
+                    .padding(.bottom, 56)
+            }
+        }
+        .animation(.default, value: environment.router.banner)
         .onOpenURL { url in
             environment.router.handle(url: url, mode: environment.workMode)
         }
@@ -41,12 +67,9 @@ struct RootView: View {
 
     private var moreIcon: TabIconSource { .named("more_horiz", ColorPair(light: Palette.onSurfaceVariant.light, dark: Palette.onSurfaceVariant.dark)) }
 
-    private func tab(_ value: AppTab, accent: SectionAccent, title: LocalizedStringKey, showsAdd: Bool) -> some View {
+    private func tab(_ value: AppTab, accent: SectionAccent, title: LocalizedStringKey) -> some View {
         NavigationStack {
             TabPlaceholder(title: title)
-                .overlay(alignment: .bottomTrailing) {
-                    if showsAdd { AddEntryButton() }
-                }
         }
         .tabItem { TabLabel(title: title, icon: .section(accent)) }
         .tag(value)
@@ -109,10 +132,12 @@ struct TabLabel: View {
 /// Pływający przycisk „+” (Dodaj wpis) w prawym dolnym rogu nad paskiem kart. Wybór rodzaju wpisu i konia dochodzi w fazie 4.
 struct AddEntryButton: View {
     @Environment(AppEnvironment.self) private var environment
+    /// Prośba otwierana po dotknięciu; domyślnie użytkownik wybiera rodzaj i konia.
+    var request = EntryRequest()
 
     var body: some View {
         Button {
-            environment.router.pendingDestination = .newEntry(kind: "")
+            if environment.workMode == .standalone { environment.router.entryRequest = request.renewed() }
         } label: {
             HIcon(name: "add", size: 28)
                 .foregroundStyle(HorselyColor.onPrimary)

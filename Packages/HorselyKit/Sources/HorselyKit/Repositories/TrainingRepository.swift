@@ -2,7 +2,7 @@ import Foundation
 import HorselyCore
 
 /// Filtr listy treningów konia (FR-M-TRN-02): rodzaj i zakres dat.
-public struct TrainingFilter: Sendable, Equatable {
+public struct TrainingFilter: Sendable, Hashable {
     public var trainingTypeId: String?
     public var from: LocalDate?
     public var to: LocalDate?

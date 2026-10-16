@@ -143,7 +143,7 @@ enum FormField: Hashable, Sendable {
         case .total: []
         case .assignment: ["assignment"]
         case .notes: ["notes"]
-        case .competitionChoice: ["competitionId"]
+        case .competitionChoice: ["competitionId", "name", "dateFrom", "city"]
         case .competitionName: ["name"]
         case .dateFrom: ["dateFrom"]
         case .dateTo: ["dateTo"]

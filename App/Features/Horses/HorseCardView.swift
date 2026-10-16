@@ -1,4 +1,5 @@
 import HorselyCore
+import HorselyKit
 import SwiftUI
 
 /// Karta konia (FR-M-KON-02): nagłówek (miniatura 72 pt, imię, imię stajenne, plakietka statusu, paszport, UELN, chip), przewijane
@@ -29,6 +30,7 @@ struct HorseCardView: View {
     @State private var editing = false
     @State private var showingPhotoSheet = false
     @State private var banner: String?
+    @State private var overview: HorseOverview?
 
     private var directory: HorseDirectory { environment.horseDirectory }
 
@@ -50,13 +52,17 @@ struct HorseCardView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.between) {
                 header(horse)
+                overviewSections
                 tabStrip
-                tabContent
+                tabContent(horse)
             }
             .padding(.horizontal, Spacing.screenEdge)
             .padding(.bottom, Spacing.addButtonClearance)
         }
         .navigationTitle(horse.name)
+        .navigationDestination(for: EntryRoute.self) { route in EntryDetailView(route: route) }
+        .navigationDestination(for: ReminderRoute.self) { route in ReminderDetailView(reminderId: route.id) }
+        .task(id: environment.dataRevision) { overview = try? await environment.entries.overview(horseId: horseId) }
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button(tr("common_edit")) { editing = true }.accessibilityIdentifier("horse-edit")
@@ -170,15 +176,87 @@ struct HorseCardView: View {
         }
     }
 
-    /// Treść zakładek dochodzi w kolejnych fazach (oś czasu, terminy, paszport, treningi, zawody, zakupy — US2; załączniki — US6).
-    private var tabContent: some View {
-        VStack(spacing: Spacing.between) {
+    // MARK: Podsumowanie
+
+    @ViewBuilder
+    private var overviewSections: some View {
+        if let overview {
+            VStack(alignment: .leading, spacing: 0) {
+                SectionHeader("horse_next_reminders")
+                if overview.nextReminders.isEmpty {
+                    Text("horse_no_reminders").font(.subheadline).foregroundStyle(HorselyColor.onSurfaceVariant).padding(.vertical, 4)
+                } else {
+                    VStack(spacing: Spacing.between) {
+                        ForEach(overview.nextReminders) { item in
+                            InfoCard(tone: item.isOverdue ? .warning : .neutral) {
+                                NavigationLink(value: ReminderRoute(id: item.id)) {
+                                    ReminderContent(reminder: item, today: environment.dates.today(), showsHorse: false).contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    }
+                }
+                SectionHeader(LocalizedStringKey(tr("horse_costs_year", overview.year)))
+                InfoCard {
+                    VStack(alignment: .leading, spacing: 4) {
+                        if overview.yearCosts.isEmpty {
+                            Text("horse_costs_none").font(.subheadline)
+                        } else {
+                            ForEach(overview.yearCosts) { cost in
+                                HStack {
+                                    Text(cost.category).font(.subheadline)
+                                    Spacer()
+                                    Text(Formats.money(cost.amount)).font(.subheadline)
+                                }
+                            }
+                            DividerLine(inset: 0)
+                            Text(tr("horse_costs_total", Formats.money(overview.yearTotal))).font(.subheadline.weight(.semibold))
+                        }
+                    }
+                }
+                .accessibilityIdentifier("horse-costs-year")
+                SectionHeader("horse_balance_title")
+                InfoCard {
+                    VStack(spacing: 4) {
+                        balanceRow("horse_balance_purchase", overview.balance.purchase)
+                        balanceRow("horse_balance_costs", overview.balance.costs)
+                        balanceRow("horse_balance_prizes", overview.balance.prizes)
+                        balanceRow("horse_balance_sale", overview.balance.sale)
+                        DividerLine(inset: 0)
+                        balanceRow("horse_balance_result", overview.balance.result, bold: true)
+                    }
+                }
+                .accessibilityIdentifier("horse-balance")
+            }
+        }
+    }
+
+    private func balanceRow(_ title: LocalizedStringKey, _ amount: Money?, bold: Bool = false) -> some View {
+        HStack {
+            Text(title).font(bold ? .subheadline.weight(.semibold) : .subheadline)
+            Spacer()
+            Text(amount.map { Formats.money($0) } ?? Formats.dash).font(bold ? .subheadline.weight(.semibold) : .subheadline)
+        }
+    }
+
+    /// Treść zakładek: oś czasu, terminy, paszport, treningi, zawody, zakupy (US2); załączniki dochodzą w US6.
+    @ViewBuilder
+    private func tabContent(_ horse: LocalHorse) -> some View {
+        switch tab {
+        case .timeline: TimelineTab(horseId: horse.id)
+        case .reminders: RemindersTab(horseId: horse.id)
+        case .passport: PassportTab(horse: horse)
+        case .trainings: TrainingsTab(horseId: horse.id)
+        case .competitions: CompetitionsTab(horseId: horse.id)
+        case .purchases: PurchasesTab(horseId: horse.id)
+        case .attachments:
             Text(LocalizedStringKey(tab.titleKey))
                 .font(.headline)
                 .foregroundStyle(HorselyColor.onSurfaceVariant)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 32)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 32)
     }
 
     private var notFound: some View {

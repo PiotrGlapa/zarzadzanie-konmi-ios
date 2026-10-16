@@ -38,13 +38,21 @@ final class AppEnvironment {
     @ObservationIgnored let launchOptions: LaunchOptions
     @ObservationIgnored let files: LocalFileStore
     @ObservationIgnored let horses: HorseRepository
+    @ObservationIgnored let entries: EntryRepository
+    @ObservationIgnored let reminders: ReminderRepository
+    @ObservationIgnored let trainings: TrainingRepository
     let router = DeepLinkRouter()
+    /// Licznik zmian magazynu — widoki z danymi złożonymi z wielu rekordów (Pulpit, terminy, oś czasu) odświeżają się, gdy rośnie.
+    private(set) var dataRevision: Int64 = 0
     /// Konie w pamięci aplikacji (lista, kafle, karta) razem z miniaturami zdjęć; uruchamia go `RootView`.
     let horseDirectory: HorseDirectory
 
     /// Tryb pracy (FR-TRB-01); zapisywany w ustawieniach przy każdej zmianie.
     var workMode: WorkMode {
-        didSet { settings.workMode = workMode }
+        didSet {
+            settings.workMode = workMode
+            if workMode == .standalone, oldValue != .standalone { Task { await prepareStore() } }
+        }
     }
 
     var theme: ThemeSetting {
@@ -67,8 +75,30 @@ final class AppEnvironment {
         self.files = files
         self.horses = HorseRepository(store: store, files: files, dates: dates)
         self.horseDirectory = HorseDirectory(repository: horses)
+        self.entries = EntryRepository(store: store, dates: dates)
+        self.reminders = ReminderRepository(entries: entries)
+        self.trainings = TrainingRepository(entries: entries)
         self.workMode = settings.workMode
         self.theme = settings.theme
+    }
+
+    /// Przygotowuje magazyn do pracy: w trybie samodzielnym wstawia domyślne słowniki (gdy ich jeszcze nie ma).
+    func prepareStore() async {
+        guard workMode == .standalone else { return }
+        do {
+            try await entries.seedDictionariesIfNeeded()
+        } catch {
+            log.log("storage", "Nie można dodać domyślnych słowników: \(error.localizedDescription)")
+        }
+    }
+
+    /// Pętla odświeżania widoków po zmianach w magazynie; uruchamia ją `RootView`.
+    func observeChanges() async {
+        do {
+            for try await counter in store.observeChanges() { dataRevision = counter }
+        } catch {
+            log.log("storage", "Obserwacja zmian zatrzymana: \(error.localizedDescription)")
+        }
     }
 
     /// Środowisko produkcyjne: baza w kontenerze App Group (a bez niego — w Application Support), dziennik obok.

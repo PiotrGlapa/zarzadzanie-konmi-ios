@@ -37,6 +37,11 @@ public struct UndoStep: Sendable {
 /// przeniesiony do kosza wraca z kosza razem z zależnymi.
 public struct EntryUndo: Sendable {
     let steps: [UndoStep]
+
+    /// Kilka zapisów cofanych razem (kowal „Kilka koni”, start z nowymi zawodami).
+    public static func combine(_ undos: [EntryUndo]) -> EntryUndo {
+        EntryUndo(steps: undos.flatMap(\.steps))
+    }
 }
 
 /// Zapisany wpis: rekord główny (`nil` przy usunięciu), skutki reguł (np. zamknięty termin), ostrzeżenia i cofnięcie.
@@ -46,6 +51,14 @@ public struct EntrySaved: Sendable {
     public let warnings: [String: [String]]
     public let batchId: String?
     public let undo: EntryUndo
+
+    public init(record: (any LocalRecord)?, effects: [RecordEffect], warnings: [String: [String]], batchId: String?, undo: EntryUndo) {
+        self.record = record
+        self.effects = effects
+        self.warnings = warnings
+        self.batchId = batchId
+        self.undo = undo
+    }
 }
 
 public enum EntryResult: Sendable {

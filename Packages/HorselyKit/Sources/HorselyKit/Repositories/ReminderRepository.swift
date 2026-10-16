@@ -2,7 +2,7 @@ import Foundation
 import HorselyCore
 
 /// Filtr listy terminów (FR-M-TER-02): koń, rodzaj, status (domyślnie „Otwarty”) i zakres dat.
-public struct ReminderFilter: Sendable, Equatable {
+public struct ReminderFilter: Sendable, Hashable {
     public var horseId: String?
     public var kind: ReminderKind?
     public var status: ReminderStatus? = .open

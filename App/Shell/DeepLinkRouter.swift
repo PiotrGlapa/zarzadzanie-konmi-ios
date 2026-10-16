@@ -33,6 +33,10 @@ final class DeepLinkRouter {
     var selectedTab: AppTab = .dashboard
     /// Cel do otwarcia przez ekran karty (ekrany reagują na zmianę i zerują wartość po obsłużeniu).
     var pendingDestination: AppDestination?
+    /// Prośba o nowy wpis ("+", szybkie dodawanie, karta konia, adres) — arkusz otwiera `RootView`.
+    var entryRequest: EntryRequest?
+    /// Komunikat u dołu ekranu („Zapisano” z „Cofnij”) niezależny od ekranu, który go wywołał.
+    var banner: BannerMessage?
     /// Cel odłożony do czasu wyboru trybu pracy.
     private(set) var deferredDestination: AppDestination?
 

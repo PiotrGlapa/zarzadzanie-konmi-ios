@@ -80,3 +80,10 @@ public enum RecordCodec {
 /// Konie i załączniki jako elementy list SwiftUI (`ForEach`, `List`).
 extension LocalHorse: Identifiable {}
 extension LocalAttachment: Identifiable {}
+extension LocalContact: Identifiable {}
+extension LocalDictionaryItem: Identifiable {}
+extension LocalCompetition: Identifiable {}
+extension LocalReminder: Identifiable {}
+extension LocalTraining: Identifiable {}
+extension LocalPurchase: Identifiable {}
+extension LocalCompetitionStart: Identifiable {}

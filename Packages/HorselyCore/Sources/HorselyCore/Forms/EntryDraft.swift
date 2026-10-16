@@ -38,6 +38,8 @@ public struct EntryDraft: Equatable, Sendable {
     public var horseId: String?
     /// Kilka koni: kowal „Kilka koni” (osobny wpis na konia) i zakup „kilka koni” (podział kosztu).
     public var horseIds: [String] = []
+    /// Kowal: przełącznik „Kilka koni”.
+    public var manyHorses = false
     public var date: LocalDate?
     public var hour = 12
     public var minute = 0
