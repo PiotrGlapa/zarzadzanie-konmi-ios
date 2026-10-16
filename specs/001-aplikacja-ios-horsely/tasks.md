@@ -240,12 +240,12 @@ Po tej fazie — pierwsza kompilacja dla grupy „Właściciele” (quickstart �
 
 **Independent Test**: spec.md US6.
 
-- [ ] T112 [P] [US6] Testy polityki plików w `Packages/HorselyCore/Tests/HorselyCoreTests/FilePolicyTests.swift` (jpg, png, heic, webp, pdf, docx, xlsx, txt, mp4, mov; maks. 100 MB)
-- [ ] T113 [P] [US6] Testy operacji załączników w `Packages/HorselyKit/Tests/HorselyKitTests/AttachmentOperationTests.swift` (załącznik po swoim wpisie, także z kolejki; licznik przed i po z `sha256`; tryb samodzielny — plik w magazynie, `pinned`)
-- [ ] T114 [US6] `Packages/HorselyKit/Sources/HorselyKit/Files/AttachmentStore.swift` (pliki w App Group, LRU z limitem 200 MB w trybie online, `pinned` dla miniatur i trybu samodzielnego, ostrzeżenie < 500 MB wolnego miejsca) i `Outbox/BackgroundUploader.swift` (sesja w tle `pl.glapa.horsely.upload`, postęp, wznawianie)
-- [ ] T115 [US6] `App/Features/Attachments/AddAttachmentSheet.swift` (aparat, galeria — wiele, pliki; opis), `AttachmentsGrid.swift` (miniatury), `AttachmentViewer.swift` (obraz z powiększaniem, PDF, wideo z przewijaniem, „Zapisz na urządzeniu” / „Udostępnij”, „Usuń” z potwierdzeniem), zakładka „Załączniki” karty konia
-- [ ] T116 [US6] `ShareExtension/ShareFlowView.swift` + `ShareViewController.swift`: kopia plików do App Group strumieniowo, wybór konia i wpisu albo „Nowa notatka”, zapis operacji/rekordu w bazie App Group, komunikaty dla pliku niedozwolonego i trybu nieustawionego (contracts/app-entry-points-ios.md)
-- [ ] T117 [US6] Przetwarzanie plików z rozszerzenia przy otwarciu aplikacji (`App/Shell/SharedInboxProcessor.swift`: zmniejszanie zdjęć, wysyłka)
+- [X] T112 [P] [US6] Testy polityki plików w `Packages/HorselyCore/Tests/HorselyCoreTests/FilePolicyTests.swift` (jpg, png, heic, webp, pdf, docx, xlsx, txt, mp4, mov; maks. 100 MB)
+- [X] T113 [P] [US6] Testy operacji załączników w `Packages/HorselyKit/Tests/HorselyKitTests/AttachmentOperationTests.swift` (załącznik po swoim wpisie, także z kolejki; licznik przed i po z `sha256`; tryb samodzielny — plik w magazynie, `pinned`)
+- [X] T114 [US6] `Packages/HorselyKit/Sources/HorselyKit/Files/AttachmentStore.swift` (pliki w App Group, LRU z limitem 200 MB w trybie online, `pinned` dla miniatur i trybu samodzielnego, ostrzeżenie < 500 MB wolnego miejsca) i `Outbox/BackgroundUploader.swift` (sesja w tle `pl.glapa.horsely.upload`, postęp, wznawianie)
+- [X] T115 [US6] `App/Features/Attachments/AddAttachmentSheet.swift` (aparat, galeria — wiele, pliki; opis), `AttachmentsGrid.swift` (miniatury), `AttachmentViewer.swift` (obraz z powiększaniem, PDF, wideo z przewijaniem, „Zapisz na urządzeniu” / „Udostępnij”, „Usuń” z potwierdzeniem), zakładka „Załączniki” karty konia — sekcja i siatka w `AttachmentsGrid.swift` (także w szczegółach wpisów), podgląd przez QuickLook
+- [X] T116 [US6] `ShareExtension/ShareFlowView.swift` + `ShareViewController.swift`: kopia plików do App Group strumieniowo, wybór konia i wpisu albo „Nowa notatka”, zapis operacji/rekordu w bazie App Group, komunikaty dla pliku niedozwolonego i trybu nieustawionego (contracts/app-entry-points-ios.md) — rozszerzenie czyta bazę tylko do odczytu i zapisuje pozycję skrzynki App Group (`SharedInbox`); załączniki tworzy aplikacja (T117), contracts/app-entry-points-ios.md
+- [X] T117 [US6] Przetwarzanie plików z rozszerzenia przy otwarciu aplikacji (`App/Shell/SharedInboxProcessor.swift`: zmniejszanie zdjęć, wysyłka)
 
 ---
 
