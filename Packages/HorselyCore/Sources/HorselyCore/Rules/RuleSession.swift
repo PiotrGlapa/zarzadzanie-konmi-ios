@@ -167,11 +167,11 @@ final class RuleSession {
     }
 
     func records(_ type: RecordType, horseId: String? = nil) throws -> [any LocalRecord] {
-        try merged(base.query(type, horseId: horseId, from: nil, to: nil, includeDeleted: false), type: type, horseId: horseId, byOwner: nil).map(.record)
+        try merged(base.query(type, horseId: horseId, from: nil, to: nil, includeDeleted: false), type: type, horseId: horseId, byOwner: nil).map { $0.record }
     }
 
     func ownerRecords(_ type: RecordType, _ ownerId: String) throws -> [any LocalRecord] {
-        try merged(base.byOwner(type, ownerId: ownerId, includeDeleted: false), type: type, horseId: nil, byOwner: ownerId).map(.record)
+        try merged(base.byOwner(type, ownerId: ownerId, includeDeleted: false), type: type, horseId: nil, byOwner: ownerId).map { $0.record }
     }
 
     func all<R: LocalRecord>(_ type: RecordType, as _: R.Type = R.self, horseId: String? = nil) throws -> [R] {
