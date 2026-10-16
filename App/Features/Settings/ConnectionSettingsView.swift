@@ -2,7 +2,7 @@ import HorselyCore
 import HorselyKit
 import SwiftUI
 
-/// Pozycje ustawień dostępne od fazy 5: tryb pracy i połączenie z programem (pełny ekran ustawień — US9).
+/// Pozycje ustawień dostępne do tej pory: tryb pracy, powiadomienia i połączenie z programem (pełny ekran ustawień — US9).
 struct SettingsHubView: View {
     @Environment(AppEnvironment.self) private var environment
 
@@ -10,6 +10,8 @@ struct SettingsHubView: View {
         List {
             NavigationLink(value: SettingsDestination.workMode) { Text("work_mode_title") }
                 .accessibilityIdentifier("settings-work-mode")
+            NavigationLink(value: SettingsDestination.notifications) { Text("notif_settings_title") }
+                .accessibilityIdentifier("settings-notifications")
             if environment.workMode == .online {
                 NavigationLink(value: SettingsDestination.connection) { Text("connection_settings_title") }
                     .accessibilityIdentifier("settings-connection")
@@ -23,6 +25,7 @@ struct SettingsHubView: View {
             switch destination {
             case .workMode: WorkModeView()
             case .connection: ConnectionSettingsView()
+            case .notifications: NotificationSettingsView()
             case let .address(id): AddressEditView(addressId: id)
             }
         }
@@ -32,6 +35,7 @@ struct SettingsHubView: View {
 enum SettingsDestination: Hashable {
     case workMode
     case connection
+    case notifications
     /// `nil` — nowy adres.
     case address(String?)
 }

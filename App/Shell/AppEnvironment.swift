@@ -80,6 +80,8 @@ final class AppEnvironment {
     @ObservationIgnored let connectionLog: ConnectionLog
     @ObservationIgnored let reports: ReportRepository
     @ObservationIgnored let attachments: AttachmentStore
+    @ObservationIgnored let notifications: NotificationScheduler
+    @ObservationIgnored private var notificationTask: Task<Void, Never>?
     /// Postęp wysyłki plików do programu (Kolejka wysyłki).
     let uploadProgress: UploadProgress
     /// Jeden stan połączenia dla całej aplikacji (pasek, ikonka, podtytuł „Dane z …”).
@@ -145,6 +147,7 @@ final class AppEnvironment {
         self.resolver = ConflictResolver(store: store, client: client, capabilities: capabilitiesOf)
         self.pairing = PairingService(store: store, client: client, secrets: secretStore, files: files)
         self.reports = ReportRepository(store: store, client: client, mode: currentMode, dates: dates)
+        self.notifications = NotificationScheduler(store: store)
         self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
     }
 
@@ -214,7 +217,10 @@ final class AppEnvironment {
         }
         initialSyncRunning = false
         initialSync = nil
-        if case let .done(_, _, _, at, _) = outcome { connection.dataFrom = at }
+        if case let .done(_, _, _, at, _) = outcome {
+            connection.dataFrom = at
+            rescheduleNotifications()
+        }
         await loadPairingInfo()
     }
 
@@ -276,7 +282,10 @@ final class AppEnvironment {
     /// Pętla odświeżania widoków po zmianach w magazynie; uruchamia ją `RootView`.
     func observeChanges() async {
         do {
-            for try await counter in entries.observeChanges() { dataRevision = counter }
+            for try await counter in entries.observeChanges() {
+                dataRevision = counter
+                rescheduleNotifications()
+            }
         } catch {
             log.log("storage", "Obserwacja zmian zatrzymana: \(error.localizedDescription)")
         }
@@ -401,5 +410,28 @@ final class UploadProgress {
         self.sent = sent
         self.total = total
         if let total, sent >= total { self.operationId = nil }
+    }
+}
+
+extension AppEnvironment {
+    /// Przelicza powiadomienia o terminach (FR-M-POW-03) — po zmianach w magazynie, odświeżeniu i zmianie ustawień. Seria zmian
+    /// (np. pełne pobranie) daje jedno przeliczenie.
+    func rescheduleNotifications() {
+        notificationTask?.cancel()
+        notificationTask = Task {
+            try? await Task.sleep(for: .milliseconds(500))
+            guard !Task.isCancelled else { return }
+            await rescheduleNotificationsNow()
+        }
+    }
+
+    /// Przeliczenie od razu (zadanie w tle, ekran ustawień).
+    func rescheduleNotificationsNow() async {
+        let settings = settings
+        let enabled = settings.notificationsEnabled && workMode != .unset && !launchOptions.isTestRun
+        await notifications.reschedule(
+            enabled: enabled, settings: NotificationPlanSettings(time: settings.notificationsDailyTime, onDueDate: settings.notificationsOnDueDate),
+            hideDetails: settings.notificationsHideDetails, now: Date(), fetchedAt: workMode == .online ? connection.dataFrom : nil
+        )
     }
 }
