@@ -81,6 +81,9 @@ struct MoreView: View {
                 case .queue: QueueView()
                 case .conflicts: ConflictsView()
                 case .settings: SettingsHubView()
+                case .purchases: PurchasesView()
+                case .competitions: CompetitionsView()
+                case .contacts: ContactsView()
                 default:
                     MorePlaceholder(titleKey: menu.sections.first { $0.destination == destination }?.titleKey
                         ?? menu.phone.first { $0.destination == destination }?.titleKey ?? "nav_more")

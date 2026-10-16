@@ -89,6 +89,8 @@ final class AppEnvironment {
     private(set) var initialSync: SyncProgress?
     private(set) var initialSyncRunning = false
     @ObservationIgnored private var onlineStarted = false
+    /// Filtry działów Treningi, Zakupy i Zawody — zapamiętane do zamknięcia aplikacji (US11/5).
+    let sectionFilters: SectionFilters
 
     init(
         settings: SettingsStore, dates: any DateProvider, log: DiagnosticLog, store: RecordStore, files: LocalFileStore,
@@ -109,6 +111,7 @@ final class AppEnvironment {
         self.trainings = TrainingRepository(entries: entries)
         self.workMode = settings.workMode
         self.theme = settings.theme
+        self.sectionFilters = SectionFilters(today: dates.today())
 
         // Bez jawnej grupy: domyślna grupa to pierwsza z `keychain-access-groups` (wspólna z rozszerzeniem).
         let secretStore = secrets ?? KeychainStore()

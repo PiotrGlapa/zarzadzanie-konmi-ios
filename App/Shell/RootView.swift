@@ -25,7 +25,9 @@ struct RootView: View {
                     RemindersView()
                         .tabItem { TabLabel(title: "nav_reminders", icon: .section(.reminders)) }
                         .tag(AppTab.reminders)
-                    tab(.trainings, accent: .trainings, title: "nav_trainings")
+                    TrainingsSectionView()
+                        .tabItem { TabLabel(title: "nav_trainings", icon: .section(.trainings)) }
+                        .tag(AppTab.trainings)
                     MoreView()
                         .tabItem { TabLabel(title: "nav_more", icon: moreIcon) }
                         .badge(environment.queueCount)
