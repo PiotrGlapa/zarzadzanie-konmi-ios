@@ -42,6 +42,7 @@ struct HorsesView: View {
             .background(HorselyColor.background)
             .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle("horses_title")
+            .connectionChrome()
             .navigationBarTitleDisplayMode(.large)
             .searchable(text: $query, prompt: Text("horses_search"))
             .navigationDestination(for: String.self) { id in

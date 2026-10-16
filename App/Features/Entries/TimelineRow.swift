@@ -46,6 +46,7 @@ struct TimelineRow: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(item.title).font(.body.weight(.semibold)).foregroundStyle(HorselyColor.onBackground)
                     Text(subtitle).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant).lineLimit(2)
+                    RecordMarkerLabel(type: item.entryType.recordType, id: item.id)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 VStack(alignment: .trailing, spacing: 2) {

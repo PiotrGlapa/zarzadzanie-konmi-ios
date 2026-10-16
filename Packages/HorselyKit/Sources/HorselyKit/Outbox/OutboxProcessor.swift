@@ -415,7 +415,7 @@ public actor OutboxProcessor {
         var resolved = op
         for depId in op.dependsOn {
             guard let dep = await operation(depId), let resultId = dep.resultId else { return nil }
-            resolved.payload = resolved.payload.replacingStrings(dep.localRef, with: resultId)
+            resolved.payload = resolved.payload.replacingValues(dep.localRef, with: resultId)
             if resolved.recordId == dep.localRef { resolved.recordId = resultId }
         }
         return resolved

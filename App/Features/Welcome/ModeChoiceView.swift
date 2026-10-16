@@ -18,7 +18,7 @@ struct ModeChoiceView: View {
         switch step {
         case .choice: choiceScreen
         case .notifications: NotificationsRationaleView(onContinue: finishStandalone)
-        case .pairing: PairingPendingView(onBack: { step = .choice })
+        case .pairing: PairingFlowView(purpose: .firstRun, onFinish: { step = .choice })
         }
     }
 
@@ -141,27 +141,3 @@ private struct NotificationsRationaleView: View {
     }
 }
 
-/// Parowanie z programem (kod QR, wpis ręczny) dochodzi w fazie 5 (T086); do tego czasu ekran informuje i wraca do wyboru trybu
-/// (FR-TRB-03: przerwane parowanie wraca do wyboru trybu).
-private struct PairingPendingView: View {
-    let onBack: () -> Void
-
-    var body: some View {
-        VStack(spacing: Spacing.beforeSection) {
-            Spacer()
-            Text("pairing_welcome_title").font(.title2.weight(.semibold)).multilineTextAlignment(.center)
-            // Tymczasowy tekst do czasu fazy 5 — nie ma go w `strings.xml` Androida, więc nie trafia do katalogu tekstów.
-            Text(verbatim: "Parowanie z programem pojawi się w następnej wersji aplikacji. Na razie wybierz pracę samodzielną.")
-                .font(.body).foregroundStyle(HorselyColor.onSurfaceVariant).multilineTextAlignment(.center)
-            Spacer()
-            Button(action: onBack) {
-                Text("mode_choice_back").font(.headline).frame(maxWidth: .infinity, minHeight: Spacing.minTouchTarget)
-            }
-            .buttonStyle(.bordered)
-            .tint(HorselyColor.primary)
-            .accessibilityIdentifier("pairing-back")
-        }
-        .padding(Spacing.screenEdge)
-        .background(HorselyColor.background)
-    }
-}

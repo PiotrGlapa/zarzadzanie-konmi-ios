@@ -6,6 +6,7 @@ import UIKit
 /// Treść kart dochodzi w kolejnych fazach; na razie każda karta pokazuje swój tytuł.
 struct RootView: View {
     @Environment(AppEnvironment.self) private var environment
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         @Bindable var router = environment.router
@@ -37,17 +38,43 @@ struct RootView: View {
         .preferredColorScheme(environment.theme.colorScheme)
         .task { await environment.horseDirectory.run() }
         .task { await environment.observeChanges() }
-        .task(id: environment.workMode) { await environment.prepareStore() }
+        .task(id: environment.workMode) {
+            await environment.prepareStore()
+            await environment.startOnline()
+        }
+        .task { await environment.observeQueue() }
+        .onChange(of: environment.connection.problem) { old, new in
+            withAnimation { environment.indicator.problemChanged(from: old, to: new) }
+        }
+        .fullScreenCover(isPresented: $router.showPairing) {
+            PairingFlowView(purpose: .repair) { environment.router.showPairing = false }
+                .environment(environment)
+        }
+        .onChange(of: scenePhase) { _, phase in
+            guard environment.workMode == .online else { return }
+            switch phase {
+            case .active:
+                environment.connection.enterForeground()
+                Task { await environment.refresh(force: false) }
+            case .background:
+                environment.connection.enterBackground()
+            default:
+                break
+            }
+        }
         .onChange(of: environment.router.pendingDestination) { _, destination in
             if case let .newEntry(kind) = destination {
                 environment.router.pendingDestination = nil
-                if environment.workMode == .standalone { environment.router.entryRequest = EntryRequest(kind: FormKind(linkName: kind)) }
+                if environment.workMode != .unset { environment.router.entryRequest = EntryRequest(kind: FormKind(linkName: kind)) }
             }
         }
         .sheet(item: $router.entryRequest) { request in
             NewEntryView(request: request) { saved, edited in
-                environment.router.banner = BannerMessage(text: tr(edited ? "entry_updated" : "common_saved")) {
-                    Task { try? await environment.entries.undo(saved.undo) }
+                Task {
+                    let text = await environment.messageAfterSave(saved, edited: edited)
+                    environment.router.banner = BannerMessage(text: text) {
+                        Task { try? await environment.entries.undo(saved.undo) }
+                    }
                 }
             }
             .environment(environment)
@@ -137,7 +164,7 @@ struct AddEntryButton: View {
 
     var body: some View {
         Button {
-            if environment.workMode == .standalone { environment.router.entryRequest = request.renewed() }
+            if environment.workMode != .unset { environment.router.entryRequest = request.renewed() }
         } label: {
             HIcon(name: "add", size: 28)
                 .foregroundStyle(HorselyColor.onPrimary)

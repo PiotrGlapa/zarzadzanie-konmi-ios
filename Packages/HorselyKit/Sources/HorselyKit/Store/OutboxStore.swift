@@ -305,6 +305,22 @@ extension RecordStore {
             .values(in: database.writer)
     }
 
+    /// Strumień stanu kolejki bez typów GRDB (dla aplikacji).
+    public func queueUpdates() -> AsyncThrowingStream<QueueSnapshot, Error> {
+        let store = self
+        return AsyncThrowingStream { continuation in
+            let task = Task {
+                do {
+                    for try await snapshot in store.observeQueue() { continuation.yield(snapshot) }
+                    continuation.finish()
+                } catch {
+                    continuation.finish(throwing: error)
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
     public func queueSnapshot() async throws -> QueueSnapshot {
         try await read { QueueSnapshot(operations: try $0.operations(), openConflicts: try $0.openConflicts()) }
     }

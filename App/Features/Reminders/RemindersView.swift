@@ -46,6 +46,7 @@ struct RemindersView: View {
             .background(HorselyColor.background)
             .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle("reminders_title")
+            .connectionChrome()
             .navigationBarTitleDisplayMode(.large)
             .navigationDestination(for: String.self) { id in ReminderDetailView(reminderId: id) }
             .toolbar {

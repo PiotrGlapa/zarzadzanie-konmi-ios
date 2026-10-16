@@ -65,6 +65,7 @@ struct ReminderContent: View {
             } else if reminder.status != .open {
                 Text(LocalizedStringKey(reminder.status.labelKey)).font(.footnote.weight(.bold))
             }
+            RecordMarkerLabel(type: .reminder, id: reminder.id)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)

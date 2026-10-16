@@ -159,7 +159,7 @@ public struct ConflictResolver: Sendable {
                     next.localRef = fresh
                     next.baseVersion = nil
                     next.countBefore = nil
-                    next.payload = current.payload.replacingStrings(conflict.recordId, with: fresh)
+                    next.payload = current.payload.replacingValues(conflict.recordId, with: fresh)
                     return next
                 }
                 try access.putConflict(Self.closed(conflict, .keepMine, at: moment))

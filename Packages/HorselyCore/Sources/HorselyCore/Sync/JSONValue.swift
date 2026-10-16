@@ -129,6 +129,16 @@ public enum JSONValue: Hashable, Sendable, Codable {
         }
     }
 
+    /// Zamienia napisy równe `from` (całe wartości) na `to` — podstawienie `id` z programu za odwołanie do rekordu z kolejki.
+    public func replacingValues(_ from: String, with to: String) -> JSONValue {
+        switch self {
+        case let .string(value): value == from ? .string(to) : self
+        case let .array(items): .array(items.map { $0.replacingValues(from, with: to) })
+        case let .object(fields): .object(fields.mapValues { $0.replacingValues(from, with: to) })
+        default: self
+        }
+    }
+
     /// Czy któryś napis zawiera `text`.
     public func containsString(_ text: String) -> Bool {
         switch self {

@@ -29,10 +29,11 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
+                    OnlineDashboardCards()
                     if directory.isLoaded, directory.horses.isEmpty, environment.workMode == .standalone {
                         addFirstHorseCard.padding(.top, Spacing.between)
                     }
-                    if environment.workMode == .standalone, !directory.horses.isEmpty { quickAdd }
+                    if environment.workMode != .unset, !directory.horses.isEmpty { quickAdd }
                     if let dashboard, !directory.horses.isEmpty {
                         reminderAreas(dashboard)
                         costs(dashboard)
@@ -64,6 +65,8 @@ struct DashboardView: View {
             .overlay(alignment: .bottomTrailing) { AddEntryButton() }
             .animation(.default, value: banner)
             .task(id: environment.dataRevision) { await load() }
+            .refreshable { if environment.workMode == .online { await environment.refresh(force: true) } }
+            .connectionChrome()
         }
     }
 

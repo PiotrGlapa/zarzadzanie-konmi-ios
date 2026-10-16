@@ -37,6 +37,8 @@ final class DeepLinkRouter {
     var entryRequest: EntryRequest?
     /// Komunikat u dołu ekranu („Zapisano” z „Cofnij”) niezależny od ekranu, który go wywołał.
     var banner: BannerMessage?
+    /// Ponowne parowanie („Połącz ponownie” w komunikacie o odrzuconym kluczu albo zmienionym certyfikacie).
+    var showPairing = false
     /// Cel odłożony do czasu wyboru trybu pracy.
     private(set) var deferredDestination: AppDestination?
 

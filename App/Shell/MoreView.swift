@@ -75,9 +75,16 @@ struct MoreView: View {
             .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle("nav_more")
             .navigationBarTitleDisplayMode(.large)
+            .connectionChrome()
             .navigationDestination(for: MoreItem.Destination.self) { destination in
-                MorePlaceholder(titleKey: menu.sections.first { $0.destination == destination }?.titleKey
-                    ?? menu.phone.first { $0.destination == destination }?.titleKey ?? "nav_more")
+                switch destination {
+                case .queue: QueueView()
+                case .conflicts: ConflictsView()
+                case .settings: SettingsHubView()
+                default:
+                    MorePlaceholder(titleKey: menu.sections.first { $0.destination == destination }?.titleKey
+                        ?? menu.phone.first { $0.destination == destination }?.titleKey ?? "nav_more")
+                }
             }
         }
     }

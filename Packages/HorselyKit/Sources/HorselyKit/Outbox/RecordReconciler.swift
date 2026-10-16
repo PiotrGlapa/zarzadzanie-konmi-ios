@@ -61,7 +61,7 @@ struct RecordReconciler: Sendable {
             try access.updateOperation(operation.id, expected: Set(OutboxState.allCases)) { current in
                 var next = current
                 let same = current.recordId == from
-                next.payload = current.payload.replacingStrings(from, with: to)
+                next.payload = current.payload.replacingValues(from, with: to)
                 if same {
                     next.recordId = to
                     if current.kind.isChange { next.baseVersion = version }
