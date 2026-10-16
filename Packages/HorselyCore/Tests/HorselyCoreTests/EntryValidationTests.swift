@@ -28,7 +28,7 @@ struct EntryValidationTests {
         var input = VetVisitInput()
         input.horseId = "h"; input.visitTypeId = "t"; input.visitDateTime = LocalDateTime("2026-09-28T10:00:00")
         input.medications = [
-            VetMedicationInput(name: "Lek", startDate: date("2026-09-20"), endDate: date("2026-09-25")),
+            VetMedicationInput(name: "Lek", startDate: date("2026-09-25"), endDate: date("2026-09-20")),
             VetMedicationInput(name: "  "),
         ]
         let report = EntryValidation.vet(input)
