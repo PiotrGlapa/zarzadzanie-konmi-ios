@@ -438,10 +438,7 @@ public actor OutboxProcessor {
             }
             defer { try? FileManager.default.removeItem(at: upload) }
             let request = ApiRequest(.post, "attachments", contentType: "multipart/form-data; boundary=\(MultipartBody.boundary)", bodyFile: upload, idempotencyKey: key, forFile: true)
-            let sink = uploadProgress
-            let operationId = op.id
-            let progress: (@Sendable (Int64, Int64?) -> Void)? = sink.map { report in { sent, total in report(operationId, sent, total) } }
-            return await client.execute(request, progress: progress).map { response in
+            return await client.execute(request, progress: Self.progress(uploadProgress, operationId: op.id)).map { response in
                 let json = response.json
                 let first = json?.arrayValue?.first ?? json
                 return (first?["id"]?.stringValue, first)
@@ -603,6 +600,12 @@ public actor OutboxProcessor {
             return try access.outboxFile(op.id)
         }
         if let file = file ?? nil { Self.release(file) }
+    }
+
+    /// Postęp wysyłki jednej operacji dla `ApiClient` (bajty wysłane, wszystkie).
+    static func progress(_ sink: (@Sendable (String, Int64, Int64?) -> Void)?, operationId: String) -> (@Sendable (Int64, Int64?) -> Void)? {
+        guard let sink else { return nil }
+        return { sent, total in sink(operationId, sent, total) }
     }
 
     static func release(_ file: OutboxFile) {

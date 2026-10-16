@@ -325,7 +325,8 @@ public final class AttachmentStore: Sendable {
             }
             var touched = info
             touched.lastOpenedAt = opened
-            try await store.write { try $0.upsertFile(touched) }
+            let row = touched
+            try await store.write { try $0.upsertFile(row) }
             await evict()
             return files.url(for: info)
         case .failure(.notFound):
