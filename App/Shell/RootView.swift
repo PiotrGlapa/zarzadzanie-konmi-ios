@@ -31,6 +31,7 @@ struct RootView: View {
                 .tint(HorselyColor.primary)
             }
         }
+        .tint(HorselyColor.primary)
         .preferredColorScheme(environment.theme.colorScheme)
         .task { await environment.horseDirectory.run() }
         .onOpenURL { url in

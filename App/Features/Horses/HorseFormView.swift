@@ -28,6 +28,8 @@ struct HorseFormView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
+            .scrollContentBackground(.hidden)
+            .background(HorselyColor.background)
             .navigationTitle(model.isEditing ? "horse_form_title_edit" : "horse_form_title_new")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -62,6 +64,7 @@ struct HorseFormView: View {
                 }
             }
         }
+        .tint(HorselyColor.primary)
         .interactiveDismissDisabled(model.isDirty)
     }
 

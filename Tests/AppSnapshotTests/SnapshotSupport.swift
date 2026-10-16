@@ -43,7 +43,7 @@ extension XCTestCase {
     func assertScreen(
         _ view: some View, name: String, variant: SnapshotVariant, file: StaticString = #filePath, testName: String = #function, line: UInt = #line
     ) {
-        let controller = UIHostingController(rootView: view)
+        let controller = UIHostingController(rootView: view.tint(HorselyColor.primary))
         assertSnapshot(
             of: controller,
             as: .image(drawHierarchyInKeyWindow: true, precision: 0.98, perceptualPrecision: 0.98, size: Self.snapshotSize, traits: variant.traits),
