@@ -279,7 +279,8 @@ public actor OutboxProcessor {
         }
         let expected = op.updatedAt
         let moment = now()
-        guard let sending = try? await store.writeQuietly({ try $0.markSending(op.id, countBefore: countBefore, expectedUpdatedAt: expected, now: moment) }) else { return .next }
+        let counted = countBefore
+        guard let sending = try? await store.writeQuietly({ try $0.markSending(op.id, countBefore: counted, expectedUpdatedAt: expected, now: moment) }) else { return .next }
         var outgoing = sending
         outgoing.payload = resolved.payload
         let result = await execute(outgoing, file: attachment, useKey: useKey)
