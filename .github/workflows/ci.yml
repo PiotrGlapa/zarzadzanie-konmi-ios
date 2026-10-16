@@ -114,7 +114,7 @@ jobs:
             -derivedDataPath build/DerivedData \
             -only-testing:AppUITests \
             -resultBundlePath build/ui-tests.xcresult \
-            $SIMULATOR_SIGNING | tail -n 40
+            $SIMULATOR_SIGNING | tee build/ui-tests.log | tail -n 40 || { grep -E "error:|Test Case .* failed" build/ui-tests.log | sed "s|$GITHUB_WORKSPACE/||" | sort -u | head -n 60; exit 65; }
 
       - name: Wyciągnij zrzuty ekranów z wyników testów UI
         if: env.RUN_UI_TESTS == 'true' && always()

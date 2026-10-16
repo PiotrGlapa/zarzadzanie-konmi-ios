@@ -61,7 +61,7 @@ final class WelcomeStandaloneUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["mode-next"].waitForExistence(timeout: 10))
         app.buttons["mode-next"].tap() // domyślnie „Tak, połącz z programem”
-        let back = app.buttons["pairing-back"]
+        let back = app.buttons["pairing-cancel"]
         XCTAssertTrue(back.waitForExistence(timeout: 5))
         back.tap()
         XCTAssertTrue(app.buttons["mode-online"].waitForExistence(timeout: 5), "przerwane parowanie wraca do wyboru trybu")
