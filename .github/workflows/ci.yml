@@ -97,7 +97,11 @@ jobs:
             -derivedDataPath build/DerivedData \
             -only-testing:AppSnapshotTests \
             -resultBundlePath build/snapshot-tests.xcresult \
-            $SIMULATOR_SIGNING | tail -n 40
+            $SIMULATOR_SIGNING | tee build/snapshot-tests.log | tail -n 40
+
+      - name: Niepowodzenia testów migawkowych (bez zapisów nowych wzorców)
+        if: failure()
+        run: grep -E "error: " build/snapshot-tests.log | grep -v "No reference was found" | sed "s|$GITHUB_WORKSPACE/||" | sort -u | head -40 || true
 
       - name: Testy UI (iPhone 15 Pro, iOS 18)
         if: env.RUN_UI_TESTS == 'true'

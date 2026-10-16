@@ -71,7 +71,7 @@ extension XCTestCase {
         assertSnapshot(
             of: controller,
             as: .image(drawHierarchyInKeyWindow: true, precision: 0.98, perceptualPrecision: 0.98, size: Self.snapshotSize, traits: variant.traits),
-            named: "(name)-(variant.rawValue)",
+            named: "\(name)-\(variant.rawValue)",
             file: file,
             testName: testName,
             line: line
