@@ -86,6 +86,8 @@ final class AppEnvironment {
     @ObservationIgnored private var notificationTask: Task<Void, Never>?
     /// Postęp wysyłki plików do programu (Kolejka wysyłki).
     let uploadProgress: UploadProgress
+    /// Blokada aplikacji (zablokowana od startu, gdy włączona).
+    let appLock: AppLockState
     /// Jeden stan połączenia dla całej aplikacji (pasek, ikonka, podtytuł „Dane z …”).
     let connection: ConnectionStatus
     /// Rozwinięcie i zwinięcie komunikatu o połączeniu — wspólne dla wszystkich ekranów.
@@ -121,6 +123,7 @@ final class AppEnvironment {
         self.workMode = settings.workMode
         self.theme = settings.theme
         self.sectionFilters = SectionFilters(today: dates.today())
+        self.appLock = AppLockState(locked: settings.appLockEnabled && !launchOptions.isTestRun)
 
         // Bez jawnej grupy: domyślna grupa to pierwsza z `keychain-access-groups` (wspólna z rozszerzeniem).
         let secretStore = secrets ?? KeychainStore()

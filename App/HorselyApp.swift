@@ -7,12 +7,20 @@ import UserNotifications
 /// przed końcem uruchamiania (wymóg `BGTaskScheduler`).
 @main
 struct HorselyApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var environment: AppEnvironment
     private let background: BackgroundTasks
     private let notificationDelegate: NotificationDelegate
 
     init() {
         let environment = AppEnvironment.live()
+        #if DEBUG
+        // Testy UI: szybka akcja ikony podana jako argument (`-UITestShortcut <typ>`).
+        let arguments = ProcessInfo.processInfo.arguments
+        if let index = arguments.firstIndex(of: "-UITestShortcut"), arguments.indices.contains(index + 1) {
+            QuickActions.shared.pending = arguments[index + 1]
+        }
+        #endif
         _environment = State(initialValue: environment)
         let settings = environment.settings
         let store = environment.store

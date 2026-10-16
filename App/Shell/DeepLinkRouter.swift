@@ -46,6 +46,12 @@ final class DeepLinkRouter {
         route(Self.destination(for: url), mode: mode)
     }
 
+    /// Szybka akcja ikony aplikacji (nieznany typ — bez zmian).
+    func handle(shortcut type: String, mode: WorkMode) {
+        guard let destination = Self.destination(forShortcut: type) else { return }
+        route(destination, mode: mode)
+    }
+
     func route(_ destination: AppDestination, mode: WorkMode) {
         guard mode != .unset else {
             deferredDestination = destination

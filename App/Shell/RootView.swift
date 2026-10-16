@@ -37,6 +37,13 @@ struct RootView: View {
             }
         }
         .tint(HorselyColor.primary)
+        // Blokada aplikacji (FR-TRB-09): osobne okno nad wszystkim (także nad otwartymi arkuszami) — bez danych na ekranie i w przełączniku.
+        .background(LockWindowHost(environment: environment, locked: environment.appLock.locked, covered: environment.appLock.covered))
+        .alert(tr("app_lock_notice_title"), isPresented: Binding(get: { environment.appLock.notice }, set: { environment.appLock.notice = $0 })) {
+            Button(tr("common_ok")) {}
+        } message: {
+            Text("app_lock_notice_text")
+        }
         .preferredColorScheme(environment.theme.colorScheme)
         .task { await environment.horseDirectory.run() }
         .task { await environment.observeChanges() }
@@ -54,6 +61,7 @@ struct RootView: View {
                 .environment(environment)
         }
         .onChange(of: scenePhase) { _, phase in
+            environment.appLock.sceneChanged(phase, settings: environment.settings)
             if phase == .active { Task { await environment.processSharedInbox() } }
             guard environment.workMode == .online else { return }
             switch phase {
@@ -93,6 +101,11 @@ struct RootView: View {
         .animation(.default, value: environment.router.banner)
         .onOpenURL { url in
             environment.router.handle(url: url, mode: environment.workMode)
+        }
+        .onChange(of: QuickActions.shared.pending, initial: true) { _, type in
+            guard let type else { return }
+            QuickActions.shared.pending = nil
+            environment.router.handle(shortcut: type, mode: environment.workMode)
         }
     }
 

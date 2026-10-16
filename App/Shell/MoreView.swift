@@ -88,6 +88,7 @@ struct MoreView: View {
                 case .trash: TrashView()
                 case .dictionaries: DictionariesView()
                 case .backup: BackupView()
+                case .about: AboutView()
                 default:
                     MorePlaceholder(titleKey: menu.sections.first { $0.destination == destination }?.titleKey
                         ?? menu.phone.first { $0.destination == destination }?.titleKey ?? "nav_more")

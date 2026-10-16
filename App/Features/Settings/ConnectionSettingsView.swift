@@ -2,20 +2,27 @@ import HorselyCore
 import HorselyKit
 import SwiftUI
 
-/// Pozycje ustawień dostępne do tej pory: tryb pracy, powiadomienia i połączenie z programem (pełny ekran ustawień — US9).
+/// Ustawienia (T131, FR-M-UST-00): w tej kolejności — „Połączenie z programem” (tylko online) · „Tryb pracy” · „Powiadomienia” ·
+/// „Blokada aplikacji” · „Dane” · „Wygląd”. „Kopia zapasowa” i „O aplikacji” są w menu „Więcej”.
 struct SettingsHubView: View {
     @Environment(AppEnvironment.self) private var environment
 
     var body: some View {
         List {
-            NavigationLink(value: SettingsDestination.workMode) { Text("work_mode_title") }
-                .accessibilityIdentifier("settings-work-mode")
-            NavigationLink(value: SettingsDestination.notifications) { Text("notif_settings_title") }
-                .accessibilityIdentifier("settings-notifications")
             if environment.workMode == .online {
                 NavigationLink(value: SettingsDestination.connection) { Text("connection_settings_title") }
                     .accessibilityIdentifier("settings-connection")
             }
+            NavigationLink(value: SettingsDestination.workMode) { Text("work_mode_title") }
+                .accessibilityIdentifier("settings-work-mode")
+            NavigationLink(value: SettingsDestination.notifications) { Text("notif_settings_title") }
+                .accessibilityIdentifier("settings-notifications")
+            NavigationLink(value: SettingsDestination.appLock) { Text("app_lock_setting_title") }
+                .accessibilityIdentifier("settings-app-lock")
+            NavigationLink(value: SettingsDestination.data) { Text("data_settings_title") }
+                .accessibilityIdentifier("settings-data")
+            NavigationLink(value: SettingsDestination.appearance) { Text("appearance_settings_title") }
+                .accessibilityIdentifier("settings-appearance")
         }
         .scrollContentBackground(.hidden)
         .background(HorselyColor.background)
@@ -26,6 +33,9 @@ struct SettingsHubView: View {
             case .workMode: WorkModeView()
             case .connection: ConnectionSettingsView()
             case .notifications: NotificationSettingsView()
+            case .appLock: AppLockSettingsView()
+            case .data: DataSettingsView()
+            case .appearance: AppearanceSettingsView()
             case let .address(id): AddressEditView(addressId: id)
             }
         }
@@ -36,6 +46,9 @@ enum SettingsDestination: Hashable {
     case workMode
     case connection
     case notifications
+    case appLock
+    case data
+    case appearance
     /// `nil` — nowy adres.
     case address(String?)
 }
