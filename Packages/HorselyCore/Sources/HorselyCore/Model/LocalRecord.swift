@@ -87,3 +87,8 @@ extension LocalReminder: Identifiable {}
 extension LocalTraining: Identifiable {}
 extension LocalPurchase: Identifiable {}
 extension LocalCompetitionStart: Identifiable {}
+extension LocalVetVisit: Identifiable {}
+extension LocalFarrierVisit: Identifiable {}
+extension LocalPhysioVisit: Identifiable {}
+extension LocalSpecialistVisit: Identifiable {}
+extension LocalNote: Identifiable {}
