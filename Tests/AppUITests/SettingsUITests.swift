@@ -7,6 +7,7 @@ final class SettingsUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    @MainActor
     private func openSettings(_ app: XCUIApplication) {
         let more = app.tabBars.firstMatch.buttons.element(boundBy: 4)
         XCTAssertTrue(more.waitForExistence(timeout: 20))
@@ -17,6 +18,7 @@ final class SettingsUITests: XCTestCase {
     }
 
     /// Pozycje widoczne w ustawieniach, od góry.
+    @MainActor
     private func items(_ app: XCUIApplication, _ identifiers: [String]) -> [String] {
         identifiers
             .compactMap { id -> (String, CGFloat)? in
