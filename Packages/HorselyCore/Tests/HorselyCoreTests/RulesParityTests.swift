@@ -257,6 +257,7 @@ struct RuleScenarioParityTests {
                 failures.append("\(name): wyjątek \(error)")
             }
         }
-        #expect(failures.isEmpty, "\(failures.count) z \(names.count) scenariuszy:\n" + failures.joined(separator: "\n---\n"))
+        let report = failures.joined(separator: "\n---\n")
+        #expect(failures.isEmpty, "\(failures.count) z \(names.count) scenariuszy:\n\(report)")
     }
 }
