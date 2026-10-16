@@ -95,6 +95,7 @@ enum ReportLoad<Report: Sendable> {
     }
 
     /// Wynik repozytorium; błąd (brak odpowiedzi programu i brak danych w pamięci) — komunikat „wymaga połączenia”.
+    @MainActor
     static func run(_ work: () async throws -> ReportResult<Report>) async -> ReportLoad<Report> {
         do {
             let result = try await work()
