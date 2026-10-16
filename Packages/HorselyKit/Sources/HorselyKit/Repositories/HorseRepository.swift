@@ -131,6 +131,8 @@ public final class HorseRepository: Sendable {
     /// „Wybierz z załączników konia”: zdjęciem może być tylko obraz z jego własnych załączników.
     public func choosePhoto(horseId: String, attachmentId: String) async throws {
         let now = dates.now()
+        let online = mode() == .online
+        let moment = Date()
         try await store.write { access in
             guard let stored = try access.get(.horse, id: horseId), !stored.isDeleted, var horse = try stored.record(as: LocalHorse.self) else {
                 throw StoreError.notFound(horseId)
@@ -142,13 +144,15 @@ public final class HorseRepository: Sendable {
             }
             horse.photoAttachmentId = attachmentId
             horse = horse.withAudit(version: horse.version + 1, updatedAt: now)
-            try access.upsert([try StoredRecord.of(horse, syncState: .local)])
+            try Self.writePhotoChange(horse, previous: stored, online: online, access: access, moment: moment)
         }
     }
 
     /// „Usuń zdjęcie”: tylko odpina — plik zostaje w załącznikach konia.
     public func clearPhoto(horseId: String) async throws {
         let now = dates.now()
+        let online = mode() == .online
+        let moment = Date()
         try await store.write { access in
             guard let stored = try access.get(.horse, id: horseId), !stored.isDeleted, var horse = try stored.record(as: LocalHorse.self) else {
                 throw StoreError.notFound(horseId)
@@ -156,7 +160,7 @@ public final class HorseRepository: Sendable {
             guard horse.photoAttachmentId != nil else { return }
             horse.photoAttachmentId = nil
             horse = horse.withAudit(version: horse.version + 1, updatedAt: now)
-            try access.upsert([try StoredRecord.of(horse, syncState: .local)])
+            try Self.writePhotoChange(horse, previous: stored, online: online, access: access, moment: moment)
         }
     }
 
@@ -182,6 +186,20 @@ public final class HorseRepository: Sendable {
     }
 
     // MARK: Pomocnicze
+
+    /// Zmiana zdjęcia konia: w trybie online koń `Pending` i `UpdateRecord` z `photoAttachmentId` w kolejce, w samodzielnym — zapis lokalny.
+    private static func writePhotoChange(_ horse: LocalHorse, previous: StoredRecord, online: Bool, access: RecordAccess, moment: Date) throws {
+        guard online else {
+            try access.upsert([try StoredRecord.of(horse, syncState: .local)])
+            return
+        }
+        let base: Int? = previous.syncState == .synced || previous.syncState == .projected ? previous.version : previous.baseVersion
+        try access.upsert([try StoredRecord.of(horse, syncState: .pending, baseVersion: base)])
+        if let operation = OnlineWrites.operation(.updateRecord, record: horse, previous: previous, baseVersion: base, access: access, now: moment, includePhoto: true) {
+            var applied = OnlineWrites.Applied()
+            try OnlineWrites.queue(operation, access: access, now: moment, into: &applied)
+        }
+    }
 
     private static func horses(in access: RecordAccess) throws -> [LocalHorse] {
         try access.query(.horse).compactMap { try $0.record(as: LocalHorse.self) }

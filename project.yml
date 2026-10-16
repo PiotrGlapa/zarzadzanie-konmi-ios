@@ -71,6 +71,8 @@ targets:
         excludes:
           - Info.plist
           - HorselyShare.entitlements
+      # Teksty ze `strings.xml` (ten sam katalog co aplikacja).
+      - path: App/Resources/Localizable.xcstrings
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely.ShareExtension
@@ -80,6 +82,9 @@ targets:
         GENERATE_INFOPLIST_FILE: NO
         CODE_SIGN_ENTITLEMENTS: ShareExtension/HorselyShare.entitlements
         SKIP_INSTALL: YES
+    dependencies:
+      - package: HorselyCore
+      - package: HorselyKit
 
   AppSnapshotTests:
     type: bundle.unit-test

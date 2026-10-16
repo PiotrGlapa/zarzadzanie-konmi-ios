@@ -82,7 +82,7 @@ struct HorseCardView: View {
                 case let .picked(image):
                     Task {
                         do {
-                            try await environment.horses.setPhoto(horseId: horse.id, image: image)
+                            try await savePhoto(image, horseId: horse.id)
                             banner = tr("photo_saved")
                         } catch {
                             banner = tr("photo_failed")
@@ -104,6 +104,20 @@ struct HorseCardView: View {
             }
         }
         .animation(.default, value: banner)
+    }
+
+    /// Zdjęcie konia: w trybie samodzielnym plik w magazynie; online — załącznik konia w kolejce i zmiana konia z `photoAttachmentId`
+    /// (wysyłka po załączniku).
+    private func savePhoto(_ image: PreparedImage, horseId: String) async throws {
+        guard environment.workMode == .online else {
+            try await environment.horses.setPhoto(horseId: horseId, image: image)
+            return
+        }
+        let store = environment.attachments
+        let file = try await Task.detached { try store.prepare(data: image.jpeg, fileName: "zdjecie.jpg", mimeType: "image/jpeg") }.value
+        guard let id = try await store.add(AttachmentOwner(type: .horse, id: horseId, horseId: horseId), [PendingAttachment(file: file)]).first else { return }
+        try await environment.horses.choosePhoto(horseId: horseId, attachmentId: id)
+        Task { _ = await environment.sendQueue() }
     }
 
     // MARK: Nagłówek
@@ -245,7 +259,7 @@ struct HorseCardView: View {
         }
     }
 
-    /// Treść zakładek: oś czasu, terminy, paszport, treningi, zawody, zakupy (US2); załączniki dochodzą w US6.
+    /// Treść zakładek: oś czasu, terminy, paszport, treningi, zawody, zakupy (US2) i załączniki (US6).
     @ViewBuilder
     private func tabContent(_ horse: LocalHorse) -> some View {
         switch tab {
@@ -255,12 +269,7 @@ struct HorseCardView: View {
         case .trainings: TrainingsTab(horseId: horse.id)
         case .competitions: CompetitionsTab(horseId: horse.id)
         case .purchases: PurchasesTab(horseId: horse.id)
-        case .attachments:
-            Text(LocalizedStringKey(tab.titleKey))
-                .font(.headline)
-                .foregroundStyle(HorselyColor.onSurfaceVariant)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 32)
+        case .attachments: AttachmentsSection(owner: AttachmentOwner(type: .horse, id: horse.id, horseId: horse.id), horseWide: true)
         }
     }
 

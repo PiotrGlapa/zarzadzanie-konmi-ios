@@ -43,6 +43,24 @@ public enum ImagePreparer {
         return try encodeJPEG(image, quality: quality)
     }
 
+    /// Oryginał bez danych lokalizacji („Wysyłaj oryginały” bez „Zachowuj lokalizację”): ten sam format i piksele, metadane bez GPS.
+    /// Gdy formatu nie da się zapisać ponownie, zwraca JPEG w pełnej rozdzielczości.
+    public static func removingLocation(_ data: Data) throws -> Data {
+        guard hasGPS(data) else { return data }
+        let source = try makeSource(data)
+        if let type = CGImageSourceGetType(source) {
+            let output = NSMutableData()
+            if let destination = CGImageDestinationCreateWithData(output, type, 1, nil) {
+                let options: [CFString: Any] = [kCGImageMetadataShouldExcludeGPS: true]
+                var error: Unmanaged<CFError>?
+                if CGImageDestinationCopyImageSource(destination, source, options as CFDictionary, &error) {
+                    return output as Data
+                }
+            }
+        }
+        return try prepare(data, maxSide: try longestSide(of: source), quality: 0.95).jpeg
+    }
+
     /// Czy plik zawiera słownik GPS w metadanych (do testów i kontroli przed wysłaniem).
     public static func hasGPS(_ data: Data) -> Bool {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),

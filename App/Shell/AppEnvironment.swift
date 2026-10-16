@@ -79,6 +79,9 @@ final class AppEnvironment {
     @ObservationIgnored let pairing: PairingService
     @ObservationIgnored let connectionLog: ConnectionLog
     @ObservationIgnored let reports: ReportRepository
+    @ObservationIgnored let attachments: AttachmentStore
+    /// Postęp wysyłki plików do programu (Kolejka wysyłki).
+    let uploadProgress: UploadProgress
     /// Jeden stan połączenia dla całej aplikacji (pasek, ikonka, podtytuł „Dane z …”).
     let connection: ConnectionStatus
     /// Rozwinięcie i zwinięcie komunikatu o połączeniu — wspólne dla wszystkich ekranów.
@@ -90,13 +93,14 @@ final class AppEnvironment {
     private(set) var initialSync: SyncProgress?
     private(set) var initialSyncRunning = false
     @ObservationIgnored private var onlineStarted = false
+    @ObservationIgnored var inboxRunning = false
     /// Filtry działów Treningi, Zakupy i Zawody — zapamiętane do zamknięcia aplikacji (US11/5).
     let sectionFilters: SectionFilters
 
     init(
         settings: SettingsStore, dates: any DateProvider, log: DiagnosticLog, store: RecordStore, files: LocalFileStore,
         launchOptions: LaunchOptions = LaunchOptions(arguments: []), secrets: SecretStore? = nil, transport: ProgramTransport? = nil,
-        probe: ConnectProbe? = nil
+        probe: ConnectProbe? = nil, uploader: BackgroundUploader? = nil
     ) {
         self.settings = settings
         self.dates = dates
@@ -121,7 +125,7 @@ final class AppEnvironment {
         let connectionLog = ConnectionLog(log: log, enabled: { ConnectionLog.isEnabled(until: settings.connectionLogUntil) })
         let capabilitiesOf: @Sendable () async -> ProgramCapabilities = { ProgramCapabilities(serialized: try? await store.meta(SyncMetaKey.capabilities)) }
         let client = ApiClient(
-            addresses: StoreAddressBook(store: store), secrets: secretStore, transport: transport ?? URLSessionTransport(), probe: probe ?? TCPConnectProbe(),
+            addresses: StoreAddressBook(store: store), secrets: secretStore, transport: transport ?? uploader ?? URLSessionTransport(), probe: probe ?? TCPConnectProbe(),
             network: { monitor.conditions }, wifiOnly: { settings.wifiOnly }, capabilities: capabilitiesOf,
             events: { [weak status] event in Task { @MainActor in status?.handle(event) } }, connectionLog: connectionLog
         )
@@ -133,10 +137,15 @@ final class AppEnvironment {
         self.sync = SyncService(client: client, store: store, log: { log.log("sync", $0) }, onRemoved: { refs in
             for ref in refs where ref.type == .attachment { files.delete(attachmentId: ref.id) }
         })
-        self.outbox = OutboxProcessor(store: store, client: client, capabilities: capabilitiesOf, log: { log.log("queue", $0) })
+        let progress = UploadProgress()
+        self.uploadProgress = progress
+        self.outbox = OutboxProcessor(store: store, client: client, capabilities: capabilitiesOf, log: { log.log("queue", $0) }, uploadProgress: { id, sent, total in
+            Task { @MainActor in progress.update(operationId: id, sent: sent, total: total) }
+        })
         self.resolver = ConflictResolver(store: store, client: client, capabilities: capabilitiesOf)
         self.pairing = PairingService(store: store, client: client, secrets: secretStore, files: files)
         self.reports = ReportRepository(store: store, client: client, mode: currentMode, dates: dates)
+        self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
     }
 
     /// Przygotowuje magazyn do pracy: w trybie samodzielnym wstawia domyślne słowniki (gdy ich jeszcze nie ma).
@@ -309,7 +318,11 @@ final class AppEnvironment {
             )
         }
         #endif
-        return AppEnvironment(settings: settings, dates: dates, log: log, store: RecordStore(database: database), files: files, launchOptions: options)
+        // Pliki do programu idą sesją w tle (FR-M-ZAL-04); przebiegi testowe zostają przy zwykłym transporcie.
+        return AppEnvironment(
+            settings: settings, dates: dates, log: log, store: RecordStore(database: database), files: files, launchOptions: options,
+            uploader: options.isTestRun ? nil : BackgroundUploader.shared
+        )
     }
 }
 
@@ -367,5 +380,26 @@ extension AppEnvironment {
         environment.queueCount = queueCount
         environment.conflictCount = conflictCount
         return environment
+    }
+}
+
+/// Postęp wysyłki pliku do programu: operacja, wysłane i wszystkie bajty (Kolejka wysyłki — „Wysyłanie plików do programu”).
+@MainActor
+@Observable
+final class UploadProgress {
+    private(set) var operationId: String?
+    private(set) var sent: Int64 = 0
+    private(set) var total: Int64?
+
+    var fraction: Double? {
+        guard let total, total > 0 else { return nil }
+        return min(Double(sent) / Double(total), 1)
+    }
+
+    func update(operationId: String, sent: Int64, total: Int64?) {
+        self.operationId = operationId
+        self.sent = sent
+        self.total = total
+        if let total, sent >= total { self.operationId = nil }
     }
 }

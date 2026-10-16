@@ -50,6 +50,8 @@ public actor OutboxProcessor {
     private let now: @Sendable () -> Date
     private let newId: @Sendable () -> String
     private let log: @Sendable (String) -> Void
+    /// Postęp wysyłki pliku: identyfikator operacji, wysłane bajty, wszystkie bajty.
+    private let uploadProgress: (@Sendable (String, Int64, Int64?) -> Void)?
     private let reconciler: RecordReconciler
     private let detector: ConflictDetector
     private var tail: Task<Void, Never>?
@@ -57,8 +59,9 @@ public actor OutboxProcessor {
     public init(
         store: RecordStore, client: ApiClient, capabilities: @escaping @Sendable () async -> ProgramCapabilities = { .none },
         now: @escaping @Sendable () -> Date = { Date() }, newId: @escaping @Sendable () -> String = { UUID().uuidString.lowercased() },
-        log: @escaping @Sendable (String) -> Void = { _ in }
+        log: @escaping @Sendable (String) -> Void = { _ in }, uploadProgress: (@Sendable (String, Int64, Int64?) -> Void)? = nil
     ) {
+        self.uploadProgress = uploadProgress
         self.store = store
         self.client = client
         self.capabilities = capabilities
@@ -435,7 +438,10 @@ public actor OutboxProcessor {
             }
             defer { try? FileManager.default.removeItem(at: upload) }
             let request = ApiRequest(.post, "attachments", contentType: "multipart/form-data; boundary=\(MultipartBody.boundary)", bodyFile: upload, idempotencyKey: key, forFile: true)
-            return await client.execute(request).map { response in
+            let sink = uploadProgress
+            let operationId = op.id
+            let progress: (@Sendable (Int64, Int64?) -> Void)? = sink.map { report in { sent, total in report(operationId, sent, total) } }
+            return await client.execute(request, progress: progress).map { response in
                 let json = response.json
                 let first = json?.arrayValue?.first ?? json
                 return (first?["id"]?.stringValue, first)

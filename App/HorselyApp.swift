@@ -19,6 +19,7 @@ struct HorselyApp: App {
         let network = environment.network
         background = BackgroundTasks(
             refresh: { _ in
+                await environment.processSharedInbox()
                 guard settings.workMode == .online else { return true }
                 _ = await outbox.processAll()
                 let hasLocal = ((try? await store.read { try $0.addresses() }) ?? []).contains(where: \.isLocal)
@@ -26,6 +27,7 @@ struct HorselyApp: App {
                 return await sync.refresh(background: true).succeeded
             },
             sync: { _ in
+                await environment.processSharedInbox()
                 guard settings.workMode == .online else { return true }
                 return await outbox.processAll().stopped == nil
             },
@@ -43,5 +45,7 @@ struct HorselyApp: App {
                     await background.scheduleRefresh()
                 }
         }
+        // Sesja wysyłki plików w tle: system budzi aplikację, gdy wysyłka skończy się poza nią — zdarzenia odbiera `BackgroundUploader`.
+        .backgroundTask(.urlSession(BackgroundUploader.identifier)) {}
     }
 }

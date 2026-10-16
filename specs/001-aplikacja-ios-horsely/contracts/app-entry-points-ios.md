@@ -33,10 +33,14 @@ Statyczne `UIApplicationShortcutItems` w `Info.plist` (tytuły z `strings.xml`):
 | `NSExtensionActivationSupportsMovieWithMaxCount` | 5 |
 | `NSExtensionActivationSupportsFileWithMaxCount` | 20 (UTType: PDF, DOCX, XLSX, TXT) |
 
-Przebieg: kopia plików do App Group → wybór konia → wybór wpisu albo „Nowa notatka” → zapis operacji `CreateAttachment`
-(online) lub rekordu załącznika (samodzielny) w bazie App Group → „Gotowe”. Plik niedozwolony lub > 100 MB → komunikat
-(FR-M-ZAL-02). Tryb nieustawiony → „Najpierw otwórz aplikację Horsely i wybierz tryb pracy”. Rozszerzenie nie łączy się
-z siecią; aplikacja przetwarza pliki (zmniejszanie) i wysyła kolejkę przy otwarciu i w tle.
+Przebieg: kopia plików do skrzynki App Group (`Inbox/`, folder roboczy → `manifest.json` → zatwierdzenie zmianą nazwy) → wybór
+konia → wybór wpisu (20 ostatnich z osi czasu konia) albo „Nowa notatka” (tytuł opcjonalny, domyślnie „Załącznik”) → „Gotowe”.
+Plik niedozwolony lub > 100 MB → pominięty z komunikatem (FR-M-ZAL-02). Tryb nieustawiony → „Najpierw otwórz aplikację Horsely
+i wybierz tryb pracy”; tryb online bez parowania → „Najpierw połącz aplikację z programem”. Rozszerzenie czyta bazę tylko do
+odczytu (konie, oś czasu), nie zapisuje do niej i nie łączy się z siecią — zapisuje wyłącznie aplikacja, więc dwa procesy nigdy
+nie piszą do bazy naraz. Aplikacja zamienia pozycje skrzynki w załączniki (operacja `CreateAttachment` online / rekord
+załącznika w trybie samodzielnym; zmniejszanie zdjęć i usuwanie lokalizacji jak przy dodawaniu w aplikacji) przy otwarciu,
+przy powrocie na pierwszy plan i w zadaniach w tle `pl.glapa.horsely.refresh` / `pl.glapa.horsely.sync`, po czym wysyła kolejkę.
 
 ## Akcje wychodzące
 

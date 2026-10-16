@@ -16,6 +16,7 @@ struct RecordReconciler: Sendable {
             let server = response.flatMap { ApiRecordMapping.record(type, from: $0, parentId: op.text("competitionId")) }
             let version = server?.version ?? row?.version ?? 1
             if serverId != localId { try Self.remap(access, sentId: op.id, type: type, from: localId, to: serverId, version: version) }
+            if type == .attachment, serverId != localId { try access.remapFiles(from: localId, to: serverId) }
             if let row {
                 if serverId != localId { try access.deleteHard(type, id: localId) }
                 try access.upsert([try Self.settled(row, server: server, id: serverId, version: version, final: others.isEmpty)])

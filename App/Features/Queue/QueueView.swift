@@ -22,6 +22,7 @@ struct QueueView: View {
             .pickerStyle(.segmented)
             .padding(Spacing.screenEdge)
             if tab == 0 {
+                UploadProgressCard(operations: operations)
                 queueList(operations)
             } else {
                 historyList
@@ -202,6 +203,32 @@ struct QueueRow: View {
         case .sent: "queue_state_sent"
         case .alreadyHandled: "queue_state_already_handled"
         case .conflict: "queue_state_conflict"
+        }
+    }
+}
+
+/// „Wysyłanie plików do programu”: postęp bieżącego pliku i jego numer wśród plików w kolejce (FR-M-ZAL-04).
+struct UploadProgressCard: View {
+    let operations: [OutboxOperation]
+    @Environment(AppEnvironment.self) private var environment
+
+    var body: some View {
+        let files = operations.filter { $0.kind == .createAttachment }
+        if let current = environment.uploadProgress.operationId, let index = files.firstIndex(where: { $0.id == current }) {
+            InfoCard(tone: .neutral) {
+                VStack(alignment: .leading, spacing: Spacing.between) {
+                    Text("attachments_upload_title").font(.subheadline.weight(.semibold))
+                    if let fraction = environment.uploadProgress.fraction {
+                        ProgressView(value: fraction)
+                    } else {
+                        ProgressView()
+                    }
+                    Text(tr("attachments_upload_progress", index + 1, files.count)).font(.footnote)
+                }
+            }
+            .padding(.horizontal, Spacing.screenEdge)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("upload-progress")
         }
     }
 }

@@ -43,6 +43,7 @@ struct RootView: View {
         .task(id: environment.workMode) {
             await environment.prepareStore()
             await environment.startOnline()
+            await environment.processSharedInbox()
         }
         .task { await environment.observeQueue() }
         .onChange(of: environment.connection.problem) { old, new in
@@ -53,6 +54,7 @@ struct RootView: View {
                 .environment(environment)
         }
         .onChange(of: scenePhase) { _, phase in
+            if phase == .active { Task { await environment.processSharedInbox() } }
             guard environment.workMode == .online else { return }
             switch phase {
             case .active:

@@ -100,6 +100,9 @@ struct EntryDetailView: View {
                 ForEach(Array(FormSpec.sections(for: kind).enumerated()), id: \.offset) { _, section in
                     sectionView(section, kind: kind, draft: draft, record: record)
                 }
+                if let owner = Self.attachmentOwner(record) {
+                    AttachmentsSection(owner: owner).padding(.top, Spacing.beforeSection)
+                }
                 actions(record, kind)
                 Color.clear.frame(height: Spacing.addButtonClearance)
             }
@@ -122,6 +125,23 @@ struct EntryDetailView: View {
         } message: {
             Text("entry_delete_message")
         }
+    }
+
+    /// Wpisy, które mogą mieć załączniki (rodzaje właściciela programu).
+    static func attachmentOwner(_ record: any LocalRecord) -> AttachmentOwner? {
+        let type: AttachmentOwnerType
+        switch record.recordType {
+        case .vetVisit: type = .vetVisit
+        case .farrierVisit: type = .farrierVisit
+        case .physioVisit: type = .physioVisit
+        case .specialistVisit: type = .specialistVisit
+        case .competition: type = .competition
+        case .competitionStart: type = .competitionStart
+        case .purchase: type = .purchase
+        case .note: type = .note
+        default: return nil
+        }
+        return AttachmentOwner(type: type, id: record.id, horseId: record.primaryHorseId)
     }
 
     private func startEditing(_ record: any LocalRecord, _ kind: FormKind) {

@@ -12,6 +12,11 @@ public final class AppDatabase: Sendable {
         try AppDatabase.migrator().migrate(writer)
     }
 
+    /// Bez migracji — baza otwarta tylko do odczytu (`openReadOnly`).
+    init(readOnly reader: any DatabaseWriter) {
+        self.writer = reader
+    }
+
     /// Baza w pliku `Horsely/horsely.sqlite` w podanym katalogu (w aplikacji — kontener App Group).
     public static func open(in directory: URL) throws -> AppDatabase {
         let folder = directory.appendingPathComponent("Horsely", isDirectory: true)
