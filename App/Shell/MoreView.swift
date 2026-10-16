@@ -89,9 +89,6 @@ struct MoreView: View {
                 case .dictionaries: DictionariesView()
                 case .backup: BackupView()
                 case .about: AboutView()
-                default:
-                    MorePlaceholder(titleKey: menu.sections.first { $0.destination == destination }?.titleKey
-                        ?? menu.phone.first { $0.destination == destination }?.titleKey ?? "nav_more")
                 }
             }
         }
@@ -132,16 +129,5 @@ struct MoreRow: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("more-\(item.destination.rawValue)")
-    }
-}
-
-/// Tymczasowy ekran pozycji menu (treść w kolejnych fazach).
-private struct MorePlaceholder: View {
-    let titleKey: String
-
-    var body: some View {
-        HorselyColor.background
-            .navigationTitle(LocalizedStringKey(titleKey))
-            .navigationBarTitleDisplayMode(.inline)
     }
 }
