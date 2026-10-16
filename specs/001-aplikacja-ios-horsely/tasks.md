@@ -101,24 +101,24 @@ zielonym przebiegiem CI (`gh run watch`), nie lokalnym uruchomieniem.
 
 ### Testy US1
 
-- [ ] T038 [P] [US1] Testy walidacji konia w `Packages/HorselyCore/Tests/HorselyCoreTests/HorseRulesTests.swift`: „Numer paszportu wymagany, chyba że zaznaczono Źrebak”, unikalność paszportu, unikalne imię źrebaka bez paszportu (`409` → błąd przy imieniu), `farrierIntervalWeeks` 1–26, `Deceased` → `salePrice = 0`, przejścia `Active`↔`Injured` — teksty komunikatów z plików `parity`
-- [ ] T039 [P] [US1] Test wyszukiwania koni w `Packages/HorselyCore/Tests/HorselyCoreTests/HorseSearchTests.swift` (imię, paszport, imię stajenne; bez wielkości liter i polskich znaków; domyślnie aktywne i kontuzjowane; filtry Aktywny/Kontuzjowany/Wszystkie/Źrebięta)
-- [ ] T040 [P] [US1] Test UI w `Tests/AppUITests/WelcomeStandaloneUITests.swift`: ekran wyboru trybu (domyślnie „Tak, połącz z programem”), „Nie, używaj samodzielnie” → Pulpit „Dodaj pierwszego konia”, ponowne uruchomienie → Pulpit
-- [ ] T041 [P] [US1] Test kadrowania w `Tests/AppSnapshotTests/PhotoCropTests.swift` (kwadrat, obrót 90°, wynik bez GPS)
+- [X] T038 [P] [US1] Testy walidacji konia w `Packages/HorselyCore/Tests/HorselyCoreTests/HorseRulesTests.swift`: „Numer paszportu wymagany, chyba że zaznaczono Źrebak”, unikalność paszportu, unikalne imię źrebaka bez paszportu (`409` → błąd przy imieniu), `farrierIntervalWeeks` 1–26, `Deceased` → `salePrice = 0`, przejścia `Active`↔`Injured` — teksty komunikatów z plików `parity`
+- [X] T039 [P] [US1] Test wyszukiwania koni w `Packages/HorselyCore/Tests/HorselyCoreTests/HorseSearchTests.swift` (imię, paszport, imię stajenne; bez wielkości liter i polskich znaków; domyślnie aktywne i kontuzjowane; filtry Aktywny/Kontuzjowany/Wszystkie/Źrebięta)
+- [X] T040 [P] [US1] Test UI w `Tests/AppUITests/WelcomeStandaloneUITests.swift`: ekran wyboru trybu (domyślnie „Tak, połącz z programem”), „Nie, używaj samodzielnie” → Pulpit „Dodaj pierwszego konia”, ponowne uruchomienie → Pulpit
+- [X] T041 [P] [US1] Test kadrowania w `Packages/HorselyKit/Tests/HorselyKitTests/PhotoCropTests.swift` (kwadrat, obrót 90°, wynik bez GPS; w pakiecie, bo ImageIO działa w `swift test` bez symulatora)
 
 ### Implementacja US1
 
-- [ ] T042 [P] [US1] `Packages/HorselyCore/Sources/HorselyCore/Rules/HorseRules.swift` (walidacja i skutki zapisu konia; komunikaty programu)
-- [ ] T043 [P] [US1] `Packages/HorselyCore/Sources/HorselyCore/Rules/HorseSearch.swift` (normalizacja polskich znaków jak `HorseSearch.kt`)
-- [ ] T044 [US1] `Packages/HorselyKit/Sources/HorselyKit/Repositories/HorseRepository.swift`: zapis konia w trybie samodzielnym (transakcja, `Local`, `version`+1), lista z filtrami, miniatury
-- [ ] T045 [US1] `App/Features/Welcome/ModeChoiceView.swift`: wariant B (tytuł pełna nazwa, opcje z opisami, „Dalej”, „Zmienisz to w Ustawieniach → Tryb pracy”, „Odtwórz z kopii zapasowej” po wyborze samodzielnego — akcja podpinana w US8); zgoda na powiadomienia z wyjaśnieniem
-- [ ] T046 [US1] `App/Features/Horses/HorsesView.swift` + `HorsesViewModel.swift`: wyszukiwanie, chipy Aktywny · Kontuzjowany · Pokaż wszystkie · Tylko źrebięta, wiersz (miniatura 40 pt, imię, „imię stajenne”, podtytuł paszportu, `InjuredBadge`), „Dodaj konia” na końcu listy, VoiceOver „<imię>, kontuzjowany”
-- [ ] T047 [US1] `App/Features/Horses/HorseFormView.swift` + model: sekcje Podstawowe · Szczegóły · „Kwoty konia (ocena własna)”, pola z FR-M-KON-03, status z datą i notatką (w tym „Kontuzjowany”), pole „Zdjęcie”, potwierdzenie porzucenia zmian
-- [ ] T048 [US1] `App/Features/Horses/HorseCardView.swift`: nagłówek (miniatura 72 pt, imię, imię stajenne, plakietka statusu, paszport, UELN, chip), przewijane zakładki Oś czasu · Terminy · Paszport · Treningi · Zawody · Zakupy · Załączniki (treść zakładek dopełniana w US2/US4/US6), „Nie znaleziono konia” z „Wróć”
-- [ ] T049 [P] [US1] `Packages/HorselyKit/Sources/HorselyKit/Files/ImagePreparer.swift`: zmniejszanie do 2560 px, JPEG 85 %, usuwanie GPS (ImageIO), miniatury
-- [ ] T050 [US1] `App/Features/Horses/HorsePhotoSheet.swift` + `PhotoCropView.swift`: „Zrób zdjęcie”, „Wybierz z telefonu” (`PhotosPicker`), „Wybierz z załączników konia”, „Pokaż zdjęcie”, „Usuń zdjęcie” (z potwierdzeniem); kadrowanie z gestami i obrotem; poprzednie zdjęcie zostaje w załącznikach (FR-ZDK-03)
-- [ ] T051 [US1] `App/Features/Dashboard/DashboardView.swift` (część koni): karta „Dodaj pierwszego konia”, kafle po 2 w rzędzie (równa wysokość, treść do góry, miniatura 40 pt, imię stajenne, „bez paszportu od X mies.” z tłem ostrzegawczym od 12 mies., ikona `healing` 24 pt w prawym górnym rogu kontuzjowanego), kafel → karta konia
-- [ ] T052 [US1] Testy migawkowe `Tests/AppSnapshotTests/HorsesSnapshotTests.swift` (lista, karta, kafle; jasny/ciemny/XXXL; dane `zrzuty`)
+- [X] T042 [P] [US1] `Packages/HorselyCore/Sources/HorselyCore/Rules/HorseRules.swift` (walidacja i skutki zapisu konia; komunikaty programu)
+- [X] T043 [P] [US1] `Packages/HorselyCore/Sources/HorselyCore/Rules/HorseSearch.swift` (normalizacja polskich znaków jak `HorseSearch.kt`)
+- [X] T044 [US1] `Packages/HorselyKit/Sources/HorselyKit/Repositories/HorseRepository.swift`: zapis konia w trybie samodzielnym (transakcja, `Local`, `version`+1), lista z filtrami, miniatury
+- [X] T045 [US1] `App/Features/Welcome/ModeChoiceView.swift`: wariant B (tytuł pełna nazwa, opcje z opisami, „Dalej”, „Zmienisz to w Ustawieniach → Tryb pracy”, „Odtwórz z kopii zapasowej” po wyborze samodzielnego — akcja podpinana w US8); zgoda na powiadomienia z wyjaśnieniem
+- [X] T046 [US1] `App/Features/Horses/HorsesView.swift` + `HorsesViewModel.swift`: wyszukiwanie, chipy Aktywny · Kontuzjowany · Pokaż wszystkie · Tylko źrebięta, wiersz (miniatura 40 pt, imię, „imię stajenne”, podtytuł paszportu, `InjuredBadge`), „Dodaj konia” na końcu listy, VoiceOver „<imię>, kontuzjowany”
+- [X] T047 [US1] `App/Features/Horses/HorseFormView.swift` + model: sekcje Podstawowe · Szczegóły · „Kwoty konia (ocena własna)”, pola z FR-M-KON-03, status z datą i notatką (w tym „Kontuzjowany”), pole „Zdjęcie”, potwierdzenie porzucenia zmian
+- [X] T048 [US1] `App/Features/Horses/HorseCardView.swift`: nagłówek (miniatura 72 pt, imię, imię stajenne, plakietka statusu, paszport, UELN, chip), przewijane zakładki Oś czasu · Terminy · Paszport · Treningi · Zawody · Zakupy · Załączniki (treść zakładek dopełniana w US2/US4/US6), „Nie znaleziono konia” z „Wróć”
+- [X] T049 [P] [US1] `Packages/HorselyKit/Sources/HorselyKit/Files/ImagePreparer.swift`: zmniejszanie do 2560 px, JPEG 85 %, usuwanie GPS (ImageIO), miniatury
+- [X] T050 [US1] `App/Features/Horses/HorsePhotoSheet.swift` + `PhotoCropView.swift`: „Zrób zdjęcie”, „Wybierz z telefonu” (`PhotosPicker`), „Wybierz z załączników konia” (na karcie konia; w formularzu pozostałe akcje), „Pokaż zdjęcie”, „Usuń zdjęcie” (z potwierdzeniem); kadrowanie z gestami i obrotem; poprzednie zdjęcie zostaje w załącznikach (FR-ZDK-03)
+- [X] T051 [US1] `App/Features/Dashboard/DashboardView.swift` (część koni): karta „Dodaj pierwszego konia”, kafle po 2 w rzędzie (równa wysokość, treść do góry, miniatura 40 pt, imię stajenne, „bez paszportu od X mies.” z tłem ostrzegawczym od 12 mies., ikona `healing` 24 pt w prawym górnym rogu kontuzjowanego), kafel → karta konia
+- [X] T052 [US1] Testy migawkowe `Tests/AppSnapshotTests/HorsesSnapshotTests.swift` (lista, karta, kafle; jasny/ciemny/XXXL; dane `zrzuty`)
 
 **Checkpoint**: US1 działa samodzielnie bez sieci.
 
