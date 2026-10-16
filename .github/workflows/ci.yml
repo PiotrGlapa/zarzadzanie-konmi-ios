@@ -84,6 +84,10 @@ jobs:
             $SIMULATOR_SIGNING | tee build/build.log | tail -n 40
         shell: bash
 
+      - name: Błędy kompilacji (z pełnego dziennika)
+        if: failure()
+        run: grep -E "error:" build/build.log | sed "s|$GITHUB_WORKSPACE/||" | sort -u | head -60 || true
+
       - name: Testy migawkowe i zgodności tekstów (AppSnapshotTests)
         run: |
           set -o pipefail
