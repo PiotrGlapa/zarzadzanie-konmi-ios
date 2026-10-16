@@ -1,4 +1,5 @@
 import HorselyCore
+import HorselyKit
 import SwiftUI
 import UserNotifications
 
@@ -13,6 +14,7 @@ struct ModeChoiceView: View {
 
     @State private var choice: Choice = .online
     @State private var step: Step = .choice
+    @State private var restoring = false
 
     var body: some View {
         switch step {
@@ -38,13 +40,12 @@ struct ModeChoiceView: View {
                 .accessibilityLabel(tr("mode_choice_group"))
 
                 if choice == .standalone {
-                    // Odtwarzanie kopii dochodzi w zadaniu T127 (US8); do tego czasu przycisk jest nieaktywny.
-                    Button {} label: {
+                    // Odtworzenie kopii (także z Androida) od razu kończy wybór: tryb samodzielny z danymi z kopii.
+                    Button { restoring = true } label: {
                         Text("mode_choice_restore").frame(maxWidth: .infinity, minHeight: Spacing.minTouchTarget)
                     }
                     .buttonStyle(.bordered)
                     .tint(HorselyColor.primary)
-                    .disabled(true)
                     .accessibilityIdentifier("mode-restore")
                 }
 
@@ -63,6 +64,9 @@ struct ModeChoiceView: View {
             .padding(Spacing.screenEdge)
         }
         .background(HorselyColor.background)
+        .sheet(isPresented: $restoring) {
+            RestoreBackupFlow { finishStandalone() }.environment(environment)
+        }
     }
 
     private func optionRow(_ option: Choice, title: LocalizedStringKey, hint: LocalizedStringKey) -> some View {
@@ -103,6 +107,8 @@ struct ModeChoiceView: View {
     }
 
     private func finishStandalone() {
+        // Pierwsza kopia ma 7 dni na pierwsze dane (jak w Androidzie) — przypomnienie nie pojawia się od razu.
+        environment.settings.backupReminderSnoozedUntil = BackupPolicy.stamp(Date().addingTimeInterval(BackupPolicy.interval))
         environment.workMode = .standalone
         environment.router.resumeDeferred(mode: .standalone)
     }

@@ -30,6 +30,7 @@ struct DashboardView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     OnlineDashboardCards()
+                    BackupReminderCard()
                     if directory.isLoaded, directory.horses.isEmpty, environment.workMode == .standalone {
                         addFirstHorseCard.padding(.top, Spacing.between)
                     }

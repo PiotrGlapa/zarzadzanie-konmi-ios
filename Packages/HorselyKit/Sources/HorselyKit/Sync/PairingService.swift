@@ -218,4 +218,20 @@ public struct PairingService: Sendable {
         }
         if let files { for id in attachmentIds { files.delete(attachmentId: id) } }
     }
+
+    /// Przejście online → samodzielny (T129, FR-TRB-06): dane z programu zostają w telefonie jako punkt startowy (rekordy `Local`,
+    /// pliki załączników przypięte — poza limitem miejsca), niewysłane operacje i konflikty znikają, a z nimi adresy, stan pobierania
+    /// i klucz API. Jedna transakcja.
+    public func switchToStandalone() async throws {
+        try await store.write { access in
+            access.state.dirty = true
+            try access.db.execute(sql: "UPDATE local_record SET syncState = ?, baseVersion = NULL", arguments: [SyncState.local.rawValue])
+            try access.db.execute(sql: "UPDATE local_file SET pinned = 1")
+            try access.clearQueue()
+            try access.clearConflicts()
+            try access.clearAddresses()
+            try access.clearSyncState()
+        }
+        try? secrets.delete()
+    }
 }

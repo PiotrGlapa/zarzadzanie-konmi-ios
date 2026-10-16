@@ -35,6 +35,10 @@ struct HorselyApp: App {
                 guard settings.workMode == .online else { return true }
                 return await outbox.processAll().stopped == nil
             },
+            backup: { _ in
+                await AutoBackupRunner.runIfDue(environment)
+                return true
+            },
             interval: { BackgroundWork.refreshInterval(for: await sync.capabilities()) }
         )
         background.register()
@@ -46,6 +50,13 @@ struct HorselyApp: App {
         WindowGroup {
             RootView()
                 .environment(environment)
+                .task {
+                    // Kopia automatyczna: nadrabianie przy otwarciu i następne zadanie w tle (tryb samodzielny).
+                    if environment.workMode == .standalone {
+                        await AutoBackupRunner.runIfDue(environment)
+                        background.scheduleBackup()
+                    }
+                }
                 .task {
                     guard environment.workMode == .online else { return }
                     await background.scheduleRefresh()

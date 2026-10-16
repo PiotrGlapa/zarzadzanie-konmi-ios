@@ -11,6 +11,7 @@ import BackgroundTasks
 public enum BackgroundWork {
     public static let refreshIdentifier = "pl.glapa.horsely.refresh"
     public static let syncIdentifier = "pl.glapa.horsely.sync"
+    public static let backupIdentifier = "pl.glapa.horsely.backup"
     public static let refreshInterval: TimeInterval = 60 * 60
     public static let stampRefreshInterval: TimeInterval = 15 * 60
 
@@ -38,15 +39,18 @@ public final class BackgroundTasks: @unchecked Sendable {
 
     private let refresh: Work
     private let sync: Work
+    private let backup: Work?
     private let interval: @Sendable () async -> TimeInterval
 
     /// - Parameters:
     ///   - refresh: wysyłka kolejki + odświeżenie danych; `true` — udane
     ///   - sync: sama wysyłka kolejki
     ///   - interval: odstęp następnego odświeżenia (zależny od możliwości programu)
-    public init(refresh: @escaping Work, sync: @escaping Work, interval: @escaping @Sendable () async -> TimeInterval) {
+    ///   - backup: kopia automatyczna co tydzień (`pl.glapa.horsely.backup`)
+    public init(refresh: @escaping Work, sync: @escaping Work, backup: Work? = nil, interval: @escaping @Sendable () async -> TimeInterval) {
         self.refresh = refresh
         self.sync = sync
+        self.backup = backup
         self.interval = interval
     }
 
@@ -56,6 +60,12 @@ public final class BackgroundTasks: @unchecked Sendable {
         }
         BGTaskScheduler.shared.register(forTaskWithIdentifier: BackgroundWork.syncIdentifier, using: nil) { [self] task in
             handle(task, work: sync, reschedule: false)
+        }
+        if let backup {
+            BGTaskScheduler.shared.register(forTaskWithIdentifier: BackgroundWork.backupIdentifier, using: nil) { [self] task in
+                handle(task, work: backup, reschedule: false)
+                scheduleBackup()
+            }
         }
     }
 
@@ -89,6 +99,15 @@ public final class BackgroundTasks: @unchecked Sendable {
     public func scheduleRefresh() async {
         let request = BGAppRefreshTaskRequest(identifier: BackgroundWork.refreshIdentifier)
         request.earliestBeginDate = Date().addingTimeInterval(await interval())
+        try? BGTaskScheduler.shared.submit(request)
+    }
+
+    /// Kopia automatyczna: system uruchamia zadanie przy ładowaniu i bez użytkownika; aplikacja i tak nadrabia przy otwarciu.
+    public func scheduleBackup(after delay: TimeInterval = 24 * 60 * 60) {
+        let request = BGProcessingTaskRequest(identifier: BackgroundWork.backupIdentifier)
+        request.requiresNetworkConnectivity = false
+        request.requiresExternalPower = false
+        request.earliestBeginDate = Date().addingTimeInterval(delay)
         try? BGTaskScheduler.shared.submit(request)
     }
 

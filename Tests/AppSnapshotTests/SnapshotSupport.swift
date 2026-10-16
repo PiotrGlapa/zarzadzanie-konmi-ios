@@ -37,6 +37,8 @@ extension XCTestCase {
         let settings = SettingsStore(defaults: defaults)
         settings.workMode = mode
         settings.theme = variant.theme
+        // Zrzuty ekranów nie pokazują przypomnienia o kopii zapasowej (ma osobne warunki, test `BackupPolicyTests`).
+        settings.backupReminderSnoozedUntil = "2100-01-01T00:00:00Z"
         return AppEnvironment.testing(settings: settings, queueCount: queue, conflictCount: conflicts)
     }
 

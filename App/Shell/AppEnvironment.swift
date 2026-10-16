@@ -81,6 +81,8 @@ final class AppEnvironment {
     @ObservationIgnored let reports: ReportRepository
     @ObservationIgnored let attachments: AttachmentStore
     @ObservationIgnored let notifications: NotificationScheduler
+    @ObservationIgnored let trash: TrashRepository
+    @ObservationIgnored let backup: BackupService
     @ObservationIgnored private var notificationTask: Task<Void, Never>?
     /// Postęp wysyłki plików do programu (Kolejka wysyłki).
     let uploadProgress: UploadProgress
@@ -148,6 +150,11 @@ final class AppEnvironment {
         self.pairing = PairingService(store: store, client: client, secrets: secretStore, files: files)
         self.reports = ReportRepository(store: store, client: client, mode: currentMode, dates: dates)
         self.notifications = NotificationScheduler(store: store)
+        self.trash = TrashRepository(store: store, entries: entries, files: files, dates: dates)
+        self.backup = BackupService(
+            store: store, files: files, workDirectory: FileManager.default.temporaryDirectory.appendingPathComponent("horsely-backup", isDirectory: true),
+            appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.1", dates: dates
+        )
         self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
     }
 
@@ -156,6 +163,7 @@ final class AppEnvironment {
         guard workMode == .standalone else { return }
         do {
             try await entries.seedDictionariesIfNeeded()
+            try await entries.addMissingTrainingTypesOnce()
         } catch {
             log.log("storage", "Nie można dodać domyślnych słowników: \(error.localizedDescription)")
         }
@@ -259,6 +267,34 @@ final class AppEnvironment {
         capabilities = .none
         programVersion = nil
         workMode = .unset
+    }
+
+    /// Przejście online → samodzielny, krok 1 (T129): aktualne dane z programu i brakujące oryginały załączników. Zwraca, czego
+    /// nie udało się pobrać (dane, liczba plików).
+    func prepareStandaloneSwitch(progress: @escaping @Sendable @MainActor (Int) -> Void) async -> (syncFailed: Bool, missingFiles: Int) {
+        let outcome = await sync.refresh { value in Task { @MainActor in progress(value.records) } }
+        let attachments = (try? await store.read { access in
+            try access.query(.attachment, includeDeleted: true).compactMap { row -> LocalAttachment? in
+                guard try access.file(attachmentId: row.id, kind: .original) == nil else { return nil }
+                return try row.record(as: LocalAttachment.self)
+            }
+        }) ?? []
+        var missing = 0
+        for attachment in attachments {
+            if (try? await self.attachments.content(attachment)) == nil { missing += 1 }
+        }
+        return (!outcome.succeeded, missing)
+    }
+
+    /// Krok 2: dane zostają jako punkt startowy, połączenie i klucz znikają, tryb samodzielny.
+    func completeStandaloneSwitch() async throws {
+        try await pairing.switchToStandalone()
+        connection.reset()
+        onlineStarted = false
+        capabilities = .none
+        programVersion = nil
+        settings.backupReminderSnoozedUntil = nil
+        workMode = .standalone
     }
 
     /// Kolejka i konflikty jako strumień (licznik „Więcej”, oznaczenia na listach).
