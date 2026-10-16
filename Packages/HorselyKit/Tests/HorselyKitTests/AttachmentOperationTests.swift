@@ -154,7 +154,7 @@ struct AttachmentOperationTests {
         try Data("x".utf8).write(to: abandoned.appendingPathComponent("a.txt"))
         let folder = try inbox.newFolder()
         try Data("faktura".utf8).write(to: folder.appendingPathComponent("faktura.pdf"))
-        let entry = SharedInboxEntry(horseId: "h1", target: .entry(ownerType: .vetVisit, ownerId: "v1"), files: [.init(name: "faktura.pdf", contentType: "application/pdf")])
+        let entry = SharedInboxEntry(createdAt: now, horseId: "h1", target: .entry(ownerType: .vetVisit, ownerId: "v1"), files: [.init(name: "faktura.pdf", contentType: "application/pdf")])
         try inbox.commit(entry, folder: folder)
 
         let entries = inbox.entries()
