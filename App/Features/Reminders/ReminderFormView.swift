@@ -103,6 +103,10 @@ struct ReminderFormView: View {
                 Text("common_discard_message")
             }
             .task {
+                if editing == nil, input.dueDate == nil {
+                    input.dueDate = today
+                    baseline.dueDate = today
+                }
                 await environment.prepareStore()
                 specialistTypes = ((try? await environment.entries.allDictionaryItems()) ?? []).filter { $0.dictionaryType == .specialistType }
             }

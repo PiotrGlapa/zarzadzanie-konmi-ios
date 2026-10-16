@@ -55,6 +55,30 @@ extension XCTestCase {
     }
 }
 
+@MainActor
+extension XCTestCase {
+    /// Jak `assertScreen`, ale najpierw pokazuje widok w oknie przez sekundę, żeby zadania ładujące dane (`.task`) zdążyły się wykonać.
+    func assertSettledScreen(
+        _ view: some View, name: String, variant: SnapshotVariant, file: StaticString = #filePath, testName: String = #function, line: UInt = #line
+    ) async {
+        let controller = UIHostingController(rootView: view.tint(HorselyColor.primary))
+        let window = UIWindow(frame: CGRect(origin: .zero, size: Self.snapshotSize))
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        try? await Task.sleep(for: .seconds(1))
+        window.rootViewController = nil
+        window.isHidden = true
+        assertSnapshot(
+            of: controller,
+            as: .image(drawHierarchyInKeyWindow: true, precision: 0.98, perceptualPrecision: 0.98, size: Self.snapshotSize, traits: variant.traits),
+            named: "(name)-(variant.rawValue)",
+            file: file,
+            testName: testName,
+            line: line
+        )
+    }
+}
+
 /// Konie do zrzutów: aktywny z imieniem stajennym, kontuzjowany, źrebię bez paszportu od 14 miesięcy (ostrzeżenie na kaflu), sprzedany.
 enum SnapshotHorses {
     struct Spec {

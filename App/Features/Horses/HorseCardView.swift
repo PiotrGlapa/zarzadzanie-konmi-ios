@@ -10,6 +10,11 @@ struct HorseCardView: View {
     @Environment(\.dismiss) private var dismiss
     let horseId: String
 
+    init(horseId: String, initialTab: CardTab = .timeline) {
+        self.horseId = horseId
+        self._tab = State(initialValue: initialTab)
+    }
+
     enum CardTab: CaseIterable, Hashable {
         case timeline, reminders, passport, trainings, competitions, purchases, attachments
 
@@ -26,7 +31,7 @@ struct HorseCardView: View {
         }
     }
 
-    @State private var tab: CardTab = .timeline
+    @State private var tab: CardTab
     @State private var editing = false
     @State private var showingPhotoSheet = false
     @State private var banner: String?
