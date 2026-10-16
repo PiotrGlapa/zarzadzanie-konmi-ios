@@ -121,24 +121,40 @@ struct ContactFormView: View {
 }
 
 /// Dane z książki adresowej telefonu do formularza (nazwa, firma, pierwszy telefon, e‑mail i adres).
-enum ContactImport {
-    static func merge(_ contact: CNContact, into input: ContactInput) -> ContactInput {
-        var result = input
-        let name = [contact.givenName, contact.familyName].filter { !$0.isEmpty }.joined(separator: " ")
-        if !name.isEmpty { result.name = name } else if !contact.organizationName.isEmpty { result.name = contact.organizationName }
-        if !contact.organizationName.isEmpty { result.company = contact.organizationName }
-        if let phone = contact.phoneNumbers.first?.value.stringValue { result.phone = phone }
-        if let email = contact.emailAddresses.first?.value as String? { result.email = email }
-        if let postal = contact.postalAddresses.first?.value {
-            result.address = CNPostalAddressFormatter.string(from: postal, style: .mailingAddress).replacingOccurrences(of: "\n", with: ", ")
+/// Dane wybranego kontaktu skopiowane z `CNContact` (który nie jest `Sendable`) w wątku delegata.
+struct PickedContact: Sendable {
+    let name: String
+    let company: String
+    let phone: String?
+    let email: String?
+    let address: String?
+
+    init(_ contact: CNContact) {
+        name = [contact.givenName, contact.familyName].filter { !$0.isEmpty }.joined(separator: " ")
+        company = contact.organizationName
+        phone = contact.phoneNumbers.first?.value.stringValue
+        email = contact.emailAddresses.first.map { $0.value as String }
+        address = contact.postalAddresses.first.map {
+            CNPostalAddressFormatter.string(from: $0.value, style: .mailingAddress).replacingOccurrences(of: "\n", with: ", ")
         }
+    }
+}
+
+enum ContactImport {
+    static func merge(_ contact: PickedContact, into input: ContactInput) -> ContactInput {
+        var result = input
+        if !contact.name.isEmpty { result.name = contact.name } else if !contact.company.isEmpty { result.name = contact.company }
+        if !contact.company.isEmpty { result.company = contact.company }
+        if let phone = contact.phone { result.phone = phone }
+        if let email = contact.email { result.email = email }
+        if let address = contact.address { result.address = address }
         return result
     }
 }
 
 /// Systemowe okno wyboru kontaktu (`CNContactPickerViewController`) — działa poza procesem aplikacji, więc nie wymaga zgody.
 struct ContactPickerSheet: UIViewControllerRepresentable {
-    let onPick: (CNContact) -> Void
+    let onPick: (PickedContact) -> Void
     let onCancel: () -> Void
 
     func makeUIViewController(context: Context) -> CNContactPickerViewController {
@@ -153,16 +169,17 @@ struct ContactPickerSheet: UIViewControllerRepresentable {
 
     @MainActor
     final class Coordinator: NSObject, CNContactPickerDelegate {
-        let onPick: (CNContact) -> Void
+        let onPick: (PickedContact) -> Void
         let onCancel: () -> Void
 
-        init(onPick: @escaping (CNContact) -> Void, onCancel: @escaping () -> Void) {
+        init(onPick: @escaping (PickedContact) -> Void, onCancel: @escaping () -> Void) {
             self.onPick = onPick
             self.onCancel = onCancel
         }
 
         nonisolated func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
-            MainActor.assumeIsolated { onPick(contact) }
+            let picked = PickedContact(contact)
+            MainActor.assumeIsolated { onPick(picked) }
         }
 
         nonisolated func contactPickerDidCancel(_ picker: CNContactPickerViewController) {
