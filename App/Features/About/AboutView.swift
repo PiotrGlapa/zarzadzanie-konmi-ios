@@ -49,8 +49,10 @@ struct AboutView: View {
             Section {
                 NavigationLink(value: AboutRoute.log) { Text("about_diagnostic_log") }
                     .accessibilityIdentifier("about-diagnostic-log")
-                if let title = LicensesView.title { NavigationLink(value: AboutRoute.licenses) { Text(verbatim: title) } }
-                    .accessibilityIdentifier("about-licenses")
+                if let title = LicensesView.title {
+                    NavigationLink(value: AboutRoute.licenses) { Text(verbatim: title) }
+                        .accessibilityIdentifier("about-licenses")
+                }
             }
         }
         .scrollContentBackground(.hidden)
