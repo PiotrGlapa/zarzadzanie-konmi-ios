@@ -285,11 +285,11 @@ Po tej fazie — pierwsza kompilacja dla grupy „Właściciele” (quickstart �
 
 **Independent Test**: spec.md US9.
 
-- [ ] T130 [P] [US9] Test UI `Tests/AppUITests/SettingsUITests.swift` (kolejność pozycji FR-M-UST-00 w obu trybach, brak „Połączenie z programem” w trybie samodzielnym, szybkie akcje otwierają właściwe ekrany)
-- [ ] T131 [US9] `App/Features/Settings/SettingsView.swift`, `DataSettingsView.swift` (zakres osi czasu, limit załączników, oryginały, lokalizacja zdjęć, „Wyczyść pamięć podręczną” tylko online, zajętość, „tylko przez Wi‑Fi”, „Pobieraj wszystkie załączniki” tylko online), `AppearanceSettingsView.swift`
-- [ ] T132 [US9] `Packages/HorselyKit/Sources/HorselyKit/Security/AppLock.swift` + `App/Features/Lock/LockOverlay.swift` (Face ID / kod, 5 min w tle, zasłona w przełączniku aplikacji, przełącznik nieaktywny bez kodu urządzenia z wyjaśnieniem, wyłączenie po usunięciu kodu z informacją) i `App/Features/Settings/AppLockSettingsView.swift`
-- [ ] T133 [US9] `App/Features/About/AboutView.swift` (pełna nazwa, wersja 2.0.1 i kompilacja, autor „Piotr Glapa”, wersja programu, ostrzeżenie „Program <wersja> — aplikacja testowana z 2.0.0…”, tryb zgodności, licencje) i `DiagnosticLogView.swift` (rozmiar, wpisy od najnowszych, czcionka o stałej szerokości, „Wyślij” z tematem „Log diagnostyczny — Horsely”, „Wyczyść” z potwierdzeniem, „Dziennik jest pusty.”); przełącznik „Szczegółowy dziennik połączeń” z „Włączony do …” w `ConnectionSettingsView.swift`
-- [ ] T134 [US9] Szybkie akcje: obsługa `UIApplicationShortcutItem` w `App/Shell/DeepLinkRouter.swift` (Dodaj notatkę, Kowal, Terminy)
+- [X] T130 [P] [US9] Test UI `Tests/AppUITests/SettingsUITests.swift` (kolejność pozycji FR-M-UST-00 w obu trybach, brak „Połączenie z programem” w trybie samodzielnym, szybkie akcje otwierają właściwe ekrany)
+- [X] T131 [US9] `App/Features/Settings/SettingsView.swift`, `DataSettingsView.swift` (zakres osi czasu, limit załączników, oryginały, lokalizacja zdjęć, „Wyczyść pamięć podręczną” tylko online, zajętość, „tylko przez Wi‑Fi”, „Pobieraj wszystkie załączniki” tylko online), `AppearanceSettingsView.swift` — ekran Ustawień w `ConnectionSettingsView.swift` (`SettingsHubView`); Android 2.0.1 nie ma już zakresu osi czasu na ekranie Dane, więc go nie dodano
+- [X] T132 [US9] `Packages/HorselyKit/Sources/HorselyKit/Security/AppLock.swift` + `App/Features/Lock/LockOverlay.swift` (Face ID / kod, 5 min w tle, zasłona w przełączniku aplikacji, przełącznik nieaktywny bez kodu urządzenia z wyjaśnieniem, wyłączenie po usunięciu kodu z informacją) i `App/Features/Settings/AppLockSettingsView.swift` — blokada i zasłona w osobnym oknie nad arkuszami (`LockWindowHost`)
+- [X] T133 [US9] `App/Features/About/AboutView.swift` (pełna nazwa, wersja 2.0.1 i kompilacja, autor „Piotr Glapa”, wersja programu, ostrzeżenie „Program <wersja> — aplikacja testowana z 2.0.0…”, tryb zgodności, licencje) i `DiagnosticLogView.swift` (rozmiar, wpisy od najnowszych, czcionka o stałej szerokości, „Wyślij” z tematem „Log diagnostyczny — Horsely”, „Wyczyść” z potwierdzeniem, „Dziennik jest pusty.”); przełącznik „Szczegółowy dziennik połączeń” z „Włączony do …” w `ConnectionSettingsView.swift`
+- [X] T134 [US9] Szybkie akcje: obsługa `UIApplicationShortcutItem` w `App/Shell/DeepLinkRouter.swift` (Dodaj notatkę, Kowal, Terminy)
 
 ---
 
