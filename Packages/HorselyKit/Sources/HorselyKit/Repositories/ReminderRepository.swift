@@ -57,11 +57,11 @@ public final class ReminderRepository: Sendable {
     }
 
     public func complete(id: String) async throws -> EntryResult {
-        try await entries.perform(.completeReminder) { $0.reminderAction(id: id, .complete) }
+        try await entries.perform(hint: .completeReminder) { $0.reminderAction(id: id, .complete) }
     }
 
     public func dismiss(id: String) async throws -> EntryResult {
-        try await entries.perform(.dismissReminder) { $0.reminderAction(id: id, .dismiss) }
+        try await entries.perform(hint: .dismissReminder) { $0.reminderAction(id: id, .dismiss) }
     }
 
     public func reopen(id: String) async throws -> EntryResult {
@@ -80,7 +80,7 @@ public final class ReminderRepository: Sendable {
         let id = reminder.id
         let version = reminder.version
         let changed = input
-        return try await entries.perform(.reschedule) { $0.updateReminder(id: id, changed, expectedVersion: version) }
+        return try await entries.perform(hint: .reschedule) { $0.updateReminder(id: id, changed, expectedVersion: version) }
     }
 
     public func delete(id: String) async throws -> EntryResult {

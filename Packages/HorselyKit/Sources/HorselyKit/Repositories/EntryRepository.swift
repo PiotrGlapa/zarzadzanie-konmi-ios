@@ -99,7 +99,11 @@ public final class EntryRepository: Sendable {
 
     /// Wykonuje operację silnika reguł i, gdy ją przyjął, zapisuje wszystkie zmiany w jednej transakcji. W trybie online rekord
     /// główny jest `Pending`, skutki reguł `Projected`, a operacja trafia do kolejki (`hint` — akcja na terminie albo „Przełóż”).
-    public func perform(_ hint: OnlineHint = .automatic, _ operation: @escaping @Sendable (RuleEngine) -> RuleOutcome) async throws -> EntryResult {
+    public func perform(_ operation: @escaping @Sendable (RuleEngine) -> RuleOutcome) async throws -> EntryResult {
+        try await perform(hint: .automatic, operation)
+    }
+
+    public func perform(hint: OnlineHint, _ operation: @escaping @Sendable (RuleEngine) -> RuleOutcome) async throws -> EntryResult {
         let dates = self.dates
         let online = mode() == .online
         let moment = Date()
