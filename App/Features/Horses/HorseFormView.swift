@@ -83,7 +83,7 @@ struct HorseFormView: View {
             Toggle("horse_form_foal", isOn: $model.draft.isFoal).accessibilityIdentifier("horse-foal")
             textField(
                 "horse_form_passport", text: $model.draft.passportNumber, key: "passportNumber", capitalization: .characters,
-                required: !model.draft.isFoal, identifier: "horse-passport"
+                required: !model.draft.isFoal, identifier: "horse-passport", noAutocorrect: true
             )
             textField("horse_form_stable_name", text: $model.draft.stableName, key: "stableName", capitalization: .words)
             Picker("horse_form_sex", selection: $model.draft.sex) {
@@ -106,7 +106,7 @@ struct HorseFormView: View {
 
     private var detailsSection: some View {
         Section {
-            textField("horse_form_ueln", text: $model.draft.ueln, key: "ueln", capitalization: .characters)
+            textField("horse_form_ueln", text: $model.draft.ueln, key: "ueln", capitalization: .characters, noAutocorrect: true)
             textField("horse_form_microchip", text: $model.draft.microchipNumber, key: "microchipNumber", keyboard: .numbersAndPunctuation)
             textField("horse_form_farrier_interval", text: $model.intervalText, key: "farrierIntervalWeeks", keyboard: .numberPad, identifier: "horse-interval")
             Picker("horse_form_status", selection: $model.draft.status) {
@@ -169,7 +169,8 @@ struct HorseFormView: View {
 
     private func textField(
         _ title: LocalizedStringKey, text: Binding<String>, key: String, label: LocalizedStringKey? = nil,
-        capitalization: TextInputAutocapitalization = .sentences, keyboard: UIKeyboardType = .default, required: Bool = false, identifier: String? = nil
+        capitalization: TextInputAutocapitalization = .sentences, keyboard: UIKeyboardType = .default, required: Bool = false, identifier: String? = nil,
+        noAutocorrect: Bool = false
     ) -> some View {
         fieldWithErrors(key) {
             LabeledContent {
@@ -177,7 +178,7 @@ struct HorseFormView: View {
                     .multilineTextAlignment(.trailing)
                     .textInputAutocapitalization(capitalization)
                     .keyboardType(keyboard)
-                    .autocorrectionDisabled(keyboard != .default || capitalization == .characters)
+                    .autocorrectionDisabled(keyboard != .default || noAutocorrect)
                     .accessibilityIdentifier(identifier ?? key)
             } label: {
                 Text(label ?? title)

@@ -32,6 +32,7 @@ struct HorsePhotoSheet: View {
     let onResult: (PhotoSheetResult) -> Void
 
     @State private var pickerItem: PhotosPickerItem?
+    @State private var showingPicker = false
     @State private var showingCamera = false
     @State private var cropSource: CropSource?
     @State private var viewerImage: UIImage?
@@ -58,7 +59,7 @@ struct HorsePhotoSheet: View {
                     .disabled(!cameraAvailable)
                     .accessibilityHint(cameraAvailable ? "" : tr("attachments_camera_unavailable"))
                     .accessibilityIdentifier("photo-take")
-                PhotosPicker(selection: $pickerItem, matching: .images) { row("photo.on.rectangle", "photo_pick") }
+                Button { showingPicker = true } label: { row("photo.on.rectangle", "photo_pick") }
                     .accessibilityIdentifier("photo-pick")
                 if context == .card, horse != nil {
                     Button { Task { await openAttachments() } } label: { row("paperclip", "photo_from_attachments") }
@@ -74,6 +75,7 @@ struct HorsePhotoSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button(tr("common_close")) { dismiss() } }
             }
+            .photosPicker(isPresented: $showingPicker, selection: $pickerItem, matching: .images)
             .onChange(of: pickerItem) { _, item in
                 guard let item else { return }
                 Task { await load(item) }
