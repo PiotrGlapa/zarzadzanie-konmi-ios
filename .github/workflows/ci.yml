@@ -64,6 +64,9 @@ jobs:
 
       - name: Testy HorselyKit
         working-directory: Packages/HorselyKit
+        # Wzorcowa kopia zapasowa z iOS (FR-KOP-09) — artefakt do testu odtwarzania w Androidzie.
+        env:
+          HORSELY_BACKUP_OUT: ${{ github.workspace }}/build/ios-backup
         run: swift test
 
       - name: Wygeneruj projekt Xcode
@@ -132,6 +135,15 @@ jobs:
           path: Tests/AppSnapshotTests/__Snapshots__
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Artefakt — wzorcowa kopia zapasowa iOS
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-backup-${{ github.run_attempt }}
+          path: build/ios-backup
+          if-no-files-found: ignore
+          retention-days: 30
 
       - name: Artefakt — wyniki testów (.xcresult)
         if: always()

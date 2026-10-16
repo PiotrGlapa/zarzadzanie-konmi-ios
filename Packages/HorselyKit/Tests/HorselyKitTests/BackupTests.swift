@@ -253,6 +253,28 @@ struct BackupTests {
         #expect(note.title == "Notatka zażółć 1")
     }
 
+    // MARK: Plik dla Androida (FR-KOP-09 w drugą stronę)
+
+    /// Wzorcowe kopie iOS dla testu odtwarzania w Androidzie: w CI zmienna `HORSELY_BACKUP_OUT` wskazuje katalog artefaktu.
+    @Test func writesTheReferenceBackupsForAndroid() async throws {
+        guard let out = ProcessInfo.processInfo.environment["HORSELY_BACKUP_OUT"], !out.isEmpty else { return }
+        let folder = URL(fileURLWithPath: out, isDirectory: true)
+        try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
+        let source = try setup()
+        let photo = try await seed(source)
+        try await source.service.write(to: folder.appendingPathComponent("ios-2.0.1.zkkopia"), password: nil, attachmentsCacheMb: 200)
+        try await source.service.write(to: folder.appendingPathComponent("ios-2.0.1-haslo.zkkopia"), password: "Siano-2026", attachmentsCacheMb: 200)
+        let lines = try await source.store.read { access in
+            try RecordType.allCases.flatMap { type in
+                try access.query(type, includeDeleted: true).map { row in
+                    "\(row.type.rawValue)|\(row.id)|v\(row.version)|\(row.deletedAt?.description ?? "")|\(row.deletionBatchId ?? "")"
+                }
+            }.sorted()
+        }
+        let text = (lines + ["sha:a1=\(BackupService.sha256(photo))"]).joined(separator: "\n") + "\n"
+        try text.write(to: folder.appendingPathComponent("ios-2.0.1-expected.txt"), atomically: true, encoding: .utf8)
+    }
+
     // MARK: Pomocnicze
 
     private func read(_ file: URL) throws -> [String: Data] {
