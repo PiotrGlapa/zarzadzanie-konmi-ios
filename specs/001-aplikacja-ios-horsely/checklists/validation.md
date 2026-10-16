@@ -22,3 +22,9 @@ pierwsze pobranie 50 koni / 50 000 wpisów < 3 min, zapis < 1 s). Wynik zostanie
 ## Program na komputerze (T096) — do sprawdzenia przez właściciela
 
 Scenariusze quickstart.md §5 z programem 2.0.0 (i 1.6.1): domowe Wi‑Fi i dane komórkowe przez adres publiczny z HTTPS.
+
+## Wydanie (T141)
+
+Tag `v2.0.1` → kompilacja **2.0.1 (23)** wysłana do TestFlight 2026-10-16 (przebieg 38969761212). Kompilacja wygasa po 90 dniach —
+przypomnienie o nowej od 2027-01-04. Punkty listy kontrolnej quickstart.md §7 wymagające telefonu (skan QR, połączenie spoza domu,
+Face ID, aparat, powiadomienie o 08:00, VoiceOver, tekst 200 %) sprawdza właściciel na zainstalowanej aplikacji.

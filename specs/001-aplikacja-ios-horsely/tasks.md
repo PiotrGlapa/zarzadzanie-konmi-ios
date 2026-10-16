@@ -301,7 +301,7 @@ Po tej fazie — pierwsza kompilacja dla grupy „Właściciele” (quickstart �
 - [X] T138 Zależność zewnętrzna (repozytorium `zarzadzanie_konmi_android`): plik `fixtures/zrzuty.zkkopia` i test zrzutów Androida na tych samych danych i dacie 2026-10-05; skopiuj PNG do `Tests/Reference/android/` i plik do `fixtures/zrzuty.zkkopia` (contracts/test-fixtures.md) — **pominięte na prośbę właściciela** (2026-10-16): funkcjonalność sprawdzana na zainstalowanej aplikacji, rozbieżności — wydanie poprawkowe
 - [X] T139 Zależność zewnętrzna (repozytorium `zarzadzanie_konmi_android`): test odtwarzania kopii utworzonej przez iOS (plik z artefaktu CI iOS) — FR-KOP-09 w obie strony — kopie z artefaktu CI odtworzone kodem `BackupReader` Androida 2.0.1 (jednorazowy test JVM), wynik w `checklists/validation.md`
 - [X] T140 Porównanie zrzutów iOS z Androidem dla wszystkich ekranów z contracts/test-fixtures.md §2; rozbieżności poprawione albo uzasadnione natywnym komponentem — wynik w `checklists/validation.md` — **pominięte na prośbę właściciela** (2026-10-16), patrz `checklists/validation.md`
-- [ ] T141 Lista kontrolna wydania z quickstart.md §7, tag `v2.0.1`, kompilacja w grupie „Właściciele”, zapis daty (przypomnienie po 80 dniach)
+- [X] T141 Lista kontrolna wydania z quickstart.md §7, tag `v2.0.1`, kompilacja w grupie „Właściciele”, zapis daty (przypomnienie po 80 dniach) — tag `v2.0.1` → kompilacja 23 w TestFlight 2026-10-16 (przebieg 38969761212); przypomnienie od 2027-01-04; punkty listy §7 wymagające telefonu sprawdza właściciel
 
 ---
 
