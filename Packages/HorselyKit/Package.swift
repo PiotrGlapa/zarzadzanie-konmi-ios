@@ -28,7 +28,9 @@ let package = Package(
             dependencies: [
                 "HorselyKit",
                 .product(name: "GRDB", package: "GRDB.swift"),
+                .product(name: "ZIPFoundation", package: "ZIPFoundation"),
             ],
+            resources: [.copy("Resources")],
             swiftSettings: [.unsafeFlags(["-warnings-as-errors"])]
         ),
     ]
