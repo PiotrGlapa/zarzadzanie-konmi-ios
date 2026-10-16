@@ -104,8 +104,7 @@ struct WorkModeView: View {
         if missing.syncFailed { lines.append(tr("work_mode_missing_sync")) }
         if missing.files > 0 { lines.append(tr("work_mode_missing_files", missing.files)) }
         lines.append(tr("work_mode_missing_hint"))
-        return lines.joined(separator: "
-")
+        return lines.joined(separator: "\n")
     }
 
     /// Online → samodzielny: aktualne dane i brakujące oryginały z programu; braki — ostrzeżenie z „Przejdź mimo braków”.
