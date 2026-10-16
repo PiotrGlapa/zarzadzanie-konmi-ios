@@ -179,6 +179,12 @@ public struct LocalDictionaryItem: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalDictionaryItem {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Kontakt.
@@ -283,6 +289,12 @@ public struct LocalContact: LocalRecord {
         var copy = self
         copy.version = version
         copy.updatedAt = updatedAt
+        return copy
+    }
+
+    public func withCreated(at time: LocalDateTime) -> LocalContact {
+        var copy = self
+        copy.createdAt = time
         return copy
     }
 }
@@ -524,6 +536,12 @@ public struct LocalHorse: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalHorse {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Wizyta weterynaryjna.
@@ -668,6 +686,12 @@ public struct LocalVetVisit: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalVetVisit {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Wizyta kowala.
@@ -774,6 +798,12 @@ public struct LocalFarrierVisit: LocalRecord {
         var copy = self
         copy.version = version
         copy.updatedAt = updatedAt
+        return copy
+    }
+
+    public func withCreated(at time: LocalDateTime) -> LocalFarrierVisit {
+        var copy = self
+        copy.createdAt = time
         return copy
     }
 }
@@ -908,6 +938,12 @@ public struct LocalPhysioVisit: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalPhysioVisit {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Wizyta innego specjalisty.
@@ -1034,6 +1070,12 @@ public struct LocalSpecialistVisit: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalSpecialistVisit {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Zawody (bez startów — w pliku eksportu są zagnieżdżone, tu osobne rekordy).
@@ -1139,6 +1181,12 @@ public struct LocalCompetition: LocalRecord {
         var copy = self
         copy.version = version
         copy.updatedAt = updatedAt
+        return copy
+    }
+
+    public func withCreated(at time: LocalDateTime) -> LocalCompetition {
+        var copy = self
+        copy.createdAt = time
         return copy
     }
 }
@@ -1310,6 +1358,12 @@ public struct LocalCompetitionStart: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalCompetitionStart {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Zakup (jeden koń, kilka koni albo ogólny).
@@ -1447,6 +1501,12 @@ public struct LocalPurchase: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalPurchase {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Notatka.
@@ -1529,6 +1589,12 @@ public struct LocalNote: LocalRecord {
         var copy = self
         copy.version = version
         copy.updatedAt = updatedAt
+        return copy
+    }
+
+    public func withCreated(at time: LocalDateTime) -> LocalNote {
+        var copy = self
+        copy.createdAt = time
         return copy
     }
 }
@@ -1663,6 +1729,12 @@ public struct LocalTraining: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalTraining {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Termin.
@@ -1790,6 +1862,12 @@ public struct LocalReminder: LocalRecord {
         copy.updatedAt = updatedAt
         return copy
     }
+
+    public func withCreated(at time: LocalDateTime) -> LocalReminder {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 /// Załącznik (metadane; plik leży w `local_file`).
@@ -1891,6 +1969,12 @@ public struct LocalAttachment: LocalRecord {
         var copy = self
         copy.version = version
         copy.updatedAt = updatedAt
+        return copy
+    }
+
+    public func withCreated(at time: LocalDateTime) -> LocalAttachment {
+        var copy = self
+        copy.createdAt = time
         return copy
     }
 }

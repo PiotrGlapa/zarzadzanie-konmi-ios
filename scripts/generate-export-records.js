@@ -167,6 +167,12 @@ function generate(type, isRecord) {
     lines.push('        copy.updatedAt = updatedAt');
     lines.push('        return copy');
     lines.push('    }');
+    lines.push('');
+    lines.push(`    public func withCreated(at time: LocalDateTime) -> ${type.name} {`);
+    lines.push('        var copy = self');
+    lines.push('        copy.createdAt = time');
+    lines.push('        return copy');
+    lines.push('    }');
   }
   lines.push('}');
   return lines.join('\n');

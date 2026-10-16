@@ -24,6 +24,9 @@ public protocol LocalRecord: Codable, Hashable, Sendable {
 
     /// Ten sam rekord z nowym znacznikiem audytu — używane przy zapisie lokalnym.
     func withAudit(version: Int, updatedAt: LocalDateTime) -> Self
+
+    /// Ten sam rekord z czasem utworzenia (nowy rekord wstawiany przez reguły).
+    func withCreated(at time: LocalDateTime) -> Self
 }
 
 public extension LocalRecord {
