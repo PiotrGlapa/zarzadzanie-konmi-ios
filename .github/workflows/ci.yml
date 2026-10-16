@@ -123,7 +123,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: snapshots
+          name: snapshots-${{ github.run_attempt }}
           path: Tests/AppSnapshotTests/__Snapshots__
           if-no-files-found: ignore
           retention-days: 14
@@ -132,7 +132,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: xcresult
+          name: xcresult-${{ github.run_attempt }}
           path: build/*.xcresult
           if-no-files-found: ignore
           retention-days: 14
@@ -141,7 +141,7 @@ jobs:
         if: env.RUN_UI_TESTS == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
-          name: screenshots
+          name: screenshots-${{ github.run_attempt }}
           path: screenshots/ios
           if-no-files-found: ignore
           retention-days: 14
