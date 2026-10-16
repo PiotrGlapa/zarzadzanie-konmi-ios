@@ -78,7 +78,7 @@ public struct StoredRecord: Sendable, Hashable {
 /// zapisu, w której coś zapisano, zwiększa licznik zmian dokładnie raz (kopia automatyczna, przypomnienie o kopii).
 public struct RecordAccess {
     let db: Database
-    fileprivate let state: WriteState
+    let state: WriteState
 
     final class WriteState {
         var dirty = false
@@ -278,7 +278,7 @@ public enum StoreError: Error, Equatable {
 public final class RecordStore: Sendable {
     static let changeCounterKey = "changeCounter"
 
-    private let database: AppDatabase
+    let database: AppDatabase
 
     public init(database: AppDatabase) {
         self.database = database

@@ -159,6 +159,16 @@ public final class AppDatabase: Sendable {
             }
             try db.create(index: "address_position", on: "address", columns: ["position"])
         }
+        // Kolejka 2.0 (T084): identyfikator tworzonego rekordu dla operacji zależnych, konie do rozpoznania stajni, opis bez treści
+        // wpisu i `id` nadane przez program. `fileRef` niesie plik załącznika (JSON), `lastError` — problem programu (JSON).
+        migrator.registerMigration("v2") { db in
+            try db.alter(table: "queue_operation") { t in
+                t.add(column: "localRef", .text)
+                t.add(column: "horseRefs", .text)
+                t.add(column: "summary", .text).notNull().defaults(to: "")
+                t.add(column: "resultId", .text)
+            }
+        }
         return migrator
     }
 }

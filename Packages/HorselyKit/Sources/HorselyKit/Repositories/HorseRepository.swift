@@ -9,11 +9,20 @@ public final class HorseRepository: Sendable {
     private let store: RecordStore
     private let files: LocalFileStore
     private let dates: any DateProvider
+    private let mode: @Sendable () -> WorkMode
 
-    public init(store: RecordStore, files: LocalFileStore, dates: any DateProvider = SystemDateProvider()) {
+    public init(store: RecordStore, files: LocalFileStore, dates: any DateProvider = SystemDateProvider(), mode: @escaping @Sendable () -> WorkMode = { .standalone }) {
         self.store = store
         self.files = files
         self.dates = dates
+        self.mode = mode
+    }
+
+    /// Operacje kolejki ostatniego zapisu konia w trybie online (do natychmiastowej wysyłki).
+    public func pendingOperations(horseId: String) async throws -> [String] {
+        try await store.read { access in
+            try access.operations().filter { $0.recordType == .horse && $0.recordId == horseId && $0.state == .pending }.map(\.id)
+        }
     }
 
     // MARK: Odczyt
@@ -54,6 +63,8 @@ public final class HorseRepository: Sendable {
     @discardableResult
     public func save(_ draft: HorseDraft, id: String? = nil) async throws -> HorseRules.SaveOutcome {
         let dates = self.dates
+        let online = mode() == .online
+        let moment = Date()
         return try await store.write { access in
             let existing = try Self.horses(in: access)
             let old: LocalHorse?
@@ -67,7 +78,20 @@ public final class HorseRepository: Sendable {
                 draft, id: id ?? Self.newId(), old: old, existing: existing, today: dates.today(), now: dates.now()
             )
             if case let .saved(horse, _) = outcome {
-                try access.upsert([try StoredRecord.of(horse, syncState: .local)])
+                if online {
+                    // Tryb online: koń `Pending` + `CreateHorse` / `UpdateRecord` w kolejce w tej samej transakcji (T085).
+                    let previous = try access.get(.horse, id: horse.id)
+                    let base: Int? = previous.map { $0.syncState == .synced || $0.syncState == .projected ? $0.version : $0.baseVersion } ?? nil
+                    try access.upsert([try StoredRecord.of(horse, syncState: .pending, baseVersion: base)])
+                    if let operation = OnlineWrites.operation(
+                        previous == nil ? .createHorse : .updateRecord, record: horse, previous: previous, baseVersion: base, access: access, now: moment, includePhoto: false
+                    ) {
+                        var applied = OnlineWrites.Applied()
+                        try OnlineWrites.queue(operation, access: access, now: moment, into: &applied)
+                    }
+                } else {
+                    try access.upsert([try StoredRecord.of(horse, syncState: .local)])
+                }
             }
             return outcome
         }

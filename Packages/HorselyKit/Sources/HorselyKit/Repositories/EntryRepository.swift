@@ -37,10 +37,12 @@ public struct UndoStep: Sendable {
 /// przeniesiony do kosza wraca z kosza razem z zależnymi.
 public struct EntryUndo: Sendable {
     let steps: [UndoStep]
+    /// Tryb online: operacje kolejki tego zapisu — „Cofnij” usuwa je, dopóki wysyłka się nie zaczęła.
+    var operationIds: [String] = []
 
     /// Kilka zapisów cofanych razem (kowal „Kilka koni”, start z nowymi zawodami).
     public static func combine(_ undos: [EntryUndo]) -> EntryUndo {
-        EntryUndo(steps: undos.flatMap(\.steps))
+        EntryUndo(steps: undos.flatMap(\.steps), operationIds: undos.flatMap(\.operationIds))
     }
 }
 
@@ -51,6 +53,9 @@ public struct EntrySaved: Sendable {
     public let warnings: [String: [String]]
     public let batchId: String?
     public let undo: EntryUndo
+
+    /// Tryb online: operacje kolejki do natychmiastowej wysyłki (`OutboxProcessor.sendNow`).
+    public var operationIds: [String] { undo.operationIds }
 
     public init(record: (any LocalRecord)?, effects: [RecordEffect], warnings: [String: [String]], batchId: String?, undo: EntryUndo) {
         self.record = record
@@ -78,26 +83,35 @@ public enum EntryResult: Sendable {
 
 /// Wpisy w magazynie lokalnym (tryb samodzielny — telefon jest źródłem prawdy): zapis z regułami programu w jednej transakcji
 /// (rekord + skutki + licznik zmian), widoki Pulpitu i osi czasu, słowniki i kontakty do list wyboru. Zapis w trybie online
-/// (rekord `Pending` + operacja w kolejce) dochodzi w zadaniu T085.
+/// zapisuje rekord `Pending` + operację w kolejce w tej samej transakcji (`OnlineWrites`, T085).
 public final class EntryRepository: Sendable {
     let store: RecordStore
     let dates: any DateProvider
+    let mode: @Sendable () -> WorkMode
 
-    public init(store: RecordStore, dates: any DateProvider = SystemDateProvider()) {
+    public init(store: RecordStore, dates: any DateProvider = SystemDateProvider(), mode: @escaping @Sendable () -> WorkMode = { .standalone }) {
         self.store = store
         self.dates = dates
+        self.mode = mode
     }
 
     // MARK: Zapis
 
-    /// Wykonuje operację silnika reguł i, gdy ją przyjął, zapisuje wszystkie zmiany w jednej transakcji.
-    public func perform(_ operation: @escaping @Sendable (RuleEngine) -> RuleOutcome) async throws -> EntryResult {
+    /// Wykonuje operację silnika reguł i, gdy ją przyjął, zapisuje wszystkie zmiany w jednej transakcji. W trybie online rekord
+    /// główny jest `Pending`, skutki reguł `Projected`, a operacja trafia do kolejki (`hint` — akcja na terminie albo „Przełóż”).
+    public func perform(_ hint: OnlineHint = .automatic, _ operation: @escaping @Sendable (RuleEngine) -> RuleOutcome) async throws -> EntryResult {
         let dates = self.dates
+        let online = mode() == .online
+        let moment = Date()
         return try await store.write { access in
             let engine = RuleEngine(source: AccessRecordSource(access: access), dates: dates)
             switch operation(engine) {
             case let .rejected(problem):
                 return .rejected(problem)
+            case let .saved(saved) where online:
+                let applied = try OnlineWrites.apply(saved, hint: hint, access: access, now: moment)
+                let undo = EntryUndo(steps: applied.steps, operationIds: applied.operationIds)
+                return .saved(EntrySaved(record: saved.record, effects: saved.effects, warnings: saved.warnings, batchId: saved.batchId, undo: undo))
             case let .saved(saved):
                 var steps: [UndoStep] = []
                 var rows: [StoredRecord] = []
@@ -114,8 +128,16 @@ public final class EntryRepository: Sendable {
     }
 
     /// Cofnięcie ostatniego zapisu („Cofnij” w komunikacie „Zapisano”).
-    public func undo(_ undo: EntryUndo) async throws {
+    /// `false` — w trybie online wysyłka już się zaczęła i cofnięcie jest niedostępne.
+    @discardableResult
+    public func undo(_ undo: EntryUndo) async throws -> Bool {
         try await store.write { access in
+            for id in undo.operationIds {
+                if let operation = try access.operation(id), operation.state != .pending { return false }
+            }
+            for id in undo.operationIds {
+                try access.deleteOperation(id, allowed: [.pending]).files.forEach(OutboxProcessor.release)
+            }
             for step in undo.steps.reversed() {
                 if let previous = step.previous {
                     try access.upsert([previous])
@@ -123,6 +145,7 @@ public final class EntryRepository: Sendable {
                     try access.deleteHard(step.type, id: step.id)
                 }
             }
+            return true
         }
     }
 
