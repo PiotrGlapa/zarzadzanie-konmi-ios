@@ -74,21 +74,6 @@ public struct StoredRecord: Sendable, Hashable {
     public var isDeleted: Bool { deletedAt != nil }
 }
 
-/// Metadane wiersza bez treści — do uzgadniania pełnego pobrania bez dekodowania 50 000 rekordów.
-public struct RecordMeta: Sendable, Equatable {
-    public let version: Int
-    public let syncState: SyncState
-    public let baseVersion: Int?
-    public let deleted: Bool
-
-    public init(version: Int, syncState: SyncState, baseVersion: Int?, deleted: Bool) {
-        self.version = version
-        self.syncState = syncState
-        self.baseVersion = baseVersion
-        self.deleted = deleted
-    }
-}
-
 /// Zbiór operacji na magazynie w jednej transakcji bazy. Tworzony tylko wewnątrz `RecordStore.write`/`read`. Każda transakcja
 /// zapisu, w której coś zapisano, zwiększa licznik zmian dokładnie raz (kopia automatyczna, przypomnienie o kopii).
 public struct RecordAccess {
