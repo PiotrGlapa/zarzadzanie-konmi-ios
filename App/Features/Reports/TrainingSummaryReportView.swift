@@ -40,30 +40,32 @@ struct TrainingSummaryReportView: View {
         let report = load.report
         let parameters = report.map(ReportCharts.availableParameters) ?? []
         let shown = parameters.contains(parameter) ? parameter : parameters.first
+        // Sumy „Razem” stoją teraz nad wykresem (jak w Androidzie), więc przejście między okresami zostaje nad nimi, przy filtrach.
+        let navigator: AnyView? = range == .all ? nil : AnyView(
+            HStack {
+                Button { anchor = Self.shift(day, range, by: -1) } label: {
+                    Image(systemName: "chevron.left").frame(minWidth: Spacing.minTouchTarget, minHeight: Spacing.minTouchTarget)
+                }
+                .accessibilityLabel(tr("reports_previous_period"))
+                .accessibilityIdentifier("report-previous-period")
+                Text(ReportFormat.period(range.period(day).from, range.period(day).to) ?? "")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                Button { anchor = Self.shift(day, range, by: 1) } label: {
+                    Image(systemName: "chevron.right").frame(minWidth: Spacing.minTouchTarget, minHeight: Spacing.minTouchTarget)
+                }
+                .accessibilityLabel(tr("reports_next_period"))
+                .accessibilityIdentifier("report-next-period")
+            }
+        )
         return ReportScaffold(
             titleKey: "reports_training_summary", table: report.map(ReportTables.trainingSummary), isEmpty: report?.isEmpty ?? true,
             fromMemory: load.fromMemory, fetchedAt: load.fetchedAt, filterLines: filterLines(report), failure: load.failure, loading: load.isLoading,
             pdfCharts: pdfCharts,
             fileName: ReportFormat.fileName(ReportTexts.trainingSummaryTitle + (report.map { " — \($0.horseName)" } ?? ""), today: today,
-                                            fromMemory: load.fromMemory, fetchedAt: load.fetchedAt)
+                                            fromMemory: load.fromMemory, fetchedAt: load.fetchedAt),
+            accessory: navigator
         ) {
-            if range != .all {
-                HStack {
-                    Button { anchor = Self.shift(day, range, by: -1) } label: {
-                        Image(systemName: "chevron.left").frame(minWidth: Spacing.minTouchTarget, minHeight: Spacing.minTouchTarget)
-                    }
-                    .accessibilityLabel(tr("reports_previous_period"))
-                    .accessibilityIdentifier("report-previous-period")
-                    Text(ReportFormat.period(range.period(day).from, range.period(day).to) ?? "")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                    Button { anchor = Self.shift(day, range, by: 1) } label: {
-                        Image(systemName: "chevron.right").frame(minWidth: Spacing.minTouchTarget, minHeight: Spacing.minTouchTarget)
-                    }
-                    .accessibilityLabel(tr("reports_next_period"))
-                    .accessibilityIdentifier("report-next-period")
-                }
-            }
             if let report, let shown, let chart = ReportCharts.progress(report, shown) {
                 InfoCard(tone: .neutral) {
                     VStack(alignment: .leading, spacing: Spacing.between) {

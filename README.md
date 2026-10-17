@@ -14,4 +14,10 @@ Odpowiednik na Androida ma osobny projekt i ten sam zakres funkcji.
 
 ## Status
 
-Projekt na etapie specyfikacji; brak kodu aplikacji.
+- **2.0.1** — wydana (TestFlight, kompilacja 23): pełny zakres aplikacji na Androida 2.0.1.
+- **2.0.2** — w przygotowaniu, trzy poprawki ([specs/002-poprawki-2-0-2](specs/002-poprawki-2-0-2/spec.md)):
+  blokada aplikacji nie blokuje ponownie po odblokowaniu, miniatury zdjęć koni z programu pojawiają się na listach,
+  raport „Treningi jeźdźca” ma sumy na górze, wykres grup i zwijaną listę treningów. Wersja zostanie uznana
+  za wydaną po ręcznej liście kontrolnej na iPhonie.
+
+Budowanie, testy i wysyłka do TestFlight odbywają się wyłącznie w GitHub Actions (brak Maca).

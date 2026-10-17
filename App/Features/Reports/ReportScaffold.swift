@@ -106,8 +106,8 @@ enum ReportLoad<Report: Sendable> {
     }
 }
 
-/// Wspólny ekran raportu: opis filtrów, wykresy, karty wierszy (pierwsza kolumna jako tytuł, pozostałe jako etykieta—wartość
-/// z „Więcej szczegółów”), sumy, uwagi, eksport CSV i PDF.
+/// Wspólny ekran raportu: opis filtrów, sumy, wykresy, karty wierszy (pierwsza kolumna jako tytuł, pozostałe jako etykieta—wartość
+/// z „Więcej szczegółów”), uwagi, eksport CSV i PDF (kolejność wg specyfikacji: filtry → sumy → wykresy → wiersze → uwagi).
 struct ReportScaffold<Charts: View, Filters: View>: View {
     let titleKey: String
     let table: TabularReport?
@@ -121,16 +121,24 @@ struct ReportScaffold<Charts: View, Filters: View>: View {
     let fileName: String
     /// Wiersz rozwinięty od początku (zrzuty ekranu).
     var expandedRow: Int?
+    /// `false` — raport pokazuje własne podsumowanie w miejscu wykresów (np. „Treningi jeźdźca”: kafelki i karty grup).
+    var showsTotals = true
+    /// Wiersze zwinięte pod przyciskiem „Pokaż treningi (N)” / „Ukryj treningi”.
+    var collapsibleRows = false
+    /// Element pod opisem filtrów, nad sumami (np. przejście do poprzedniego i następnego okresu).
+    var accessory: AnyView?
     @ViewBuilder let charts: () -> Charts
     @ViewBuilder let filters: () -> Filters
 
     @State private var showingFilters = false
+    @State private var rowsExpanded = false
     @Environment(AppEnvironment.self) private var environment
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.beforeSection) {
                 header
+                if let accessory { accessory }
                 content
             }
             .padding(Spacing.screenEdge)
@@ -185,11 +193,7 @@ struct ReportScaffold<Charts: View, Filters: View>: View {
                 }
             }
         }
-        charts()
-        ForEach(Array(table.rows.enumerated()), id: \.offset) { index, row in
-            ReportRowCard(columns: table.columns, cells: row, expanded: index == expandedRow)
-        }
-        if !table.totalRows.isEmpty {
+        if showsTotals, !table.totalRows.isEmpty {
             InfoCard(tone: .primary) {
                 VStack(alignment: .leading, spacing: Spacing.between) {
                     ForEach(Array(table.totalRows.enumerated()), id: \.offset) { _, row in
@@ -199,7 +203,32 @@ struct ReportScaffold<Charts: View, Filters: View>: View {
             }
             .accessibilityIdentifier("report-totals")
         }
+        charts()
+        if collapsibleRows {
+            if !table.rows.isEmpty {
+                Button {
+                    withAnimation { rowsExpanded.toggle() }
+                } label: {
+                    Text(rowsExpanded ? tr("reports_hide_trainings") : tr("reports_show_trainings", table.rows.count))
+                        .font(.body.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: Spacing.minTouchTarget)
+                }
+                .buttonStyle(.bordered)
+                .tint(HorselyColor.primary)
+                .accessibilityIdentifier("report-rows-toggle")
+            }
+            if rowsExpanded { rowCards(table) }
+        } else {
+            rowCards(table)
+        }
         ForEach(table.notes, id: \.self) { Text($0).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant) }
+    }
+
+    @ViewBuilder
+    private func rowCards(_ table: TabularReport) -> some View {
+        ForEach(Array(table.rows.enumerated()), id: \.offset) { index, row in
+            ReportRowCard(columns: table.columns, cells: row, expanded: index == expandedRow)
+        }
     }
 
     private var filterSheet: some View {

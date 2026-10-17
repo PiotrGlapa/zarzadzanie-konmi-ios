@@ -90,7 +90,44 @@ public struct LineChart: Equatable, Sendable {
     public let series: [LineSeries]
 }
 
+/// Miara wykresu grup „Treningi jeźdźca”: liczba treningów albo łączny czas w minutach.
+public enum GroupMetric: CaseIterable, Sendable {
+    case count, minutes
+
+    public var label: String {
+        switch self {
+        case .count: ChartDescriptions.metricCount
+        case .minutes: ChartDescriptions.metricTime
+        }
+    }
+}
+
+public struct GroupBar: Equatable, Sendable {
+    public let label: String
+    public let value: Int
+}
+
+/// Słupki grup raportu „Treningi jeźdźca” (konie jednego jeźdźca albo jeźdźcy): wartości z `RiderTrainingsReport.groups` bez
+/// przeliczania. Przy więcej niż 12 grupach — 11 największych (w kolejności raportu) i „Pozostałe” z sumą reszty.
+public struct GroupBarChart: Equatable, Sendable {
+    public static let maxBars = 12
+    public let metric: GroupMetric
+    public let bars: [GroupBar]
+}
+
 public enum ReportCharts {
+    /// Wykres grup w wybranej mierze; `nil`, gdy raport nie ma grup.
+    public static func riderGroups(_ report: RiderTrainingsReport, metric: GroupMetric) -> GroupBarChart? {
+        let bars = report.groups.map { GroupBar(label: $0.name, value: metric == .count ? $0.count : $0.totalMinutes) }
+        guard !bars.isEmpty else { return nil }
+        guard bars.count > GroupBarChart.maxBars else { return GroupBarChart(metric: metric, bars: bars) }
+        let keep = GroupBarChart.maxBars - 1
+        let largest = Set(bars.indices.sorted { bars[$0].value != bars[$1].value ? bars[$0].value > bars[$1].value : $0 < $1 }.prefix(keep))
+        let shown = bars.indices.filter(largest.contains).map { bars[$0] }
+        let rest = bars.indices.filter { !largest.contains($0) }.reduce(0) { $0 + bars[$1].value }
+        return GroupBarChart(metric: metric, bars: shown + [GroupBar(label: ChartDescriptions.others, value: rest)])
+    }
+
     /// Słupki miesięczne po kategoriach z wierszy `groupBy=Month`; `nil` dla innego grupowania albo bez kosztów.
     public static func monthlyCosts(_ report: CostReport) -> StackedBarChart? {
         guard report.groupBy?.lowercased() == "month" else { return nil }
@@ -163,6 +200,20 @@ public enum ReportCharts {
 public enum ChartDescriptions {
     public static let monthlyTitle = "Koszty miesięczne według kategorii"
     public static let shareTitle = "Udział kategorii w kosztach"
+    public static let riderGroupsTitle = "Treningi według grup"
+    public static let metricCount = "Liczba treningów"
+    public static let metricTime = "Łączny czas"
+    public static let others = "Pozostałe"
+
+    /// Wartość słupka grup: liczba albo czas „X h Y min” (FR-M-RAP-04).
+    public static func groupValue(_ value: Int, metric: GroupMetric) -> String {
+        metric == .count ? String(value) : Formats.duration(minutes: value)
+    }
+
+    public static func groupBars(_ chart: GroupBarChart) -> String {
+        "\(riderGroupsTitle), \(chart.metric.label): "
+            + chart.bars.map { "\($0.label) — \(groupValue($0.value, metric: chart.metric))" }.joined(separator: "; ")
+    }
 
     public static func progressTitle(_ parameter: TrainingParameter) -> String { "Postęp: \(parameter.label)" }
 

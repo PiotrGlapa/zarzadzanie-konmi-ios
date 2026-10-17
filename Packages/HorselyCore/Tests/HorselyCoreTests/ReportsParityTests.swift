@@ -134,6 +134,31 @@ struct ReportsParityTests {
         #expect(TrainingRange.week.period(LocalDate(year: 2026, month: 9, day: 23)!).from == LocalDate(year: 2026, month: 9, day: 21))
     }
 
+    /// FR-017: „Podsumowanie treningów” pokazuje wykres postępu, gdy parametr ma wartości (np. czas, ocena).
+    @Test func theTrainingSummaryHasAProgressChartWheneverAParameterHasValues() throws {
+        let report = try decode(TrainingSummaryReport.self, "golden/training-summary/grom-all.json")
+        let available = ReportCharts.availableParameters(report)
+        #expect(available.contains(.duration))
+        #expect(available.contains(.rating))
+        for parameter in available {
+            let chart = try #require(ReportCharts.progress(report, parameter), "\(parameter)")
+            #expect(chart.parameter == parameter)
+            #expect(!chart.series.isEmpty)
+        }
+        // Parametr bez wartości w raporcie nie ma wykresu.
+        for parameter in TrainingParameter.allCases where !available.contains(parameter) {
+            #expect(ReportCharts.progress(report, parameter) == nil)
+        }
+    }
+
+    @Test func theRiderTrainingsGoldenFilesStillProduceTheSameTable() throws {
+        // Wykres grup nie zmienia tabeli: CSV/PDF z tych samych danych jak w 2.0.1 (FR-016).
+        let report = try decode(RiderTrainingsReport.self, "golden/rider-trainings/all-riders.json")
+        let table = ReportTables.riderTrainings(report)
+        #expect(table.totalRows.count == report.groups.count + 1)
+        #expect(String(decoding: CsvReportWriter.write(table), as: UTF8.self) == String(decoding: try Fixtures.data("golden/rider-trainings/all-riders.csv"), as: UTF8.self))
+    }
+
     @Test func chartsComeFromTheReportRows() throws {
         let source = InMemoryRecordSource(document: try ExportDocument.parse(Fixtures.data("parity/maly/export.json")))
         let report = try LocalReports(source: source).costReport(CostFilter(from: LocalDate(year: 2026, month: 1, day: 1), to: LocalDate(year: 2026, month: 12, day: 31)))

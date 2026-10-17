@@ -1078,7 +1078,7 @@ Identyfikatory: `FR-M-<obszar>-<nr>`. Słowa MUST/SHOULD jak w RFC 2119.
   kategorii; „Podsumowanie treningów” — wykres postępów z serii `series` (seria na rodzaj, kolor według `paletteIndex`
   jak w programie, różne kształty znaczników, legenda); „Treningi jeźdźca” — poziomy wykres słupkowy grup z odpowiedzi
   (`groups`: konie albo jeźdźcy) z przełącznikiem miary „Liczba treningów” / „Łączny czas” (wartości `count` i
-  `totalMinutes` bez przeliczania; przy więcej niż 12 grupach 11 pierwszych i słupek „Pozostałe” z sumą reszty — karty
+  `totalMinutes` bez przeliczania; przy więcej niż 12 grupach 11 największych (w kolejności raportu) i słupek „Pozostałe” z sumą reszty — karty
   grup zawsze pełne), a lista treningów MUST być domyślnie zwinięta pod przyciskiem „Pokaż treningi (N)” / „Ukryj
   treningi”. W każdym raporcie karta sum MUST stać nad wykresami (kolejność: filtry → sumy → wykresy → wiersze → uwagi).
   Wykresy MUST być czytelne w obu motywach i w orientacji pionowej

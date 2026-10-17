@@ -120,6 +120,31 @@ struct LineChartView: View {
     }
 }
 
+/// Treningi według grup (konie jednego jeźdźca albo jeźdźcy): poziome słupki z wartością przy słupku — liczba treningów albo
+/// łączny czas „X h Y min”; opis dla VoiceOver zawiera każdą etykietę i wartość.
+struct GroupBarChartView: View {
+    let chart: GroupBarChart
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.between) {
+            Text(tr("reports_chart_rider_groups_title")).font(.subheadline.weight(.semibold))
+            Chart(Array(chart.bars.enumerated()), id: \.offset) { _, bar in
+                BarMark(x: .value(chart.metric.label, bar.value), y: .value("Grupa", bar.label))
+                    .foregroundStyle(HorselyColor.primary)
+                    .annotation(position: .trailing, alignment: .center) {
+                        Text(ChartDescriptions.groupValue(bar.value, metric: chart.metric)).font(.caption2).foregroundStyle(HorselyColor.onSurfaceVariant)
+                    }
+            }
+            .chartXAxis(.hidden)
+            .chartXScale(domain: 0...(Double(max(chart.bars.map(\.value).max() ?? 0, 1)) * 1.35))
+            .frame(height: CGFloat(chart.bars.count) * 36 + 12)
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(ChartDescriptions.groupBars(chart))
+        .accessibilityIdentifier("report-chart-groups")
+    }
+}
+
 /// Obraz wykresu do PDF (renderowany przez `ImageRenderer` z tych samych widoków co ekran).
 struct ChartImage: Identifiable {
     let id = UUID()
