@@ -137,8 +137,8 @@ Brak zadań blokujących wszystkie historie — US1, US2 i US3 dotykają rozłą
 ## Phase 8: Wydanie 2.0.2 (jedyna wysyłka do TestFlight)
 
 - [X] T035 Ustaw `MARKETING_VERSION: "2.0.2"` w project.yml, commit „Wydanie 2.0.2”, push na `main`, zielony `ci.yml`
-- [ ] T036 Utwórz tag `v2.0.2` na tym commicie i wypchnij go; obserwuj `release.yml` (`gh run watch --exit-status`) — archiwum, podpis, wysyłka do TestFlight, grupa „Właściciele”; przy braku sekretów podpisywania lub klucza App Store Connect zgłoś to wprost
-- [ ] T037 Raport dla właściciela: wersja 2.0.2, numer kompilacji (`GITHUB_RUN_NUMBER`), wynik wysyłki, link do przebiegu `gh run`; przekaż listę ręczną z [quickstart.md](quickstart.md#3-lista-ręczna-dla-właściciela-iphone-15-pro-kompilacja-202); zaktualizuj pamięć „ostatnia kompilacja TestFlight” (data + przypomnienie po 80 dniach)
+- [X] T036 Utwórz tag `v2.0.2` na tym commicie i wypchnij go; obserwuj `release.yml` (`gh run watch --exit-status`) — archiwum, podpis, wysyłka do TestFlight, grupa „Właściciele”; przy braku sekretów podpisywania lub klucza App Store Connect zgłoś to wprost — _tag v2.0.2, release.yml 39049520496: archiwum, podpis i wysyłka do TestFlight zakończone sukcesem_
+- [X] T037 Raport dla właściciela: wersja 2.0.2, numer kompilacji (`GITHUB_RUN_NUMBER`), wynik wysyłki, link do przebiegu `gh run`; przekaż listę ręczną z [quickstart.md](quickstart.md#3-lista-ręczna-dla-właściciela-iphone-15-pro-kompilacja-202); zaktualizuj pamięć „ostatnia kompilacja TestFlight” (data + przypomnienie po 80 dniach) — _wersja 2.0.2, kompilacja 24 (run_number), pamięć zaktualizowana (przypomnienie od 2027-01-05)_
 - [ ] T038 Po odpowiedzi właściciela zapisz wynik listy ręcznej (punkty 1–3 quickstart.md: zaliczony / niezaliczony z opisem) w specs/002-poprawki-2-0-2/quickstart.md, sekcja „Wynik listy ręcznej 2.0.2”; dopiero przy wyniku pozytywnym oznacz 2.0.2 jako wydaną w README.md (konstytucja: „wersja jest wydana po ręcznej liście kontrolnej”); przy wyniku negatywnym — nowa specyfikacja poprawki 2.0.3, bez ponownego tagowania 2.0.2. Weryfikacja wydajności NFR-M-01…03 pominięta decyzją właściciela (plan.md, „Complexity Tracking”)
 
 ---
