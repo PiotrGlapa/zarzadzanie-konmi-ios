@@ -14,6 +14,11 @@ struct HorseRepositoryTests {
         return (repository, store, directory)
     }
 
+    /// Źródło miniatur i oryginałów nad tym samym magazynem co repozytorium (bez programu: tryb samodzielny).
+    private func makeAttachments(_ store: RecordStore, _ directory: URL) throws -> AttachmentStore {
+        AttachmentStore(store: store, files: try LocalFileStore(root: directory), client: nil, mode: { .standalone }, settings: { AttachmentSettings() })
+    }
+
     private func draft(_ name: String, passport: String? = nil) -> HorseDraft {
         var draft = HorseDraft()
         draft.name = name
@@ -123,8 +128,9 @@ struct HorseRepositoryTests {
         #expect(attachment.contentType == "image/jpeg")
         #expect(try await repository.imageAttachments(horseId: horse.id).map(\.id) == [photoId])
 
-        let thumbnail = try #require(await repository.thumbnailData(attachmentId: photoId))
-        let original = try #require(await repository.originalData(attachmentId: photoId))
+        let attachments = try makeAttachments(store, directory)
+        guard case let .image(thumbnail) = await attachments.thumbnail(attachmentId: photoId) else { throw TestFailure("brak miniatury") }
+        let original = try Data(contentsOf: try await attachments.content(attachmentId: photoId))
         #expect(!thumbnail.isEmpty && thumbnail.count < original.count)
         #expect(!ImagePreparer.hasGPS(original))
 
@@ -147,7 +153,7 @@ struct HorseRepositoryTests {
     }
 
     @Test func removingThePhotoOnlyUnlinksIt() async throws {
-        let (repository, _, directory) = try makeRepository()
+        let (repository, store, directory) = try makeRepository()
         defer { try? FileManager.default.removeItem(at: directory) }
         let horse = try savedHorse(try await repository.save(draft("Grom")))
         try await repository.setPhoto(horseId: horse.id, image: try sampleImage())
@@ -155,7 +161,30 @@ struct HorseRepositoryTests {
         try await repository.clearPhoto(horseId: horse.id)
         #expect(try await repository.horse(id: horse.id)?.photoAttachmentId == nil)
         #expect(try await repository.imageAttachments(horseId: horse.id).map(\.id) == [photoId])
-        #expect(await repository.thumbnailData(attachmentId: photoId) != nil)
+        guard case .image = await (try makeAttachments(store, directory)).thumbnail(attachmentId: photoId) else { throw TestFailure("brak miniatury") }
+    }
+
+    /// FR-011: po przejściu na tryb samodzielny (pobrany oryginał zdjęcia konia, bez miniatury) awatar działa bez programu.
+    @Test func afterSwitchingToStandaloneAHorsePhotoGetsItsThumbnailFromTheDownloadedOriginal() async throws {
+        let (repository, store, directory) = try makeRepository()
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let horse = try savedHorse(try await repository.save(draft("Grom")))
+        try await repository.setPhoto(horseId: horse.id, image: try sampleImage())
+        let photoId = try #require(try await repository.horse(id: horse.id)?.photoAttachmentId)
+        // Stan po pobraniu oryginałów z programu: jest oryginał, nie ma miniatury.
+        let original = try #require(try await store.read { try $0.file(attachmentId: photoId, kind: .original) })
+        try await store.write { access in
+            try access.deleteFiles(attachmentId: photoId)
+            try access.upsertFile(original)
+        }
+        try FileManager.default.removeItem(at: directory.appendingPathComponent("\(photoId)/thumbnail.jpg"))
+        let attachments = try makeAttachments(store, directory)
+        #expect(try await store.read { try $0.file(attachmentId: photoId, kind: .thumbnail) } == nil)
+
+        guard case let .image(data) = await attachments.thumbnail(attachmentId: photoId) else { throw TestFailure("brak miniatury") }
+        #expect(!data.isEmpty)
+        let saved = try #require(try await store.read { try $0.file(attachmentId: photoId, kind: .thumbnail) })
+        #expect(saved.pinned)
     }
 
     @Test func aPhotoCanBeChosenOnlyFromTheHorsesOwnImages() async throws {

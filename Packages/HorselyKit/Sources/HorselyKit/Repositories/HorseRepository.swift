@@ -173,18 +173,6 @@ public final class HorseRepository: Sendable {
         }
     }
 
-    /// Dane miniatury załącznika (lub `nil`, gdy pliku nie ma w telefonie).
-    public func thumbnailData(attachmentId: String) async -> Data? {
-        guard let info = try? await store.read({ access in try access.file(attachmentId: attachmentId, kind: .thumbnail) }) else { return nil }
-        return files.read(info)
-    }
-
-    /// Dane oryginału załącznika (podgląd zdjęcia „Pokaż zdjęcie”).
-    public func originalData(attachmentId: String) async -> Data? {
-        guard let info = try? await store.read({ access in try access.file(attachmentId: attachmentId, kind: .original) }) else { return nil }
-        return files.read(info)
-    }
-
     // MARK: Pomocnicze
 
     /// Zmiana zdjęcia konia: w trybie online koń `Pending` i `UpdateRecord` z `photoAttachmentId` w kolejce, w samodzielnym — zapis lokalny.

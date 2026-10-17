@@ -41,6 +41,8 @@ struct HorsePhotoSheet: View {
     @State private var attachments: [LocalAttachment] = []
     @State private var showingAttachments = false
     @State private var loadFailed = false
+    @State private var loadingViewer = false
+    @State private var viewerFailure: String?
 
     init(horse: LocalHorse?, hasPhoto: Bool, context: PhotoSheetContext, previewData: Data? = nil, onResult: @escaping (PhotoSheetResult) -> Void) {
         self.horse = horse
@@ -65,10 +67,18 @@ struct HorsePhotoSheet: View {
                     Button { Task { await openAttachments() } } label: { row("paperclip", "photo_from_attachments") }
                 }
                 if hasPhoto {
-                    Button { Task { await openViewer() } } label: { row("eye", "photo_show") }
+                    Button { Task { await openViewer() } } label: {
+                        HStack {
+                            row("eye", "photo_show")
+                            if loadingViewer { ProgressView() }
+                        }
+                    }
+                    .disabled(loadingViewer)
+                    .accessibilityIdentifier("photo-show")
                     Button(role: .destructive) { confirmingRemoval = true } label: { row("trash", "photo_remove") }
                 }
                 if loadFailed { Text("photo_crop_failed").foregroundStyle(HorselyColor.error) }
+                if let viewerFailure { Text(viewerFailure).foregroundStyle(HorselyColor.error) }
             }
             .navigationTitle("photo_sheet_title")
             .navigationBarTitleDisplayMode(.inline)
@@ -146,9 +156,24 @@ struct HorsePhotoSheet: View {
 
     // MARK: Podgląd i załączniki
 
+    /// „Pokaż zdjęcie”: oczekujące zdjęcie z formularza albo oryginał — z pamięci telefonu, a gdy go tam nie ma (zdjęcie z programu),
+    /// pobrany z programu (FR-009); komunikaty jak przy otwieraniu załącznika.
     private func openViewer() async {
+        viewerFailure = nil
         var data = previewData
-        if data == nil, let attachmentId = horse?.photoAttachmentId { data = await environment.horses.originalData(attachmentId: attachmentId) }
+        if data == nil, let attachmentId = horse?.photoAttachmentId {
+            loadingViewer = true
+            defer { loadingViewer = false }
+            do {
+                data = try Data(contentsOf: try await environment.attachments.content(attachmentId: attachmentId))
+            } catch AttachmentError.fileUnavailable {
+                viewerFailure = tr("attachments_file_unavailable")
+                return
+            } catch {
+                viewerFailure = tr("attachments_download_failed")
+                return
+            }
+        }
         guard let data, let image = UIImage(data: data) else { loadFailed = true; return }
         viewerImage = image
         showingViewer = true

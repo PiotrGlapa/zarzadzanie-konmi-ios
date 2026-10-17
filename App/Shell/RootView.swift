@@ -62,7 +62,11 @@ struct RootView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             environment.appLock.sceneChanged(phase, settings: environment.settings)
-            if phase == .active { Task { await environment.processSharedInbox() } }
+            if phase == .active {
+                Task { await environment.processSharedInbox() }
+                // Powrót na pierwszy plan ponawia miniatury zdjęć koni także wtedy, gdy odświeżenie nie jest jeszcze należne (FR-008).
+                Task { await environment.horseDirectory.retryMissingThumbnails() }
+            }
             guard environment.workMode == .online else { return }
             switch phase {
             case .active:

@@ -12,6 +12,8 @@ final class FakeProgram: @unchecked Sendable {
         case fail(URLError.Code)
         /// Odpowiedź JSON po opóźnieniu (zapis z połączeniem dłuższy niż 1 s).
         case delayed(TimeInterval, Int, String)
+        /// Odpowiedź binarna (obraz) po opcjonalnym opóźnieniu — miniatury i pliki załączników.
+        case bytes(Int, Data, contentType: String = "image/jpeg", delay: TimeInterval = 0)
     }
 
     struct Recorded: Sendable {
@@ -138,6 +140,14 @@ final class StubProtocol: URLProtocol, @unchecked Sendable {
         case let .delayed(seconds, status, text):
             DispatchQueue.global().asyncAfter(deadline: .now() + seconds) { [self] in
                 respond(status, ["Content-Type": "application/json"], Data(text.utf8))
+            }
+        case let .bytes(status, data, contentType, delay):
+            if delay > 0 {
+                DispatchQueue.global().asyncAfter(deadline: .now() + delay) { [self] in
+                    respond(status, ["Content-Type": contentType], data)
+                }
+            } else {
+                respond(status, ["Content-Type": contentType], data)
             }
         }
     }

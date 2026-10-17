@@ -61,4 +61,18 @@ final class HorsesFlowUITests: XCTestCase {
         XCTAssertTrue(app.buttons["horse-row-Iskra"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["horses-add"].exists)
     }
+
+    /// Poprawka 2.0.2 (FR-006, SC-002): miniatura zdjęcia konia z programu pojawia się na liście koni sama, w ciągu 10 s po
+    /// pobraniu danych, bez restartu (zaślepka programu `photos` odpowiada małym PNG na `attachments/{id}/thumbnail`).
+    @MainActor
+    func testAHorsePhotoFromTheProgramAppearsOnTheHorsesList() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-UITestReset", "-UITestToday", "2026-10-05", "-UITestMode", "online", "-UITestProgram", "photos"]
+        app.launch()
+
+        app.tabBars.firstMatch.buttons.element(boundBy: 1).tap()
+        XCTAssertTrue(app.buttons["horse-row-Grom"].waitForExistence(timeout: 20), "koń z programu na liście")
+        let photo = app.descendants(matching: .any)["horse-avatar-photo-Grom"]
+        XCTAssertTrue(photo.waitForExistence(timeout: 10), "miniatura zdjęcia konia z programu")
+    }
 }

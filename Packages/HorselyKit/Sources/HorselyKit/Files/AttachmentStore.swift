@@ -293,12 +293,50 @@ public final class AttachmentStore: Sendable {
 
     /// Miniatura z pamięci albo z programu (tylko obrazy); `nil`, gdy jej nie ma.
     public func thumbnail(_ attachment: LocalAttachment) async -> Data? {
-        if let info = try? await store.read({ try $0.file(attachmentId: attachment.id, kind: .thumbnail) }), let data = files.read(info) { return data }
-        guard FilePolicy.isImage(attachment.contentType), mode() == .online, let client else { return nil }
-        guard case let .success(response) = await client.execute(ApiRequest(.get, "attachments/\(attachment.id)/thumbnail", forFile: true)),
-              !response.body.isEmpty, let info = try? files.write(response.body, attachmentId: attachment.id, kind: .thumbnail, pinned: true) else { return nil }
-        try? await store.write { try $0.upsertFile(info) }
-        return response.body
+        if let data = await localThumbnail(attachment.id) { return data }
+        guard FilePolicy.isImage(attachment.contentType) else { return nil }
+        if case let .image(data) = await thumbnail(attachmentId: attachment.id) { return data }
+        return nil
+    }
+
+    /// Miniatura załącznika-obrazu po identyfikatorze (zdjęcie konia, FR-006…FR-011), w kolejności: plik miniatury →
+    /// miniatura z lokalnego oryginału (zapis przypięty) → w trybie online `GET attachments/{id}/thumbnail` (zapis przypięty).
+    /// Odpowiedź `404` to `.unavailable` (zdjęcia już nie ma w programie); brak źródła albo sieci to `.failed` — do ponowienia.
+    public func thumbnail(attachmentId id: String) async -> ThumbnailResult {
+        if let data = await localThumbnail(id) { return .image(data) }
+        if let info = try? await store.read({ try $0.file(attachmentId: id, kind: .original) }), let original = files.read(info) {
+            guard let small = try? ImagePreparer.thumbnail(original) else { return .unavailable }
+            if let saved = try? files.write(small, attachmentId: id, kind: .thumbnail, pinned: true) {
+                try? await store.write { try $0.upsertFile(saved) }
+            }
+            return .image(small)
+        }
+        guard mode() == .online, let client else { return .failed }
+        switch await client.execute(ApiRequest(.get, "attachments/\(id)/thumbnail", forFile: true)) {
+        case let .success(response):
+            guard !response.body.isEmpty else { return .failed }
+            if let saved = try? files.write(response.body, attachmentId: id, kind: .thumbnail, pinned: true) {
+                try? await store.write { try $0.upsertFile(saved) }
+            }
+            return .image(response.body)
+        case .failure(.notFound):
+            return .unavailable
+        case .failure:
+            return .failed
+        }
+    }
+
+    private func localThumbnail(_ id: String) async -> Data? {
+        guard let info = try? await store.read({ try $0.file(attachmentId: id, kind: .thumbnail) }) else { return nil }
+        return files.read(info)
+    }
+
+    /// Cały plik załącznika po identyfikatorze (podgląd „Pokaż zdjęcie” konia): jak `content(_:)`, rekord czytany z magazynu.
+    public func content(attachmentId id: String) async throws -> URL {
+        guard let attachment = try await store.read({ try $0.get(.attachment, id: id)?.record(as: LocalAttachment.self) }) else {
+            throw AttachmentError.fileUnavailable
+        }
+        return try await content(attachment)
     }
 
     /// Cały plik: z pamięci (zapamiętuje otwarcie), z kolejki (jeszcze niewysłany) albo z programu (do pamięci LRU, przypięty przy

@@ -10,7 +10,7 @@ struct LaunchOptions: Equatable, Sendable {
     var fixture: String?
     var today: LocalDate?
     var mode: WorkMode?
-    /// `-UITestProgram <paired|offline|conflict>`: zaślepka programu w procesie (testy UI parowania i połączenia).
+    /// `-UITestProgram <paired|offline|conflict|photos>`: zaślepka programu w procesie (testy UI parowania i połączenia).
     var program: String?
     /// `-UITestReset`: wyczyść zapamiętane ustawienia przed startem (świeża instalacja).
     var reset = false
@@ -159,6 +159,7 @@ final class AppEnvironment {
             appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.1", dates: dates
         )
         self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
+        horseDirectory.useThumbnailSource(attachments)
     }
 
     /// Przygotowuje magazyn do pracy: w trybie samodzielnym wstawia domyślne słowniki (gdy ich jeszcze nie ma).
@@ -233,6 +234,8 @@ final class AppEnvironment {
             rescheduleNotifications()
         }
         await loadPairingInfo()
+        // Kolejne odświeżenie ponawia miniatury zdjęć koni, których pobranie się nie udało (FR-008).
+        await horseDirectory.retryMissingThumbnails()
     }
 
     /// Po zapisie z formularza: w trybie online wysyła operacje i czeka ≤ 1 s. Zwraca tekst komunikatu
@@ -286,6 +289,8 @@ final class AppEnvironment {
         for attachment in attachments {
             if (try? await self.attachments.content(attachment)) == nil { missing += 1 }
         }
+        // Miniatury zdjęć koni z pobranych oryginałów — awatary działają w trybie samodzielnym bez programu (FR-011).
+        await horseDirectory.retryMissingThumbnails()
         return (!outcome.succeeded, missing)
     }
 

@@ -12,6 +12,7 @@ struct HorsesView: View {
     @State private var banner: String?
 
     private var directory: HorseDirectory { environment.horseDirectory }
+    private static let exposesPhotoToUITests = ProcessInfo.processInfo.arguments.contains("-UITestMode")
 
     private var visible: [LocalHorse] {
         HorseSearch.apply(directory.horses, query: query, filter: filter, onlyFoals: onlyFoals)
@@ -33,6 +34,16 @@ struct HorsesView: View {
                             }
                             .buttonStyle(.plain)
                             .accessibilityIdentifier("horse-row-\(horse.name)")
+                            .overlay(alignment: .leading) {
+                                // Tylko w przebiegu testów UI: awatar jest dekoracyjny i wchodzi w skład wiersza, więc jego obecność
+                                // zdjęcia (z programu) sygnalizuje osobny, niewidoczny element.
+                                if Self.exposesPhotoToUITests, directory.thumbnail(for: horse) != nil {
+                                    Color.clear.frame(width: 1, height: 1)
+                                        .accessibilityElement()
+                                        .accessibilityLabel(horse.name)
+                                        .accessibilityIdentifier("horse-avatar-photo-\(horse.name)")
+                                }
+                            }
                         }
                     }
                     addButton
