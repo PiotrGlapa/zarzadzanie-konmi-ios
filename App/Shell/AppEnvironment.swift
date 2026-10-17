@@ -156,7 +156,7 @@ final class AppEnvironment {
         self.trash = TrashRepository(store: store, entries: entries, files: files, dates: dates)
         self.backup = BackupService(
             store: store, files: files, workDirectory: FileManager.default.temporaryDirectory.appendingPathComponent("horsely-backup", isDirectory: true),
-            appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.1", dates: dates
+            appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.0.2", dates: dates
         )
         self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
         horseDirectory.useThumbnailSource(attachments)
