@@ -109,6 +109,7 @@ struct RiderTrainingsReportView: View {
 struct RiderTrainingsSummaryView: View {
     let report: RiderTrainingsReport
     @State private var metric: GroupMetric = .count
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private static let ratingColumn = ReportColumn(ReportTexts.trainingRating, .decimal1)
 
@@ -139,8 +140,11 @@ struct RiderTrainingsSummaryView: View {
     private var tiles: some View {
         let total = report.total
         return InfoCard(tone: .primary) {
-            LazyVGrid(columns: [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)], alignment: .leading,
-                      spacing: Spacing.between) {
+            // Przy dużym tekście (dostępność) jedna kolumna — etykiety i kwoty nie łamią się w środku słowa.
+            let columns = typeSize.isAccessibilitySize
+                ? [GridItem(.flexible(), alignment: .topLeading)]
+                : [GridItem(.flexible(), alignment: .topLeading), GridItem(.flexible(), alignment: .topLeading)]
+            LazyVGrid(columns: columns, alignment: .leading, spacing: Spacing.between) {
                 tile(tr("reports_chart_metric_count"), String(total.count))
                 tile(tr("reports_chart_metric_time"), Formats.duration(minutes: total.totalMinutes))
                 tile(ReportTexts.trainingRating, TabularReport.display(Self.ratingColumn, total.averageRating.map(ReportValue.number)))

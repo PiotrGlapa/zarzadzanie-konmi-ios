@@ -33,7 +33,7 @@ nie blokują US1 i US2.
 - [X] T002 Uruchom scripts/sync-strings.ps1, aby przenieść nowe teksty do zasobów aplikacji iOS (App/Resources), i sprawdź, że Tests/AppSnapshotTests/StringsParityTests.swift nie wymaga zmian
 - [X] T003 [P] Opisz zmianę zakresu w SPECYFIKACJA_MOBILE_IOS.md: historia „Raporty” scenariusz 5 i FR-M-RAP-03 — wykres słupkowy grup (liczba / łączny czas, > 12 grup → 11 + „Pozostałe”), lista treningów zwinięta pod „Pokaż treningi (N)”; wpis w historii wersji dokumentu (2.0.2)
 - [X] T004 [P] Opisz tę samą zmianę zakresu w ../zarzadzanie_konmi_android/SPECYFIKACJA_MOBILE_ANDROID.md (scenariusz 5 „Treningi jeźdźca”, FR-M-RAP-03) i zacommituj w repozytorium Androida
-- [ ] T005 Commit i push na `main` (iOS), poczekaj na zielony `ci.yml` — bez taga
+- [X] T005 Commit i push na `main` (iOS), poczekaj na zielony `ci.yml` — bez taga
 
 **Checkpoint**: teksty i specyfikacje gotowe; CI zielone.
 
@@ -61,7 +61,7 @@ Brak zadań blokujących wszystkie historie — US1, US2 i US3 dotykają rozłą
 - [X] T008 [US1] Przebuduj `AppLockState` w App/Features/Lock/LockOverlay.swift na cienką powłokę `@Observable` nad `AppLockMachine`: `sceneChanged` mapuje `ScenePhase` na zdarzenia z `Date()`, `unlock()` woła `authenticationStarted`/`authenticationFinished`; usuń odczyt i zapis `settings.appLockLastBackgroundAt`; zachowaj wyłączenie blokady w testach (`settings.appLockEnabled && !launchOptions.isTestRun` w App/Shell/AppEnvironment.swift:126)
 - [X] T009 [US1] W `LockOverlay` (App/Features/Lock/LockOverlay.swift) zmień `.task` tak, aby samoczynne uwierzytelnienie startowało tylko gdy `autoPromptAvailable` (nowa metoda `AppLockState.autoUnlock()`), a przycisk „Odblokuj” zawsze wywoływał `unlock()`
 - [X] T010 [US1] Oznacz `appLockLastBackgroundAt` w Packages/HorselyKit/Sources/HorselyKit/Store/SettingsStore.swift jako nieużywany (komentarz, bez usuwania klucza — brak migracji) i zaktualizuj ewentualne odwołania w Packages/HorselyKit/Tests/HorselyKitTests/SettingsMaintenanceTests.swift
-- [ ] T011 [US1] Commit i push na `main`, zielony `ci.yml` (testy pakietów, migawkowe, UI) — bez taga
+- [X] T011 [US1] Commit i push na `main`, zielony `ci.yml` (testy pakietów, migawkowe, UI) — bez taga
 
 **Checkpoint**: blokada naprawiona i zabezpieczona testem sekwencji.
 
@@ -86,7 +86,7 @@ Brak zadań blokujących wszystkie historie — US1, US2 i US3 dotykają rozłą
 - [X] T017 [US2] W App/Shell/AppEnvironment.swift wywołaj `horseDirectory.retryMissingThumbnails()` po zakończonej synchronizacji w `refresh(force:)` (także pierwszej i wymuszonej przeciągnięciem w dół), przy powrocie aplikacji na pierwszy plan (`.active` w `RootView.onChange(of: scenePhase)`, także gdy `refresh(force: false)` kończy się wcześniej, bo odświeżenie nie jest należne) oraz po `prepareStandaloneSwitch` (miniatury z pobranych oryginałów, FR-011) — tak rozumiemy „kolejne odświeżenie” z FR-008
 - [X] T018 [US2] W App/Features/Horses/HorsePhotoSheet.swift (podgląd „Pokaż zdjęcie”) pobieraj oryginał przez `environment.attachments.content(_:)`, z dotychczasowym wskaźnikiem ładowania i komunikatem jak przy otwieraniu załącznika, gdy program niedostępny
 - [X] T019 [US2] Dodaj scenariusz `photos` do zaślepki programu w App/Shell/DemoProgram.swift (`-UITestProgram photos`: sparowany program z koniem, który ma `photoAttachmentId`, rekord załącznika obrazu oraz odpowiedzi `attachments/{id}/thumbnail` i `attachments/{id}/content` z małym PNG w kodzie) i dodaj test UI w Tests/AppUITests/HorsesFlowUITests.swift (`-UITestMode online -UITestProgram photos`): na liście koni awatar konia ma obraz (identyfikator dostępności awatara, np. `horse-avatar-photo`) w ≤ 10 s; jeśli brak identyfikatora, dodaj go w `HorseAvatar`
-- [ ] T020 [US2] Commit i push na `main`, zielony `ci.yml` — bez taga; jeśli zmieniły się migawki koni lub Pulpitu (Tests/AppSnapshotTests/HorsesSnapshotTests.swift, ShellSnapshotTests.swift), pobierz artefakt `snapshots-*`, przejrzyj zrzuty i zacommituj referencje
+- [X] T020 [US2] Commit i push na `main`, zielony `ci.yml` — bez taga; jeśli zmieniły się migawki koni lub Pulpitu (Tests/AppSnapshotTests/HorsesSnapshotTests.swift, ShellSnapshotTests.swift), pobierz artefakt `snapshots-*`, przejrzyj zrzuty i zacommituj referencje
 
 **Checkpoint**: miniatury działają online, offline i po przejściu na tryb samodzielny.
 
