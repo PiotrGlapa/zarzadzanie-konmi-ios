@@ -113,7 +113,7 @@ Brak zadań blokujących wszystkie historie — US1, US2 i US3 dotykają rozłą
 - [X] T026 [US3] W App/Features/Reports/RiderReportViews.swift (`RiderTrainingsReportView`): kafelki podsumowania z `report.total` (liczba, łączny czas, średnia ocena „—” bez ocen, koszt) w slocie sum, przełącznik segmentowy `report-chart-metric` „Liczba treningów / Łączny czas” + `GroupBarChartView`, karty grup `report-group-<n>` jak w Androidzie, `collapsibleRows: true`; `pdfCharts` — oba warianty wykresu przez `ChartRendering.image` z tytułem `reports_chart_rider_groups_title` i opisem `ChartDescriptions.groupBars`
 - [X] T027 [US3] Sprawdź App/Features/Reports/TrainingSummaryReportView.swift po zmianie scaffoldu: sumy „Razem” nad wierszami rodzajów, wykres postępu widoczny przy danych; popraw tylko, jeśli test T022 lub migawka wykazuje problem
 - [X] T028 [US3] Dodaj migawki w Tests/AppSnapshotTests/ReportsSnapshotTests.swift: `testRiderTrainingsSummaryAndChart` (jeden jeździec, kilka koni) i `testRiderTrainingsAllRiders` (wszyscy jeźdźcy) — jasny, ciemny, tekst 200 %; istniejące migawki raportów zmienią się przez sumy na górze
-- [ ] T029 [US3] Commit i push na `main`; z przebiegu `ci.yml` pobierz artefakt `snapshots-*`, przejrzyj nowe i zmienione zrzuty raportów (sumy i wykres widoczne bez przewijania na iPhone 15 Pro, SC-004), zacommituj referencje do Tests/AppSnapshotTests/__Snapshots__/ i doprowadź `ci.yml` do zielonego — bez taga
+- [X] T029 [US3] Commit i push na `main`; z przebiegu `ci.yml` pobierz artefakt `snapshots-*`, przejrzyj nowe i zmienione zrzuty raportów (sumy i wykres widoczne bez przewijania na iPhone 15 Pro, SC-004), zacommituj referencje do Tests/AppSnapshotTests/__Snapshots__/ i doprowadź `ci.yml` do zielonego — bez taga
 
 **Checkpoint**: raporty czytelne, eksport bez zmian wartości.
 
@@ -122,15 +122,15 @@ Brak zadań blokujących wszystkie historie — US1, US2 i US3 dotykają rozłą
 ## Phase 6: Polish & Cross-Cutting
 
 - [X] T030 [P] Zaktualizuj README.md (sekcja „Status”: wydanie 2.0.2 z trzema poprawkami) i wpis historii zmian w SPECYFIKACJA_MOBILE_IOS.md
-- [ ] T031 [P] Utwórz zadanie dla repozytorium Androida (osobna sesja lub issue w `zarzadzanie_konmi_android`): wykres grup i zwijana lista w `RiderReportScreens.kt` zgodnie z T004 — nie blokuje wydania iOS
-- [ ] T032 Przegląd zgodności z [spec.md](spec.md): każdy FR-001…FR-019 ma zadanie i test; przejrzyj ostrzeżenia kompilacji w logu `ci.yml` (ostrzeżenia jako błędy)
-- [ ] T033 Commit i push na `main`, zielony `ci.yml` — bez taga
+- [X] T031 [P] Utwórz zadanie dla repozytorium Androida (osobna sesja lub issue w `zarzadzanie_konmi_android`): wykres grup i zwijana lista w `RiderReportScreens.kt` zgodnie z T004 — nie blokuje wydania iOS — _wykonano: zgłoszenie https://github.com/PiotrGlapa/zarzadzanie-konmi-android/issues/2_
+- [X] T032 Przegląd zgodności z [spec.md](spec.md): każdy FR-001…FR-019 ma zadanie i test; przejrzyj ostrzeżenia kompilacji w logu `ci.yml` (ostrzeżenia jako błędy)
+- [X] T033 Commit i push na `main`, zielony `ci.yml` — bez taga — _CI zielony: przebieg 39046775993 (ten sam kod; dalsze commity tylko zadania i wersja)_
 
 ---
 
 ## Phase 7: Bramka przed wydaniem
 
-- [ ] T034 Potwierdź warunki wejścia z [contracts/release.md](contracts/release.md): T001–T033 ukończone, ostatni `ci.yml` na `main` zielony, zrzuty przejrzane, obie specyfikacje zaktualizowane; potwierdź, że weryfikacja wydajności jest świadomie pominięta (plan.md, „Complexity Tracking”); sprawdź, że w fazach 1–6 nie powstał tag `v*` ani przebieg `release.yml` (`gh run list --workflow release.yml --limit 3`)
+- [X] T034 Potwierdź warunki wejścia z [contracts/release.md](contracts/release.md): T001–T033 ukończone, ostatni `ci.yml` na `main` zielony, zrzuty przejrzane, obie specyfikacje zaktualizowane; potwierdź, że weryfikacja wydajności jest świadomie pominięta (plan.md, „Complexity Tracking”); sprawdź, że w fazach 1–6 nie powstał tag `v*` ani przebieg `release.yml` (`gh run list --workflow release.yml --limit 3`)
 
 ---
 
