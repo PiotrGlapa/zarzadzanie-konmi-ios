@@ -123,7 +123,7 @@ final class AppEnvironment {
         self.workMode = settings.workMode
         self.theme = settings.theme
         self.sectionFilters = SectionFilters(today: dates.today())
-        self.appLock = AppLockState(locked: settings.appLockEnabled && !launchOptions.isTestRun)
+        self.appLock = AppLockState(enabled: settings.appLockEnabled, suppressed: launchOptions.isTestRun)
 
         // Bez jawnej grupy: domyślna grupa to pierwsza z `keychain-access-groups` (wspólna z rozszerzeniem).
         let secretStore = secrets ?? KeychainStore()

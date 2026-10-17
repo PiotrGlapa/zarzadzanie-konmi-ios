@@ -2,60 +2,68 @@ import HorselyKit
 import SwiftUI
 import UIKit
 
-/// Stan blokady aplikacji (T132, FR-TRB-09): zablokowana przy otwarciu i po powrocie po ponad 5 minutach w tle; zasłona ukrywa treść
-/// w przełączniku aplikacji; telefon bez blokady ekranu wyłącza blokadę z informacją.
+/// Stan blokady aplikacji (T132, FR-TRB-09; 2.0.2 FR-001…FR-005): cienka powłoka `@Observable` nad `AppLockMachine`
+/// z HorselyKit (cała logika i jej testy są w pakiecie). Zablokowana przy zimnym starcie i po powrocie po ponad 5 minutach
+/// w tle; zasłona ukrywa treść w przełączniku aplikacji; telefon bez blokady ekranu wyłącza blokadę z informacją.
 @MainActor
 @Observable
 final class AppLockState {
-    private(set) var locked: Bool
+    private var machine: AppLockMachine
+    /// Przebieg testowy aplikacji nigdy nie blokuje.
+    private let suppressed: Bool
+
+    init(enabled: Bool, suppressed: Bool) {
+        self.suppressed = suppressed
+        machine = AppLockMachine(enabled: enabled && !suppressed)
+        machine.launch()
+    }
+
+    var locked: Bool { machine.locked }
     /// Zasłona, gdy aplikacja nie jest na pierwszym planie (przełącznik aplikacji, przejście w tło).
-    private(set) var covered = false
+    var covered: Bool { machine.covered }
     /// „Blokada aplikacji wyłączona” — telefon nie ma już blokady ekranu.
-    var notice = false
-    private var authenticating = false
-
-    init(locked: Bool) {
-        self.locked = locked
+    var notice: Bool {
+        get { machine.disabledNotice }
+        set { if !newValue { machine.acknowledgeNotice() } }
     }
 
-    func unlocked() {
-        locked = false
+    /// Ustawienie „Blokada aplikacji” zmieniło się w Ustawieniach (włączenie nie blokuje bieżącej sesji).
+    func settingChanged(_ settings: SettingsStore) {
+        machine.setEnabled(settings.appLockEnabled && !suppressed)
     }
 
-    func sceneChanged(_ phase: ScenePhase, settings: SettingsStore) {
-        let enabled = settings.appLockEnabled
+    func sceneChanged(_ phase: ScenePhase, settings: SettingsStore, now: Date = Date()) {
+        settingChanged(settings)
         switch phase {
         case .background:
-            if !locked { settings.appLockLastBackgroundAt = Date().timeIntervalSince1970 }
-            covered = enabled
+            machine.didEnterBackground(at: now)
         case .inactive:
-            // Okno uwierzytelniania też wprowadza scenę w stan nieaktywny — wtedy zasłona już jest zbędna.
-            if !authenticating { covered = enabled }
+            machine.willResignActive()
         case .active:
-            covered = false
-            guard enabled else { return }
-            if AppLockAuthenticator().availability() == .noPasscode {
-                settings.appLockEnabled = false
-                locked = false
-                notice = true
-                return
-            }
-            let backgrounded = settings.appLockLastBackgroundAt.map { Date(timeIntervalSince1970: $0) }
-            if backgrounded != nil, AppLockPolicy.requiresUnlock(enabled: true, backgroundedAt: backgrounded, now: Date()) { locked = true }
+            let passcode = !machine.enabled || AppLockAuthenticator().availability() != .noPasscode
+            machine.didBecomeActive(at: now, passcodeAvailable: passcode)
+            if machine.disabledNotice { settings.appLockEnabled = false }
         @unknown default:
             break
         }
     }
 
+    /// Przycisk „Odblokuj” — zawsze ponawia próbę.
     func unlock() async {
-        guard locked, !authenticating else { return }
-        authenticating = true
-        defer { authenticating = false }
-        if await AppLockAuthenticator().authenticate(reason: tr("app_lock_prompt_title")) { locked = false }
+        guard machine.locked, !machine.authenticating else { return }
+        machine.authenticationStarted()
+        let success = await AppLockAuthenticator().authenticate(reason: tr("app_lock_prompt_title"))
+        machine.authenticationFinished(success: success)
+    }
+
+    /// Samoczynna próba tuż po pokazaniu ekranu blokady — tylko raz na epizod blokady, żeby anulowanie okna nie wywoływało go w kółko.
+    func autoUnlock() async {
+        guard machine.autoPromptAvailable else { return }
+        await unlock()
     }
 }
 
-/// „Aplikacja zablokowana” — bez danych; odblokowanie zabezpieczeniem telefonu (próba od razu po pokazaniu).
+/// „Aplikacja zablokowana” — bez danych; odblokowanie zabezpieczeniem telefonu (jedna samoczynna próba po pokazaniu, potem przycisk).
 struct LockOverlay: View {
     @Environment(AppEnvironment.self) private var environment
 
@@ -78,7 +86,7 @@ struct LockOverlay: View {
         .padding(Spacing.screenEdge)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(HorselyColor.background)
-        .task { await environment.appLock.unlock() }
+        .task { await environment.appLock.autoUnlock() }
     }
 }
 

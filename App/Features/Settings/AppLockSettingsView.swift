@@ -42,13 +42,14 @@ struct AppLockSettingsView: View {
         guard on else {
             enabled = false
             environment.settings.appLockEnabled = false
+            environment.appLock.settingChanged(environment.settings)
             return
         }
         Task {
             if await AppLockAuthenticator().authenticate(reason: tr("app_lock_prompt_title")) {
                 enabled = true
                 environment.settings.appLockEnabled = true
-                environment.appLock.unlocked()
+                environment.appLock.settingChanged(environment.settings)
             } else {
                 failed = true
             }

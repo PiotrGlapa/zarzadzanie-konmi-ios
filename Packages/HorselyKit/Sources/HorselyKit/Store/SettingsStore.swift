@@ -168,6 +168,8 @@ public struct SettingsStore: @unchecked Sendable {
         nonmutating set { defaults.set(newValue, forKey: Key.appLockEnabled) }
     }
 
+    /// Nieużywane od 2.0.2: trwały znacznik przejścia w tło, nigdy niezerowany, powodował ponowną blokadę zaraz po
+    /// odblokowaniu (`AppLockMachine` trzyma ten czas tylko w pamięci). Klucz zostaje bez migracji i bez odczytu.
     public var appLockLastBackgroundAt: Double? {
         get { defaults.object(forKey: Key.appLockLastBackgroundAt) as? Double }
         nonmutating set { defaults.set(newValue, forKey: Key.appLockLastBackgroundAt) }
