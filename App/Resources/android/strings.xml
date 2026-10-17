@@ -956,6 +956,13 @@
     <string name="reports_chart_zoom">Powiększ wykres</string>
     <string name="reports_no_horses_title">Brak koni w pamięci</string>
     <string name="reports_no_horses_hint">Podsumowanie treningów dotyczy jednego konia. Połącz się z komputerem, aby pobrać listę koni.</string>
+    <!-- Wersja 2.0.2 (iOS): wykres grup i zwijana lista w „Treningach jeźdźca”; w Androidzie użyte po wdrożeniu zmiany -->
+    <string name="reports_show_trainings" tools:ignore="UnusedResources">Pokaż treningi (%1$d)</string>
+    <string name="reports_hide_trainings" tools:ignore="UnusedResources">Ukryj treningi</string>
+    <string name="reports_chart_metric_count" tools:ignore="UnusedResources">Liczba treningów</string>
+    <string name="reports_chart_metric_time" tools:ignore="UnusedResources">Łączny czas</string>
+    <string name="reports_chart_rider_groups_title" tools:ignore="UnusedResources">Treningi według grup</string>
+    <string name="reports_chart_others" tools:ignore="UnusedResources">Pozostałe</string>
     <!-- ============ Powiadomienia ============ -->
     <string name="channel_daily_summary">Terminy — podsumowanie dnia</string>
     <string name="channel_due_day">Terminy — w dniu terminu</string>

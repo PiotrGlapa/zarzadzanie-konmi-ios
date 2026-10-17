@@ -10416,6 +10416,50 @@
         }
       }
     },
+    "reports_chart_metric_count" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Liczba treningów"
+          }
+        }
+      }
+    },
+    "reports_chart_metric_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Łączny czas"
+          }
+        }
+      }
+    },
+    "reports_chart_others" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pozostałe"
+          }
+        }
+      }
+    },
+    "reports_chart_rider_groups_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Treningi według grup"
+          }
+        }
+      }
+    },
     "reports_chart_zoom" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -10599,6 +10643,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Grupowanie"
+          }
+        }
+      }
+    },
+    "reports_hide_trainings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ukryj treningi"
           }
         }
       }
@@ -10995,6 +11050,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wyślij raport"
+          }
+        }
+      }
+    },
+    "reports_show_trainings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokaż treningi (%1$lld)"
           }
         }
       }

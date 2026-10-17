@@ -7,6 +7,7 @@
 | **Zakres wersji 1.2 aplikacji** | poprawki (kafel konia → karta konia, zakupy i starty otwierają szczegóły, zawody całego bieżącego roku), ocena gwiazdkami, terminy i koszty w obszarach z tonami, linie między wierszami list, sekcje formularzy (5.1, 5.2, 5.4) |
 | **Zakres wersji 2.0 aplikacji** | tryb pracy wybierany przy pierwszym uruchomieniu (online / samodzielny), pełna praca offline z edycją i konfliktami (FR-SYN2-*), reguły programu w telefonie (FR-SAM-*), kosz i słowniki w trybie samodzielnym, kopia zapasowa (FR-KOP-*), zdjęcie konia (FR-ZDK-*), więcej kolorów i nowe ikony (FR-KOL-*), blokada aplikacji (FR-TRB-09) — sekcje [3.1](#31-historie-wersji-20) i [4.12](#412-wersja-20--tryby-pracy-praca-offline-kopia-zapasowa-kolory-zdjęcie-konia) |
 | **Zakres wersji 2.0.1 aplikacji** | nazwa „Horsely – Zarządzanie Koniem, Trening i Budżet”, słowniki zgodne z programem 2.0.0, możliwości programu (`capabilities`), status „Kontuzjowany” z ikoną plastra, poprawka układu wierszy raportów, szczegółowy dziennik diagnostyczny — sekcje [3.2](#32-historie-wersji-201) i [4.13](#413-wersja-201--horsely-i-program-200) |
+| **Zakres wersji 2.0.2 aplikacji** | 2026-10-17 — poprawki iOS: blokada aplikacji nie blokuje ponownie po odblokowaniu, miniatury zdjęć koni z programu, czytelny raport „Treningi jeźdźca” (sumy na górze, wykres słupkowy grup, zwinięta lista treningów) — FR-M-RAP-03; szczegóły: `specs/002-poprawki-2-0-2/`. Zmiana zakresu raportu obowiązuje też w specyfikacji Androida (do wdrożenia w Androidzie) |
 | **Platforma** | iOS (iPhone) — aplikacja natywna (osobny projekt; odpowiednik na Androida: `SPECYFIKACJA_MOBILE_ANDROID.md`, implementacja wzorcowa: repozytorium `zarzadzanie_konmi_android`, wersja 2.0.1) |
 | **Współpracuje z** | program „Horsely” (dawniej „Zarządzanie końmi”) na Windows, wersja **1.5.0 lub nowsza** (API `/api/v1`; kontrakt bez zmian do 1.6.1; od 2.0.0 możliwości programu wykrywane polem `capabilities`, §6.6); wersja testowana: **2.0.0** |
 | **Autor systemu** | Piotr Glapa |
@@ -488,9 +489,10 @@ grosza i minuty; plik CSV z aplikacji ma te same kolumny, nagłówki i liczby co
    przeszkód) — przy „Wszystkie rodzaje” osobne serie wyróżnione kolorem i kształtem znacznika
    (`GET /reports/training-summary`).
 5. **Given** „Treningi jeźdźca”, **When** wybieram jeźdźca albo „Wszyscy jeźdźcy”, konia i okres, **Then** widzę
-   podsumowanie — liczba, łączny czas, średnia ocena, koszt — razem i w podziale na konie albo na jeźdźców, a pod nim
-   treningi (data, koń, rodzaj, czas, intensywność, ocena, trener, koszt; przy wszystkich jeźdźcach także jeździec)
-   (`GET /reports/rider-trainings`).
+   podsumowanie — liczba, łączny czas, średnia ocena, koszt — na górze ekranu, pod nim wykres słupkowy grup (konie albo
+   jeźdźcy) z przełącznikiem „Liczba treningów / Łączny czas” i karty grup, a na końcu treningi zwinięte pod przyciskiem
+   „Pokaż treningi (N)” / „Ukryj treningi” (data, koń, rodzaj, czas, intensywność, ocena, trener, koszt; przy wszystkich
+   jeźdźcach także jeździec) (`GET /reports/rider-trainings`).
 6. **Given** „Zawody jeźdźca”, **When** wybieram jeźdźca albo „Wszyscy jeźdźcy”, konia i okres, **Then** widzę
    podsumowanie — liczba zawodów i startów, suma kosztów, suma nagród i różnica — a pod nim zawody z ich startami (data,
    koń, dyscyplina, klasa, wynik / miejsce, wpisowe, pozostałe koszty, nagroda) (`GET /reports/rider-competitions`).
@@ -1074,8 +1076,14 @@ Identyfikatory: `FR-M-<obszar>-<nr>`. Słowa MUST/SHOULD jak w RFC 2119.
 - **FR-M-RAP-03**: Wykresy MUST powstawać z danych odpowiedzi bez zmiany wartości: „Koszty” — słupkowy kosztów
   miesięcznych skumulowany po kategoriach (wiersze `groupBy=month` z polami `month` i `category`) i kołowy udziału
   kategorii; „Podsumowanie treningów” — wykres postępów z serii `series` (seria na rodzaj, kolor według `paletteIndex`
-  jak w programie, różne kształty znaczników, legenda). Wykresy MUST być czytelne w obu motywach i w orientacji pionowej
-  (pozioma dozwolona do powiększenia wykresu), z opisem dla czytnika ekranu i nie tylko kolorem.
+  jak w programie, różne kształty znaczników, legenda); „Treningi jeźdźca” — poziomy wykres słupkowy grup z odpowiedzi
+  (`groups`: konie albo jeźdźcy) z przełącznikiem miary „Liczba treningów” / „Łączny czas” (wartości `count` i
+  `totalMinutes` bez przeliczania; przy więcej niż 12 grupach 11 pierwszych i słupek „Pozostałe” z sumą reszty — karty
+  grup zawsze pełne), a lista treningów MUST być domyślnie zwinięta pod przyciskiem „Pokaż treningi (N)” / „Ukryj
+  treningi”. W każdym raporcie karta sum MUST stać nad wykresami (kolejność: filtry → sumy → wykresy → wiersze → uwagi).
+  Wykresy MUST być czytelne w obu motywach i w orientacji pionowej
+  (pozioma dozwolona do powiększenia wykresu), z opisem dla czytnika ekranu i nie tylko kolorem. Eksport CSV i PDF
+  zachowuje wartości bez zmian (PDF „Treningi jeźdźca” zawiera dodatkowo oba warianty wykresu grup).
 - **FR-M-RAP-04**: Czas w raportach MUST być pokazywany jak w programie: łączny czas i czas treningu „X h Y min” od
   60 minut, „Y min” poniżej, „—” bez wpisanego czasu; statystyki czasu pojedynczego treningu — w minutach.
 - **FR-M-RAP-05**: Każdy raport z danymi MUST dać się wyeksportować do **CSV** i **PDF** w formacie programu:
