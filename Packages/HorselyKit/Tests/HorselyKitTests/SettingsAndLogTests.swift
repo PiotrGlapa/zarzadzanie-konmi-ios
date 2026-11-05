@@ -47,6 +47,43 @@ struct SettingsAndLogTests {
         #expect(settings.modeChangePending == nil)
     }
 
+    // MARK: Push z serwera (spec 003, T020)
+
+    @Test func pushSettingsStartAsUnregistered() {
+        let settings = freshSettings()
+        #expect(settings.pushRegistration == PushRegistration())
+        #expect(settings.pushActive == false)
+        #expect(settings.pushPermissionAsked == false)
+        #expect(settings.notificationsOffCardDismissed == false)
+    }
+
+    @Test func pushRegistrationIsStoredAsAWhole() {
+        let settings = freshSettings()
+        let registered = Date(timeIntervalSince1970: 1_793_787_300)
+        let failing = Date(timeIntervalSince1970: 1_793_790_000)
+        let value = PushRegistration(
+            registered: true, tokenPrefix: "dGhpcyBp", registeredAt: registered, failingSince: failing,
+            permanentFailure: true, deviceRemovedNotice: true, apnsRefused: true
+        )
+        settings.pushRegistration = value
+        #expect(settings.pushRegistration == value)
+        settings.pushRegistration = PushRegistration(registered: true, registeredAt: registered)
+        #expect(settings.pushRegistration == PushRegistration(registered: true, registeredAt: registered), "puste pola są usuwane")
+    }
+
+    @Test func clearingPushConnectionStateKeepsThePermissionDecisionAndTheCardChoice() {
+        let settings = freshSettings()
+        settings.pushRegistration = PushRegistration(registered: true, tokenPrefix: "abcd1234", registeredAt: Date(timeIntervalSince1970: 100))
+        settings.pushActive = true
+        settings.pushPermissionAsked = true
+        settings.notificationsOffCardDismissed = true
+        settings.clearPushConnectionState()
+        #expect(settings.pushRegistration == PushRegistration())
+        #expect(settings.pushActive == false)
+        #expect(settings.pushPermissionAsked == true, "decyzja użytkownika dotyczy telefonu, nie połączenia")
+        #expect(settings.notificationsOffCardDismissed == true)
+    }
+
     private func logDirectory() -> URL {
         FileManager.default.temporaryDirectory.appendingPathComponent("horsely-log-\(UUID().uuidString)")
     }

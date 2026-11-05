@@ -1574,6 +1574,17 @@
         }
       }
     },
+    "channel_server_push" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia z serwera"
+          }
+        }
+      }
+    },
     "common_back" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3961,6 +3972,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Brak terminów do wykonania"
+          }
+        }
+      }
+    },
+    "dashboard_notifications_off_enable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włącz"
+          }
+        }
+      }
+    },
+    "dashboard_notifications_off_hide" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie pokazuj"
+          }
+        }
+      }
+    },
+    "dashboard_notifications_off_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplikacja nie przypomni o kowalu, weterynarzu ani innych terminach. Włącz codzienne podsumowanie w ustawieniach powiadomień."
+          }
+        }
+      }
+    },
+    "dashboard_notifications_off_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia o terminach są wyłączone"
           }
         }
       }
@@ -8049,7 +8104,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zgoda została odrzucona, więc powiadomienia się nie pokażą. Aby je włączyć, otwórz ustawienia powiadomień aplikacji i zezwól na nie. Reszta aplikacji działa bez zmian."
+            "value" : "Telefon nie ma zgody na powiadomienia tej aplikacji, więc się nie pokażą. Aby je włączyć, otwórz ustawienia powiadomień aplikacji i zezwól na nie. Reszta aplikacji działa bez zmian."
           }
         }
       }
@@ -9229,6 +9284,270 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zakupów: %1$lld · Razem: %2$@"
+          }
+        }
+      }
+    },
+    "push_device_removed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Właściciel usunął ten telefon z listy urządzeń. Telefon zarejestrował się ponownie — reguły trzeba znów przypisać w UI webowym."
+          }
+        }
+      }
+    },
+    "push_device_removed_ok" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rozumiem"
+          }
+        }
+      }
+    },
+    "push_hide_background_note" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia z serwera odebrane w tle pokazują treść także na ekranie blokady."
+          }
+        }
+      }
+    },
+    "push_hide_previews_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby ukryć treść także dla nich, wybierz w Ustawieniach iOS → Powiadomienia → Pokazuj podglądy: Gdy odblokowany."
+          }
+        }
+      }
+    },
+    "push_last_delivered" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnie powiadomienie: %1$@"
+          }
+        }
+      }
+    },
+    "push_never_delivered" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnie powiadomienie: jeszcze żadnego"
+          }
+        }
+      }
+    },
+    "push_permission_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serwer Horsely może teraz wysyłać na ten telefon powiadomienia o terminach. Telefon musi mieć na nie zgodę — za chwilę o nią zapyta. Możesz odmówić i włączyć zgodę później w ustawieniach."
+          }
+        }
+      }
+    },
+    "push_public_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nowe powiadomienie"
+          }
+        }
+      }
+    },
+    "push_refresh" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odśwież"
+          }
+        }
+      }
+    },
+    "push_registered_at" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zarejestrowano: %1$@"
+          }
+        }
+      }
+    },
+    "push_rules_empty_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ten telefon nie dostaje teraz żadnych powiadomień o terminach. Reguły przypisuje właściciel w UI webowym (Administracja → Serwer → Powiadomienia). Po wdrożeniu wszystkie są domyślnie wyłączone."
+          }
+        }
+      }
+    },
+    "push_rules_empty_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak przypisanych powiadomień"
+          }
+        }
+      }
+    },
+    "push_rules_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się pobrać listy — spróbuj później."
+          }
+        }
+      }
+    },
+    "push_rules_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jakie powiadomienia dostaję"
+          }
+        }
+      }
+    },
+    "push_section_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia z serwera"
+          }
+        }
+      }
+    },
+    "push_server_backup_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serwer Horsely zgłosił nieudaną kopię zapasową. Sprawdź kopie w UI webowym (Administracja → Kopie zapasowe). Dane w telefonie nie są zagrożone."
+          }
+        }
+      }
+    },
+    "push_server_backup_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopia zapasowa na serwerze"
+          }
+        }
+      }
+    },
+    "push_state_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się zarejestrować telefonu na serwerze — powiadomienia planuje telefon."
+          }
+        }
+      }
+    },
+    "push_state_no_apns" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telefon nie może odbierać powiadomień z serwera — powiadomienia planuje telefon."
+          }
+        }
+      }
+    },
+    "push_state_no_permission" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak zgody na powiadomienia — ani serwer, ani telefon nie pokażą żadnego."
+          }
+        }
+      }
+    },
+    "push_state_no_play" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak Usług Google Play — powiadomienia planuje telefon."
+          }
+        }
+      }
+    },
+    "push_state_no_push" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serwer nie wysyła powiadomień — powiadomienia planuje telefon."
+          }
+        }
+      }
+    },
+    "push_state_pending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rejestruję telefon na serwerze… Do tego czasu powiadomienia planuje telefon."
+          }
+        }
+      }
+    },
+    "push_state_registered" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włączone — powiadomienia o terminach wysyła serwer Horsely."
           }
         }
       }

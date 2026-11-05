@@ -59,15 +59,17 @@ public enum ReminderDigest {
         return reminders.filter { $0.status == .open && inStable.contains($0.horseId) }
     }
 
-    /// „X przeterminowanych, Y na dziś i jutro” (z dopiskiem o starych danych) albo `nil`, gdy nie ma czego zgłosić.
+    /// „Przeterminowane: X, na dziś i jutro: Y” (z dopiskiem o starych danych) albo `nil`, gdy nie ma czego zgłosić.
     public static func dailySummary(_ open: [LocalReminder], day: LocalDate, fetchedAt: LocalDateTime?, at moment: LocalDateTime) -> String? {
         let overdue = open.filter { $0.dueDate < day }.count
         let soon = open.filter { $0.dueDate == day || $0.dueDate == day.adding(days: 1) }.count
         if overdue == 0 && soon == 0 { return nil }
+        // Jak w Androidzie 2.1.0 (`ReminderDigest.kt`): bez odmiany liczebników, pierwsza litera wielka.
         var parts: [String] = []
-        if overdue > 0 { parts.append("\(overdue) przeterminowanych") }
-        if soon > 0 { parts.append("\(soon) na dziś i jutro") }
-        let summary = parts.joined(separator: ", ")
+        if overdue > 0 { parts.append("przeterminowane: \(overdue)") }
+        if soon > 0 { parts.append("na dziś i jutro: \(soon)") }
+        let joined = parts.joined(separator: ", ")
+        let summary = joined.prefix(1).uppercased() + joined.dropFirst()
         guard let note = staleNote(fetchedAt: fetchedAt, at: moment) else { return summary }
         return "\(summary)\n\(note)"
     }

@@ -217,8 +217,11 @@ public final class ApiClient: Sendable {
         progress: (@Sendable (Int64, Int64?) -> Void)? = nil
     ) async -> ApiResult {
         var result = await attempt(address, request, apiKey: apiKey, features: features, progress: progress)
-        if case let .failure(.network(sentBody, idempotent)) = result, idempotent, sentBody {
-            connectionLog?.note("ponowienie odczytu", address: address, network: network().label)
+        // Odczyt: jedno ponowienie. Zapis idempotentny (`retryOnDrop`): do tylu ponowień, ile zażądano.
+        var retries = max(request.method.isIdempotentRead ? 1 : 0, request.retryOnDrop)
+        while retries > 0, case let .failure(.network(sentBody, idempotent)) = result, idempotent, sentBody {
+            retries -= 1
+            connectionLog?.note(request.method.isIdempotentRead ? "ponowienie odczytu" : "ponowienie zapisu idempotentnego", address: address, network: network().label)
             result = await attempt(address, request, apiKey: apiKey, features: features, progress: progress)
         }
         return result
@@ -246,7 +249,7 @@ public final class ApiClient: Sendable {
             let reachable = await probe.canConnect(host: host.name, port: host.port, timeout: AddressOrder.connectTimeout)
             if !reachable {
                 connectionLog?.request(request, address: address, ip: nil, network: conditions.label, result: "brak połączenia (limit 3 s)", started: started)
-                return .failure(.network(sentBody: false, idempotent: request.method.isIdempotentRead))
+                return .failure(.network(sentBody: false, idempotent: request.isIdempotent))
             }
             await probes.remember(address.id, at: moment)
         }
@@ -284,7 +287,7 @@ public final class ApiClient: Sendable {
             return .failure(.certificateRejected)
         case let .failure(sentBody, code):
             connectionLog?.request(request, address: address, ip: nil, network: conditions.label, result: "błąd sieci \(code.map { String($0.rawValue) } ?? "-")", started: started)
-            return .failure(.network(sentBody: sentBody, idempotent: request.method.isIdempotentRead))
+            return .failure(.network(sentBody: sentBody, idempotent: request.isIdempotent))
         case let .response(status, headers, body, file, remoteIP):
             connectionLog?.request(request, address: address, ip: remoteIP, network: conditions.label, result: "HTTP \(status)", started: started)
             await inspect(address, status: status, headers: headers, body: body, at: moment)

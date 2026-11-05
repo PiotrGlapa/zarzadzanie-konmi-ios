@@ -152,10 +152,13 @@ public struct ApiRequest: Sendable {
     public var forFile: Bool
     /// Pobranie do pliku (eksport) z postępem.
     public var downloadToFile: Bool
+    /// Zapis idempotentny bez `Idempotency-Key` (np. `PUT`/`DELETE push/device`): po zerwaniu połączenia po wysłaniu treści
+    /// do tylu natychmiastowych ponowień na tym samym adresie; potem — jak odczyt — przejście na kolejny adres.
+    public var retryOnDrop: Int
 
     public init(
         _ method: HTTPMethod, _ path: String, body: Data? = nil, contentType: String? = nil, bodyFile: URL? = nil, ifMatch: Int? = nil,
-        idempotencyKey: String? = nil, forFile: Bool = false, downloadToFile: Bool = false
+        idempotencyKey: String? = nil, forFile: Bool = false, downloadToFile: Bool = false, retryOnDrop: Int = 0
     ) {
         self.method = method
         self.path = path
@@ -166,7 +169,11 @@ public struct ApiRequest: Sendable {
         self.idempotencyKey = idempotencyKey
         self.forFile = forFile
         self.downloadToFile = downloadToFile
+        self.retryOnDrop = max(retryOnDrop, 0)
     }
+
+    /// Żądanie można bezpiecznie powtórzyć po zerwanym połączeniu: odczyt albo zapis z `retryOnDrop > 0`.
+    public var isIdempotent: Bool { method.isIdempotentRead || retryOnDrop > 0 }
 
     public static func get(_ path: String) -> ApiRequest { ApiRequest(.get, path) }
 

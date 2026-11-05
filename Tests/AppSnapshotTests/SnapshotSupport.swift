@@ -39,6 +39,8 @@ extension XCTestCase {
         settings.theme = variant.theme
         // Zrzuty ekranów nie pokazują przypomnienia o kopii zapasowej (ma osobne warunki, test `BackupPolicyTests`).
         settings.backupReminderSnoozedUntil = "2100-01-01T00:00:00Z"
+        // Karta „Powiadomienia o terminach są wyłączone” ma własną migawkę (`Dashboard_notificationsOffCard`).
+        settings.notificationsOffCardDismissed = true
         return AppEnvironment.testing(settings: settings, queueCount: queue, conflictCount: conflicts)
     }
 

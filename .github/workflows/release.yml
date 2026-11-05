@@ -122,6 +122,12 @@ jobs:
           done
           echo "Uprawnienia App Group i pęku kluczy obecne w aplikacji i rozszerzeniu."
 
+      # Powiadomienia push (spec 003): aps-environment=production tylko w aplikacji, plist Firebase tylko w aplikacji, manifest
+      # prywatności. Błąd zatrzymuje przebieg przed wysyłką do TestFlight (nigdy ciche pominięcie).
+      - name: Uprawnienia push
+        id: push
+        run: bash scripts/ci/verify-push-entitlements.sh "$RUNNER_TEMP/ipa"
+
       - name: Wysyłka do App Store Connect (TestFlight)
         id: upload
         run: |
@@ -139,6 +145,8 @@ jobs:
             result="BŁĄD: archiwum (podpisywanie lub kompilacja)"
           elif [ "${{ steps.export.outcome }}" = "failure" ]; then
             result="BŁĄD: eksport (podpis dystrybucyjny lub uprawnienia)"
+          elif [ "${{ steps.push.outcome }}" = "failure" ]; then
+            result="BŁĄD: uprawnienia push (aps-environment, plist Firebase lub manifest prywatności)"
           elif [ "${{ steps.upload.outcome }}" = "failure" ]; then
             result="BŁĄD: wysyłka do App Store Connect"
           else

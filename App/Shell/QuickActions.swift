@@ -1,3 +1,4 @@
+import HorselyKit
 import SwiftUI
 import UIKit
 
@@ -14,6 +15,25 @@ final class QuickActions {
 }
 
 final class AppDelegate: NSObject, UIApplicationDelegate {
+    /// Telefon, który już dostawał powiadomienia z serwera (`push.active`), konfiguruje Firebase synchronicznie przy starcie —
+    /// zanim system dostarczy token APNs (spec 003, research R6). Bez tego znacznika nic z Firebase się nie uruchamia.
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        let isTestRun = ProcessInfo.processInfo.arguments.contains { $0.hasPrefix("-UITest") }
+        if !isTestRun, SettingsStore().pushActive {
+            MainActor.assumeIsolated { FirebasePushTokenSource.shared.configureNow() }
+        }
+        return true
+    }
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        MainActor.assumeIsolated { FirebasePushTokenSource.shared.setAPNSToken(deviceToken) }
+        Task { await PushBridge.shared.registrar?.didRegisterAPNs() }
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        Task { await PushBridge.shared.registrar?.didFailAPNs() }
+    }
+
     func application(
         _ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions
     ) -> UISceneConfiguration {

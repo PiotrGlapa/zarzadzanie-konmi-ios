@@ -2,12 +2,13 @@
 
 | | |
 |---|---|
-| **Wersja dokumentu** | 1.5 (2026-10-15) — decyzje z sesji wyjaśniającej 2026-10-15: dystrybucja wyłącznie przez TestFlight (testerzy wewnętrzni), iPhone 15 Pro jako urządzenie docelowe i iOS 18+, natywne komponenty iOS z ikonami Material jak na Androidzie, kopia zapasowa wymienna z Androidem, rdzeń przepisany w Swift, XcodeGen, budowanie w GitHub Actions bez Maca, testy migawkowe, szybkie akcje / udostępnianie / import kontaktu jako MUST (9.1, 9.5–9.8). Wersja 1.4 (2026-10-15) — uzupełniona tak, by sama opisywała pełny zakres aplikacji na Androida **2.0.1** (bez odwołań do dokumentów, których nie ma w repozytorium iOS): zakres 1.1 (stabilny stan połączenia, działy, ikony), 1.2 (wygląd i poprawki), 2.0 (tryby pracy, pełna praca offline, kosz, słowniki, kopia zapasowa, zdjęcie konia, kolory, blokada) i 2.0.1 (Horsely, „Kontuzjowany”, `capabilities`, dziennik diagnostyczny); wzorzec wyglądu (sekcja [5.4](#54-wzorzec-wyglądu)). Wersja 1.3 (2026-10-05) — uzgodniona z programem 1.6.1; decyzje z sesji wyjaśniającej 2026-10-05 |
+| **Wersja dokumentu** | 1.6 (2026-11-05) — powiadomienia push z serwera w trybie z serwerem (wersja aplikacji 2.1.0, jak Android 2.1.0): sekcje [4.9a](#49a-powiadomienia-z-serwera-psh-wersja-210), [9.2](#92-zgody-i-opisy-w-infoplist), [9.9](#99-powiadomienia-push-z-serwera-wersja-210), [10](#10-poza-zakresem); szczegóły `specs/003-push-z-serwera/`. Wersja 1.5 (2026-10-15) — decyzje z sesji wyjaśniającej 2026-10-15: dystrybucja wyłącznie przez TestFlight (testerzy wewnętrzni), iPhone 15 Pro jako urządzenie docelowe i iOS 18+, natywne komponenty iOS z ikonami Material jak na Androidzie, kopia zapasowa wymienna z Androidem, rdzeń przepisany w Swift, XcodeGen, budowanie w GitHub Actions bez Maca, testy migawkowe, szybkie akcje / udostępnianie / import kontaktu jako MUST (9.1, 9.5–9.8). Wersja 1.4 (2026-10-15) — uzupełniona tak, by sama opisywała pełny zakres aplikacji na Androida **2.0.1** (bez odwołań do dokumentów, których nie ma w repozytorium iOS): zakres 1.1 (stabilny stan połączenia, działy, ikony), 1.2 (wygląd i poprawki), 2.0 (tryby pracy, pełna praca offline, kosz, słowniki, kopia zapasowa, zdjęcie konia, kolory, blokada) i 2.0.1 (Horsely, „Kontuzjowany”, `capabilities`, dziennik diagnostyczny); wzorzec wyglądu (sekcja [5.4](#54-wzorzec-wyglądu)). Wersja 1.3 (2026-10-05) — uzgodniona z programem 1.6.1; decyzje z sesji wyjaśniającej 2026-10-05 |
 | **Zakres wersji 1.1 aplikacji** | stabilny stan połączenia (FR-M-POL-14…17, US1/8–8e), działy Treningi · Zakupy · Zawody (US11), nawigacja (5.2), ikony z programu (US12), pamięć 12 miesięcy dla działów (FR-M-SYN-01) |
 | **Zakres wersji 1.2 aplikacji** | poprawki (kafel konia → karta konia, zakupy i starty otwierają szczegóły, zawody całego bieżącego roku), ocena gwiazdkami, terminy i koszty w obszarach z tonami, linie między wierszami list, sekcje formularzy (5.1, 5.2, 5.4) |
 | **Zakres wersji 2.0 aplikacji** | tryb pracy wybierany przy pierwszym uruchomieniu (online / samodzielny), pełna praca offline z edycją i konfliktami (FR-SYN2-*), reguły programu w telefonie (FR-SAM-*), kosz i słowniki w trybie samodzielnym, kopia zapasowa (FR-KOP-*), zdjęcie konia (FR-ZDK-*), więcej kolorów i nowe ikony (FR-KOL-*), blokada aplikacji (FR-TRB-09) — sekcje [3.1](#31-historie-wersji-20) i [4.12](#412-wersja-20--tryby-pracy-praca-offline-kopia-zapasowa-kolory-zdjęcie-konia) |
 | **Zakres wersji 2.0.1 aplikacji** | nazwa „Horsely – Zarządzanie Koniem, Trening i Budżet”, słowniki zgodne z programem 2.0.0, możliwości programu (`capabilities`), status „Kontuzjowany” z ikoną plastra, poprawka układu wierszy raportów, szczegółowy dziennik diagnostyczny — sekcje [3.2](#32-historie-wersji-201) i [4.13](#413-wersja-201--horsely-i-program-200) |
 | **Zakres wersji 2.0.2 aplikacji** | 2026-10-17 — poprawki iOS: blokada aplikacji nie blokuje ponownie po odblokowaniu, miniatury zdjęć koni z programu, czytelny raport „Treningi jeźdźca” (sumy na górze, wykres słupkowy grup, zwinięta lista treningów) — FR-M-RAP-03; szczegóły: `specs/002-poprawki-2-0-2/`. Zmiana zakresu raportu obowiązuje też w specyfikacji Androida (do wdrożenia w Androidzie) |
+| **Zakres wersji 2.1.0 aplikacji** | 2026-11-05 — powiadomienia push z serwera Horsely 2.0 (Firebase Cloud Messaging przez APNs) w trybie z serwerem z możliwością `push`: rejestracja telefonu, brak dubli z powiadomieniami lokalnymi, tryb awaryjny, ekran „Powiadomienia” z listą reguł, karta Pulpitu „Powiadomienia o terminach są wyłączone” — sekcje [4.9a](#49a-powiadomienia-z-serwera-psh-wersja-210) i [9.9](#99-powiadomienia-push-z-serwera-wersja-210); szczegóły: `specs/003-push-z-serwera/`. Odpowiednik: Android 2.1.0 (`specs/006-push-z-serwera/`) |
 | **Platforma** | iOS (iPhone) — aplikacja natywna (osobny projekt; odpowiednik na Androida: `SPECYFIKACJA_MOBILE_ANDROID.md`, implementacja wzorcowa: repozytorium `zarzadzanie_konmi_android`, wersja 2.0.1) |
 | **Współpracuje z** | program „Horsely” (dawniej „Zarządzanie końmi”) na Windows, wersja **1.5.0 lub nowsza** (API `/api/v1`; kontrakt bez zmian do 1.6.1; od 2.0.0 możliwości programu wykrywane polem `capabilities`, §6.6); wersja testowana: **2.0.0** |
 | **Autor systemu** | Piotr Glapa |
@@ -1115,6 +1116,33 @@ Identyfikatory: `FR-M-<obszar>-<nr>`. Słowa MUST/SHOULD jak w RFC 2119.
 - **FR-M-POW-05**: (Android) prośba o wyłączenie optymalizacji baterii i instrukcja dla producenta. **W iOS nie
   dotyczy** — powiadomienia lokalne planowane z wyprzedzeniem działają niezależnie od pracy w tle ([9.4](#94-praca-w-tle)).
 
+### 4.9a Powiadomienia z serwera (`PSH`, wersja 2.1.0)
+
+Szczegóły: `specs/003-push-z-serwera/` (spec z Clarifications, plan, kontrakty). Dotyczy wyłącznie trybu z serwerem Horsely 2.0,
+który ogłasza możliwość `push` w `GET /system/info`; tryb samodzielny i serwery bez `push` działają jak w 4.9. Zakres i teksty
+jak w aplikacji na Androida 2.1.0 (`SPECYFIKACJA_MOBILE_ANDROID.md` 4.9a).
+
+- **FR-M-PSH-01**: Telefon MUST rejestrować token Firebase Cloud Messaging na serwerze (`PUT /push/device`, platforma `Ios`)
+  po zgodzie na powiadomienia i MUST go wyrejestrować (`DELETE /push/device`, potem usunięcie tokenu i wyrejestrowanie z APNs)
+  przy rozłączeniu, przejściu w tryb samodzielny, usunięciu danych połączenia i cofnięciu zgody — przed usunięciem klucza API.
+- **FR-M-PSH-02**: O tym, które powiadomienia, kiedy i na który telefon trafiają, decyduje właściciel w UI webowym (reguły push);
+  telefon pokazuje ich gotowe opisy (`GET /push/rules`) bez własnej interpretacji.
+- **FR-M-PSH-03**: Po udanej rejestracji telefon MUST NOT planować lokalnych powiadomień o terminach i podsumowaniu (brak dubli),
+  także gdy nie ma przypisanych reguł (ekran ostrzega wtedy „Brak przypisanych powiadomień”). Do udanej rejestracji i zawsze, gdy
+  push nie działa (serwer bez `push`, system odmówił rejestracji do powiadomień zdalnych, trwale nieudana rejestracja), telefon
+  MUST planować powiadomienia lokalne jak w 4.9 i pokazywać powód.
+- **FR-M-PSH-04**: Dotknięcie powiadomienia z serwera otwiera szczegóły terminu, listę terminów, ekran „Kopia zapasowa na
+  serwerze” albo Pulpit. Powiadomienia z serwera pokazują treść z serwera — w tle (także na ekranie blokady) i na pierwszym
+  planie; „Ukryj szczegóły na ekranie blokady” obejmuje powiadomienia lokalne, a ekran wskazuje systemowe „Pokazuj podglądy”
+  (różnica wobec Androida, który na pierwszym planie buduje powiadomienie sam).
+- **FR-M-PSH-05**: Firebase MUST być konfigurowany ręcznie wyłącznie w trybie z serwerem (automatyczna inicjalizacja
+  wyłączona), tylko moduł Messaging, bez analityki i raportowania awarii; dziennik bez pełnego tokenu (najwyżej 8 znaków)
+  i bez treści powiadomień (konstytucja II 2.1.0).
+- **FR-M-PSH-06**: W trybie z serwerem przy działającym push ekran „Powiadomienia” (FR-M-UST-02) ukrywa włączenie, godzinę
+  podsumowania i „w dniu terminu”, a pokazuje stan push, datę rejestracji i ostatniej dostawy oraz listę „Jakie powiadomienia
+  dostaję”. Pulpit pokazuje kartę „Powiadomienia o terminach są wyłączone” („Włącz”, „Nie pokazuj”), dopóki powiadomienia
+  lokalne są wyłączone (nie przy działającym push).
+
 ### 4.10 Ustawienia aplikacji (`UST`)
 
 - **FR-M-UST-01**: Połączenie: nazwa i wersja programu, adresy (dodaj, popraw, usuń, kolejność), szyfrowanie tak/nie i tryb
@@ -1692,7 +1720,7 @@ kontuzjowane; `status=all` — wszystkie. Pełny opis: `specs/009-horsely-2-0-0/
 | NFR-M-06 | Logi diagnostyczne bez treści wpisów, nazw koni i danych kontaktów; rotacja (maks. 5 MB) |
 | NFR-M-07 | Dostępność: czytnik ekranu (etykiety wszystkich kontrolek), skalowanie tekstu do 200% bez obcinania, kontrast WCAG 2.1 AA, cele dotyku ≥ 48 dp / 44 pt |
 | NFR-M-08 | Działanie w tle oszczędne dla baterii: odświeżanie w tle nie częściej niż co godzinę i tylko przy połączeniu z komputerem |
-| NFR-M-09 | Zużycie danych: bez połączenia z komputerem aplikacja nie łączy się z żadnym innym serwerem (brak telemetrii, reklam i usług zewnętrznych; jedyny wyjątek — mapy/telefon/e‑mail otwierane w innych aplikacjach na żądanie; brak sprawdzania aktualizacji w internecie — FR-M-UST-06). |
+| NFR-M-09 | Zużycie danych: bez połączenia z komputerem aplikacja nie łączy się z żadnym innym serwerem (brak telemetrii, reklam i usług zewnętrznych; wyjątki — mapy/telefon/e‑mail otwierane w innych aplikacjach na żądanie oraz od 2.1.0 Firebase Cloud Messaging (przez APNs) wyłącznie w trybie z serwerem z `push`, 4.9a; brak sprawdzania aktualizacji w internecie — FR-M-UST-06). Bez działającego push powiadomienia planuje telefon (FR-M-PSH-03). |
 | NFR-M-10 | Odporność: przerwanie połączenia, zamknięcie aplikacji przez system lub restart telefonu w dowolnym momencie nie powoduje utraty wpisu z kolejki ani duplikatu w programie |
 | NFR-M-11 | Zgodność wstecz z programem: aplikacja działa z programem 1.5.0 i nowszymi wersjami `/api/v1` (w 1.6.0 i 1.6.1 kontrakt bez zmian); nieznane pola w odpowiedziach są ignorowane; z programem 1.1–1.4 aplikacja nie współpracuje (FR-M-POL-04) |
 | NFR-M-12 | Testy: logika kolejki, mapowanie błędów, podpowiedzi (kowal, kwota zakupu, trener / jeździec / koszt z ostatniego treningu), mapowanie terminów na formularze, format czasu i kwot w raportach, zawartość CSV raportów (porównanie z plikami CSV
@@ -1786,7 +1814,8 @@ Kryteria wersji 2.0.1: **SC-001** pliki wzorcowe programu 2.0.0 (słowniki, koń
 |---|---|---|
 | `NSLocalNetworkUsageDescription` | Połączenie z komputerem w sieci lokalnej (iOS wymaga zgody „Sieć lokalna”) | Przy pierwszym połączeniu z adresem w sieci lokalnej — aplikacja MUST wcześniej pokazać ekran wyjaśnienia, a po odmowie instrukcję włączenia zgody w Ustawieniach |
 | `NSCameraUsageDescription` | Skanowanie kodu QR, zdjęcia | Przy pierwszym skanowaniu / zdjęciu |
-| Powiadomienia (`UNUserNotificationCenter`) | Przypomnienia o terminach, błąd kopii automatycznej | Po parowaniu albo po wyborze trybu samodzielnego, z ekranem wyjaśnienia |
+| Powiadomienia (`UNUserNotificationCenter`) | Przypomnienia o terminach, błąd kopii automatycznej; od 2.1.0 także powiadomienia z serwera (ta sama zgoda) | Po parowaniu albo po wyborze trybu samodzielnego, z ekranem wyjaśnienia; w trybie z serwerem także przy pierwszym pojawieniu się `push` (przy otwarciu aplikacji, nigdy z tła), gdy zgoda jest nieustalona |
+| Powiadomienia zdalne (2.1.0): uprawnienie `aps-environment`, `UIBackgroundModes` → `remote-notification` | Odbiór powiadomień push z serwera (FR-M-PSH-01, 9.9) | — (bez osobnego pytania; rejestracja tylko w trybie z serwerem po zgodzie na powiadomienia) |
 | Brak dostępu do biblioteki zdjęć | Wybór zdjęć przez `PHPickerViewController` / `PhotosPicker` (bez zgody), plików przez selektor dokumentów | — |
 
 Aplikacja MUST NOT prosić o lokalizację, kontakty (import kontaktu przez `CNContactPicker` bez zgody) ani pełny
@@ -1875,7 +1904,9 @@ Decyzje z 2026-10-15 (odpowiednik prywatnych wydań APK na Androidzie):
   podpisywania albo klucza API App Store Connect to jawna informacja dla właściciela — nigdy ciche pominięcie wysyłki.
 - Pierwsza wersja: **2.0.1** (FR-025); numer kompilacji rośnie przy każdej wysyłce (numer przebiegu CI).
 - Gdyby kiedyś aplikacja miała trafić do App Store: tryb samodzielny wystarcza recenzentowi bez serwera, a etykieta
-  prywatności to „Dane niezbierane” — poza zakresem obecnej wersji.
+  prywatności to „Dane niezbierane” — poza zakresem obecnej wersji. Od 2.1.0 manifest prywatności (`PrivacyInfo.xcprivacy`)
+  i odpowiedzi „App Privacy” uwzględniają Firebase Messaging (identyfikator urządzenia do dostarczania powiadomień, bez
+  śledzenia), 9.9.
 
 ### 9.7 Wskazówki technologiczne (dla `/speckit-plan`)
 
@@ -1929,6 +1960,31 @@ Rozwój odbywa się na Windows, bez lokalnego Maca — kompilacja, testy, podpis
 
 ---
 
+### 9.9 Powiadomienia push z serwera (wersja 2.1.0)
+
+Odpowiednik Androida 2.1.0 (Firebase Cloud Messaging przez Usługi Google Play); na iOS FCM przekazuje wiadomości do APNs.
+Szczegóły: `specs/003-push-z-serwera/`.
+
+- **Konfiguracja**: Firebase iOS SDK przez Swift Package Manager — tylko `FirebaseMessaging` (bez Analytics i Crashlytics),
+  analityka wyłączona, automatyczna inicjalizacja wyłączona. Plik `App/Resources/GoogleService-Info.plist` (projekt
+  `horsely-41baf`, aplikacja `pl.glapa.horsely`) jest w repozytorium — nie jest sekretem; klucz API w nim ograniczony w Google
+  Cloud do aplikacji iOS `pl.glapa.horsely`. Klucz APNs `.p8` jest wgrany do Firebase (oba środowiska) i nie trafia do
+  repozytorium ani do sekretów CI.
+- **Uprawnienia aplikacji**: `aps-environment` — `development` dla kompilacji deweloperskich, `production` dla TestFlight;
+  krok podpisywania w CI (9.8) MUST weryfikować właściwą wartość w aplikacji i jej brak w rozszerzeniu udostępniania
+  (rozszerzenie bez Firebase).
+- **Stan push**: jedna funkcja decyzji w rdzeniu — `Standalone`, `Fallback(powód)`, `NoPermission`, `Pending`, `Registered`;
+  powiadomienia lokalne o terminach i podsumowaniu działają zawsze, gdy stan ≠ `Registered`. Odmowa rejestracji do powiadomień
+  zdalnych przez system → od razu tryb awaryjny; brak tokenu FCM i błędy serwera → ponowienia (w otwartej aplikacji od 30 s do
+  15 min, przy wejściu na pierwszy plan, w zadaniu odświeżania w tle — 9.4), a po 24 h od pierwszego niepowodzenia lub po `400`
+  tryb awaryjny „Nie udało się zarejestrować telefonu na serwerze”.
+- **Sieć**: żądania push są zwykłymi żądaniami (nie podlegają „tylko przez Wi‑Fi” dla plików, FR-M-UST-03) i działają przez adres
+  publiczny w sieci komórkowej; `PUT`/`DELETE /push/device` ponawiane do 2 razy po zerwanym połączeniu.
+- **Inicjalizacja**: Firebase konfigurowany leniwie (tryb z serwerem + `push` + zgoda); przy starcie aplikacji od razu tylko,
+  gdy push był aktywny (trwały znacznik usuwany przy wyrejestrowaniu), aby obsłużyć zmianę tokenu po restarcie procesu.
+- **Testy**: zaślepka serwera z `PUT/DELETE/GET /push/device` i `GET /push/rules`; symulator bez rejestracji APNs → tryb
+  awaryjny. Testy ręczne wyłącznie z serwerem uruchomionym lokalnie, nigdy z produkcyjnym serwerem użytkownika.
+
 ## 10. Poza zakresem
 
 Zostaje w programie na komputerze (aplikacja może co najwyżej poinformować, że dana funkcja jest w programie):
@@ -1941,8 +1997,8 @@ Zostaje w programie na komputerze (aplikacja może co najwyżej poinformować, �
 
 Poza zakresem obu części systemu (możliwe przyszłe rozszerzenia):
 
-- serwer pośredniczący w internecie, powiadomienia push z serwera (dostęp spoza sieci lokalnej zapewnia od programu 1.2
-  tryb „Dostęp spoza sieci domowej”);
+- serwer pośredniczący w internecie (dostęp spoza sieci lokalnej zapewnia od programu 1.2 tryb „Dostęp spoza sieci domowej”);
+  powiadomienia push z serwera są w zakresie od wersji 2.1.0 aplikacji (4.9a, 9.9);
 - wielu użytkowników z uprawnieniami, kilka stajni w jednej aplikacji;
 - pomiary, OCR paszportu i paragonów; załączniki do treningów (program 1.6.1 ich nie przyjmuje);
 - widżety ekranu głównego, zegarki, wersja na tablet z osobnym układem (tablet używa układu telefonu).

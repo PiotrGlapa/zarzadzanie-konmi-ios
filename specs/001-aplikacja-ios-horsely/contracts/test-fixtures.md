@@ -31,3 +31,18 @@ komponentów iOS (pasek nawigacji, karty, przełączniki) są dozwolone (spec FR
 
 swift-snapshot-testing dla tych samych ekranów i wariantów; wzorce w `Tests/AppSnapshotTests/__Snapshots__/`; zmiana wzorca
 tylko świadomym commitem (różnica z artefaktu CI przejrzana).
+
+## 4. Argumenty testów push (spec 003, 2.1.0; tylko konfiguracja Debug)
+
+Zaślepki i argumenty uruchomienia dla powiadomień push z serwera. W Release są ignorowane; Firebase i systemowe pytanie o zgodę
+nigdy nie biorą udziału w testach UI i migawkach (`DisabledPushTokenSource`).
+
+| Argument | Wartości | Działanie |
+|---|---|---|
+| `-UITestProgram push` | — | jak `paired`, a serwer ogłasza `push` (`capabilities`); `PUT`/`GET push/device` zwracają urządzenie, `GET push/rules` — dwie reguły |
+| `-UITestProgram pushNoRules` | — | jak `push`, ale `GET push/rules` zwraca pustą listę (ostrzeżenie „Brak przypisanych powiadomień”) |
+| `-UITestPush <stan>` | `apnsRefused` · `registered` · `pending` · `noPermission` | wymusza stan push (`fallback(.apnsUnavailable)` · `registered` · `pending` · `noPermission(asked: true)`) bez rejestratora, Firebase i zgody systemu; zaślepka serwera nadal odpowiada na `push/device` i `push/rules` |
+| `-UITestOpenPush <rodzaj>` | `reminder` · `summary` · `backup` · `test` | po sekundzie symuluje dotknięcie wiadomości z serwera tego rodzaju (`type`; dla `reminder` — identyfikator terminu, którego telefon nie ma) |
+
+Karta Pulpitu „Powiadomienia o terminach są wyłączone” jest w testach UI ukryta, chyba że podano `-UITestPush`; migawki środowiska
+(`makeEnvironment`) mają ją ukrytą (`notifications.offCardDismissed`), a własną migawkę `Dashboard_notificationsOffCard` — widoczną.

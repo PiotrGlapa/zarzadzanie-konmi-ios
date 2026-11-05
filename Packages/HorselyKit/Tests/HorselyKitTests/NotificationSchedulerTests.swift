@@ -63,6 +63,26 @@ struct NotificationSchedulerTests {
         #expect(center.requests.allSatisfy { !$0.body.contains("Grom") })
     }
 
+    /// Push z serwera (spec 003, FR-013): gdy powiadomienia wysyła serwer (`localRemindersActive == false`), plan lokalny jest
+    /// pusty — zaplanowane `daily-`/`due-` znikają, nowe nie powstają, a inne identyfikatory zostają.
+    @Test func whenTheServerSendsRemindersTheLocalPlanIsEmptyAndOtherNoticesStay() async throws {
+        let center = FakeCenter(existing: ["daily-2026-10-06", "due-r1", "backup-error", "queue-needsfix"])
+        let scheduler = NotificationScheduler(store: try await store(), center: center)
+        let serverSends = PushState.registered
+        let plan = await scheduler.reschedule(
+            enabled: serverSends.localRemindersActive, settings: NotificationPlanSettings(onDueDate: true), hideDetails: false,
+            now: now, fetchedAt: nil, calendar: utc
+        )
+        #expect(plan.isEmpty)
+        #expect(center.requests.map(\.identifier) == ["backup-error", "queue-needsfix"])
+
+        let localAgain = await scheduler.reschedule(
+            enabled: PushState.pending.localRemindersActive, settings: NotificationPlanSettings(onDueDate: true), hideDetails: false,
+            now: now, fetchedAt: nil, calendar: utc
+        )
+        #expect(!localAgain.isEmpty, "w trybie awaryjnym i w stanie pending plan lokalny działa")
+    }
+
     @Test func turningNotificationsOffRemovesThePlan() async throws {
         let center = FakeCenter(existing: ["daily-2026-10-06", "due-r1", "queue-needsfix"])
         let scheduler = NotificationScheduler(store: try await store(), center: center)

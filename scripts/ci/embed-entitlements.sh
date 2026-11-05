@@ -26,4 +26,4 @@ sign "$app" App/Horsely.entitlements
 rm -rf "$tmp"
 
 echo "Uprawnienia wstawione do archiwum."
-codesign -d --entitlements :- "$app" 2>/dev/null | grep -E "group\.|keychain" || true
+codesign -d --entitlements :- "$app" 2>/dev/null | grep -E "group\.|keychain|aps-environment" || true

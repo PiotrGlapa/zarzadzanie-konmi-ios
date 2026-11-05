@@ -1,24 +1,30 @@
 <!--
 Sync Impact Report
-- Version change: (brak) → 2.0.1 (pierwsza konstytucja projektu iOS)
-- Źródło: konstytucja aplikacji na Androida 2.0.0 (repozytorium zarzadzanie_konmi_android,
-  `.specify/memory/constitution.md`, ratyfikowana 2026-10-05, zmieniona 2026-10-09) przeniesiona
-  z dopasowaniem do platformy iOS według decyzji z sesji wyjaśniającej 2026-10-15
-  (SPECYFIKACJA_MOBILE_IOS.md, wersja dokumentu 1.5). Numer 2.0.1 = zakres funkcji Androida 2.0.1.
-- Principles: I–VII jak w Androidzie (treść merytoryczna bez zmian), dopasowane:
-  - II. uprawnienia iOS (bez lokalizacji, kontaktów, pełnej biblioteki zdjęć; PhotosPicker,
-    selektor dokumentów); wykluczenie z kopii iCloud.
-  - III. Keychain (`kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly`) zamiast Keystore; zasłona
-    w przełączniku aplikacji zamiast `FLAG_SECURE`.
-  - V. dodana zgodność z aplikacją na Androida 2.0.1 (te same funkcje, teksty, kolory, ikony,
-    format kopii zapasowej).
-  - VII. preferowane rozwiązania wbudowane w iOS; bez zależności od usług zewnętrznych.
-- Added sections: „Zgodność z aplikacją na Androida” (zasada VIII).
-- Ograniczenia i proces: Swift/SwiftUI, iOS 18+, iPhone 15 Pro, XcodeGen, GitHub Actions
-  bez Maca, wydanie przez TestFlight (testerzy wewnętrzni), testy migawkowe.
-- Templates: plan-template.md, spec-template.md, tasks-template.md — skopiowane z projektu
-  Androida, bez zmian (odwołują się ogólnie do zasad konstytucji) ✅
-- Follow-up TODOs: brak.
+- Version change: 2.0.1 → 2.1.0 (MINOR — wąski, opisany wyjątek w zasadzie II i doprecyzowania,
+  bez usuwania ani redefinicji zasad; numer zgodny z konstytucją Androida 2.1.0)
+- Źródło: specs/003-push-z-serwera/spec.md (FR-027a–FR-032b, Clarifications 2026-11-05);
+  odpowiednik: konstytucja Androida 2.1.0, zasada II.
+- Modified principles:
+  - II. Prywatność i brak usług zewnętrznych — wyjątek dla Firebase Cloud Messaging (przez APNs):
+    tylko odbiór push z serwera użytkownika, tylko tryb z serwerem z `push`; tylko moduł Messaging,
+    analityka jawnie wyłączona, auto‑inicjalizacja wyłączona, brak rejestracji APNs w trybie
+    samodzielnym; rozszerzenie udostępniania bez Firebase i `aps-environment`; serwerowi tylko
+    platforma i token; wyrejestrowanie przy odparowaniu, zmianie trybu, usunięciu danych i cofnięciu
+    zgody; powrót do powiadomień lokalnych, gdy push nie działa. Logi: bez pełnego tokenu (maks.
+    8 znaków), tytułów i treści powiadomień. `GoogleService-Info.plist` nie jest sekretem (klucz
+    ograniczony do `pl.glapa.horsely`); klucz konta usługi FCM i klucz APNs `.p8` nigdy w repozytorium.
+  - VII. Prostota — wyjątek: Firebase Messaging jako jedyna biblioteka wymagająca usługi zewnętrznej.
+  - VIII. Zgodność z aplikacją na Androida — odniesienie 2.0.1 → 2.1.0.
+- Proces: `GoogleService-Info.plist` w repozytorium; testy ręczne tylko na lokalnym serwerze,
+  nigdy na produkcyjnym serwerze użytkownika.
+- Added sections: brak. Removed sections: brak.
+- Templates: plan-template.md ✅, spec-template.md ✅, tasks-template.md ✅ (bez zmian — odwołują się
+  ogólnie do zasad).
+- Dependent artifacts: ✅ SPECYFIKACJA_MOBILE_IOS.md 1.6 — push poza „Poza zakresem” (rozdz. 10),
+  nowe 4.9a i 9.9, zaktualizowane 9.2, 9.6, NFR-M-09 (FR-032); ✅ README.md — notatka
+  o `GoogleService-Info.plist` (FR-032a); ✅ .claude/CLAUDE.md pkt 5 — Android 2.1.0, pkt 6 — serwer
+  produkcyjny wyłączony z testów.
+- Follow-up TODOs: brak placeholderów.
 -->
 # Horsely — aplikacja na iOS — Constitution
 
@@ -58,20 +64,44 @@ jest wymagana i testowana (SC-M-04, SC-M-09).
 
 - Aplikacja MUSI łączyć się wyłącznie ze sparowanym komputerem użytkownika (w trybie samodzielnym —
   z nikim); NIE MOŻE zawierać telemetrii, analityki, raportowania awarii do usług zewnętrznych,
-  reklam ani SDK nawiązujących połączenia wychodzące. Jedyny wyjątek: mapy, telefon i e‑mail
-  otwierane w innych aplikacjach na żądanie użytkownika.
+  reklam ani SDK nawiązujących połączenia wychodzące (np. Firebase Analytics, Crashlytics).
+  Wyjątki: mapy, telefon i e‑mail otwierane w innych aplikacjach na żądanie użytkownika oraz
+  Firebase Cloud Messaging na warunkach z punktu niżej.
+- Firebase Cloud Messaging (FCM, dostarczający przez APNs) MOŻE być używany **wyłącznie** do
+  odbioru powiadomień push wysyłanych przez serwer użytkownika i **wyłącznie w trybie z serwerem**,
+  gdy serwer ogłasza możliwość `push`:
+  - w trybie samodzielnym FCM NIE MOŻE być konfigurowany ani łączyć się z siecią, a aplikacja NIE
+    MOŻE rejestrować się do powiadomień zdalnych APNs; automatyczna inicjalizacja FCM MUSI być
+    wyłączona domyślnie, a konfiguracja wykonywana ręcznie tylko w trybie z serwerem;
+  - z rodziny Firebase dozwolony jest tylko moduł Messaging (z jego zależnościami); Analytics,
+    Crashlytics, Performance, Remote Config i inne moduły są zabronione, a zbieranie analityki
+    MUSI być jawnie wyłączone; rozszerzenie udostępniania NIE MOŻE zawierać Firebase ani
+    uprawnienia do powiadomień zdalnych;
+  - serwerowi wolno przekazać wyłącznie platformę i token FCM; przy odparowaniu, przejściu w tryb
+    samodzielny, usunięciu danych połączenia i cofnięciu zgody token MUSI zostać wyrejestrowany
+    na serwerze (gdy to możliwe) i usunięty z telefonu, a aplikacja wyrejestrowana z APNs;
+  - niedziałający push (brak rejestracji APNs, brak tokenu, serwer bez `push`) NIE MOŻE pozbawić
+    użytkownika powiadomień — aplikacja wraca wtedy do powiadomień planowanych w telefonie.
+- Plik `GoogleService-Info.plist` NIE jest sekretem (nie pozwala wysyłać powiadomień) i MOŻE być
+  w repozytorium, pod warunkiem że klucz API w nim jest ograniczony w konsoli Google Cloud do
+  aplikacji iOS o identyfikatorze pakietu `pl.glapa.horsely`. Klucz konta usługi FCM (do
+  wysyłania) i klucz APNs (`.p8`) NIE MOGĄ nigdy trafić do aplikacji ani do jej repozytorium.
 - Aplikacja MUSI prosić wyłącznie o zgody z listy w specyfikacji (sekcja 9.2) i NIE MOŻE prosić
   o lokalizację, dostęp do kontaktów ani pełny dostęp do biblioteki zdjęć; zdjęcia wybiera się
   przez `PhotosPicker`, pliki przez selektor dokumentów, kontakt przez `CNContactPickerViewController`.
-- Logi diagnostyczne NIE MOGĄ zawierać treści wpisów, nazw koni, danych kontaktów ani klucza API;
-  rozmiar logów MUSI być ograniczony (rotacja, maks. 5 MB).
+- Logi diagnostyczne NIE MOGĄ zawierać treści wpisów, nazw koni, danych kontaktów, klucza API,
+  pełnego tokenu FCM (najwyżej 8 pierwszych znaków) ani tytułów i treści powiadomień; rozmiar logów
+  MUSI być ograniczony (rotacja, maks. 5 MB).
 - Lokalna baza danych, kolejka zmian i załączniki MUSZĄ leżeć w prywatnym obszarze aplikacji
   (i wspólnym kontenerze App Group dla rozszerzenia udostępniania) i być wykluczone z kopii iCloud.
   Kopia zapasowa danych trybu samodzielnego MOŻE powstawać wyłącznie na żądanie użytkownika
   (albo w włączonej przez niego kopii automatycznej) do miejsca wskazanego przez niego.
 
 **Uzasadnienie**: dane to prywatna ewidencja właściciela; nie opuszczają jego telefonu i komputera
-bez jego decyzji (NFR-M-05, NFR-M-06, NFR-M-09).
+bez jego decyzji (NFR-M-05, NFR-M-06, NFR-M-09). Serwer użytkownika wysyła push przez FCM (który
+przekazuje je do APNs), więc wyjątek jest wąski i taki sam jak w aplikacji na Androida 2.1.0: tylko
+odbiór, tylko w trybie z serwerem, tylko identyfikatory w danych wiadomości, a o treści i odbiorcach
+decyduje serwer użytkownika (specs/003-push-z-serwera).
 
 ### III. Bezpieczne połączenie i klucz API
 
@@ -162,7 +192,9 @@ modelu objawiałaby się utratą lub zniekształceniem danych.
 - Każda dodatkowa warstwa, wzorzec lub zależność zewnętrzna MUSI mieć uzasadnienie w
   `research.md` lub w „Complexity Tracking” planu.
 - Nowa biblioteka MUSI mieć zgodną licencję, być aktywnie utrzymywana i NIE MOŻE wymagać usług
-  zewnętrznych; preferowane są rozwiązania wbudowane w iOS.
+  zewnętrznych; preferowane są rozwiązania wbudowane w iOS. Jedynym wyjątkiem jest Firebase
+  Messaging dla push z serwera (zasada II) — push nie jest funkcją podstawową, a bez niego
+  aplikacja działa w pełni.
 
 **Uzasadnienie**: jeden użytkownik i jedno źródło danych w danym trybie — złożoność nie przynosi
 korzyści, a podnosi koszt utrzymania.
@@ -170,7 +202,7 @@ korzyści, a podnosi koszt utrzymania.
 ### VIII. Zgodność z aplikacją na Androida
 
 - Aplikacja na iOS MUSI mieć te same funkcje, ekrany, teksty, kolory, ikony (Material, wariant
-  Outlined) i zachowanie co aplikacja na Androida 2.0.1; różnice dopuszcza wyłącznie sekcja 9
+  Outlined) i zachowanie co aplikacja na Androida 2.1.0; różnice dopuszcza wyłącznie sekcja 9
   specyfikacji (mechanizmy systemu, natywne komponenty iOS).
 - Teksty interfejsu MUSZĄ pochodzić z `strings.xml` aplikacji na Androida przez skrypt, z testem
   zgodności; plik kopii zapasowej MUSI być wymienny między platformami.
@@ -216,7 +248,10 @@ oznacza te same nawyki, ten sam opis w instrukcji i przenośne dane.
   ręcznej liście kontrolnej na iPhone 15 Pro. Nowa kompilacja trafia do TestFlight co najmniej raz
   na 80 dni.
 - Sekrety podpisywania i klucz API App Store Connect są wyłącznie w sekretach repozytorium GitHub;
-  NIE MOGĄ trafiać do repozytorium ani do logów.
+  NIE MOGĄ trafiać do repozytorium ani do logów. `GoogleService-Info.plist` nie jest sekretem
+  (zasada II) i leży w repozytorium, aby budowanie z samego repozytorium dawało działający push.
+- Testy ręczne z prawdziwym serwerem odbywają się na serwerze uruchomionym lokalnie; serwer
+  produkcyjny użytkownika NIE MOŻE służyć do testów aplikacji.
 - Aktualizacja aplikacji NIE MOŻE utracić danych lokalnych użytkownika (w szczególności danych
   trybu samodzielnego i niewysłanych zmian).
 
@@ -233,4 +268,4 @@ oznacza te same nawyki, ten sam opis w instrukcji i przenośne dane.
 - Bieżące wskazówki wytwórcze: `SPECYFIKACJA_MOBILE_IOS.md`, `.claude/CLAUDE.md` oraz
   `specs/<feature>/plan.md` i `quickstart.md`.
 
-**Version**: 2.0.1 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-15
+**Version**: 2.1.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-11-05

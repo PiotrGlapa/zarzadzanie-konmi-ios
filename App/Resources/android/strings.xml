@@ -217,6 +217,10 @@
     <string name="backup_reminder_since">Ostatnia kopia: %1$s. Od tego czasu dane się zmieniły.</string>
     <string name="backup_reminder_now">Utwórz teraz</string>
     <string name="backup_reminder_later">Przypomnij później</string>
+    <string name="dashboard_notifications_off_title">Powiadomienia o terminach są wyłączone</string>
+    <string name="dashboard_notifications_off_text">Aplikacja nie przypomni o kowalu, weterynarzu ani innych terminach. Włącz codzienne podsumowanie w ustawieniach powiadomień.</string>
+    <string name="dashboard_notifications_off_enable">Włącz</string>
+    <string name="dashboard_notifications_off_hide">Nie pokazuj</string>
     <string name="mode_choice_restore">Odtwórz z kopii zapasowej</string>
 
     <!-- ============ Tryb pracy w Ustawieniach (US4) ============ -->
@@ -967,6 +971,8 @@
     <string name="channel_daily_summary">Terminy — podsumowanie dnia</string>
     <string name="channel_due_day">Terminy — w dniu terminu</string>
     <string name="channel_data_transfer">Wysyłanie danych</string>
+    <string name="channel_server_push">Powiadomienia z serwera</string>
+    <string name="push_public_text">Nowe powiadomienie</string>
     <string name="notif_settings_title">Powiadomienia</string>
     <string name="notif_settings_enable">Powiadomienia o terminach</string>
     <string name="notif_settings_enable_hint">Dzienne podsumowanie przeterminowanych terminów i terminów na dziś i jutro. Bez internetu — z danych w telefonie.</string>
@@ -977,8 +983,33 @@
     <string name="notif_settings_hide_hint">Na zablokowanym telefonie nie będzie imion koni ani tytułów terminów.</string>
     <string name="notif_settings_not_now">Nie teraz</string>
     <string name="notif_settings_denied_title">Telefon nie pozwala na powiadomienia</string>
-    <string name="notif_settings_denied_text">Zgoda została odrzucona, więc powiadomienia się nie pokażą. Aby je włączyć, otwórz ustawienia powiadomień aplikacji i zezwól na nie. Reszta aplikacji działa bez zmian.</string>
+    <string name="notif_settings_denied_text">Telefon nie ma zgody na powiadomienia tej aplikacji, więc się nie pokażą. Aby je włączyć, otwórz ustawienia powiadomień aplikacji i zezwól na nie. Reszta aplikacji działa bez zmian.</string>
     <string name="notif_settings_open_notifications">Otwórz ustawienia powiadomień</string>
+    <string name="push_section_title">Powiadomienia z serwera</string>
+    <string name="push_state_registered">Włączone — powiadomienia o terminach wysyła serwer Horsely.</string>
+    <string name="push_state_pending">Rejestruję telefon na serwerze… Do tego czasu powiadomienia planuje telefon.</string>
+    <string name="push_state_no_push">Serwer nie wysyła powiadomień — powiadomienia planuje telefon.</string>
+    <string name="push_state_no_play">Brak Usług Google Play — powiadomienia planuje telefon.</string>
+    <string name="push_state_failed">Nie udało się zarejestrować telefonu na serwerze — powiadomienia planuje telefon.</string>
+    <string name="push_state_no_permission">Brak zgody na powiadomienia — ani serwer, ani telefon nie pokażą żadnego.</string>
+    <string name="push_registered_at">Zarejestrowano: %1$s</string>
+    <string name="push_last_delivered">Ostatnie powiadomienie: %1$s</string>
+    <string name="push_never_delivered">Ostatnie powiadomienie: jeszcze żadnego</string>
+    <string name="push_rules_title">Jakie powiadomienia dostaję</string>
+    <string name="push_rules_empty_title">Brak przypisanych powiadomień</string>
+    <string name="push_rules_empty_text">Ten telefon nie dostaje teraz żadnych powiadomień o terminach. Reguły przypisuje właściciel w UI webowym (Administracja → Serwer → Powiadomienia). Po wdrożeniu wszystkie są domyślnie wyłączone.</string>
+    <string name="push_rules_failed">Nie udało się pobrać listy — spróbuj później.</string>
+    <string name="push_refresh">Odśwież</string>
+    <string name="push_device_removed">Właściciel usunął ten telefon z listy urządzeń. Telefon zarejestrował się ponownie — reguły trzeba znów przypisać w UI webowym.</string>
+    <string name="push_device_removed_ok">Rozumiem</string>
+    <string name="push_permission_text">Serwer Horsely może teraz wysyłać na ten telefon powiadomienia o terminach. Telefon musi mieć na nie zgodę — za chwilę o nią zapyta. Możesz odmówić i włączyć zgodę później w ustawieniach.</string>
+    <string name="push_server_backup_title">Kopia zapasowa na serwerze</string>
+    <string name="push_server_backup_text">Serwer Horsely zgłosił nieudaną kopię zapasową. Sprawdź kopie w UI webowym (Administracja → Kopie zapasowe). Dane w telefonie nie są zagrożone.</string>
+    <string name="push_hide_background_note">Powiadomienia z serwera odebrane w tle pokazują treść także na ekranie blokady.</string>
+    <!-- tylko iOS (Horsely iOS 2.1.0) -->
+    <string name="push_state_no_apns" tools:ignore="UnusedResources">Telefon nie może odbierać powiadomień z serwera — powiadomienia planuje telefon.</string>
+    <!-- tylko iOS (Horsely iOS 2.1.0) -->
+    <string name="push_hide_previews_hint" tools:ignore="UnusedResources">Aby ukryć treść także dla nich, wybierz w Ustawieniach iOS → Powiadomienia → Pokazuj podglądy: Gdy odblokowany.</string>
     <string name="notif_permission_title">Zgoda na powiadomienia</string>
     <string name="notif_permission_text">Aby przypominać o terminach, aplikacja musi mieć zgodę telefonu na powiadomienia. Za chwilę telefon zapyta o nią. Możesz odmówić — aplikacja będzie działać dalej, a zgodę włączysz później w ustawieniach.</string>
     <string name="battery_section_title">Bateria</string>
