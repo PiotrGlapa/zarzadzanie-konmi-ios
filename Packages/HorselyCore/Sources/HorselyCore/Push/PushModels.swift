@@ -72,7 +72,7 @@ public struct PushDevice: Equatable, Sendable {
 /// `ISO8601DateFormatter` nie przyjmuje każdej liczby cyfr, więc ułamek jest sprowadzany do 3 cyfr przed odczytem.
 public enum PushInstant {
     public static func parse(_ text: String) -> Date? {
-        SyncMerger.parseInstant(normalized(text))
+        RefreshPlan.parseInstant(normalized(text))
     }
 
     static func normalized(_ text: String) -> String {
