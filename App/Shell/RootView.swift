@@ -53,6 +53,7 @@ struct RootView: View {
             await environment.processSharedInbox()
         }
         .task { await environment.observeQueue() }
+        .task { await environment.observePushState() }
         .onChange(of: environment.connection.problem) { old, new in
             withAnimation { environment.indicator.problemChanged(from: old, to: new) }
         }
@@ -72,8 +73,10 @@ struct RootView: View {
             case .active:
                 environment.connection.enterForeground()
                 Task { await environment.refresh(force: false) }
+                Task { await environment.pushEnteredForeground() }
             case .background:
                 environment.connection.enterBackground()
+                Task { await environment.pushEnteredBackground() }
             default:
                 break
             }

@@ -33,6 +33,8 @@ struct HorselyApp: App {
                 // Okno planu powiadomień (14 dni) przesuwa się z każdym przebiegiem w tle.
                 await environment.rescheduleNotificationsNow()
                 guard settings.workMode == .online else { return true }
+                // Push z serwera: jedna próba nadrobienia rejestracji, bez ponowień (spec 003, research R7).
+                await environment.pushRegistrar.reconcile(.background)
                 _ = await outbox.processAll()
                 let hasLocal = ((try? await store.read { try $0.addresses() }) ?? []).contains(where: \.isLocal)
                 guard BackgroundWork.mayRefresh(network: network.conditions, wifiOnly: settings.wifiOnly, hasLocalAddress: hasLocal) else { return true }
@@ -50,7 +52,11 @@ struct HorselyApp: App {
             interval: { BackgroundWork.refreshInterval(for: await sync.capabilities()) }
         )
         background.register()
-        notificationDelegate = NotificationDelegate { url in environment.router.handle(url: url, mode: environment.workMode) }
+        PushBridge.shared.registrar = environment.pushRegistrar
+        notificationDelegate = NotificationDelegate(
+            open: { url in environment.router.handle(url: url, mode: environment.workMode) },
+            presentServerMessage: { message in environment.presentation(forServerMessage: message) }
+        )
         UNUserNotificationCenter.current().delegate = notificationDelegate
     }
 

@@ -58,17 +58,20 @@ public final class SyncService: Sendable {
     private let now: @Sendable () -> Date
     private let log: @Sendable (String) -> Void
     private let onRemoved: @Sendable ([RecordRef]) async -> Void
+    private let onCapabilitiesChange: @Sendable (CapabilitiesChange) -> Void
     private let gate = SyncGate()
 
     public init(
         client: ApiClient, store: RecordStore, now: @escaping @Sendable () -> Date = { Date() }, log: @escaping @Sendable (String) -> Void = { _ in },
-        onRemoved: @escaping @Sendable ([RecordRef]) async -> Void = { _ in }
+        onRemoved: @escaping @Sendable ([RecordRef]) async -> Void = { _ in },
+        onCapabilitiesChange: @escaping @Sendable (CapabilitiesChange) -> Void = { _ in }
     ) {
         self.client = client
         self.store = store
         self.now = now
         self.log = log
         self.onRemoved = onRemoved
+        self.onCapabilitiesChange = onCapabilitiesChange
     }
 
     // MARK: Możliwości
@@ -76,7 +79,7 @@ public final class SyncService: Sendable {
     /// Zapamiętuje możliwości z `system/info`; zmiana `updatedSince` albo `horseStatusInjured` ustawia wymuszenie pełnego pobrania.
     @discardableResult
     public func record(_ info: ProgramInfo) async throws -> CapabilitiesChange {
-        try await store.writeQuietly { access in
+        let change = try await store.writeQuietly { access in
             let before = ProgramCapabilities(serialized: try access.meta(SyncMetaKey.capabilities))
             let after = info.programCapabilities
             let change = CapabilitiesChange(before: before, after: after)
@@ -87,6 +90,9 @@ public final class SyncService: Sendable {
             }
             return change
         }
+        // Zmiana możliwości (np. `push` pojawiło się albo zniknęło) trafia do rejestratora push (spec 003, FR-002, FR-011).
+        if change.changed { onCapabilitiesChange(change) }
+        return change
     }
 
     public func capabilities() async -> ProgramCapabilities {

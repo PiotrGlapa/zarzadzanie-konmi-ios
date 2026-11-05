@@ -58,7 +58,7 @@ struct ApiClientPushTests {
         program.on("PUT", "push/device", .fail(.networkConnectionLost))
         let (client, _) = program.client()
         let outcome = await PushApi(client: client).registerDevice(token: try registration())
-        #expect(outcome == .transient)
+        #expect(outcome.isTransient)
         #expect(program.requests("PUT", "push/device").count == 3, "pierwsza próba i dwa ponowienia")
     }
 
@@ -74,7 +74,7 @@ struct ApiClientPushTests {
         let program = FakeProgram()
         program.on("GET", "push/device", .fail(.networkConnectionLost))
         let (client, _) = program.client()
-        #expect(await PushApi(client: client).device() == .transient)
+        #expect(await PushApi(client: client).device().isTransient)
         #expect(program.requests("GET", "push/device").count == 2)
     }
 
@@ -108,7 +108,7 @@ struct ApiClientPushTests {
         let api = PushApi(client: client)
         #expect(await api.registerDevice(token: try registration()) == .invalid(fields: ["token"]))
         #expect(await api.device() == .notRegistered)
-        #expect(await api.rules() == .transient)
+        #expect(await api.rules().isTransient)
     }
 
     @Test func aRejectedKeyIsAnAccessIssueNotAPushError() async throws {

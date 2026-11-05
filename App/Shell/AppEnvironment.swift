@@ -3,6 +3,7 @@ import HorselyCore
 import HorselyKit
 import Observation
 import SwiftUI
+import UserNotifications
 
 /// Argumenty uruchomienia dla testów (contracts/test-fixtures.md): `-UITestFixture <nazwa>`, `-UITestToday <yyyy-MM-dd>`,
 /// `-UITestMode <unset|online|standalone>`. Obsługiwane tylko w konfiguracji Debug; w Release ignorowane.
@@ -81,6 +82,11 @@ final class AppEnvironment {
     @ObservationIgnored let reports: ReportRepository
     @ObservationIgnored let attachments: AttachmentStore
     @ObservationIgnored let notifications: NotificationScheduler
+    /// Rejestracja telefonu na serwerze i stan push (spec 003). Źródło tokenu: Firebase w aplikacji, zaślepka w testach.
+    @ObservationIgnored let pushRegistrar: PushRegistrar
+    @ObservationIgnored private let pushStates: AsyncStream<PushState>
+    /// Stan push: ekran „Powiadomienia”, karta Pulpitu i planista powiadomień lokalnych (lokalne wyłącza wyłącznie `registered`).
+    private(set) var pushState: PushState = .standalone
     @ObservationIgnored let trash: TrashRepository
     @ObservationIgnored let backup: BackupService
     @ObservationIgnored private var notificationTask: Task<Void, Never>?
@@ -106,7 +112,7 @@ final class AppEnvironment {
     init(
         settings: SettingsStore, dates: any DateProvider, log: DiagnosticLog, store: RecordStore, files: LocalFileStore,
         launchOptions: LaunchOptions = LaunchOptions(arguments: []), secrets: SecretStore? = nil, transport: ProgramTransport? = nil,
-        probe: ConnectProbe? = nil, uploader: BackgroundUploader? = nil
+        probe: ConnectProbe? = nil, uploader: BackgroundUploader? = nil, pushTokens: (any PushTokenSource)? = nil
     ) {
         self.settings = settings
         self.dates = dates
@@ -141,8 +147,19 @@ final class AppEnvironment {
         self.connection = status
         self.connectionLog = connectionLog
         self.client = client
+        let pushStream = AsyncStream<PushState>.makeStream()
+        let registrar = PushRegistrar(
+            api: PushApi(client: client), tokens: pushTokens ?? DisabledPushTokenSource(), settings: settings, capabilities: capabilitiesOf,
+            authorization: { await systemPushAuthorization() }, log: { log.log(PushDiagnostics.category, $0) },
+            onState: { pushStream.continuation.yield($0) }
+        )
+        self.pushRegistrar = registrar
+        self.pushStates = pushStream.stream
         self.sync = SyncService(client: client, store: store, log: { log.log("sync", $0) }, onRemoved: { refs in
             for ref in refs where ref.type == .attachment { files.delete(attachmentId: ref.id) }
+        }, onCapabilitiesChange: { change in
+            // `push` pojawiło się albo zniknęło na serwerze: rejestracja albo powrót powiadomień lokalnych (FR-002, FR-011).
+            Task { await registrar.reconcile(.capabilities(change)) }
         })
         let progress = UploadProgress()
         self.uploadProgress = progress
@@ -176,7 +193,8 @@ final class AppEnvironment {
     // MARK: Tryb online
 
     /// Start pracy z programem: przerwane wysyłki → wynik nieznany, stan połączenia, wysyłka kolejki i odświeżenie danych.
-    func startOnline() async {
+    /// `trigger` mówi rejestratorowi push, czy to start aplikacji, czy świeże parowanie.
+    func startOnline(trigger: PushTrigger = .launch) async {
         guard workMode == .online, !onlineStarted else { return }
         onlineStarted = true
         network.start()
@@ -196,7 +214,43 @@ final class AppEnvironment {
         await loadPairingInfo()
         await outbox.recover()
         connection.enterForeground()
+        // Rejestracja push idzie osobno: nie opóźnia odświeżenia danych, a jej błędy nie wpływają na stan połączenia.
+        await pushRegistrar.startObservingTokenChanges()
+        let registrar = pushRegistrar
+        Task { await registrar.reconcile(trigger) }
         await refresh(force: false)
+    }
+
+    // MARK: Push z serwera
+
+    /// Zmiany stanu push z rejestratora: ekran, karta Pulpitu i przeliczenie powiadomień lokalnych; uruchamia je `RootView`.
+    func observePushState() async {
+        await pushRegistrar.state()
+        for await state in pushStates {
+            pushState = state
+            rescheduleNotifications()
+        }
+    }
+
+    /// Wejście na pierwszy plan: zgoda systemu mogła się zmienić, a rejestracja nadrobić zaległość (R7).
+    func pushEnteredForeground() async {
+        guard workMode == .online else { return }
+        await pushRegistrar.reconcile(.foreground)
+    }
+
+    /// Przejście w tło: oczekujące ponowienia rejestracji są anulowane.
+    func pushEnteredBackground() async {
+        await pushRegistrar.suspend()
+    }
+
+    /// Wiadomość z serwera przy otwartej aplikacji (FR-016, FR-017): pokazana tylko przy zarejestrowanym telefonie (inaczej
+    /// powiadomienia planuje telefon, więc byłby dubel), także przy „ukryj szczegóły” (Clarifications Q2); wiadomość o terminach
+    /// odświeża dane. Dziennik: tylko rodzaj wiadomości.
+    func presentation(forServerMessage message: PushMessage) -> UNNotificationPresentationOptions {
+        log.log(PushDiagnostics.category, PushDiagnostics.message(kind: message.kind))
+        guard pushState == .registered else { return [] }
+        if message.triggersSync { Task { await refresh(force: true) } }
+        return [.banner, .list, .sound]
     }
 
     func loadPairingInfo() async {
@@ -260,12 +314,14 @@ final class AppEnvironment {
         connection.reset()
         onlineStarted = false
         workMode = .online
-        await startOnline()
+        await startOnline(trigger: .paired)
         return identity
     }
 
     /// „Rozłącz”: klucz, pamięć, kolejka i adresy usunięte; aplikacja wraca do wyboru trybu.
     func disconnect() async throws {
+        // Push: `DELETE push/device` musi wyjść, zanim klucz API zniknie z pęku kluczy (research R9); wynik nie blokuje odparowania.
+        await pushRegistrar.unregister()
         try await pairing.disconnect()
         connection.reset()
         connection.enterBackground()
@@ -296,6 +352,7 @@ final class AppEnvironment {
 
     /// Krok 2: dane zostają jako punkt startowy, połączenie i klucz znikają, tryb samodzielny.
     func completeStandaloneSwitch() async throws {
+        await pushRegistrar.unregister()
         try await pairing.switchToStandalone()
         connection.reset()
         onlineStarted = false
@@ -371,10 +428,11 @@ final class AppEnvironment {
             )
         }
         #endif
-        // Pliki do programu idą sesją w tle (FR-M-ZAL-04); przebiegi testowe zostają przy zwykłym transporcie.
+        // Pliki do programu idą sesją w tle (FR-M-ZAL-04); przebiegi testowe zostają przy zwykłym transporcie i bez Firebase.
         return AppEnvironment(
             settings: settings, dates: dates, log: log, store: RecordStore(database: database), files: files, launchOptions: options,
-            uploader: options.isTestRun ? nil : BackgroundUploader.shared
+            uploader: options.isTestRun ? nil : BackgroundUploader.shared,
+            pushTokens: options.isTestRun ? nil : FirebasePushTokenSource.shared
         )
     }
 }
@@ -472,10 +530,20 @@ extension AppEnvironment {
     /// Przeliczenie od razu (zadanie w tle, ekran ustawień).
     func rescheduleNotificationsNow() async {
         let settings = settings
-        let enabled = settings.notificationsEnabled && workMode != .unset && !launchOptions.isTestRun
+        // Gdy powiadomienia o terminach wysyła serwer (stan `registered`), telefon nie planuje własnych — bez dubli (FR-006, FR-007).
+        let enabled = settings.notificationsEnabled && workMode != .unset && pushState.localRemindersActive && !launchOptions.isTestRun
         await notifications.reschedule(
             enabled: enabled, settings: NotificationPlanSettings(time: settings.notificationsDailyTime, onDueDate: settings.notificationsOnDueDate),
             hideDetails: settings.notificationsHideDetails, now: Date(), fetchedAt: workMode == .online ? connection.dataFrom : nil
         )
+    }
+}
+
+/// Zgoda telefonu na powiadomienia w kształcie rejestratora push: `provisional` i `ephemeral` liczą się jako zgoda.
+func systemPushAuthorization() async -> PushAuthorization {
+    switch await UNUserNotificationCenter.current().notificationSettings().authorizationStatus {
+    case .authorized, .provisional, .ephemeral: .allowed
+    case .notDetermined: .notDetermined
+    default: .denied
     }
 }

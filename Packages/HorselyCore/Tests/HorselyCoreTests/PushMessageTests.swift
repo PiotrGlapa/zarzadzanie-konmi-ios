@@ -22,6 +22,13 @@ struct PushMessageTests {
         #expect(PushMessage(userInfo: ["type": 5]) == nil)
     }
 
+    @Test func onlyReminderAndSummaryTriggerASync() throws {
+        for (type, expected) in [("reminder", true), ("summary", true), ("backup", false), ("analytic", false), ("test", false), ("inny", false)] {
+            let message = try #require(PushMessage(userInfo: ["type": type]))
+            #expect(message.triggersSync == expected, "\(type)")
+        }
+    }
+
     @Test func identifiersAreNonEmptyStringsAndTheDateIsValidated() throws {
         let message = try #require(PushMessage(userInfo: [
             "type": "reminder", "reminderId": "6F1C", "horseId": "A0B2", "targetDate": "2026-11-05",

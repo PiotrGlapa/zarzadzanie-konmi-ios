@@ -8,14 +8,21 @@ public enum PushCallOutcome<Value: Sendable>: Sendable {
     case invalid(fields: [String])
     /// `404` — serwer nie zna tego urządzenia.
     case notRegistered
-    /// Sieć, brak adresu, `5xx`, nieczytelna odpowiedź — warto spróbować później.
-    case transient
+    /// Sieć, brak adresu, `5xx`, nieczytelna odpowiedź — warto spróbować później; `reason` to opis słowami do dziennika.
+    case transient(reason: String)
     /// `401`/`403`/`429`, wstrzymany adres, odrzucony certyfikat — obsłużone już przez `ApiClient` (wstrzymanie adresu i ekran
     /// połączenia); rejestracja push nie dokłada własnego komunikatu.
     case access
 }
 
 extension PushCallOutcome: Equatable where Value: Equatable {}
+
+extension PushCallOutcome {
+    public var isTransient: Bool {
+        if case .transient = self { return true }
+        return false
+    }
+}
 
 /// Wywołania `push/*` programu 2.0 przez zwykły `ApiClient` (klucz API, przypinanie certyfikatu, ogranicznik, dziennik połączeń).
 /// Wszystkie żądania mają `forFile: false`, więc „tylko przez Wi‑Fi” nie wyklucza adresu zewnętrznego na danych komórkowych.
@@ -56,7 +63,7 @@ public struct PushApi: Sendable {
     public func device() async -> PushCallOutcome<PushDevice> {
         switch await client.execute(ApiRequest(.get, "push/device", forFile: false)) {
         case let .success(response):
-            guard let device = PushDevice.decode(response.body) else { return .transient }
+            guard let device = PushDevice.decode(response.body) else { return .transient(reason: PushDiagnostics.unreadableResponse) }
             return .ok(device)
         case let .failure(failure):
             return Self.outcome(failure)
@@ -67,7 +74,7 @@ public struct PushApi: Sendable {
     public func rules() async -> PushCallOutcome<[ClientPushRule]> {
         switch await client.execute(ApiRequest(.get, "push/rules", forFile: false)) {
         case let .success(response):
-            guard let rules = ClientPushRule.decodeList(response.body) else { return .transient }
+            guard let rules = ClientPushRule.decodeList(response.body) else { return .transient(reason: PushDiagnostics.unreadableResponse) }
             return .ok(rules)
         case let .failure(failure):
             return Self.outcome(failure)
@@ -79,7 +86,7 @@ public struct PushApi: Sendable {
         case let .validationFailed(problem): .invalid(fields: problem.errors.keys.sorted())
         case .notFound: .notRegistered
         case .unauthorized, .keyHomeOnly, .remoteAccessDisabled, .forbidden, .rateLimited, .suspended, .certificateRejected: .access
-        default: .transient
+        default: .transient(reason: PushDiagnostics.describe(failure))
         }
     }
 }

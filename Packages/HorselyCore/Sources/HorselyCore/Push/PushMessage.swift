@@ -41,6 +41,14 @@ public struct PushMessage: Equatable, Sendable {
         targetDate = Self.text(userInfo["targetDate"]).flatMap { LocalDate($0) }
     }
 
+    /// Wiadomość o terminach (`reminder`, `summary`) odświeża dane telefonu (FR-017); pozostałe rodzaje nie.
+    public var triggersSync: Bool {
+        switch kind {
+        case .reminder, .summary: true
+        default: false
+        }
+    }
+
     private static func text(_ value: Any?) -> String? {
         guard let text = value as? String, !text.isEmpty else { return nil }
         return text
