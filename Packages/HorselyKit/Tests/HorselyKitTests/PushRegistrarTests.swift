@@ -588,8 +588,7 @@ struct PushRegistrarTests {
         diagnostic.log(PushDiagnostics.category, PushDiagnostics.message(kind: message.kind))
         await h.registrar.unregister()
         let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
-        let text = files.compactMap { try? String(contentsOf: $0, encoding: .utf8) }.joined(separator: "
-")
+        let text = files.compactMap { try? String(contentsOf: $0, encoding: .utf8) }.joined(separator: "\n")
         #expect(text.contains("token=\(token.prefix(8))…"))
         #expect(text.contains("PUT /push/device"), "dziennik połączeń też działa")
         #expect(text.contains("wiadomość type=reminder"))
