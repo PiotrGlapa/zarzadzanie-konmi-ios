@@ -194,10 +194,10 @@ odparowanie kończy się w ≤ ~5 s dłużej niż w 2.0.2.
 - [X] T061 [P] Test prywatności dziennika w Packages/HorselyKit/Tests/HorselyKitTests/PushRegistrarTests.swift: po scenariuszu rejestracja → wiadomość → wyrejestrowanie (`FakeProgram`, włączony dziennik połączeń) żaden plik dziennika nie zawiera pełnego tokenu, tytułu ani treści; są tylko prefiksy 8 znaków i opisy słowami (FR-028, SC-009)
 - [X] T062 [P] Test w Tests/AppSnapshotTests/InfoPlistPolicyTests.swift (`testStandaloneWorkMakesNoNetworkRequests` lub nowy): tryb samodzielny i serwer bez `push` nie wywołują `PushTokenSource` ani `registerForRemoteNotifications` (FR-027, SC-006)
 - [X] T063 Ustaw `MARKETING_VERSION: "2.1.0"` w project.yml i zaktualizuj domyślną wersję w `AppEnvironment` (`"2.0.2"` → `"2.1.0"` przy `BackupService`); utwórz CHANGELOG.md (jeśli brak) z sekcją `[2.1.0]` — Dodano: powiadomienia push z serwera w trybie z serwerem, ekran „Powiadomienia” z listą reguł, karta Pulpitu, ekran „Kopia zapasowa na serwerze”; Zmieniono: powiadomienia lokalne o terminach w trybie z serwerem z działającym push, treść dziennego podsumowania; zaktualizuj README.md (status 2.1.0)
-- [ ] T064 Oznacz PR jako gotowy, zielony `ci.yml`, scal do `main` (po zgodzie właściciela), zielony `ci.yml` na `main` (z testami UI)
-- [ ] T065 Tag `v2.1.0` na `main` → `release.yml`: krok „Uprawnienia push” zielony, wysyłka do TestFlight; podaj wersję, numer kompilacji i link do przebiegu `gh run`; brak sekretów lub klucza ASC → powiedz wprost (konstytucja)
+- [X] T064 Oznacz PR jako gotowy, zielony `ci.yml`, scal do `main` (po zgodzie właściciela), zielony `ci.yml` na `main` (z testami UI)
+- [X] T065 Tag `v2.1.0` na `main` → `release.yml`: krok „Uprawnienia push” zielony, wysyłka do TestFlight; podaj wersję, numer kompilacji i link do przebiegu `gh run`; brak sekretów lub klucza ASC → powiedz wprost (konstytucja)
 - [ ] T066 Lista kontrolna quickstart §4 (scenariusze 1–12) na iPhonie 15 Pro z **lokalnym** serwerem, wynik w checklists/validation.md; App Privacy w App Store Connect (krok właściciela, quickstart §2); po zaliczeniu — kompilacja dla grupy „Właściciele”
-- [ ] T067 Zaktualizuj pamięć projektu (`testflight-last-build.md`: 2.1.0, numer kompilacji, data, przypomnienie po 80 dniach) i zaznacz zadania w tasks.md
+- [X] T067 Zaktualizuj pamięć projektu (`testflight-last-build.md`: 2.1.0, numer kompilacji, data, przypomnienie po 80 dniach) i zaznacz zadania w tasks.md
 
 ---
 
