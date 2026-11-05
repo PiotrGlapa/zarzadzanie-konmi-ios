@@ -50,6 +50,32 @@ final class InfoPlistPolicyTests: XCTestCase {
         XCTAssertNotEqual(transport["NSAllowsArbitraryLoadsForMedia"] as? Bool, true)
     }
 
+    /// Prywatność (spec 003, FR-027, SC-006): w trybie samodzielnym i przy serwerze bez `push` źródło tokenu (Firebase) nie dostaje
+    /// żadnego wywołania, a `registerForRemoteNotifications` nie jest wołane.
+    func testStandaloneAndNoPushServerNeverTouchThePushTokenSource() async throws {
+        for mode in [WorkMode.standalone, .online] {
+            let tokens = CountingPushTokenSource()
+            let suite = "horsely.nopush.\(UUID().uuidString)"
+            let settings = SettingsStore(defaults: UserDefaults(suiteName: suite))
+            settings.workMode = mode
+            let root = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-nopush-\(UUID().uuidString)", isDirectory: true)
+            let env = AppEnvironment(
+                settings: settings, dates: FixedDateProvider(today: LocalDate(year: 2026, month: 10, day: 5)!),
+                log: DiagnosticLog(directory: root.appendingPathComponent("Logs")), store: RecordStore(database: try AppDatabase.inMemory()),
+                files: try LocalFileStore(root: root.appendingPathComponent("Files")), transport: RecordingTransport(), probe: AlwaysReachable(),
+                pushTokens: tokens
+            )
+            await env.prepareStore()
+            await env.startOnline()
+            await env.pushRegistrar.reconcile(.launch)
+            await env.pushRegistrar.reconcile(.foreground)
+            await env.pushRegistrar.reconcile(.background)
+            await env.pushEnteredForeground()
+            await env.cleanUpStalePush()
+            XCTAssertEqual(tokens.callCount, 0, "tryb \(mode): źródło tokenu nie może być wołane")
+        }
+    }
+
     /// Typowe czynności trybu samodzielnego: dane, wpisy, raporty, załączniki, kopia — zero żądań sieciowych.
     func testStandaloneWorkMakesNoNetworkRequests() async throws {
         let recorder = RecordingTransport()
@@ -76,6 +102,26 @@ final class InfoPlistPolicyTests: XCTestCase {
         await env.processSharedInbox()
         XCTAssertEqual(recorder.count, 0, "tryb samodzielny nie łączy się z siecią")
     }
+}
+
+/// Źródło tokenu liczące wywołania (żadne nie powinno wystąpić bez push).
+final class CountingPushTokenSource: PushTokenSource, @unchecked Sendable {
+    struct Unavailable: Error {}
+
+    private let lock = NSLock()
+    private var calls = 0
+    let tokenChanges = AsyncStream<String> { $0.finish() }
+
+    var callCount: Int { lock.withLock { calls } }
+
+    private func count() { lock.withLock { calls += 1 } }
+
+    func configureIfNeeded() async { count() }
+    func token() async throws -> String { count(); throw Unavailable() }
+    func deleteToken() async { count() }
+    func setAutoInit(_ enabled: Bool) async { count() }
+    func registerForRemoteNotifications() async { count() }
+    func unregisterForRemoteNotifications() async { count() }
 }
 
 /// Transport zapisujący każde żądanie (i odpowiadający błędem sieci).

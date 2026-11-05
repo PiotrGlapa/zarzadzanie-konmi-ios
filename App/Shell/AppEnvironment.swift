@@ -194,6 +194,9 @@ final class AppEnvironment {
         )
         self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
         horseDirectory.useThumbnailSource(attachments)
+        // Zarejestrowany telefon nie planuje powiadomień lokalnych już od pierwszego przeliczenia po starcie (bez chwilowego dubla);
+        // pierwsza publikacja rejestratora poprawi stan, gdyby coś się zmieniło (zgoda, możliwości serwera).
+        if settings.workMode == .online, settings.pushRegistration.registered { pushState = .registered }
     }
 
     /// Przygotowuje magazyn do pracy: w trybie samodzielnym wstawia domyślne słowniki (gdy ich jeszcze nie ma).

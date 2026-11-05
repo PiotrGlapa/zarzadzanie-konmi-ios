@@ -15,8 +15,10 @@ public enum PushTrigger: Sendable, Equatable {
     case permissionChanged
     /// Biblioteka zgłosiła nowy token.
     case tokenChanged
-    /// Inne (np. udana rejestracja w APNs po wcześniejszej odmowie, ekran „Powiadomienia”).
+    /// Inne (np. ekran „Powiadomienia”).
     case manual
+    /// System zarejestrował telefon w APNs i dostarczył token — rejestracja, która czekała na niego, rusza od razu.
+    case apnsRegistered
     /// `system/info` zmieniło możliwości serwera (`push` pojawiło się albo zniknęło).
     case capabilities(CapabilitiesChange)
 }
@@ -68,6 +70,8 @@ public actor PushRegistrar {
     private let onState: @Sendable (PushState) -> Void
 
     private var attempting = false
+    /// Token APNs dotarł w trakcie próby rejestracji — nieudana próba jest od razu powtórzona raz.
+    private var apnsArrivedDuringAttempt = false
     private var cancelRetry: (@Sendable () -> Void)?
     private var published: PushState?
     private var observing: Task<Void, Never>?
@@ -135,7 +139,7 @@ public actor PushRegistrar {
         case .fallback(.apnsUnavailable):
             stopRetrying()
             // System mógł zmienić zdanie (np. po przywróceniu sieci) — kolejna próba przy każdym wejściu na pierwszy plan.
-            if trigger != .background { await tokens.registerForRemoteNotifications() }
+            if trigger != .background, trigger != .apnsRegistered { await tokens.registerForRemoteNotifications() }
         case .pending, .registered, .fallback(.registrationFailed):
             await register(trigger)
         }
@@ -150,10 +154,11 @@ public actor PushRegistrar {
     /// System zarejestrował telefon w APNs. Po wcześniejszej odmowie — stan wraca do `pending` i rejestracja rusza dalej.
     public func didRegisterAPNs() async {
         var registration = settings.pushRegistration
-        guard registration.apnsRefused else { return }
-        registration.apnsRefused = false
-        settings.pushRegistration = registration
-        await reconcile(.manual)
+        if registration.apnsRefused {
+            registration.apnsRefused = false
+            settings.pushRegistration = registration
+        }
+        await reconcile(.apnsRegistered)
     }
 
     /// System odmówił rejestracji w APNs (np. brak uprawnienia w profilu, brak sieci): tryb awaryjny z powodem (FR-009).
@@ -183,16 +188,29 @@ public actor PushRegistrar {
     // MARK: Rejestracja
 
     private func register(_ trigger: PushTrigger) async {
-        guard !attempting else { return }
+        guard !attempting else {
+            if trigger == .apnsRegistered { apnsArrivedDuringAttempt = true }
+            return
+        }
         let registration = settings.pushRegistration
         let fresh = registration.registered && (registration.registeredAt.map { now().timeIntervalSince($0) < Self.refreshInterval } ?? false)
-        // Rejestracja aktualna (< 24 h) i ten sam token — bez żądania (FR-003).
-        if fresh, trigger != .tokenChanged { return }
+        // Rejestracja aktualna (< 24 h) i ten sam token — bez żądania (FR-003). Token APNs mógł się jednak zmienić, a system
+        // dostarcza go dopiero po rejestracji w APNs, więc przy starcie i wejściu na pierwszy plan ta rejestracja jest ponawiana.
+        if fresh, trigger != .tokenChanged {
+            if settings.pushActive, trigger == .launch || trigger == .foreground { await tokens.registerForRemoteNotifications() }
+            return
+        }
         attempting = true
+        apnsArrivedDuringAttempt = false
         defer { attempting = false }
         stopRetrying()
         await prepareSystem(trigger)
-        if await attempt() == .retry, trigger != .background { scheduleRetry(index: 0) }
+        var result = await attempt()
+        if result == .retry, apnsArrivedDuringAttempt {
+            apnsArrivedDuringAttempt = false
+            result = await attempt()
+        }
+        if result == .retry, trigger != .background { scheduleRetry(index: 0) }
     }
 
     /// Konfiguracja biblioteki i rejestracja w APNs — dopiero przy pierwszej próbie w trybie z serwerem, z `push` i zgodą.
@@ -202,7 +220,7 @@ public actor PushRegistrar {
             settings.pushActive = true
             await tokens.setAutoInit(true)
         }
-        if trigger != .background { await tokens.registerForRemoteNotifications() }
+        if trigger != .background, trigger != .apnsRegistered { await tokens.registerForRemoteNotifications() }
     }
 
     private enum Attempt { case done, retry, stop }

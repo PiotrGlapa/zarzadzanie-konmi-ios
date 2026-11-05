@@ -154,7 +154,7 @@ final class PushHarness: @unchecked Sendable {
 
     init(
         mode: WorkMode = .online, push: Bool = true, authorization: PushAuthorization = .allowed, token: String? = "dGhpcyBpcyBhIHRva2Vu:APA91bTokenA",
-        instantTimeout: Bool = false, network: FixedNetwork = .wifi
+        instantTimeout: Bool = false, network: FixedNetwork = .wifi, diagnostic: DiagnosticLog? = nil
     ) {
         let suite = "horsely.push.\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suite)!
@@ -175,7 +175,7 @@ final class PushHarness: @unchecked Sendable {
         } else {
             waiter = { _ in try? await Task.sleep(for: .seconds(3600)) }
         }
-        let (client, _) = program.client(network: network)
+        let (client, _) = program.client(network: network, connectionLog: diagnostic.map { ConnectionLog(log: $0, enabled: { true }) })
         self.program = program
         self.tokens = tokens
         self.settings = settings
@@ -188,7 +188,7 @@ final class PushHarness: @unchecked Sendable {
             capabilities: { box.capabilities }, authorization: { box.authorization },
             now: { clock.now }, schedule: timer.timer,
             wait: waiter,
-            log: { logs.add($0) }, onState: { box.record($0) }
+            log: { logs.add($0); diagnostic?.log(PushDiagnostics.category, $0) }, onState: { box.record($0) }
         )
     }
 
@@ -410,6 +410,28 @@ struct PushRegistrarTests {
         #expect(await h.registrar.state() == .registered)
     }
 
+    @Test func theApnsTokenArrivingLaterRetriesTheRegistrationAtOnceWithoutAskingTheSystemAgain() async {
+        let h = PushHarness(token: nil)
+        await h.registrar.reconcile(.launch)
+        #expect(h.putCount == 0)
+        let askedBefore = h.tokens.calls.filter { $0 == "registerForRemote" }.count
+        h.tokens.setToken(token)
+        await h.registrar.didRegisterAPNs()
+        #expect(h.putCount == 1, "bez czekania na ponowienie po 30 s")
+        #expect(await h.registrar.state() == .registered)
+        #expect(h.tokens.calls.filter { $0 == "registerForRemote" }.count == askedBefore, "bez pętli: callback APNs nie wywołuje kolejnej rejestracji")
+    }
+
+    @Test func aFreshRegistrationStillAsksTheSystemForTheApnsTokenAtLaunchAndInTheForeground() async {
+        let h = PushHarness()
+        await h.registrar.reconcile(.launch)
+        let before = h.tokens.calls.filter { $0 == "registerForRemote" }.count
+        await h.registrar.reconcile(.foreground)
+        await h.registrar.reconcile(.background)
+        #expect(h.putCount == 1)
+        #expect(h.tokens.calls.filter { $0 == "registerForRemote" }.count == before + 1, "tylko wejście na pierwszy plan; tło nie")
+    }
+
     @Test func aRejectionWithA400GivesRegistrationFailedAndKeepsRetrying() async {
         let h = PushHarness()
         h.program.on("PUT", "push/device", .json(400, #"{"title":"Błąd walidacji","status":400,"errors":{"token":["Token jest wymagany."]}}"#))
@@ -550,6 +572,31 @@ struct PushRegistrarTests {
     }
 
     // MARK: Prywatność (FR-028, SC-009)
+
+    /// Rejestracja → wiadomość → wyrejestrowanie: żaden plik dziennika (diagnostycznego ani połączeń) nie zawiera pełnego tokenu,
+    /// tytułu ani treści wiadomości — są tylko prefiks 8 znaków i opisy słowami.
+    @Test func noLogFileContainsTheFullTokenTheTitleOrTheBody() async throws {
+        let directory = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-pushprivacy-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let diagnostic = DiagnosticLog(directory: directory)
+        let h = PushHarness(diagnostic: diagnostic)
+        await h.registrar.reconcile(.launch)
+        let message = try #require(PushMessage(userInfo: [
+            "type": "reminder", "reminderId": "6F1C-id-terminu", "horseId": "A0B2-id-konia",
+            "aps": ["alert": ["title": "Tytuł wiadomości", "body": "Kowal: Gniada, jutro"]],
+        ]))
+        diagnostic.log(PushDiagnostics.category, PushDiagnostics.message(kind: message.kind))
+        await h.registrar.unregister()
+        let files = try FileManager.default.contentsOfDirectory(at: directory, includingPropertiesForKeys: nil)
+        let text = files.compactMap { try? String(contentsOf: $0, encoding: .utf8) }.joined(separator: "
+")
+        #expect(text.contains("token=\(token.prefix(8))…"))
+        #expect(text.contains("PUT /push/device"), "dziennik połączeń też działa")
+        #expect(text.contains("wiadomość type=reminder"))
+        for secret in [token, String(token.dropFirst(8)), "Tytuł wiadomości", "Kowal: Gniada, jutro", "6F1C-id-terminu", "A0B2-id-konia"] {
+            #expect(!text.contains(secret), Comment(rawValue: "w dzienniku jest: \(secret)"))
+        }
+    }
 
     @Test func theDiagnosticLogNeverContainsTheTokenOnlyItsEightCharacterPrefix() async {
         let h = PushHarness()
