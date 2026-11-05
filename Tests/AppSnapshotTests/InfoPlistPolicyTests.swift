@@ -24,6 +24,25 @@ final class InfoPlistPolicyTests: XCTestCase {
         for key in forbidden { XCTAssertNil(info[key], "niedozwolona zgoda \(key)") }
     }
 
+    /// Push z serwera (spec 003, FR-027, FR-030b, research R1/R3): Firebase bez swizzlingu i bez samoczynnego startu,
+    /// tło „remote-notification”; rozszerzenie udostępniania nie ma śladu Firebase.
+    func testPushConfigurationIsPrivacyFriendly() throws {
+        XCTAssertEqual(info["FirebaseAppDelegateProxyEnabled"] as? Bool, false)
+        XCTAssertEqual(info["FirebaseMessagingAutoInitEnabled"] as? Bool, false)
+        XCTAssertEqual(info["FIREBASE_ANALYTICS_COLLECTION_ENABLED"] as? Bool, false)
+        let modes = info["UIBackgroundModes"] as? [String] ?? []
+        for mode in ["fetch", "processing", "remote-notification"] { XCTAssertTrue(modes.contains(mode), "brak trybu tła \(mode)") }
+
+        var root = URL(fileURLWithPath: #filePath)
+        while root.pathComponents.count > 1, !FileManager.default.fileExists(atPath: root.appendingPathComponent("ShareExtension/Info.plist").path) {
+            root.deleteLastPathComponent()
+        }
+        let data = try Data(contentsOf: root.appendingPathComponent("ShareExtension/Info.plist"))
+        let share = try XCTUnwrap(PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any])
+        XCTAssertFalse(share.keys.contains { $0.localizedCaseInsensitiveContains("firebase") }, "rozszerzenie nie może mieć kluczy Firebase")
+        XCTAssertFalse((share["UIBackgroundModes"] as? [String] ?? []).contains("remote-notification"))
+    }
+
     func testArbitraryLoadsAreNotAllowed() {
         let transport = info["NSAppTransportSecurity"] as? [String: Any] ?? [:]
         XCTAssertNotEqual(transport["NSAllowsArbitraryLoads"] as? Bool, true)
