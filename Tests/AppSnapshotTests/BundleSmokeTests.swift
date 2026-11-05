@@ -6,7 +6,7 @@ import XCTest
 final class BundleSmokeTests: XCTestCase {
     func testBundleVersionAndDisplayName() {
         let info = Bundle.main.infoDictionary ?? [:]
-        XCTAssertEqual(info["CFBundleShortVersionString"] as? String, "2.0.2")
+        XCTAssertEqual(info["CFBundleShortVersionString"] as? String, "2.1.0")
         XCTAssertEqual(info["CFBundleDisplayName"] as? String, "Horsely")
     }
 
