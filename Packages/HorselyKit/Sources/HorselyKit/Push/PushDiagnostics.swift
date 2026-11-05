@@ -18,6 +18,21 @@ public enum PushDiagnostics {
         "rejestracja odrzucona przez serwer (400): \(fields.isEmpty ? "bez szczegółów" : fields.joined(separator: ", "))"
     }
 
+    /// Zmiana stanu push — widać, na czym stoi rejestracja, także gdy żadne żądanie nie wychodzi (np. brak zgody).
+    public static func state(_ state: PushState) -> String {
+        let text = switch state {
+        case .standalone: "tryb samodzielny"
+        case .fallback(.serverHasNoPush): "serwer nie ogłasza push"
+        case .fallback(.apnsUnavailable): "APNs niedostępny"
+        case .fallback(.registrationFailed): "rejestracja nieudana na stałe"
+        case .noPermission(asked: false): "czekam na zgodę na powiadomienia"
+        case .noPermission(asked: true): "brak zgody na powiadomienia"
+        case .pending: "rejestracja w toku"
+        case .registered: "zarejestrowany"
+        }
+        return "stan: \(text)"
+    }
+
     public static func message(kind: PushKind) -> String { "wiadomość type=\(name(of: kind))" }
 
     public static func unregistered(_ result: String) -> String { "wyrejestrowanie: \(result)" }

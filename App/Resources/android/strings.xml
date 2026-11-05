@@ -1010,6 +1010,10 @@
     <string name="push_state_no_apns" tools:ignore="UnusedResources">Telefon nie może odbierać powiadomień z serwera — powiadomienia planuje telefon.</string>
     <!-- tylko iOS (Horsely iOS 2.1.0) -->
     <string name="push_hide_previews_hint" tools:ignore="UnusedResources">Aby ukryć treść także dla nich, wybierz w Ustawieniach iOS → Powiadomienia → Pokazuj podglądy: Gdy odblokowany.</string>
+    <!-- tylko iOS (Horsely iOS 2.1.1) -->
+    <string name="push_state_waiting_permission" tools:ignore="UnusedResources">Serwer Horsely może wysyłać powiadomienia na ten telefon, ale telefon nie ma jeszcze na nie zgody. Do tego czasu powiadomienia planuje telefon.</string>
+    <!-- tylko iOS (Horsely iOS 2.1.1) -->
+    <string name="push_allow" tools:ignore="UnusedResources">Zezwól na powiadomienia</string>
     <string name="notif_permission_title">Zgoda na powiadomienia</string>
     <string name="notif_permission_text">Aby przypominać o terminach, aplikacja musi mieć zgodę telefonu na powiadomienia. Za chwilę telefon zapyta o nią. Możesz odmówić — aplikacja będzie działać dalej, a zgodę włączysz później w ustawieniach.</string>
     <string name="battery_section_title">Bateria</string>
