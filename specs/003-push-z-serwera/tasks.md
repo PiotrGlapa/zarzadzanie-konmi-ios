@@ -165,7 +165,7 @@ odparowanie kończy się w ≤ ~5 s dłużej niż w 2.0.2.
 - [X] T050 [US4] Pytanie o zgodę z Pulpitu w App/Features/Dashboard/DashboardView.swift: tryb online, `capabilities.push`, `authorizationStatus == .notDetermined`, `!settings.pushPermissionAsked` → okno `notif_permission_title` + `push_permission_text` → `requestAuthorization` → `pushPermissionAsked = true` → `reconcile(.permissionChanged)`; nigdy z tła
 - [X] T051 [US4] Migawki w Tests/AppSnapshotTests/ShellSnapshotTests.swift (jasny, ciemny, 200 %): `NotificationSettings_registered_rules`, `…_registered_empty`, `…_pending`, `…_fallback_noPush`, `…_fallback_apns`, `…_noPermission`, `…_notDetermined` (bez komunikatu o odmowie), `Dashboard_notificationsOffCard` — dane przez zaślepki, bez sieci
 - [X] T052 [US4] Test UI w Tests/AppUITests/SettingsUITests.swift: `-UITestProgram push -UITestPush registered` → ekran pokazuje dwa opisy reguł; `pushNoRules` → `push_rules_empty_title`
-- [ ] T053 [US4] Commit, push; pobierz artefakt `snapshots-*`, przejrzyj i zacommituj referencje; zielony `ci.yml`
+- [X] T053 [US4] Commit, push; pobierz artefakt `snapshots-*`, przejrzyj i zacommituj referencje; zielony `ci.yml`
 
 **Checkpoint**: SC-008 — stan i powód widoczne od razu.
 
