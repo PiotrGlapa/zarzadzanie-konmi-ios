@@ -29,8 +29,11 @@ wywołania poniżej i żadnego wywołania Firebase.
 
 ## Modele (`HorselyCore`, `Codable`, dekodowanie tolerancyjne)
 
-Kształt pól: [data-model.md](../data-model.md) §3–§5. Przykłady do testów dekodowania (przepisane z `api-push.md`, bo serwer nie
-publikuje OpenAPI z push — sprawdzone 2026-11-05), w `Packages/HorselyCore/Tests/HorselyCoreTests/Resources/push/`:
+Ścieżki, metody i `DeviceRegistration` — z kopii OpenAPI serwera [openapi-server-push.json](openapi-server-push.json)
+(`GET /openapi/v1.json`, kopia z repozytorium UI). Odpowiedzi `200` są tam opisane tylko jako `type: object`, a `400`/`404` nie są
+wymienione, więc kształt pól odpowiedzi i kody błędów pochodzą z `api-push.md` §1 (odstępstwo w „Complexity Tracking” planu).
+Kształt pól: [data-model.md](../data-model.md) §3–§5. Przykłady do testów dekodowania (przepisane z `api-push.md`), w
+`Packages/HorselyCore/Tests/HorselyCoreTests/Resources/push/`:
 
 ```json
 { "platform": "Ios", "tokenPrefix": "dGhpcyBp", "registeredAt": "2026-11-04T10:15:00.0000000Z",
@@ -53,4 +56,6 @@ publikuje OpenAPI z push — sprawdzone 2026-11-05), w `Packages/HorselyCore/Tes
   przełącznik `pushCapability` dopisujący `push` (i `pushAdmin`) do `capabilities`; stan: zarejestrowany token (pełny — do asercji,
   że trafił tylko do ciała), lista reguł; wymuszenie `400` / `404` / `5xx` / zerwania połączenia N razy.
 - `App/Shell/DemoProgram.swift` (`DemoProgramTransport`, testy UI): scenariusz `push` z dwiema regułami i scenariusz `pushNoRules`.
-- Gdy serwer opublikuje OpenAPI z push, kopia trafi obok obecnego kontraktu, a zaślepka będzie z nim sprawdzana (konstytucja V).
+- Test zgodności (konstytucja V/VI): każda ścieżka i metoda push obsłużona przez zaślepkę i używana przez `PushApi` istnieje
+  w `openapi-server-push.json` (kopia w zasobach testów `HorselyKit`), a ciało `PUT` zawiera wyłącznie pola `DeviceRegistration`.
+  Gdy serwer otypuje odpowiedzi, kopię odświeża się z **lokalnego** serwera (`GET /openapi/v1.json`), a test obejmuje schematy.

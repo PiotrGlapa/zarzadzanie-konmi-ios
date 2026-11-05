@@ -85,8 +85,8 @@ zablokowanym ekranie i raz przy aplikacji na ekranie.
 7. **Given** iPhone na danych komórkowych (Wi-Fi wyłączone), włączone „tylko przez Wi-Fi” dla plików i publiczny adres
    serwera, **When** aplikacja rejestruje telefon, **Then** rejestracja się udaje, a test z UI webowego dociera (błąd
    znaleziony na Androidzie).
-8. **Given** kompilacja deweloperska (środowisko APNs „development”), **When** właściciel wysyła test, **Then** telefon
-   także go dostaje.
+8. *(Nie dotyczy — projekt jest budowany bez Maca, więc kompilacje deweloperskie ze środowiskiem APNs „development” nie
+   powstają; weryfikowana jest wyłącznie kompilacja z TestFlight. Konfiguracja Firebase obsługuje oba środowiska.)*
 
 ---
 
@@ -165,7 +165,8 @@ powtórka o 07:00”.
 
 1. **Given** tryb z serwerem i działający push, **When** użytkownik otwiera ekran „Powiadomienia”, **Then** nie widzi
    przełącznika włączenia powiadomień, godziny podsumowania ani opcji „w dniu terminu”, a widzi opcję „ukryj szczegóły na
-   ekranie blokady”, „Powiadomienia z serwera: włączone”, datę rejestracji i ostatniej dostawy oraz listę reguł.
+   ekranie blokady”, sekcję „Powiadomienia z serwera” ze stanem „Włączone — powiadomienia o terminach wysyła serwer
+   Horsely.”, datę rejestracji i ostatniej dostawy oraz listę reguł.
 2. **Given** brak przypisanych reguł, **When** użytkownik otwiera ekran, **Then** widzi ostrzeżenie „Brak przypisanych
    powiadomień” i wyjaśnienie, że reguły przypisuje właściciel w UI webowym (Administracja → Serwer → Powiadomienia)
    i że po wdrożeniu wszystkie są domyślnie wyłączone.
@@ -316,7 +317,9 @@ z ograniczeniami, push nie ma na liście „Poza zakresem”; przebieg wydania w
   błąd rejestracji (FR-005; także brak identyfikatora odbiorcy przez 24 h po udanej rejestracji APNs, wcześniej traktowany
   jak błąd chwilowy) → `Fallback(registrationFailed)`; jeszcze niezarejestrowany → `Pending`; ostatnia rejestracja udana dla bieżącego klucza →
   `Registered`. Powiadomienia lokalne o terminach i podsumowaniu są aktywne zawsze, gdy stan ≠ `Registered`. Ekran
-  ustawień i planowanie powiadomień lokalnych czytają ten sam stan.
+  ustawień i planowanie powiadomień lokalnych czytają ten sam stan. `NoPermission` rozróżnia zgodę nieustaloną (jeszcze nie
+  pytano — ekran pokazuje stan rejestracji w toku, nie odmowę) od odmowy (ekran „Brak zgody” z przyciskiem); w obu
+  przypadkach telefon się nie rejestruje.
 - **FR-009**: W trybie z serwerem z dostępnym push aplikacja MUSI przestać planować lokalne powiadomienia o terminach
   i dziennym podsumowaniu oraz anulować już zaplanowane — **dopiero po udanej rejestracji** — niezależnie od tego, czy do
   telefonu są przypisane reguły (FR-024).
@@ -382,10 +385,11 @@ z ograniczeniami, push nie ma na liście „Poza zakresem”; przebieg wydania w
 
 - **FR-021**: Przy stanie `Registered` ekran MUSI ukrywać: włączenie powiadomień, godzinę podsumowania i „w dniu terminu”;
   MUSI zostawić „ukryj szczegóły na ekranie blokady”.
-- **FR-022**: Ekran MUSI pokazywać stan push teksami jak na Androidzie: „Powiadomienia z serwera: włączone”,
-  „Zarejestrowano: 05.11.2026, 08:15”, „Ostatnie powiadomienie: …” albo „Jeszcze żadnego” (z `GET /push/device`);
-  „Rejestruję telefon na serwerze…”; ostrzeżenie trybu awaryjnego z powodem (FR-012); „Brak zgody na powiadomienia”
-  z przyciskiem.
+- **FR-022**: Ekran MUSI pokazywać stan push tekstami ze `strings.xml` Androida 2.1.0 (klucze `push_*`; przy rozbieżności
+  rozstrzyga `strings.xml`): nagłówek „Powiadomienia z serwera”, stan zarejestrowany („Włączone — powiadomienia o terminach
+  wysyła serwer Horsely.”), „Zarejestrowano: 05.11.2026, 08:15”, „Ostatnie powiadomienie: …” albo „Ostatnie powiadomienie:
+  jeszcze żadnego” (z `GET /push/device`); stan rejestracji w toku („Rejestruję telefon na serwerze…”); ostrzeżenie trybu
+  awaryjnego z powodem (FR-012); stan braku zgody („Brak zgody na powiadomienia — …”) z przyciskiem.
 - **FR-023**: Ekran MUSI pokazywać listę „Jakie powiadomienia dostaję” z opisem (`description`) każdej reguły
   z `GET /push/rules` w kolejności serwera, bez własnej interpretacji pól reguły, oraz przycisk „Odśwież”. Dane urządzenia
   i reguł są pobierane tylko na żądanie ekranu, nie w tle.
@@ -435,8 +439,9 @@ z ograniczeniami, push nie ma na liście „Poza zakresem”; przebieg wydania w
   ograniczony w konsoli Google Cloud do aplikacji iOS `pl.glapa.horsely`. Budowanie z samego repozytorium (w CI) MUSI dawać
   aplikację z działającym push. Klucz APNs, konto serwisowe usługi i inne sekrety NIE MOGĄ trafić do repozytorium.
 - **FR-032b**: Podpisana aplikacja MUSI mieć uprawnienie do powiadomień zdalnych ze środowiskiem „production” dla
-  TestFlight/App Store i „development” dla kompilacji deweloperskich oraz tryb tła „powiadomienia zdalne”; krok podpisywania
-  w CI MUSI to weryfikować (obok dotychczasowych grup aplikacji i pęku kluczy).
+  TestFlight/App Store (w pliku uprawnień zostaje „development”, które profil dystrybucyjny zastępuje przy eksporcie) oraz
+  tryb tła „powiadomienia zdalne”; krok wydania w CI MUSI weryfikować „production” w podpisanej aplikacji i brak uprawnienia
+  w rozszerzeniu (obok dotychczasowych grup aplikacji i pęku kluczy).
 - **FR-033**: Zmiana MUSI być wydana jako wersja **2.1.0** (MINOR; numer kompilacji z CI) przez tag `v2.1.0` z wysyłką do
   TestFlight; ekran „O aplikacji” i dziennik diagnostyczny pokazują 2.1.0; `CHANGELOG.md` ma sekcję `[2.1.0]` (Dodano: push
   z serwera, ekran „Powiadomienia” w trybie z serwerem; Zmieniono: powiadomienia lokalne o terminach w trybie z serwerem
@@ -445,7 +450,9 @@ z ograniczeniami, push nie ma na liście „Poza zakresem”; przebieg wydania w
   push się nie powiedzie, powiadomienia lokalne działają jak w 2.0.2.
 - **FR-035**: Testy automatyczne MUSZĄ używać zaślepki serwera z `PUT/DELETE/GET /push/device` i `GET /push/rules`,
   przełącznikiem `push` w `capabilities` i wymuszaniem `400`/`404`/`5xx`; modele dekodują tolerancyjnie (nieznane pola
-  i nieznany typ reguły to nie błąd); przykłady JSON z kontraktu serwera. Testy ręczne z prawdziwym serwerem — wyłącznie
+  i nieznany typ reguły to nie błąd); ścieżki, metody i ciało rejestracji zaślepki MUSZĄ być zgodne z OpenAPI serwera
+  (`GET /openapi/v1.json`, kopia w `contracts/openapi-server-push.json`), a kształty odpowiedzi — z kontraktu
+  `api-push.md` §1 (OpenAPI opisuje je ogólnie). Testy ręczne z prawdziwym serwerem — wyłącznie
   na serwerze lokalnym, nigdy na produkcyjnym `192.168.18.33`.
 
 ### Key Entities
@@ -470,7 +477,7 @@ z ograniczeniami, push nie ma na liście „Poza zakresem”; przebieg wydania w
 - **SC-001**: Po sparowaniu z serwerem z `push` i wyrażeniu zgody telefon pojawia się na liście urządzeń w UI webowym
   w ciągu 1 minuty (przy dostępnej sieci, także komórkowej).
 - **SC-002**: Powiadomienie testowe z UI webowego pojawia się na iPhonie w ciągu 30 sekund — przy zablokowanym ekranie,
-  w tle i na ekranie — w 10 na 10 prób, dla kompilacji z TestFlight i kompilacji deweloperskiej.
+  w tle i na ekranie — w 10 na 10 prób, dla kompilacji z TestFlight.
 - **SC-003**: Przy przypisanej regule dla terminu użytkownik dostaje dokładnie jedno powiadomienie o tym terminie (0 dubli
   z powiadomień lokalnych).
 - **SC-004**: Po wyłączeniu wysyłania przez właściciela telefon wraca do powiadomień lokalnych najpóźniej przy następnej
@@ -491,8 +498,9 @@ z ograniczeniami, push nie ma na liście „Poza zakresem”; przebieg wydania w
 ## Assumptions
 
 - Serwer (program Java 2.0, spec. 008) jest wdrożony; kontrakt API telefonu i kształt wiadomości są ustalone; zmiany
-  serwera są addytywne, a aplikacja 2.0.2 działa z nim bez różnic. Serwer nie publikuje OpenAPI z push (sprawdzone
-  2026-11-05) — przykłady do testów pochodzą z kontraktu.
+  serwera są addytywne, a aplikacja 2.0.2 działa z nim bez różnic. Serwer publikuje OpenAPI z endpointami push
+  (`GET /openapi/v1.json`; sprawdzone 2026-11-05 w repozytorium serwera, test `PushOpenApiIT`), ale odpowiedzi opisuje bez
+  typów — kształty pól i przykłady do testów pochodzą z `api-push.md` §1.
 - Usługa dostarczania to Firebase Cloud Messaging (przez APNs); projekt `horsely-41baf` ma zarejestrowaną aplikację iOS
   `pl.glapa.horsely`, a klucz APNs `.p8` jest wgrany do Firebase i obsługuje oba środowiska APNs.
 - Serwer nie wysyła cichych pushy ani `mutable-content` — brak rozszerzenia przetwarzającego powiadomienia.

@@ -59,19 +59,19 @@ nigdy na produkcyjnym `192.168.18.33` (R18); brak Maca — kompilacje dewelopers
 
 *GATE: przed fazą 0 i po fazie 1. Oceniane dla trybu online (O) i samodzielnego (S). Konstytucja 2.1.0.*
 
-| Zasada | Przed | Po projekcie | Uwagi |
-|--------|-------|--------------|-------|
-| I. Jedno źródło prawdy | ✅ | ✅ | O: serwer decyduje o regułach push, telefon pokazuje `description` bez interpretacji; S: bez zmian |
-| II. Prywatność i brak usług zewnętrznych | ✅ (wyjątek FCM w 2.1.0) | ✅ | tylko `FirebaseMessaging`, auto-init wyłączony, konfiguracja wyłącznie O + `push` + zgoda (R6); S: brak Firebase i APNs; rozszerzenie bez Firebase; serwerowi tylko platforma i token; dziennik bez tokenu i treści (R16); plist w repozytorium, `.p8` i konto usługi poza nim |
-| III. Bezpieczne połączenie i klucz API | ✅ | ✅ | żądania push przez istniejący `ApiClient` (przypinanie, klucz, `401/403/429`); wyrejestrowanie przed usunięciem klucza z Keychain (R9) |
-| IV. Offline i synchronizacja | ✅ | ✅ | rejestracja nadrabiana przy otwarciu i w `BGAppRefreshTask` (R7); lokalne powiadomienia działają do udanej rejestracji |
-| V. Kontrakt API | ✅ | ✅ | `push` tylko gdy ogłoszony w `capabilities`; kształty z `api-push.md` (brak OpenAPI z push — przykłady JSON w testach, R17); nieznane pola i typy pomijane |
-| VI. Testy | ✅ | ✅ | polityka, rejestrator, mapowanie, klient (dane komórkowe, zerwane połączenia), dziennik bez tokenu, migawki stanów, test zgodności tekstów, weryfikacja uprawnień w CI |
-| VII. Prostota | ✅ | ✅ | jedna nowa zależność (wyjątek z zasady VII); bez NSE, bez osobnego zadania w tle; sekcja w istniejącym ekranie |
-| VIII. Zgodność z Androidem 2.1.0 | ✅ | ✅ | te same stany, teksty, cele nawigacji, karta Pulpitu; różnice platformy opisane (APNs zamiast Usług Google Play, pierwszy plan przy „ukryj szczegóły”, R5, R10) |
-| Proces | ✅ | ✅ | XcodeGen, CI bez Maca, wydanie tagiem `v2.1.0`; testy ręczne tylko na serwerze lokalnym |
+| Zasada | Przed (O / S) | Po projekcie (O / S) | Uwagi |
+|--------|---------------|----------------------|-------|
+| I. Jedno źródło prawdy | ✅ / ✅ | ✅ / ✅ | O: serwer decyduje o regułach push, telefon pokazuje `description` bez interpretacji; S: bez zmian |
+| II. Prywatność i brak usług zewnętrznych | ✅ / ✅ (wyjątek FCM w 2.1.0) | ✅ / ✅ | O: tylko `FirebaseMessaging`, auto-init wyłączony, konfiguracja wyłącznie przy `push` + zgodzie (R6), serwerowi tylko platforma i token, dziennik bez tokenu i treści (R16); S: brak Firebase i APNs; rozszerzenie bez Firebase; plist w repozytorium, `.p8` i konto usługi poza nim |
+| III. Bezpieczne połączenie i klucz API | ✅ / ✅ | ✅ / ✅ | O: żądania push przez istniejący `ApiClient` (przypinanie, klucz, `401/403/429`), wyrejestrowanie przed usunięciem klucza z Keychain (R9); S: bez połączeń |
+| IV. Offline i synchronizacja | ✅ / ✅ | ✅ / ✅ | O: rejestracja nadrabiana przy otwarciu i w `BGAppRefreshTask` (R7), lokalne powiadomienia działają do udanej rejestracji; S: bez zmian |
+| V. Kontrakt API | ✅ / ✅ | ✅ z odstępstwem / ✅ | O: ścieżki i ciało `PUT` z OpenAPI serwera (`contracts/openapi-server-push.json`, R17); kształty odpowiedzi, `400`/`404` z `api-push.md` §1 — odstępstwo w „Complexity Tracking”; `push` tylko gdy ogłoszony; nieznane pola i typy pomijane. S: bez zmian |
+| VI. Testy | ✅ / ✅ | ✅ / ✅ | zaślepka z endpointami push sprawdzana z kopią OpenAPI (ścieżki, metody, `DeviceRegistration`); polityka, rejestrator, mapowanie, klient (dane komórkowe, zerwane połączenia), dziennik bez tokenu, migawki stanów, zgodność tekstów, uprawnienia w CI; S: test braku wywołań Firebase |
+| VII. Prostota | ✅ / ✅ | ✅ / ✅ | jedna nowa zależność (wyjątek z zasady VII); bez NSE, bez osobnego zadania w tle; sekcja w istniejącym ekranie |
+| VIII. Zgodność z Androidem 2.1.0 | ✅ / ✅ | ✅ / ✅ | te same stany, teksty (`strings.xml`), cele nawigacji, karta Pulpitu; różnice platformy opisane (APNs zamiast Usług Google Play, pierwszy plan przy „ukryj szczegóły”, R5, R10) |
+| Proces | ✅ / ✅ | ✅ / ✅ | XcodeGen, CI bez Maca, wydanie tagiem `v2.1.0`; testy ręczne tylko na serwerze lokalnym; kompilacje deweloperskie nie powstają (R15) |
 
-Brak naruszeń — sekcja „Complexity Tracking” pusta.
+Jedno uzasadnione odstępstwo (zasada V) — „Complexity Tracking” niżej.
 
 ## Project Structure
 
@@ -84,6 +84,7 @@ specs/003-push-z-serwera/
 ├── data-model.md        # faza 1 — stan rejestracji, PushState, modele API i wiadomości
 ├── quickstart.md        # faza 1 — weryfikacja (CI, lokalny serwer, TestFlight)
 ├── contracts/
+│   ├── openapi-server-push.json # kopia OpenAPI serwera z endpointami push (repozytorium UI, dd7f142)
 │   ├── push-api-client.md   # jak aplikacja używa API telefonu
 │   ├── push-message.md      # wiadomość APNs/FCM → PushMessage → cel nawigacji
 │   ├── ui-push-ios.md       # ekran „Powiadomienia”, karta Pulpitu, zgoda, ekran kopii serwera
@@ -160,5 +161,8 @@ repozytorium Androida (R14) — osobny commit tam, przed synchronizacją tekstó
 
 ## Complexity Tracking
 
-Brak naruszeń konstytucji wymagających uzasadnienia. Jedyna nowa zależność zewnętrzna (Firebase Messaging) jest wprost dopuszczona
-przez zasady II i VII konstytucji 2.1.0.
+| Odstępstwo | Dlaczego potrzebne | Prostsza alternatywa odrzucona, bo |
+|------------|--------------------|-------------------------------------|
+| Zasada V/VI — OpenAPI serwera (`GET /openapi/v1.json`, kopia `contracts/openapi-server-push.json` z repozytorium `zarzadzanie_konmi_ui`, `api/openapi.json`, commit `dd7f142`) zawiera ścieżki `push/device` (`PUT`/`GET`/`DELETE`), `push/rules` (`GET`) i schemat `DeviceRegistration`, ale odpowiedzi `200` opisuje jako `type: object`, bez `PushDevice`/`ClientPushRule`, i nie wymienia `400`/`404`. Kształty odpowiedzi i kody błędów aplikacja bierze z `../zarzadzanie_konmi_java/specs/008-push-mobilny/contracts/api-push.md` §1 (kontrakt serwera, zgodny z testem `PushOpenApiIT` i testami API serwera) | bez tych pól nie da się pokazać dat rejestracji ani listy reguł (FR-022, FR-023), a bez `404` — wykryć usunięcia urządzenia (FR-025) | zakładanie pól tylko z OpenAPI: brak pól; czekanie na typowane schematy w OpenAPI serwera: blokuje wydanie bez zysku — pola są ustalone w kontrakcie serwera i wdrożone na produkcji. Ograniczenia ryzyka: dekodowanie tolerancyjne (R17), test zgodności zaślepki z kopią OpenAPI (ścieżki, metody, `DeviceRegistration`), a gdy serwer otypuje odpowiedzi — kopia zostanie odświeżona i test rozszerzony o schematy |
+
+Jedyna nowa zależność zewnętrzna (Firebase Messaging) jest wprost dopuszczona przez zasady II i VII konstytucji 2.1.0.

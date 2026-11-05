@@ -55,7 +55,8 @@ Decyzje fazy 0 dla [spec.md](spec.md). Odpowiedniki Androida: `../zarzadzanie_ko
 
 - **Decision**: `didFailToRegisterForRemoteNotificationsWithError` ustawia trwałe `apnsRefused = true` → od razu
   `Fallback(.apnsUnavailable)`; każda późniejsza udana rejestracja APNs (`didRegister…`) je czyści. Symulator w CI nie dostaje tokenu
-  APNs, więc tryb awaryjny przy testach UI wymusza argument `-UITestPush apnsRefused` (contracts/test-fixtures). Brak tokenu FCM
+  APNs, więc tryb awaryjny przy testach UI wymusza argument `-UITestPush apnsRefused` (opis argumentów:
+  `specs/001-aplikacja-ios-horsely/contracts/test-fixtures.md`, uzupełniany w zadaniach). Brak tokenu FCM
   po udanej rejestracji APNs (`token()` rzuca lub limit 30 s) to **błąd chwilowy** → R7.
 - **Rationale**: odmowa systemu jest jednoznaczna (odpowiednik „brak Usług Google Play”); brak tokenu FCM bywa siecią.
 - **Alternatives considered**: tryb awaryjny po kilku startach (stan „Rejestruję…” bez końca na urządzeniu bez APNs).
@@ -212,9 +213,21 @@ Decyzje fazy 0 dla [spec.md](spec.md). Odpowiedniki Androida: `../zarzadzanie_ko
   dostaje ciała), a pełny token nie występuje w żadnym pliku dziennika po scenariuszu rejestracja–wiadomość–wyrejestrowanie.
 - **Rationale**: FR-028, konstytucja II; nazwy błędów czytelne (na Androidzie zaciemnione nazwy klas dawały „ik”).
 
-## R17. Daty z serwera i modele (FR-035)
+## R17. Kontrakt, daty z serwera i modele (FR-035, konstytucja V)
 
-- **Decision**: `PushDevice`, `ClientPushRule`, `DeviceRegistration` w `HorselyCore` (`Codable`, dekodowanie tolerancyjne:
+- **Ustalenie (2026-11-05, repozytorium `zarzadzanie_konmi_java`)**: serwer **publikuje** OpenAPI z endpointami push —
+  `GET /openapi/v1.json` (test `PushOpenApiIT`: ścieżki push to wyłącznie dodatki do 2.0.0, `push/device` zabezpieczone kluczem
+  API). Zapisana kopia jest w repozytorium UI (`zarzadzanie_konmi_ui/api/openapi.json`, commit `dd7f142`, z S1–S3) i została
+  przeniesiona do `contracts/openapi-server-push.json`. Kopia zawiera `PUT`/`GET`/`DELETE /api/v1/push/device`,
+  `GET /api/v1/push/rules` i schemat `DeviceRegistration` (`platform`, `token`), ale odpowiedzi `200` ma jako `type: object`
+  (bez `PushDevice`/`ClientPushRule`) i nie wymienia `400`/`404`. Informacja z `zmiana_push.md` („serwer nie publikuje OpenAPI
+  z push”) jest nieaktualna.
+- **Decision (kontrakt)**: ścieżki, metody i ciało żądania — z kopii OpenAPI (źródło prawdy, zasada V); kształty odpowiedzi i kody
+  `400`/`404` — z `api-push.md` §1 (odstępstwo opisane w „Complexity Tracking” planu). Test w `HorselyKit` sprawdza, że każda
+  ścieżka i metoda użyta przez `PushApi` i obsłużona przez zaślepkę istnieje w kopii OpenAPI, a ciało `PUT` ma tylko pola
+  `DeviceRegistration`. Kopia trafia też do zasobów testów. Gdy serwer otypuje odpowiedzi, kopia jest odświeżana
+  (`GET http://<lokalny serwer>:5080/openapi/v1.json` — nigdy z serwera produkcyjnego), a test obejmuje schematy.
+- **Decision (modele)**: `PushDevice`, `ClientPushRule`, `DeviceRegistration` w `HorselyCore` (`Codable`, dekodowanie tolerancyjne:
   nieznane pola pomijane, `lastSeenAt`/`lastDeliveredAt` mogą być `null`, nieznany `type` reguły to zwykły napis). Daty
   `registeredAt` itd. przez istniejące `SyncMerger.parseInstant` — test z przykładem serwera o 7 cyfrach ułamka
   (`2026-11-04T10:15:00.0000000Z`); gdyby `ISO8601DateFormatter` go nie przyjął, parser obcina ułamek do 3 cyfr. Przykłady JSON
