@@ -106,7 +106,8 @@ struct ApiClientPushTests {
         program.on("GET", "push/rules", .json(503, #"{"title":"Niedostępne"}"#))
         let (client, _) = program.client()
         let api = PushApi(client: client)
-        #expect(await api.registerDevice(token: try registration()) == .invalid(fields: ["token"]))
+        let device = try registration()
+        #expect(await api.registerDevice(token: device) == .invalid(fields: ["token"]))
         #expect(await api.device() == .notRegistered)
         #expect(await api.rules().isTransient)
     }
@@ -115,7 +116,8 @@ struct ApiClientPushTests {
         let program = FakeProgram()
         program.on("PUT", "push/device", .json(401, #"{"title":"Klucz odrzucony"}"#))
         let (client, _) = program.client()
-        #expect(await PushApi(client: client).registerDevice(token: try registration()) == .access)
+        let device = try registration()
+        #expect(await PushApi(client: client).registerDevice(token: device) == .access)
     }
 
     @Test func anUnreadableSuccessBodyStillCountsAsRegistered() async throws {

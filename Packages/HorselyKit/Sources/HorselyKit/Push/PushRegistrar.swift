@@ -288,6 +288,43 @@ public actor PushRegistrar {
         cancelRetry = nil
     }
 
+    // MARK: Ekran „Powiadomienia”
+
+    /// Dane z `GET push/device` (daty rejestracji i doręczeń). `404` — właściciel usunął telefon z listy urządzeń: rejestracja
+    /// jest unieważniona, ekran pokaże jednorazowy komunikat, a telefon rejestruje się ponownie od razu (FR-025).
+    public func deviceInfo() async -> PushDevice? {
+        switch await api.device() {
+        case let .ok(device):
+            return device
+        case .notRegistered:
+            var registration = settings.pushRegistration
+            guard registration.registered else { return nil }
+            registration.registered = false
+            registration.deviceRemovedNotice = true
+            settings.pushRegistration = registration
+            log(PushDiagnostics.registrationFailed("serwer nie zna urządzenia (404)"))
+            await state()
+            await register(.manual)
+            return nil
+        default:
+            return nil
+        }
+    }
+
+    /// Reguły z `GET push/rules` w kolejności serwera; `nil` — nie udało się pobrać (stan push bez zmian, FR-026a).
+    public func rules() async -> [ClientPushRule]? {
+        guard case let .ok(rules) = await api.rules() else { return nil }
+        return rules
+    }
+
+    /// „Rozumiem” w oknie o usuniętym telefonie.
+    public func acknowledgeDeviceRemoved() {
+        var registration = settings.pushRegistration
+        guard registration.deviceRemovedNotice else { return }
+        registration.deviceRemovedNotice = false
+        settings.pushRegistration = registration
+    }
+
     // MARK: Wyrejestrowanie
 
     /// `DELETE push/device` (limit 5 s), potem token, samoczynne pobieranie, APNs i stan lokalny. Wołać **przed** usunięciem klucza

@@ -169,6 +169,12 @@ final class PushHarness: @unchecked Sendable {
         let clock = TestClock()
         let logs = LogBox()
         let timer = ManualTimer()
+        let waiter: @Sendable (TimeInterval) async -> Void
+        if instantTimeout {
+            waiter = { _ in }
+        } else {
+            waiter = { _ in try? await Task.sleep(for: .seconds(3600)) }
+        }
         let (client, _) = program.client(network: network)
         self.program = program
         self.tokens = tokens
@@ -181,7 +187,7 @@ final class PushHarness: @unchecked Sendable {
             api: PushApi(client: client), tokens: tokens, settings: settings,
             capabilities: { box.capabilities }, authorization: { box.authorization },
             now: { clock.now }, schedule: timer.timer,
-            wait: instantTimeout ? { _ in } : { _ in try? await Task.sleep(for: .seconds(3600)) },
+            wait: waiter,
             log: { logs.add($0) }, onState: { box.record($0) }
         )
     }
@@ -449,6 +455,39 @@ struct PushRegistrarTests {
         #expect(!(await h.registrar.state()).localRemindersActive)
     }
 
+    // MARK: Ekran „Powiadomienia” (US4)
+
+    @Test func theDeviceCallReturnsDatesAndTheRulesCallReturnsTheServerOrder() async {
+        let h = PushHarness()
+        h.program.setPushRules(#"[{"id":"r1","type":"Reminder","description":"Kowal: dzień przed"},{"id":"r2","type":"DailySummary","description":"Podsumowanie o 08:00"}]"#)
+        await h.registrar.reconcile(.launch)
+        let device = await h.registrar.deviceInfo()
+        #expect(device?.registeredAt == Date(timeIntervalSince1970: 1_793_787_300))
+        #expect(device?.lastDeliveredAt == nil)
+        #expect(await h.registrar.rules()?.map(\.description) == ["Kowal: dzień przed", "Podsumowanie o 08:00"])
+    }
+
+    @Test func aFailingRulesCallLeavesThePushStateUntouched() async {
+        let h = PushHarness()
+        await h.registrar.reconcile(.launch)
+        h.program.on("GET", "push/rules", .json(503, #"{"title":"Niedostępne"}"#))
+        #expect(await h.registrar.rules() == nil)
+        #expect(await h.registrar.state() == .registered)
+    }
+
+    @Test func a404FromTheDeviceCallRegistersAgainAndLeavesAOneTimeNotice() async {
+        let h = PushHarness()
+        await h.registrar.reconcile(.launch)
+        h.program.on("GET", "push/device", .json(404, #"{"title":"Nie znaleziono","status":404}"#))
+        let device = await h.registrar.deviceInfo()
+        #expect(device == nil)
+        #expect(h.putCount == 2, "natychmiastowa ponowna rejestracja")
+        #expect(h.settings.pushRegistration.deviceRemovedNotice)
+        #expect(h.settings.pushRegistration.registered)
+        await h.registrar.acknowledgeDeviceRemoved()
+        #expect(!h.settings.pushRegistration.deviceRemovedNotice)
+    }
+
     // MARK: Wyrejestrowanie (US3)
 
     @Test func unregisteringSendsTheDeleteBeforeTheTokenIsRemovedAndClearsTheLocalState() async {
@@ -476,8 +515,8 @@ struct PushRegistrarTests {
             await h.registrar.reconcile(.launch)
             h.program.on("DELETE", "push/device", reply)
             await h.registrar.unregister()
-            #expect(h.settings.pushRegistration == PushRegistration(), name)
-            #expect(h.tokens.calls.suffix(3) == ["deleteToken", "autoInit(false)", "unregisterForRemote"], name)
+            #expect(h.settings.pushRegistration == PushRegistration(), Comment(rawValue: name))
+            #expect(h.tokens.calls.suffix(3) == ["deleteToken", "autoInit(false)", "unregisterForRemote"], Comment(rawValue: name))
         }
     }
 

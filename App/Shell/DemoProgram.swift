@@ -9,10 +9,12 @@ import HorselyKit
 /// - `paired`: program działa (wersja 2.0.0, jeden koń „Grom”);
 /// - `offline`: komputer nie odpowiada (każde żądanie — błąd połączenia);
 /// - `conflict`: jak `paired`, a zmiana notatki kończy się `409` z inną wersją z programu (konflikt);
-/// - `photos`: jak `paired`, a koń „Grom” ma zdjęcie z programu (załącznik-obraz; miniatura i plik odpowiadają małym PNG).
+/// - `photos`: jak `paired`, a koń „Grom” ma zdjęcie z programu (załącznik-obraz; miniatura i plik odpowiadają małym PNG);
+/// - `push`: jak `paired`, a program ogłasza `push` (spec 003): `push/device` odpowiada urządzeniem, `push/rules` — dwiema regułami;
+/// - `pushNoRules`: jak `push`, ale telefonowi nie przypisano żadnej reguły (`push/rules` zwraca pustą listę).
 struct DemoProgramTransport: ProgramTransport {
     enum Scenario: String {
-        case paired, offline, conflict, photos
+        case paired, offline, conflict, photos, push, pushNoRules
     }
 
     let scenario: Scenario
@@ -25,6 +27,8 @@ struct DemoProgramTransport: ProgramTransport {
     static let photoAttachment = #"{"id":"\#(photoId)","version":1,"createdAt":"2026-10-01T10:00:00","updatedAt":"2026-10-01T10:00:00","ownerType":"Horse","ownerId":"11111111-1111-1111-1111-111111111111","horseId":"11111111-1111-1111-1111-111111111111","fileName":"grom.png","contentType":"image/png","sizeBytes":70,"sha256":"\#(String(repeating: "0", count: 64))"}"#
     /// Najmniejszy poprawny PNG (1 × 1 px) — miniatura i „pełne” zdjęcie zaślepki.
     static let pixel = Data(base64Encoded: "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==") ?? Data()
+    static let pushDevice = #"{"platform":"Ios","tokenPrefix":"dGhpcyBp","registeredAt":"2026-11-04T10:15:00.0000000Z","lastSeenAt":"2026-11-05T08:00:00.0000000Z","lastDeliveredAt":null}"#
+    static let pushRules = #"[{"id":"r1","type":"Reminder","reminderKind":"Farrier","offsetDays":1,"sendTime":"08:00","description":"Kowal: dzień przed o 08:00"},{"id":"r2","type":"DailySummary","sendTime":"07:30","description":"Podsumowanie dnia o 07:30"}]"#
     static let note = #"{"id":"22222222-2222-2222-2222-222222222222","version":4,"createdAt":"2026-10-01T10:00:00","updatedAt":"2026-10-04T10:00:00","horseId":"11111111-1111-1111-1111-111111111111","noteDate":"2026-10-01","title":"Kuleje (z programu)"}"#
 
     func send(_ request: URLRequest, to address: ServerAddress, bodyFile: URL?, download: Bool, progress: (@Sendable (Int64, Int64?) -> Void)?) async -> TransportOutcome {
@@ -47,7 +51,15 @@ struct DemoProgramTransport: ProgramTransport {
             }
             return .response(status: 200, headers: ["content-type": "image/png"], body: Self.pixel, file: nil, remoteIP: "127.0.0.1")
         case ("GET", "system/info"):
-            return json(200, #"{"appVersion":"2.0.0","apiVersion":"v1","schemaVersion":"1.5","serverTime":"2026-10-05T10:00:00Z","capabilities":["dataStamp","idempotencyKey","horseStatusInjured"],"dataStamp":"0123456789abcdef"}"#)
+            let names = ["dataStamp", "idempotencyKey", "horseStatusInjured"] + (scenario.hasPush ? ["push", "pushAdmin"] : [])
+            let list = names.map { "\"\($0)\"" }.joined(separator: ",")
+            return json(200, #"{"appVersion":"2.0.0","apiVersion":"v1","schemaVersion":"1.5","serverTime":"2026-10-05T10:00:00Z","capabilities":["# + list + #"],"dataStamp":"0123456789abcdef"}"#)
+        case ("PUT", "push/device") where scenario.hasPush, ("GET", "push/device") where scenario.hasPush:
+            return json(200, Self.pushDevice)
+        case ("DELETE", "push/device") where scenario.hasPush:
+            return .response(status: 204, headers: [:], body: Data(), file: nil, remoteIP: "127.0.0.1")
+        case ("GET", "push/rules") where scenario.hasPush:
+            return json(200, scenario == .pushNoRules ? "[]" : Self.pushRules)
         case ("GET", "dictionaries"):
             return json(200, "{}")
         case ("GET", "horses"):
@@ -74,7 +86,7 @@ struct DemoProgramTransport: ProgramTransport {
         try? await environment.store.write { access in
             try access.saveAddress(address)
             try access.setMeta(SyncMetaKey.programVersion, "2.0.0")
-            try access.setMeta(SyncMetaKey.capabilities, "dataStamp,horseStatusInjured,idempotencyKey")
+            try access.setMeta(SyncMetaKey.capabilities, "dataStamp,horseStatusInjured,idempotencyKey" + (scenario.hasPush ? ",push" : ""))
             guard scenario == .conflict else { return }
             let horse = LocalHorse(id: "11111111-1111-1111-1111-111111111111", createdAt: stamp, updatedAt: stamp, version: 3, name: "Grom", passportNumber: "PL-1")
             let note = LocalNote(
@@ -88,5 +100,10 @@ struct DemoProgramTransport: ProgramTransport {
             ))
         }
     }
+}
+
+extension DemoProgramTransport.Scenario {
+    /// Scenariusze, w których program ogłasza `push`.
+    var hasPush: Bool { self == .push || self == .pushNoRules }
 }
 #endif

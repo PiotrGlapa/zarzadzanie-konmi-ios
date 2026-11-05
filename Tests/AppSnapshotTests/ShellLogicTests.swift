@@ -20,6 +20,25 @@ final class ShellLogicTests: XCTestCase {
         XCTAssertEqual(destination("horsely://queue"), .queue)
     }
 
+    /// Poprawka 2.1.0: parowanie włącza powiadomienia o terminach, gdy telefon ma już zgodę (jak Android).
+    func testPairingEnablesNotificationsWhenTheSystemAlreadyAllowsThem() {
+        XCTAssertTrue(AppEnvironment.notificationsEnabledAfterPairing(authorization: .allowed, current: false))
+        XCTAssertFalse(AppEnvironment.notificationsEnabledAfterPairing(authorization: .notDetermined, current: false))
+        XCTAssertFalse(AppEnvironment.notificationsEnabledAfterPairing(authorization: .denied, current: false))
+        XCTAssertTrue(AppEnvironment.notificationsEnabledAfterPairing(authorization: .denied, current: true), "wcześniejszy wybór zostaje")
+    }
+
+    func testPushLaunchArgumentsForceAPushStateOnlyInTestRuns() {
+        XCTAssertEqual(LaunchOptions(arguments: ["-UITestPush", "apnsRefused"]).forcedPushState, .fallback(.apnsUnavailable))
+        XCTAssertEqual(LaunchOptions(arguments: ["-UITestPush", "registered"]).forcedPushState, .registered)
+        XCTAssertEqual(LaunchOptions(arguments: ["-UITestPush", "pending"]).forcedPushState, .pending)
+        XCTAssertEqual(LaunchOptions(arguments: ["-UITestPush", "noPermission"]).forcedPushState, .noPermission(asked: true))
+        XCTAssertNil(LaunchOptions(arguments: ["-UITestPush", "cos"]).forcedPushState)
+        XCTAssertNil(LaunchOptions(arguments: []).forcedPushState)
+        XCTAssertTrue(LaunchOptions(arguments: ["-UITestPush", "pending"]).isTestRun)
+        XCTAssertTrue(LaunchOptions(arguments: ["-UITestOpenPush", "backup"]).isTestRun)
+    }
+
     func testUnknownAndForeignAddressesOpenOnlyTheDashboard() {
         XCTAssertEqual(destination("horsely://nieznany"), .dashboard)
         XCTAssertEqual(destination("horsely://entry/new?kind=usun-wszystko"), .dashboard)

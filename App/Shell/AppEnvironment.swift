@@ -15,6 +15,10 @@ struct LaunchOptions: Equatable, Sendable {
     var program: String?
     /// `-UITestReset`: wyczyść zapamiętane ustawienia przed startem (świeża instalacja).
     var reset = false
+    /// `-UITestPush <apnsRefused|registered|pending|noPermission>`: wymusza stan push bez Firebase i bez zgody systemu (spec 003).
+    var push: String?
+    /// `-UITestOpenPush <reminder|summary|backup|test>`: symuluje dotknięcie wiadomości z serwera tego rodzaju (spec 003).
+    var openPush: String?
 
     init(arguments: [String]) {
         func value(after flag: String) -> String? {
@@ -26,9 +30,22 @@ struct LaunchOptions: Equatable, Sendable {
         mode = value(after: "-UITestMode").flatMap { WorkMode(rawValue: $0) }
         program = value(after: "-UITestProgram")
         reset = arguments.contains("-UITestReset")
+        push = value(after: "-UITestPush")
+        openPush = value(after: "-UITestOpenPush")
     }
 
-    var isTestRun: Bool { fixture != nil || today != nil || mode != nil || program != nil || reset }
+    var isTestRun: Bool { fixture != nil || today != nil || mode != nil || program != nil || reset || push != nil || openPush != nil }
+
+    /// Stan push narzucony argumentem testowym; `nil` — normalna praca rejestratora.
+    var forcedPushState: PushState? {
+        switch push {
+        case "apnsRefused": .fallback(.apnsUnavailable)
+        case "registered": .registered
+        case "pending": .pending
+        case "noPermission": .noPermission(asked: true)
+        default: nil
+        }
+    }
 }
 
 /// Kontener zależności aplikacji: magazyn, ustawienia, zegar, dziennik, router, tryb pracy i motyw.
@@ -217,7 +234,7 @@ final class AppEnvironment {
         // Rejestracja push idzie osobno: nie opóźnia odświeżenia danych, a jej błędy nie wpływają na stan połączenia.
         await pushRegistrar.startObservingTokenChanges()
         let registrar = pushRegistrar
-        Task { await registrar.reconcile(trigger) }
+        if launchOptions.forcedPushState == nil { Task { await registrar.reconcile(trigger) } }
         await refresh(force: false)
     }
 
@@ -225,6 +242,11 @@ final class AppEnvironment {
 
     /// Zmiany stanu push z rejestratora: ekran, karta Pulpitu i przeliczenie powiadomień lokalnych; uruchamia je `RootView`.
     func observePushState() async {
+        if let forced = launchOptions.forcedPushState {
+            pushState = forced
+            rescheduleNotifications()
+            return
+        }
         await pushRegistrar.state()
         for await state in pushStates {
             pushState = state
@@ -314,8 +336,16 @@ final class AppEnvironment {
         connection.reset()
         onlineStarted = false
         workMode = .online
+        // Poprawka 2.1.0 (jak Android): parowanie włącza powiadomienia o terminach, gdy telefon ma już zgodę.
+        settings.notificationsEnabled = Self.notificationsEnabledAfterPairing(authorization: await systemPushAuthorization(), current: settings.notificationsEnabled)
+        rescheduleNotifications()
         await startOnline(trigger: .paired)
         return identity
+    }
+
+    /// Po sparowaniu powiadomienia o terminach są włączone, jeśli były albo telefon ma już zgodę na powiadomienia.
+    nonisolated static func notificationsEnabledAfterPairing(authorization: PushAuthorization, current: Bool) -> Bool {
+        current || authorization == .allowed
     }
 
     /// „Rozłącz”: klucz, pamięć, kolejka i adresy usunięte; aplikacja wraca do wyboru trybu.
