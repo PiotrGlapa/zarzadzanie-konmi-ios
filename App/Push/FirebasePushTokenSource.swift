@@ -59,7 +59,7 @@ final class FirebasePushTokenSource: PushTokenSource, @unchecked Sendable {
         return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             let once = OnceResult(continuation)
             Task { @MainActor in
-                Messaging.messaging().token { token, error in
+                Messaging.messaging().register { token, error in
                     if let token, !token.isEmpty {
                         once.finish(.success(token))
                     } else {
@@ -76,7 +76,7 @@ final class FirebasePushTokenSource: PushTokenSource, @unchecked Sendable {
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
             let once = OnceVoid(continuation)
             Task { @MainActor in
-                Messaging.messaging().deleteToken { _ in once.finish() }
+                Messaging.messaging().unregister { _ in once.finish() }
             }
             // Brak odpowiedzi biblioteki nie może wstrzymać odparowania.
             DispatchQueue.global().asyncAfter(deadline: .now() + 5) { once.finish() }
