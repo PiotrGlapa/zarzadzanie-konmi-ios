@@ -8,6 +8,7 @@ final class PushUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    @MainActor
     private func launch(program: String = "push", push: String? = nil, openPush: String? = nil) -> XCUIApplication {
         let app = XCUIApplication()
         var arguments = ["-UITestReset", "-UITestToday", "2026-10-05", "-UITestMode", "online", "-UITestProgram", program]
@@ -18,6 +19,7 @@ final class PushUITests: XCTestCase {
         return app
     }
 
+    @MainActor
     private func element(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
         app.descendants(matching: .any).matching(identifier: identifier).firstMatch
     }
