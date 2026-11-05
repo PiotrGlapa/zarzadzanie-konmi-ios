@@ -58,7 +58,8 @@ enum MoreMenu {
 
 struct MoreView: View {
     @Environment(AppEnvironment.self) private var environment
-    @State private var path: [MoreItem.Destination] = []
+    // Ścieżka nietypowana: pozycje menu i ekrany Ustawień kładą na ten sam stos wartości różnych typów.
+    @State private var path = NavigationPath()
 
     var body: some View {
         let menu = MoreMenu.sections(mode: environment.workMode, queueCount: environment.queueCount, conflictCount: environment.conflictCount)
@@ -100,7 +101,8 @@ struct MoreView: View {
         .onChange(of: environment.router.pendingDestination, initial: true) { _, destination in
             guard destination == .serverBackup else { return }
             environment.router.pendingDestination = nil
-            path = [.serverBackup]
+            path = NavigationPath()
+            path.append(MoreItem.Destination.serverBackup)
         }
     }
 }
