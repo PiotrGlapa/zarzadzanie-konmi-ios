@@ -79,11 +79,70 @@ final class FakeProgram: @unchecked Sendable {
         defer { lock.unlock() }
         recorded.append(Recorded(method: method, path: path, headers: request.allHTTPHeaderFields ?? [:], body: body))
         guard let index = routes.lastIndex(where: { $0.method == method && ($0.path == path || ($0.path.hasSuffix("*") && path.hasPrefix(String($0.path.dropLast())))) }) else {
+            if pushEnabled, let pushed = pushReply(method: method, path: path, body: body) { return pushed }
             return .json(404, #"{"title":"Nie znaleziono"}"#)
         }
         let replies = routes[index].replies
         if replies.count > 1 { routes[index].replies.removeFirst() }
-        return replies[0]
+        return pushEnabled ? withPushCapabilities(path, replies[0]) : replies[0]
+    }
+
+    // MARK: Push (spec 003)
+
+    private var pushEnabled = false
+    private var pushToken: String?
+    private var pushRegisteredAt = "2026-11-04T10:15:00.0000000Z"
+    private var pushRulesJson = "[]"
+
+    /// Przełącznik możliwości `push`: dopisuje `push` i `pushAdmin` do `capabilities` w `system/info` i włącza zaślepkę
+    /// `push/device` (`PUT`/`GET`/`DELETE`) oraz `push/rules` (`GET`) ze stanem (zapamiętany token, reguły).
+    /// Żądania wymuszane przez `on(…)` — np. `400`, `404`, `503`, zerwane połączenie — mają pierwszeństwo przed zaślepką.
+    var pushCapability: Bool {
+        get { lock.withLock { pushEnabled } }
+        set { lock.withLock { pushEnabled = newValue } }
+    }
+
+    /// Pełny token z ostatniego udanego `PUT push/device` (tylko do asercji — nigdy do dziennika).
+    var registeredPushToken: String? { lock.withLock { pushToken } }
+
+    /// Reguły zwracane przez `GET push/rules` (tablica JSON).
+    func setPushRules(_ json: String) {
+        lock.withLock { pushRulesJson = json }
+    }
+
+    private func pushReply(method: String, path: String, body: Data?) -> Reply? {
+        switch (method, path) {
+        case ("GET", "system/info"):
+            return withPushCapabilities(path, .json(200, #"{"appVersion":"2.0.0","apiVersion":"v1","schemaVersion":"1.5","capabilities":[],"dataStamp":"0123456789abcdef"}"#))
+        case ("PUT", "push/device"):
+            guard let token = body.flatMap({ JSONValue.object($0) })?["token"]?.stringValue, !token.isEmpty else {
+                return .json(400, #"{"title":"Błąd walidacji","status":400,"errors":{"token":["Token jest wymagany."]}}"#)
+            }
+            pushToken = token
+            return .json(200, deviceJson(token))
+        case ("GET", "push/device"):
+            guard let token = pushToken else { return .json(404, #"{"title":"Nie znaleziono","status":404}"#) }
+            return .json(200, deviceJson(token))
+        case ("DELETE", "push/device"):
+            pushToken = nil
+            return .empty(204)
+        case ("GET", "push/rules"):
+            return .json(200, pushRulesJson)
+        default:
+            return nil
+        }
+    }
+
+    private func deviceJson(_ token: String) -> String {
+        #"{"platform":"Ios","tokenPrefix":"\#(token.prefix(8))","registeredAt":"\#(pushRegisteredAt)","lastSeenAt":"\#(pushRegisteredAt)","lastDeliveredAt":null}"#
+    }
+
+    private func withPushCapabilities(_ path: String, _ reply: Reply) -> Reply {
+        guard path == "system/info", case let .json(status, text, headers) = reply, case var .object(fields)? = try? JSONValue.parse(text) else { return reply }
+        var names = fields["capabilities"]?.arrayValue ?? []
+        for name in ["push", "pushAdmin"] where !names.contains(.string(name)) { names.append(.string(name)) }
+        fields["capabilities"] = .array(names)
+        return .json(status, JSONValue.object(fields).text(), headers: headers)
     }
 
     func address(id: String = "a", position: Int = 0, remote: Bool = false) -> ServerAddress {
@@ -93,13 +152,13 @@ final class FakeProgram: @unchecked Sendable {
     /// Klient z tą zaślepką.
     func client(
         addresses: [ServerAddress]? = nil, capabilities: ProgramCapabilities = .none, events: @escaping @Sendable (ConnectionEvent) -> Void = { _ in },
-        network: FixedNetwork = .wifi
+        network: FixedNetwork = .wifi, connectionLog: ConnectionLog? = nil
     ) -> (ApiClient, InMemoryAddressBook) {
         let book = InMemoryAddressBook(addresses ?? [address()])
         let transport = URLSessionTransport(configure: { $0.protocolClasses = [StubProtocol.self] })
         let client = ApiClient(
             addresses: book, secrets: InMemorySecretStore("hk_test"), transport: transport, probe: AlwaysReachable(),
-            limiter: RateLimiter(maxRequests: 1000), network: { network }, capabilities: { capabilities }, events: events
+            limiter: RateLimiter(maxRequests: 1000), network: { network }, capabilities: { capabilities }, events: events, connectionLog: connectionLog
         )
         return (client, book)
     }

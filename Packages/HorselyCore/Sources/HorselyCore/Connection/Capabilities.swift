@@ -10,9 +10,11 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     public static let idempotencyKeyName = "idempotencyKey"
     public static let horsePhotoFieldName = "horsePhotoField"
     public static let horseStatusInjuredName = "horseStatusInjured"
+    /// Powiadomienia push z serwera (spec 003). `pushAdmin` (UI webowe) nie dotyczy telefonu i jest pomijane jak każda nieznana nazwa.
+    public static let pushName = "push"
 
     private static let known: Set<String> = [
-        updatedSinceName, dataStampName, ifMatchDeleteName, idempotencyKeyName, horsePhotoFieldName, horseStatusInjuredName,
+        updatedSinceName, dataStampName, ifMatchDeleteName, idempotencyKeyName, horsePhotoFieldName, horseStatusInjuredName, pushName,
     ]
 
     /// Program bez listy możliwości (1.5.0–1.6.x) i tryb samodzielny.
@@ -43,6 +45,8 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     public var horsePhotoField: Bool { names.contains(Self.horsePhotoFieldName) }
     /// Status konia „Kontuzjowany” (klient deklaruje cechę nagłówkiem `X-Client-Features`).
     public var horseStatusInjured: Bool { names.contains(Self.horseStatusInjuredName) }
+    /// Serwer wysyła powiadomienia push (`PUT/DELETE/GET push/device`, `GET push/rules`).
+    public var push: Bool { names.contains(Self.pushName) }
 
     /// Zapis do `local_meta`: nazwy rozdzielone przecinkami, w stałej kolejności.
     public var serialized: String { names.sorted().joined(separator: ",") }
@@ -69,6 +73,12 @@ public struct CapabilitiesChange: Equatable, Sendable {
 
     /// Zmienił się odstęp pracy w tle (15 min ze stemplem danych, inaczej 60 min).
     public var refreshIntervalChanged: Bool { before.dataStamp != after.dataStamp }
+
+    /// Serwer zaczął ogłaszać `push` (rejestracja telefonu, FR-002).
+    public var pushAppeared: Bool { !before.push && after.push }
+
+    /// Serwer przestał ogłaszać `push` (lokalne powiadomienia wracają, bez `DELETE`, FR-011).
+    public var pushVanished: Bool { before.push && !after.push }
 }
 
 /// Cechy klienta w nagłówku `X-Client-Features` (contracts/android/program-2.0-integration.md §2): `horse-status-injured`

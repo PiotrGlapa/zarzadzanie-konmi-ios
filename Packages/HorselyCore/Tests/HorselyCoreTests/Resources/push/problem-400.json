@@ -1,0 +1,1 @@
+{ "type": "https://horsely/problems/validation", "title": "Błąd walidacji", "status": 400, "errors": { "token": ["Token jest wymagany."] } }

@@ -27,12 +27,15 @@ struct ReminderDigestTests {
 
     @Test func theSummaryCountsOverdueAndTodayOrTomorrow() {
         let open = [reminder("a", "2026-10-01"), reminder("b", "2026-10-02"), reminder("c", "2026-10-05"), reminder("d", "2026-10-06"), reminder("e", "2026-10-20")]
-        #expect(summary(open) == "2 przeterminowanych, 2 na dziś i jutro")
+        #expect(summary(open) == "Przeterminowane: 2, na dziś i jutro: 2")
     }
 
+    /// Jak Android 2.1.0 (`ReminderDigest.kt`): „przeterminowane: X”, „na dziś i jutro: Y”, bez odmiany liczebników.
     @Test func onlyTheNonEmptyPartIsShown() {
-        #expect(summary([reminder("a", "2026-10-01")]) == "1 przeterminowanych")
-        #expect(summary([reminder("a", "2026-10-06")]) == "1 na dziś i jutro")
+        #expect(summary([reminder("a", "2026-10-01")]) == "Przeterminowane: 1")
+        #expect(summary([reminder("a", "2026-10-06")]) == "Na dziś i jutro: 1")
+        #expect(summary([reminder("a", "2026-10-01"), reminder("b", "2026-10-02")]) == "Przeterminowane: 2")
+        #expect(summary([reminder("a", "2026-10-05"), reminder("b", "2026-10-06"), reminder("c", "2026-10-06")]) == "Na dziś i jutro: 3")
     }
 
     @Test func nothingToReportMeansNoNotification() {
@@ -45,7 +48,7 @@ struct ReminderDigestTests {
     @Test func dataOlderThanSevenDaysGetANoteWithTheDate() throws {
         let old = LocalDateTime(year: 2026, month: 9, day: 27, hour: 8)!
         let text = try #require(summary([reminder("a", "2026-10-01")], fetchedAt: old))
-        #expect(text.hasPrefix("1 przeterminowanych\n"))
+        #expect(text.hasPrefix("Przeterminowane: 1\n"))
         #expect(text.contains("Dane z 27.09.2026, 08:00 — połącz się z komputerem, aby je odświeżyć"))
     }
 
@@ -88,10 +91,10 @@ struct ReminderDigestTests {
         let plan = ReminderDigest.plan(reminders: [reminder("a", "2026-10-10")], horses: horses, settings: NotificationPlanSettings(), now: now, fetchedAt: nil)
         // Termin 10.10: jutro dla 9.10, dziś dla 10.10, potem przeterminowany aż do końca planu.
         #expect(plan.first?.identifier == "daily-2026-10-09")
-        #expect(plan.first?.text == "1 na dziś i jutro")
+        #expect(plan.first?.text == "Na dziś i jutro: 1")
         let last = try #require(plan.last)
         #expect(last.identifier == "daily-2026-10-18")
-        #expect(last.text == "1 przeterminowanych")
+        #expect(last.text == "Przeterminowane: 1")
         #expect(plan.allSatisfy { $0.deepLink == ReminderDigest.dashboardLink })
     }
 

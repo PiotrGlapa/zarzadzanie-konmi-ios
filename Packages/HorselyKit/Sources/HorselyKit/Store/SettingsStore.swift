@@ -45,6 +45,21 @@ public struct SettingsStore: @unchecked Sendable {
         static let appLockLastBackgroundAt = "appLock.lastBackgroundAt"
         static let connectionLogUntil = "connectionLog.until"
         static let programVersionWarnedFor = "programVersion.warnedFor"
+        // Push z serwera (spec 003, data-model.md §1). Pełnego tokenu FCM tu nie ma — trzyma go SDK.
+        static let pushRegistered = "push.registered"
+        static let pushTokenPrefix = "push.tokenPrefix"
+        static let pushRegisteredAt = "push.registeredAt"
+        static let pushFailingSince = "push.failingSince"
+        static let pushPermanentFailure = "push.permanentFailure"
+        static let pushDeviceRemovedNotice = "push.deviceRemovedNotice"
+        static let pushApnsRefused = "push.apnsRefused"
+        static let pushActive = "push.active"
+        static let pushPermissionAsked = "push.permissionAsked"
+        static let notificationsOffCardDismissed = "notifications.offCardDismissed"
+        /// Klucze `push.*` czyszczone razem z danymi połączenia — bez `push.permissionAsked` (decyzja użytkownika dotyczy telefonu).
+        static let pushConnectionKeys = [
+            pushRegistered, pushTokenPrefix, pushRegisteredAt, pushFailingSince, pushPermanentFailure, pushDeviceRemovedNotice, pushApnsRefused, pushActive,
+        ]
     }
 
     // MARK: Tryb pracy i motyw
@@ -87,6 +102,52 @@ public struct SettingsStore: @unchecked Sendable {
     public var notificationsHideDetails: Bool {
         get { bool(Key.notificationsHideDetails, default: false) }
         nonmutating set { defaults.set(newValue, forKey: Key.notificationsHideDetails) }
+    }
+
+    // MARK: Powiadomienia push z serwera
+
+    /// Stan rejestracji telefonu na serwerze jako całość (domyślnie: niezarejestrowany).
+    public var pushRegistration: PushRegistration {
+        get {
+            PushRegistration(
+                registered: bool(Key.pushRegistered, default: false), tokenPrefix: defaults.string(forKey: Key.pushTokenPrefix),
+                registeredAt: date(Key.pushRegisteredAt), failingSince: date(Key.pushFailingSince),
+                permanentFailure: bool(Key.pushPermanentFailure, default: false), deviceRemovedNotice: bool(Key.pushDeviceRemovedNotice, default: false),
+                apnsRefused: bool(Key.pushApnsRefused, default: false)
+            )
+        }
+        nonmutating set {
+            defaults.set(newValue.registered, forKey: Key.pushRegistered)
+            set(newValue.tokenPrefix, Key.pushTokenPrefix)
+            setDate(newValue.registeredAt, Key.pushRegisteredAt)
+            setDate(newValue.failingSince, Key.pushFailingSince)
+            defaults.set(newValue.permanentFailure, forKey: Key.pushPermanentFailure)
+            defaults.set(newValue.deviceRemovedNotice, forKey: Key.pushDeviceRemovedNotice)
+            defaults.set(newValue.apnsRefused, forKey: Key.pushApnsRefused)
+        }
+    }
+
+    /// Firebase był skonfigurowany (tryb z serwerem + `push` + zgoda) — przy starcie konfiguracja następuje synchronicznie (R6).
+    public var pushActive: Bool {
+        get { bool(Key.pushActive, default: false) }
+        nonmutating set { defaults.set(newValue, forKey: Key.pushActive) }
+    }
+
+    /// Pytanie o zgodę z Pulpitu już padło — odmowa jest szanowana (FR-014). Nie jest czyszczone przy odparowaniu.
+    public var pushPermissionAsked: Bool {
+        get { bool(Key.pushPermissionAsked, default: false) }
+        nonmutating set { defaults.set(newValue, forKey: Key.pushPermissionAsked) }
+    }
+
+    /// „Nie pokazuj” na karcie Pulpitu „Powiadomienia o terminach są wyłączone” (FR-012a); nie jest częścią danych połączenia.
+    public var notificationsOffCardDismissed: Bool {
+        get { bool(Key.notificationsOffCardDismissed, default: false) }
+        nonmutating set { defaults.set(newValue, forKey: Key.notificationsOffCardDismissed) }
+    }
+
+    /// Czyści stan połączenia push (wszystkie `push.*` poza `push.permissionAsked`) — „Rozłącz”, tryb samodzielny, usunięcie danych.
+    public func clearPushConnectionState() {
+        for key in Key.pushConnectionKeys { defaults.removeObject(forKey: key) }
     }
 
     // MARK: Dane
@@ -199,5 +260,13 @@ public struct SettingsStore: @unchecked Sendable {
 
     private func set(_ value: String?, _ key: String) {
         if let value { defaults.set(value, forKey: key) } else { defaults.removeObject(forKey: key) }
+    }
+
+    private func date(_ key: String) -> Date? {
+        (defaults.object(forKey: key) as? Double).map { Date(timeIntervalSince1970: $0) }
+    }
+
+    private func setDate(_ value: Date?, _ key: String) {
+        if let value { defaults.set(value.timeIntervalSince1970, forKey: key) } else { defaults.removeObject(forKey: key) }
     }
 }

@@ -1,0 +1,4 @@
+[{ "id": "r1", "type": "Reminder", "reminderKind": "Farrier", "offsetDays": 1, "sendTime": "08:00", "repeatTime": "07:00",
+   "description": "Kowal: dzień przed o 08:00, powtórka o 07:00", "futureField": true },
+ { "id": "r2", "type": "SomethingNew", "description": "Nowy rodzaj" },
+ { "id": "r3", "type": "DailySummary" }]
