@@ -38,7 +38,7 @@ US5 (dotknięcie powiadomienia, P2).
 - [X] T002 Uruchom `scripts\sync-strings.ps1 -AndroidRepo ..\zarzadzanie_konmi_android` — przenosi teksty `push_*`, `dashboard_notifications_off_*` i dwa nowe do App/Resources/android/ i App/Resources/Localizable.xcstrings; sprawdź `scripts\sync-strings.ps1 -Check` bez różnic i że Tests/AppSnapshotTests/StringsParityTests.swift nie wymaga zmian
 - [X] T003 Dodaj pakiet Firebase w project.yml: `packages.Firebase` z `url: https://github.com/firebase/firebase-ios-sdk` i `exactVersion` = najnowsze wydanie 12.x (sprawdź na stronie wydań i wpisz numer w komentarzu), zależność `- package: Firebase` `product: FirebaseMessaging` **tylko** w celu `Horsely` (nie w `HorselyShare`, testach ani pakietach) — research R1, contracts/ci-push.md
 - [X] T004 Dodaj w App/Info.plist klucze `FirebaseAppDelegateProxyEnabled` = false, `FirebaseMessagingAutoInitEnabled` = false, `FIREBASE_ANALYTICS_COLLECTION_ENABLED` = false oraz `remote-notification` w `UIBackgroundModes` (obok `fetch`, `processing`); zaktualizuj Tests/AppSnapshotTests/InfoPlistPolicyTests.swift tak, by sprawdzał te wartości i brak Firebase w ShareExtension/Info.plist
-- [ ] T005 Commit, push gałęzi, otwórz szkic PR „Push z serwera (iOS 2.1.0)” do `main` (`gh pr create --draft`), zielony `ci.yml` (kompilacja z Firebase, zgodność tekstów)
+- [X] T005 Commit, push gałęzi, otwórz szkic PR „Push z serwera (iOS 2.1.0)” do `main` (`gh pr create --draft`), zielony `ci.yml` (kompilacja z Firebase, zgodność tekstów)
 
 **Checkpoint**: Firebase się kompiluje, teksty są w aplikacji; zachowanie aplikacji bez zmian.
 
@@ -68,7 +68,7 @@ US5 (dotknięcie powiadomienia, P2).
 - [X] T018 Rozszerz zaślepkę Packages/HorselyKit/Tests/HorselyKitTests/FakeProgram.swift: przełącznik `pushCapability` (dopisuje `push` i `pushAdmin` do `capabilities` w `system/info`), gałęzie `PUT/DELETE/GET push/device` i `GET push/rules` ze stanem (token, `registeredAt`, reguły), wymuszanie `400` / `404` / `503` / zerwania połączenia N razy; kształty z contracts/push-api-client.md
 - [X] T019 Skopiuj specs/003-push-z-serwera/contracts/openapi-server-push.json do Packages/HorselyKit/Tests/HorselyKitTests/Resources/openapi-server-push.json (sprawdź, że `Resources` jest zasobem celu testów w Packages/HorselyKit/Package.swift) i dodaj Packages/HorselyKit/Tests/HorselyKitTests/PushOpenApiContractTests.swift: każda para metoda + ścieżka używana przez `PushApi` i obsługiwana przez zaślepkę (`PUT`/`GET`/`DELETE /api/v1/push/device`, `GET /api/v1/push/rules`) istnieje w kopii OpenAPI; ciało `PUT` z `PushApi.registerDevice` ma wyłącznie pola schematu `DeviceRegistration` (`platform`, `token`); odstępstwo dla kształtu odpowiedzi opisane w plan.md „Complexity Tracking” (konstytucja V/VI)
 - [X] T020 Dodaj klucze push w Packages/HorselyKit/Sources/HorselyKit/Store/SettingsStore.swift: `push.registered`, `push.tokenPrefix`, `push.registeredAt`, `push.failingSince`, `push.permanentFailure`, `push.deviceRemovedNotice`, `push.apnsRefused`, `push.active`, `push.permissionAsked`, `notifications.offCardDismissed`; właściwość `pushRegistration: PushRegistration` (odczyt/zapis całości) i `clearPushConnectionState()` czyszcząca wszystkie `push.*` poza `push.permissionAsked`; test w Packages/HorselyKit/Tests/HorselyKitTests/SettingsAndLogTests.swift (wartości domyślne = niezarejestrowany, czyszczenie)
-- [ ] T021 Commit, push, zielony `ci.yml` (testy T006–T010 przechodzą)
+- [X] T021 Commit, push, zielony `ci.yml` (testy T006–T010 przechodzą)
 
 **Checkpoint**: rdzeń push gotowy i przetestowany; aplikacja zachowuje się jak 2.0.2 (poza treścią podsumowania).
 
@@ -133,7 +133,7 @@ aplikacji, brak w rozszerzeniu, plist Firebase tylko w aplikacji).
 - [X] T041 [P] [US2] Opisz nowe argumenty i scenariusze testowe w specs/001-aplikacja-ios-horsely/contracts/test-fixtures.md: `-UITestPush <apnsRefused|registered|pending|noPermission>`, `-UITestOpenPush <reminder|summary|backup|test>` (T059), scenariusze `-UITestProgram push` i `pushNoRules` (dane `capabilities`, `push/device`, `push/rules`); tylko konfiguracja Debug
 - [X] T042 [US2] Poprawka 2.1.0: `completePairing` w App/Shell/AppEnvironment.swift ustawia `settings.notificationsEnabled = true`, gdy `authorizationStatus` jest `.authorized`/`.provisional`, i przelicza powiadomienia (podsumowanie planowane po parowaniu); test w Tests/AppSnapshotTests/ShellLogicTests.swift
 - [X] T043 [US2] Test UI w Tests/AppUITests/SettingsUITests.swift: `-UITestProgram push -UITestPush apnsRefused` → ekran „Powiadomienia” pokazuje `push_state_no_apns` i ustawienia lokalne (włączenie, godzina, „w dniu terminu”)
-- [ ] T044 [US2] Commit, push, zielony `ci.yml`
+- [X] T044 [US2] Commit, push, zielony `ci.yml`
 
 **Checkpoint**: żadne przypomnienie nie ginie, gdy push nie działa.
 
