@@ -8,18 +8,26 @@ import UserNotifications
 final class NotificationDelegate: NSObject, UNUserNotificationCenterDelegate, Sendable {
     private let open: @Sendable @MainActor (URL) -> Void
     private let presentServerMessage: @Sendable @MainActor (PushMessage) -> UNNotificationPresentationOptions
+    private let openServerMessage: @Sendable @MainActor (PushMessage) -> Void
 
     init(
         open: @escaping @Sendable @MainActor (URL) -> Void,
-        presentServerMessage: @escaping @Sendable @MainActor (PushMessage) -> UNNotificationPresentationOptions
+        presentServerMessage: @escaping @Sendable @MainActor (PushMessage) -> UNNotificationPresentationOptions,
+        openServerMessage: @escaping @Sendable @MainActor (PushMessage) -> Void
     ) {
         self.open = open
         self.presentServerMessage = presentServerMessage
+        self.openServerMessage = openServerMessage
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
-        guard let link = response.notification.request.content.userInfo[NotificationScheduler.linkKey] as? String, let url = URL(string: link) else { return }
-        await open(url)
+        let userInfo = response.notification.request.content.userInfo
+        // Powiadomienie lokalne: adres w kluczu `link`. Wiadomość z serwera: adres z jej rodzaju i identyfikatorów (PushDeepLink).
+        if let link = userInfo[NotificationScheduler.linkKey] as? String, let url = URL(string: link) {
+            await open(url)
+        } else if let message = PushMessage(userInfo: userInfo) {
+            await openServerMessage(message)
+        }
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {

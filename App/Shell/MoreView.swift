@@ -5,6 +5,8 @@ import SwiftUI
 struct MoreItem: Identifiable, Equatable {
     enum Destination: String, Hashable {
         case competitions, purchases, contacts, reports, conflicts, queue, trash, dictionaries, backup, settings, about
+        /// Nie jest pozycją menu — cel nawigacji z powiadomienia serwera o nieudanej kopii (spec 003).
+        case serverBackup
     }
 
     var id: Destination { destination }
@@ -56,10 +58,11 @@ enum MoreMenu {
 
 struct MoreView: View {
     @Environment(AppEnvironment.self) private var environment
+    @State private var path: [MoreItem.Destination] = []
 
     var body: some View {
         let menu = MoreMenu.sections(mode: environment.workMode, queueCount: environment.queueCount, conflictCount: environment.conflictCount)
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(spacing: 0) {
                     DividedList(menu.sections) { MoreRow(item: $0) }
@@ -89,8 +92,15 @@ struct MoreView: View {
                 case .dictionaries: DictionariesView()
                 case .backup: BackupView()
                 case .about: AboutView()
+                case .serverBackup: ServerBackupInfoView()
                 }
             }
+        }
+        // Dotknięcie powiadomienia serwera o nieudanej kopii: karta „Więcej” otwiera informację (tryb z serwerem).
+        .onChange(of: environment.router.pendingDestination, initial: true) { _, destination in
+            guard destination == .serverBackup else { return }
+            environment.router.pendingDestination = nil
+            path = [.serverBackup]
         }
     }
 }

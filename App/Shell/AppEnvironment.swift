@@ -254,6 +254,13 @@ final class AppEnvironment {
         }
     }
 
+    /// Po przerwanej zmianie trybu (albo w trybie samodzielnym / bez wyboru trybu) nie może zostać ślad rejestracji push:
+    /// znacznik `push.active`, token w bibliotece, zarejestrowany telefon na serwerze (research R9).
+    func cleanUpStalePush() async {
+        guard workMode != .online, settings.pushActive || settings.pushRegistration.registered else { return }
+        await pushRegistrar.unregister()
+    }
+
     /// Wejście na pierwszy plan: zgoda systemu mogła się zmienić, a rejestracja nadrobić zaległość (R7).
     func pushEnteredForeground() async {
         guard workMode == .online else { return }
@@ -263,6 +270,13 @@ final class AppEnvironment {
     /// Przejście w tło: oczekujące ponowienia rejestracji są anulowane.
     func pushEnteredBackground() async {
         await pushRegistrar.suspend()
+    }
+
+    /// Dotknięcie wiadomości z serwera: ekran wg rodzaju (`PushDeepLink`), a dla wiadomości o terminach — synchronizacja (FR-017, FR-019).
+    func open(serverMessage message: PushMessage) {
+        log.log(PushDiagnostics.category, PushDiagnostics.message(kind: message.kind))
+        if let url = URL(string: PushDeepLink.url(for: message)) { router.handle(url: url, mode: workMode) }
+        if message.triggersSync, workMode == .online { Task { await refresh(force: true) } }
     }
 
     /// Wiadomość z serwera przy otwartej aplikacji (FR-016, FR-017): pokazana tylko przy zarejestrowanym telefonie (inaczej
@@ -331,6 +345,8 @@ final class AppEnvironment {
     /// Zapis parowania (pierwsze, ponowne albo zmiana trybu samodzielny → online).
     func completePairing(_ request: PairingRequest, result: PairingResult) async throws -> StableIdentity {
         let replacing = workMode == .standalone
+        // Ponowne parowanie (inny klucz albo serwer): stary telefon-adresat jest wyrejestrowany, zanim stary klucz zniknie (R9).
+        if workMode == .online { await pushRegistrar.unregister() }
         let identity = try await pairing.commit(request, result: result, replacingStandaloneData: replacing)
         settings.modeChangePending = nil
         connection.reset()

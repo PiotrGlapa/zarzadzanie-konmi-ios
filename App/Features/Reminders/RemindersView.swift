@@ -66,11 +66,32 @@ struct RemindersView: View {
             .task(id: LoadKey(filter: filter, revision: environment.dataRevision)) { await load() }
             .onChange(of: environment.router.pendingDestination) { _, destination in
                 if case let .reminder(id) = destination {
-                    path = [id]
                     environment.router.pendingDestination = nil
+                    Task { await open(reminderId: id) }
                 }
             }
         }
+    }
+
+    /// Szczegóły terminu z adresu (powiadomienie lokalne albo z serwera). Termin, którego telefon jeszcze nie ma, wymaga
+    /// synchronizacji (tryb z serwerem); dalej brak — zostaje lista terminów (spec 003, FR-019).
+    private func open(reminderId id: String) async {
+        if await reminderExists(id) {
+            path = [id]
+            return
+        }
+        if environment.workMode == .online {
+            await environment.refresh(force: true)
+            if await reminderExists(id) {
+                path = [id]
+                return
+            }
+        }
+        path = []
+    }
+
+    private func reminderExists(_ id: String) async -> Bool {
+        (try? await environment.entries.record(.reminder, id: id)) != nil
     }
 
     private struct LoadKey: Hashable {

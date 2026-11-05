@@ -1,3 +1,4 @@
+import HorselyCore
 import SwiftUI
 import UIKit
 
@@ -49,11 +50,13 @@ struct RootView: View {
         .task { await environment.observeChanges() }
         .task(id: environment.workMode) {
             await environment.prepareStore()
+            await environment.cleanUpStalePush()
             await environment.startOnline()
             await environment.processSharedInbox()
         }
         .task { await environment.observeQueue() }
         .task { await environment.observePushState() }
+        .task { await openPushForTests() }
         .onChange(of: environment.connection.problem) { old, new in
             withAnimation { environment.indicator.problemChanged(from: old, to: new) }
         }
@@ -114,6 +117,15 @@ struct RootView: View {
             QuickActions.shared.pending = nil
             environment.router.handle(shortcut: type, mode: environment.workMode)
         }
+    }
+
+    /// Testy UI (`-UITestOpenPush <reminder|summary|backup|test>`, tylko Debug): symuluje dotknięcie wiadomości z serwera.
+    private func openPushForTests() async {
+        #if DEBUG
+        guard let type = environment.launchOptions.openPush else { return }
+        try? await Task.sleep(for: .seconds(1))
+        if let message = PushMessage(userInfo: ["type": type, "reminderId": "brak-takiego-terminu"]) { environment.open(serverMessage: message) }
+        #endif
     }
 
     private var moreIcon: TabIconSource { .named("more_horiz", ColorPair(light: Palette.onSurfaceVariant.light, dark: Palette.onSurfaceVariant.dark)) }

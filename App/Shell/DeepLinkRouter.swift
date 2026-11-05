@@ -14,13 +14,15 @@ enum AppDestination: Equatable, Sendable {
     case reminder(id: String)
     case newEntry(kind: String)
     case queue
+    /// „Kopia zapasowa na serwerze” — informacja po powiadomieniu serwera (karta „Więcej”, spec 003).
+    case serverBackup
 
     /// Karta, na której ląduje cel.
     var tab: AppTab {
         switch self {
         case .dashboard, .newEntry: .dashboard
         case .reminders, .reminder: .reminders
-        case .queue: .more
+        case .queue, .serverBackup: .more
         }
     }
 }
@@ -81,6 +83,8 @@ final class DeepLinkRouter {
             return .reminders
         case "queue":
             return .queue
+        case "server-backup":
+            return .serverBackup
         case "entry":
             guard parts.first == "new" else { return .dashboard }
             let kind = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "kind" }?.value

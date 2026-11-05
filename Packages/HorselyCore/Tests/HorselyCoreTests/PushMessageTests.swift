@@ -29,6 +29,36 @@ struct PushMessageTests {
         }
     }
 
+    // MARK: Cel nawigacji (contracts/push-message.md)
+
+    private func link(_ info: [AnyHashable: Any]) throws -> String {
+        PushDeepLink.url(for: try #require(PushMessage(userInfo: info)))
+    }
+
+    @Test func everyKindMapsToItsScreen() throws {
+        #expect(try link(["type": "reminder", "reminderId": "6F1C"]) == "horsely://reminders/6F1C")
+        #expect(try link(["type": "reminder"]) == "horsely://dashboard", "bez identyfikatora terminu — Pulpit")
+        #expect(try link(["type": "reminder", "reminderId": ""]) == "horsely://dashboard")
+        #expect(try link(["type": "summary"]) == "horsely://reminders")
+        #expect(try link(["type": "backup"]) == "horsely://server-backup")
+        #expect(try link(["type": "analytic"]) == "horsely://dashboard")
+        #expect(try link(["type": "test"]) == "horsely://dashboard")
+        #expect(try link(["type": "cosNowego", "reminderId": "x"]) == "horsely://dashboard")
+    }
+
+    @Test func serviceKeysAndUnknownKeysDoNotChangeTheTarget() throws {
+        let info: [AnyHashable: Any] = [
+            "type": "reminder", "reminderId": "6F1C", "aps": ["alert": ["title": "Horsely", "body": "Kowal"]],
+            "gcm.message_id": "0:1", "google.c.a.e": "1", "przyszłyKlucz": "x",
+        ]
+        #expect(try link(info) == "horsely://reminders/6F1C")
+    }
+
+    @Test func anIdentifierThatCouldBreakTheAddressFallsBackToTheDashboard() throws {
+        #expect(try link(["type": "reminder", "reminderId": "a/b"]) == "horsely://dashboard")
+        #expect(try link(["type": "reminder", "reminderId": "z spacją"]) == "horsely://reminders/z%20spacj%C4%85")
+    }
+
     @Test func identifiersAreNonEmptyStringsAndTheDateIsValidated() throws {
         let message = try #require(PushMessage(userInfo: [
             "type": "reminder", "reminderId": "6F1C", "horseId": "A0B2", "targetDate": "2026-11-05",

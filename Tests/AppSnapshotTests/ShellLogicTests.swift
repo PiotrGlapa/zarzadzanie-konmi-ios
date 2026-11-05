@@ -39,6 +39,30 @@ final class ShellLogicTests: XCTestCase {
         XCTAssertTrue(LaunchOptions(arguments: ["-UITestOpenPush", "backup"]).isTestRun)
     }
 
+    /// Powiadomienie serwera o nieudanej kopii otwiera informację na karcie „Więcej” (spec 003, FR-019).
+    func testTheServerBackupAddressOpensTheInfoOnTheMoreTab() {
+        XCTAssertEqual(destination("horsely://server-backup"), .serverBackup)
+        XCTAssertEqual(AppDestination.serverBackup.tab, .more)
+        let router = DeepLinkRouter()
+        router.route(.serverBackup, mode: .online)
+        XCTAssertEqual(router.selectedTab, .more)
+        XCTAssertEqual(router.pendingDestination, .serverBackup)
+    }
+
+    func testEveryServerMessageKindProducesAKnownDestination() throws {
+        let cases: [([AnyHashable: Any], AppDestination)] = [
+            (["type": "reminder", "reminderId": "abc"], .reminder(id: "abc")),
+            (["type": "reminder"], .dashboard),
+            (["type": "summary"], .reminders),
+            (["type": "backup"], .serverBackup),
+            (["type": "test"], .dashboard),
+        ]
+        for (info, expected) in cases {
+            let message = try XCTUnwrap(PushMessage(userInfo: info))
+            XCTAssertEqual(destination(PushDeepLink.url(for: message)), expected, "\(info)")
+        }
+    }
+
     func testUnknownAndForeignAddressesOpenOnlyTheDashboard() {
         XCTAssertEqual(destination("horsely://nieznany"), .dashboard)
         XCTAssertEqual(destination("horsely://entry/new?kind=usun-wszystko"), .dashboard)

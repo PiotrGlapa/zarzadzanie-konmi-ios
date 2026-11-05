@@ -55,7 +55,8 @@ struct HorselyApp: App {
         PushBridge.shared.registrar = environment.pushRegistrar
         notificationDelegate = NotificationDelegate(
             open: { url in environment.router.handle(url: url, mode: environment.workMode) },
-            presentServerMessage: { message in environment.presentation(forServerMessage: message) }
+            presentServerMessage: { message in environment.presentation(forServerMessage: message) },
+            openServerMessage: { message in environment.open(serverMessage: message) }
         )
         UNUserNotificationCenter.current().delegate = notificationDelegate
     }

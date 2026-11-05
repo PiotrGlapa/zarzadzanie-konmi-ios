@@ -1,3 +1,5 @@
+import HorselyCore
+import HorselyKit
 import SwiftUI
 import XCTest
 @testable import Horsely
@@ -28,6 +30,48 @@ final class ShellSnapshotTests: XCTestCase {
             let env = makeEnvironment(mode: .online, variant: variant, queue: 3, conflicts: 2)
             env.router.selectedTab = .more
             assertScreen(RootView().environment(env), name: "more-online", variant: variant)
+        }
+    }
+
+    // MARK: Push z serwera (spec 003, T051, T057)
+
+    /// Ustawienia → Powiadomienia we wszystkich stanach push; dane podane z zewnątrz, bez sieci.
+    func testNotificationSettingsInEveryPushState() {
+        let device = PushDevice(platform: "Ios", tokenPrefix: "dGhpcyBp", registeredAt: Date(timeIntervalSince1970: 1_793_787_300))
+        let rules = [
+            ClientPushRule(id: "r1", type: "Reminder", reminderKind: "Farrier", offsetDays: 1, sendTime: "08:00", description: "Kowal: dzień przed o 08:00"),
+            ClientPushRule(id: "r2", type: "DailySummary", sendTime: "07:30", description: "Podsumowanie dnia o 07:30"),
+        ]
+        let cases: [(String, PushPreview)] = [
+            ("registered_rules", PushPreview(state: .registered, device: device, rules: rules)),
+            ("registered_empty", PushPreview(state: .registered, device: device, rules: [])),
+            ("pending", PushPreview(state: .pending)),
+            ("fallback_noPush", PushPreview(state: .fallback(.serverHasNoPush))),
+            ("fallback_apns", PushPreview(state: .fallback(.apnsUnavailable))),
+            ("noPermission", PushPreview(state: .noPermission(asked: true))),
+            ("notDetermined", PushPreview(state: .noPermission(asked: false))),
+        ]
+        for (name, preview) in cases {
+            for variant in SnapshotVariant.allCases {
+                let env = makeEnvironment(mode: .online, variant: variant)
+                assertScreen(NavigationStack { NotificationSettingsView(preview: preview) }.environment(env), name: "NotificationSettings_\(name)", variant: variant)
+            }
+        }
+    }
+
+    func testDashboardWithTheNotificationsOffCard() async {
+        for variant in SnapshotVariant.allCases {
+            let env = makeEnvironment(mode: .online, variant: variant)
+            env.settings.notificationsOffCardDismissed = false
+            await env.horseDirectory.refresh()
+            assertScreen(DashboardView().environment(env), name: "Dashboard_notificationsOffCard", variant: variant)
+        }
+    }
+
+    func testServerBackupInfo() {
+        for variant in SnapshotVariant.allCases {
+            let env = makeEnvironment(mode: .online, variant: variant)
+            assertScreen(NavigationStack { ServerBackupInfoView() }.environment(env), name: "ServerBackupInfo", variant: variant)
         }
     }
 

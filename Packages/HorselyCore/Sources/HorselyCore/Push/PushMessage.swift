@@ -22,6 +22,27 @@ public enum PushKind: Equatable, Sendable {
     }
 }
 
+/// Adres `horsely://` otwierany po dotknięciu wiadomości z serwera (contracts/push-message.md, FR-019).
+public enum PushDeepLink {
+    public static let dashboard = "horsely://dashboard"
+    public static let reminders = "horsely://reminders"
+    public static let serverBackup = "horsely://server-backup"
+
+    /// `reminder` + `reminderId` → szczegóły terminu; `reminder` bez identyfikatora i rodzaje bez własnego ekranu → Pulpit;
+    /// `summary` → lista terminów; `backup` → informacja o kopii na serwerze.
+    public static func url(for message: PushMessage) -> String {
+        switch message.kind {
+        case .reminder:
+            guard let id = message.reminderId,
+                  let encoded = id.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed), !encoded.contains("/") else { return dashboard }
+            return "\(reminders)/\(encoded)"
+        case .summary: return reminders
+        case .backup: return serverBackup
+        case .analytic, .test, .other: return dashboard
+        }
+    }
+}
+
 /// Wiadomość z serwera odczytana z `userInfo` powiadomienia (data-model.md §6). Wiadomość z serwera ma klucz `type`;
 /// powiadomienia lokalne mają klucz `link` i nie mają `type`. Klucze `aps`, `gcm.*`, `google.*` i nieznane są pomijane;
 /// tytuł i treść (`aps.alert`) nie są czytane — nigdy nie trafiają do dziennika (FR-028).
