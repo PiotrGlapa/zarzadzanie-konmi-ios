@@ -32,7 +32,7 @@ Powiadomienia push z serwera w trybie z serwerem ([specs/003-push-z-serwera](spe
 
 ### Prywatność
 
-- Jedyna nowa zależność: Firebase iOS SDK 12.19.3, tylko moduł Messaging, tylko w aplikacji (nie w rozszerzeniu udostępniania).
+- Jedyna nowa zależność: Firebase iOS SDK 12.17.0, tylko moduł Messaging, tylko w aplikacji (nie w rozszerzeniu udostępniania).
   Do serwera trafia wyłącznie platforma i token; dziennik zawiera 8 znaków tokenu, nigdy tytuły ani treści.
 
 ## [2.0.2]

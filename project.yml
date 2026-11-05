@@ -36,10 +36,12 @@ packages:
     url: https://github.com/pointfreeco/swift-snapshot-testing
     from: 1.17.0
   # Powiadomienia push z serwera (spec 003, research R1): tylko produkt FirebaseMessaging i tylko w celu Horsely.
-  # Wersja przypięta (exactVersion), bo Package.resolved powstaje w generowanym .xcodeproj; 12.19.3 = najnowsze 12.x z 2026-11-05.
+  # Wersja przypięta (exactVersion), bo Package.resolved powstaje w generowanym .xcodeproj. 12.17.0, a nie najnowsze 12.19.3:
+  # od 12.18.0 Firebase uznaje token FCM (`token`, `deleteToken`) za przestarzały na rzecz rejestracji przez Installation ID,
+  # a serwer Horsely wysyła wiadomości na token FCM (FCM HTTP v1); ostrzeżenia są w projekcie błędami.
   Firebase:
     url: https://github.com/firebase/firebase-ios-sdk
-    exactVersion: 12.19.3
+    exactVersion: 12.17.0
 
 targets:
   Horsely:
