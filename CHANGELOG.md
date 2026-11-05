@@ -2,7 +2,7 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/). Wersje zgodne z aplikacją na Androida o tym samym zakresie.
 
-## [2.1.0] — w przygotowaniu
+## [2.1.0] — 2026-11-05
 
 Powiadomienia push z serwera w trybie z serwerem ([specs/003-push-z-serwera](specs/003-push-z-serwera/spec.md)).
 

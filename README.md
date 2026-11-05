@@ -18,8 +18,8 @@ Odpowiednik na Androida ma osobny projekt i ten sam zakres funkcji.
 - **2.0.2** — wydana (TestFlight, kompilacja 24), trzy poprawki ([specs/002-poprawki-2-0-2](specs/002-poprawki-2-0-2/spec.md)):
   blokada aplikacji nie blokuje ponownie po odblokowaniu, miniatury zdjęć koni z programu pojawiają się na listach,
   raport „Treningi jeźdźca” ma sumy na górze, wykres grup i zwijaną listę treningów.
-- **2.1.0** — w przygotowaniu: powiadomienia push z serwera w trybie z serwerem, jak w Androidzie 2.1.0
-  ([specs/003-push-z-serwera](specs/003-push-z-serwera/spec.md)).
+- **2.1.0** — wydanie do TestFlight: powiadomienia push z serwera w trybie z serwerem, jak w Androidzie 2.1.0
+  ([specs/003-push-z-serwera](specs/003-push-z-serwera/spec.md), [CHANGELOG.md](CHANGELOG.md)).
 
 Budowanie, testy i wysyłka do TestFlight odbywają się wyłącznie w GitHub Actions (brak Maca).
 
