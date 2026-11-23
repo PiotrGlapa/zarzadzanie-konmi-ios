@@ -113,6 +113,9 @@ public enum RecordType: String, Codable, Sendable, CaseIterable {
     case training = "Training"
     case reminder = "Reminder"
     case attachment = "Attachment"
+    case trainingRecording = "trainingRecordings"
+    case horseRideProfile = "horseRideProfiles"
+    case rideDefaults = "rideDefaults"
 
     /// Nazwa kolekcji w `data` pliku eksportu; `nil` dla startów (zagnieżdżone w zawodach).
     public var exportCollection: String? {
@@ -131,6 +134,9 @@ public enum RecordType: String, Codable, Sendable, CaseIterable {
         case .training: "trainings"
         case .reminder: "reminders"
         case .attachment: "attachments"
+        case .trainingRecording: "trainingRecordings"
+        case .horseRideProfile: "horseRideProfiles"
+        case .rideDefaults: "rideDefaults"
         }
     }
 

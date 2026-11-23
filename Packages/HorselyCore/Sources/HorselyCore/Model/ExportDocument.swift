@@ -237,9 +237,15 @@ private struct ReadData: Decodable {
     var trainings: [LocalTraining] = []
     var reminders: [LocalReminder] = []
     var attachments: [LocalAttachment] = []
+    /// Nagrania jazdy — tylko eksport pełny schematu 1.6.
+    var trainingRecordings: [TrainingRecordingEnvelope] = []
+    /// Profile jazdy koni — tylko eksport pełny schematu 1.6.
+    var horseRideProfiles: [HorseRideProfileEnvelope] = []
+    /// Ustawienia domyślne jazd — tylko eksport pełny schematu 1.6.
+    var rideDefaults: RideDefaultsEnvelope?
 
     private enum CodingKeys: String, CodingKey {
-        case dictionaries, contacts, horses, vetVisits, farrierVisits, physioVisits, specialistVisits, competitions, purchases, notes, trainings, reminders, attachments
+        case dictionaries, contacts, horses, vetVisits, farrierVisits, physioVisits, specialistVisits, competitions, purchases, notes, trainings, reminders, attachments, trainingRecordings, horseRideProfiles, rideDefaults
     }
 
     init(from decoder: Decoder) throws {
@@ -257,6 +263,9 @@ private struct ReadData: Decodable {
         trainings = try c.decodeIfPresent([LocalTraining].self, forKey: .trainings) ?? []
         reminders = try c.decodeIfPresent([LocalReminder].self, forKey: .reminders) ?? []
         attachments = try c.decodeIfPresent([LocalAttachment].self, forKey: .attachments) ?? []
+        trainingRecordings = try c.decodeIfPresent([TrainingRecordingEnvelope].self, forKey: .trainingRecordings) ?? []
+        horseRideProfiles = try c.decodeIfPresent([HorseRideProfileEnvelope].self, forKey: .horseRideProfiles) ?? []
+        rideDefaults = try c.decodeIfPresent(RideDefaultsEnvelope.self, forKey: .rideDefaults)
     }
 }
 
@@ -302,6 +311,12 @@ private struct WriteData: Encodable {
     let trainings: [LocalTraining]
     let reminders: [LocalReminder]
     let attachments: [LocalAttachment]
+    /// Nagrania jazdy — tylko eksport pełny schematu 1.6.
+    let trainingRecordings: [TrainingRecordingEnvelope]?
+    /// Profile jazdy koni — tylko eksport pełny schematu 1.6.
+    let horseRideProfiles: [HorseRideProfileEnvelope]?
+    /// Ustawienia domyślne jazd — tylko eksport pełny schematu 1.6.
+    let rideDefaults: RideDefaultsEnvelope?
 }
 
 private struct WriteFile: Encodable {
@@ -310,4 +325,49 @@ private struct WriteFile: Encodable {
     let appVersion: String?
     let scope: ExportScope
     let data: WriteData
+}
+
+// MARK: - Obiekty-wrappery dla nowych kolekcji eksportu 1.6
+
+/// Obiekt-wraper dla nagrania w eksporcie — zawiera `RecordingDto` (bez `trackData`) i `trainingDate`.
+private struct TrainingRecordingEnvelope: Codable {
+    let recording: RecordingDto
+    let trainingDate: String
+
+    private enum CodingKeys: String, CodingKey {
+        case recording, trainingDate
+    }
+
+    init(recording: RecordingDto, trainingDate: String) {
+        self.recording = recording
+        self.trainingDate = trainingDate
+    }
+}
+
+/// Obiekt-wraper dla profilu jazdy konia w eksporcie.
+private struct HorseRideProfileEnvelope: Codable {
+    let horseId: String
+    let profile: RideProfile
+
+    private enum CodingKeys: String, CodingKey {
+        case horseId, profile
+    }
+
+    init(horseId: String, profile: RideProfile) {
+        self.horseId = horseId
+        self.profile = profile
+    }
+}
+
+/// Obiekt-wraper dla ustawień domyślnych jazd w eksporcie.
+private struct RideDefaultsEnvelope: Codable {
+    let defaults: RideDefaults
+
+    private enum CodingKeys: String, CodingKey {
+        case defaults
+    }
+
+    init(defaults: RideDefaults) {
+        self.defaults = defaults
+    }
 }

@@ -14,6 +14,9 @@ public enum ApiRecordMapping {
         .dictionary: ["isSystem", "systemKey"],
     ]
 
+    /// Pola tylko do odczytu w `RecordingDto` (pomijane w `RecordingInput`).
+    static let recordingResponseOnlyFields: Set<String> = ["id", "trainingId", "version", "createdAt", "updatedAt"]
+
     // MARK: API → rekord
 
     /// Odpowiedź API (`GET`, `PUT`, `POST`, `current` z `409`) jako rekord magazynu; `nil`, gdy treść nie jest rekordem tego rodzaju.
