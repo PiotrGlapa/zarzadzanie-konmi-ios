@@ -294,7 +294,7 @@ public enum RideParameters {
 
         let elevation = Decimal(elevationGainM ?? 0) / Decimal(10) * load.climbPer10m
 
-        var raw = walkMinutes * load.weightWalk + trotMinutes * load.weightTrot + canterMinutes * load.weightCanter + elevation
+        let raw = walkMinutes * load.weightWalk + trotMinutes * load.weightTrot + canterMinutes * load.weightCanter + elevation
         return HalfUp.round(raw, scale: 1)
     }
 
