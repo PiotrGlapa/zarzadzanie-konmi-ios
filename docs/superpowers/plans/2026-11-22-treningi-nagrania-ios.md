@@ -102,9 +102,9 @@
 - Consumes: `ProgramCapabilities.apiV3` (Task 3).
 - Produces: `ApiClient` buduje adres z prefiksem `api/v3/`, gdy bieżące możliwości mają `apiV3`, z wyjątkiem `system/info`; zapisane adresy parowania bez zmian. Funkcja pomocnicza `static func versionedPath(_ base: URL, apiV3: Bool, relative: String) -> URL` (zamienia **ostatnie** `api/v1` w ścieżce bazowej).
 
-- [ ] **Step 1: Testy** — `v1PathIsRewrittenWhenServerHasV3` (`/proxy/api/v1/` + `trainings` → `/proxy/api/v3/trainings`), `systemInfoAlwaysGoesToV1`, `nothingChangesWithoutV3`, `queryAndEncodedSegmentsAreKept`.
-- [ ] **Step 2:** Implementacja; push → CI „Testy HorselyKit” PASS.
-- [ ] **Step 3: Commit** — `feat(api): przelaczanie na /api/v3 po apiVersions`
+- [x] **Step 1: Testy** — `v1PathIsRewrittenWhenServerHasV3` (`/proxy/api/v1/` + `trainings` → `/proxy/api/v3/trainings`), `systemInfoAlwaysGoesToV1`, `nothingChangesWithoutV3`, `queryAndEncodedSegmentsAreKept`.
+- [x] **Step 2:** Implementacja; push → CI „Testy HorselyKit” PASS.
+- [x] **Step 3: Commit** — `feat(api): przelaczanie na /api/v3 po apiVersions`
 
 ### Task 5: Modele nagrań, profilu i ustawień jazd = [PLAN-A] Task 4
 

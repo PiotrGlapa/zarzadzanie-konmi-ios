@@ -338,10 +338,10 @@ public final class ApiClient: Sendable {
 
     /// Zamienia ostatnie `api/v1` w ścieżce bazowej na `api/v3`.
     static func versionedPath(_ base: URL, apiV3: Bool, relative: String) -> URL {
-        guard apiV3, let range = base.absoluteString.range(of: "/api/v1/", options: .backwards) else {
+        guard apiV3, let range = base.absoluteString.range(of: "/api/v1", options: .backwards) else {
             return URL(string: base.absoluteString + "/" + relative) ?? URL(string: "/" + relative)!
         }
-        let v3 = base.absoluteString.replacingCharacters(in: range, with: "/api/v3/")
+        let v3 = base.absoluteString.replacingCharacters(in: range, with: "/api/v3")
         return URL(string: v3 + "/" + relative) ?? URL(string: "/" + relative)!
     }
 
