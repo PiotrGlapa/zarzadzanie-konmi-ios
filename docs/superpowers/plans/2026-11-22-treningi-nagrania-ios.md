@@ -88,9 +88,9 @@
 **Interfaces:**
 - Produces: `ProgramInfo.apiVersions: [String]` (domyślnie `[]`), `ProgramInfo.dataSchemaVersion: String?`; `ProgramCapabilities.trainingAttachmentsName = "trainingAttachments"`, `.trainingRecordingsName = "trainingRecordings"`, `.apiV3Name = "apiV3"` (pseudo-nazwa, w `known`); właściwości `trainingAttachments`, `trainingRecordings`, `apiV3: Bool`; `static func of(_ info: ProgramInfo) -> ProgramCapabilities` (dodaje `apiV3`, gdy `info.apiVersions.contains("3")`); zmiana `apiV3` wymusza pełne pobranie (ta sama ścieżka co dziś przy zmianie możliwości wymuszającej pełne pobranie).
 
-- [ ] **Step 1: Testy** — `systemInfo300IsParsed` (`["1","3"]`, `"3.0"`, wszystkie trzy możliwości), `server2xHasNoV3`, `apiV3SurvivesSerializeParse`, `switchingToV3ForcesFullSync`.
-- [ ] **Step 2:** Implementacja; push → CI „Testy HorselyCore” PASS.
-- [ ] **Step 3: Commit** — `feat(core): apiVersions, dataSchemaVersion i mozliwosci nagran`
+- [x] **Step 1: Testy** — `systemInfo300IsParsed` (`["1","3"]`, `"3.0"`, wszystkie trzy możliwości), `server2xHasNoV3`, `apiV3SurvivesSerializeParse`, `switchingToV3ForcesFullSync`.
+- [x] **Step 2:** Implementacja; push → CI „Testy HorselyCore” PASS.
+- [x] **Step 3: Commit** — `feat(core): apiVersions, dataSchemaVersion i mozliwosci nagran`
 
 ### Task 4: Przełączanie `/api/v1` ↔ `/api/v3` = [PLAN-A] Task 3
 
