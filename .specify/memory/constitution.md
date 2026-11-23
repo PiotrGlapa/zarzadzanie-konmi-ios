@@ -1,11 +1,10 @@
 <!--
 Sync Impact Report
-- Version change: 2.1.0 → 3.0.0 (MAJOR — redefinicja zasady II i VII, przejście na zakres 3.0.0; numer zgodny z konstytucją Androida 3.0.0)
-- Źródło: specs/001-aplikacja-ios-horsely/plan.md (zadanie 1: konstytucja 3.0.0); odpowiednik: konstytucja Androida 3.0.0.
+- Version change: 3.0.0 → 3.0.0 (BEZ ZMIANY — zatwierdzenie zakresu 3.0.0; numer zgodny z konstytucją Androida 3.0.2)
+- Źródło: docs/superpowers/plans/2026-11-22-treningi-nagrania-ios.md (zadanie 1: zakres wersji 3.0); odpowiednik: konstytucja Androida 3.0.2.
 - Modified principles:
-  - II. Prywatność i brak usług zewnętrznych — wyjątek: lokalizacja „Podczas używania” (When In Use) dozwolona TYLKO podczas nagrywania jazdy uruchomionego przez użytkownika; dozwolone są mapy Apple (Apple Maps) oraz Open‑Meteo (położenie zaokrąglone do 0,01° + godzina, z wyłącznikiem);
-  - VII. Prostota — wyjątek: mapy (Apple Maps) jako usługa zewnętrzna są dozwolone.
-  - VIII. Zgodność z aplikacją na Androida — odniesienie 2.1.0 → 3.0.0.
+  - II. Prywatność i brak usług zewnętrznych — wyjątki z [ZAK] 6.1: lokalizacja „Podczas używania” (When In Use) dozwolona TYLKO podczas nagrywania jazdy uruchomionego przez użytkownika (nigdy w logach, nigdy poza nagrywaniem); kafle Apple Maps; Open‑Meteo z położeniem zaokrąglonym do 0,01° i godziną startu, z wyłącznikiem; zdanie „NIE MOŻE prosić o lokalizację” zastąpione powyższym; lista zgód 9.2 + lokalizacja, mikrofon, dodawanie do galerii.
+  - VIII. Zgodność z aplikacją na Androida — odniesienie 2.1.0 → 3.0.2.
 - Proces: aktualizacja konstytucji i dokumentów projektowych.
 - Added sections: brak. Removed sections: brak.
 - Templates: plan-template.md ✅, spec-template.md ✅, tasks-template.md ✅.
@@ -39,9 +38,9 @@ Sync Impact Report
   - serwerowi wolno przekazać wyłącznie platformę i token FCM; przy odparowaniu, przejściu w tryb samodzielny, usunięciu danych połączenia i cofnięciu zgody token MUSI zostać wyrejestrowany na serwerze (gdy to możliwe) i usunięty z telefonu, a aplikacja wyrejestrowana z APNs;
   - niedziałający push (brak rejestracji APNs, brak tokenu, serwer bez `push`) NIE MOŻE pozbawić użytkownika powiadomień — aplikacja wraca wtedy do powiadomień planowanych w telefonie.
 - Plik `GoogleService-Info.plist` NIE jest sekretem (nie pozwala wysyłać powiadomień) i MOŻE być w repozytorium, pod warunkiem że klucz API w nim jest ograniczony w konsoli Google Cloud do aplikacji iOS o identyfikatorze pakietu `pl.glapa.horsely`. Klucz konta usługi FCM (do wysyłania) i klucz APNs (`.p8`) NIE MOGĄ nigdy trafić do aplikacji ani do jej repozytorium.
-- Aplikacja MUSI prosić wyłącznie o zgody z listy w specyfikacji (sekcja 9.2) i NIE MOŻE prosić o lokalizację, dostęp do kontaktów ani pełny dostęp do biblioteki zdjęć; zdjęcia wybiera się przez `PhotosPicker`, pliki przez selektor dokumentów, kontakt przez `CNContactPickerViewController`.
+- Aplikacja MUSI prosić wyłącznie o zgody z listy w specyfikacji (sekcja 9.2) i NIE MOŻE prosić o pełny dostęp do biblioteki zdjęć; zdjęcia wybiera się przez `PhotosPicker`, pliki przez selektor dokumentów, kontakt przez `CNContactPickerViewController`.
 - Lokalizacja „Podczas używania” (When In Use) jest dozwolona **tylko** w trakcie nagrywania jazdy uruchomionego przez użytkownika (nigdy w logach, nigdy poza nagrywaniem); dopuszcza się użycie kafli Apple Maps oraz Open‑Meteo (z zaokrąglonym położeniem do 0,01° i godziną startu), w obu trybach pracy (online i samodzielnym).
 - Logi diagnostyczne NIE MOGĄ zawierać treści wpisów, nazw koni, danych kontaktów, klucza API, pełnego tokenu FCM (najwyżej 8 pierwszych znaków) ani tytułów i treści powiadomień; rozmiar logów MUSI być ograniczony (rotacja, maks. 5 MB).
 - Lokalna baza danych, kolejka zmian i załączniki MUSZĄ leżeć w prywatnym obszarze aplikacji (i wspólnym kontenerze App Group dla rozszerzenia udostępniania) i być wykluczone z kopii iCloud. Kopia zapasowa danych trybu samodzielnego MOŻE powstawać wyłącznie na żądanie użytkownika (albo w włączonej przez niego kopii automatycznej) do miejsca wskazanego przez niego.
 
-**Uzasadnienie**: dane to prywatna ewidencja właściciela; nie opuszczają jego telefonu i komputera bez jego decyzji (NFR-M-05, NFR-M-06, NFR-M-09). Serwer użytkownika wysyła push przez FCM (który przekazuje je do APNs), więc wyjątek jest wąski i taki sam jak w aplikacji na Androida 2.1.0: tylko odbiór, tylko w trybie z serwerem, tylko identyfikatory w danych wiadomości, a o treści i odbiorcach decyduje serwer użytkownika (specs/003-push-z-serwera).
+**Uzasadnienie**: dane to prywatna ewidencja właściciela; nie opuszczają jego telefonu i komputera bez jego decyzji (NFR-M-05, NFR-M-06, NFR-M-09). Serwer użytkownika wysyła push przez FCM (który przekazuje je do APNs), więc wyjątek jest wąski i taki sam jak w aplikacji na Androida 3.0.2: tylko odbiór, tylko w trybie z serwerem, tylko identyfikatory w danych wiadomości, a o treści i odbiorcach decyduje serwer użytkownika (specs/003-push-z-serwera).
