@@ -116,9 +116,9 @@
 **Interfaces:**
 - Produces (nazwy 1:1 z [PLAN-A] Task 4): `Recording`, `Gait` (`stop`, `walk`, `trot`, `canter`, wartości surowe `Stop`…), `WeatherStatus`, `GaitSegment`, `RecordingSummary`, `GaitThresholds`, `LoadParams`, `RideProfile`, `RideDefaults` + `static let builtIn` (`1.5, 7, 15, 1, 2, 3, 1, 30, 60`, `version 0`), `EffectiveRideParameters`, `enum RideParameters { static func resolve(_:_:)`, `validate`, `loadPoints(walkSeconds:trotSeconds:canterSeconds:elevationGainM:load:) -> Decimal`, `exampleText(_:) -> String }`; `extension Recording { func toInput(trackData: String) -> JSONValue }`; `enum HalfUp { static func round(_ value: Decimal, scale: Int) -> Decimal }`.
 
-- [ ] **Step 1: Testy** — lista z [PLAN-A] Task 4 Step 1 (`recordingDtoFromContractParsesAndRoundTrips`, `inputHasNoResponseOnlyFieldsAndKeepsTrackData`, `profileInheritsFieldByField`, `exampleFromPar02Gives100Points` → `Decimal(string: "100.0")`, `walkThresholdNotAboveStopIsRejected`, `rangesFromPar05`, `exportDocumentRecordTypesMapCollections`) oraz `halfUpRoundsAwayFromZero` (`2.345`→`2.35`, `-2.345`→`-2.35`, `2.5`→`3`).
-- [ ] **Step 2:** Push testów bez implementacji → CI FAIL (kompilacja testów). **Step 3:** Implementacja → push → PASS.
-- [ ] **Step 4: Commit** — `feat(core): modele nagran jazdy, profilu konia i ustawien jazd`
+- [x] **Step 1: Testy** — lista z [PLAN-A] Task 4 Step 1 (`recordingDtoFromContractParsesAndRoundTrips`, `inputHasNoResponseOnlyFieldsAndKeepsTrackData`, `profileInheritsFieldByField`, `exampleFromPar02Gives100Points` → `Decimal(string: "100.0")`, `walkThresholdNotAboveStopIsRejected`, `rangesFromPar05`, `exportDocumentRecordTypesMapCollections`) oraz `halfUpRoundsAwayFromZero` (`2.345`→`2.35`, `-2.345`→`-2.35`, `2.5`→`3`).
+- [x] **Step 2:** Push testów bez implementacji → CI FAIL (kompilacja testów). **Step 3:** Implementacja → push → PASS.
+- [x] **Step 4: Commit** — `feat(core): modele nagran jazdy, profilu konia i ustawien jazd`
 
 ### Task 6: Baza GRDB `v3` = [PLAN-A] Task 5
 
