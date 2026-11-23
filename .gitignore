@@ -46,4 +46,6 @@ Secrets.xcconfig
 
 # Wyniki kompilacji narzędzi .NET w umiejętnościach (jak w repozytorium Androida)
 .claude/skills/**/bin/
-.claude/skills/**/obj/
+.worktrees/
+worktrees/
+
