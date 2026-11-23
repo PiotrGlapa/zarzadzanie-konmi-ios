@@ -190,7 +190,10 @@ public struct ExportDocument: Sendable {
             notes: list(.note, as: LocalNote.self),
             trainings: list(.training, as: LocalTraining.self),
             reminders: list(.reminder, as: LocalReminder.self),
-            attachments: list(.attachment, as: LocalAttachment.self)
+            attachments: list(.attachment, as: LocalAttachment.self),
+            trainingRecordings: nil,
+            horseRideProfiles: nil,
+            rideDefaults: nil
         )
         let file = WriteFile(schemaVersion: header.schemaVersion, exportedAt: header.exportedAt, appVersion: header.appVersion, scope: header.scope, data: content)
         return try RecordCodec.makeEncoder(pretty: pretty).encode(file)

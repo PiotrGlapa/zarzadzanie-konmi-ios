@@ -416,7 +416,7 @@ public struct RecordingInput: Codable, Hashable, Sendable {
 // MARK: - LocalTrainingRecording
 
 /// Lokalny rekord treningu z nagraniem — treść to `RecordingDto` bez `trackData` + `horseId`, `trainingDate`.
-public struct LocalTrainingRecording: Codable, Hashable, Sendable {
+public struct LocalTrainingRecording: Codable, Hashable, Sendable, LocalRecord {
     public var id: String
     public var createdAt: LocalDateTime
     public var updatedAt: LocalDateTime
@@ -602,11 +602,19 @@ public struct LocalTrainingRecording: Codable, Hashable, Sendable {
 // MARK: - LocalHorseRideProfile
 
 /// Lokalny rekord profilu jazdy konia.
-public struct LocalHorseRideProfile: Codable, Hashable, Sendable {
+public struct LocalHorseRideProfile: Codable, Hashable, Sendable, LocalRecord {
+    public var id: String
+    public var createdAt: LocalDateTime
+    public var updatedAt: LocalDateTime
+    public var version: Int
     public var horseId: String
     public var profile: RideProfile
 
-    public init(horseId: String, profile: RideProfile) {
+    public init(id: String, createdAt: LocalDateTime, updatedAt: LocalDateTime, version: Int, horseId: String, profile: RideProfile) {
+        self.id = id
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.version = version
         self.horseId = horseId
         self.profile = profile
     }
@@ -617,10 +625,18 @@ public struct LocalHorseRideProfile: Codable, Hashable, Sendable {
 // MARK: - LocalRideDefaults
 
 /// Lokalny rekord ustawień domyślnych jazd.
-public struct LocalRideDefaults: Codable, Hashable, Sendable {
+public struct LocalRideDefaults: Codable, Hashable, Sendable, LocalRecord {
+    public var id: String
+    public var createdAt: LocalDateTime
+    public var updatedAt: LocalDateTime
+    public var version: Int
     public var profile: RideDefaults
 
-    public init(profile: RideDefaults) {
+    public init(id: String, createdAt: LocalDateTime, updatedAt: LocalDateTime, version: Int, profile: RideDefaults) {
+        self.id = id
+        self.createdAt = createdAt
+        self.updatedAt = updatedAt
+        self.version = version
         self.profile = profile
     }
 
