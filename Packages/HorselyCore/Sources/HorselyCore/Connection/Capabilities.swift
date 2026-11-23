@@ -54,6 +54,12 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     public var horseStatusInjured: Bool { names.contains(Self.horseStatusInjuredName) }
     /// Serwer wysyła powiadomienia push (`PUT/DELETE/GET push/device`, `GET push/rules`).
     public var push: Bool { names.contains(Self.pushName) }
+    /// Serwer ogłasza załączniki treningów.
+    public var trainingAttachments: Bool { names.contains(Self.trainingAttachmentsName) }
+    /// Serwer ogłasza nagrania jazdy.
+    public var trainingRecordings: Bool { names.contains(Self.trainingRecordingsName) }
+    /// Serwer obsługuje `/api/v3` (obliczana z `apiVersions`).
+    public var apiV3: Bool { names.contains(Self.apiV3Name) }
 
     /// Zapis do `local_meta`: nazwy rozdzielone przecinkami, w stałej kolejności.
     public var serialized: String { names.sorted().joined(separator: ",") }
@@ -95,13 +101,6 @@ public struct CapabilitiesChange: Equatable, Sendable {
 
     /// Serwer przestał ogłaszać `push` (lokalne powiadomienia wracają, bez `DELETE`, FR-011).
     public var pushVanished: Bool { before.push && !after.push }
-
-    /// Serwer ogłasza załączniki treningów.
-    public var trainingAttachments: Bool { names.contains(Self.trainingAttachmentsName) }
-    /// Serwer ogłasza nagrania jazdy.
-    public var trainingRecordings: Bool { names.contains(Self.trainingRecordingsName) }
-    /// Serwer obsługuje `/api/v3` (obliczana z `apiVersions`).
-    public var apiV3: Bool { names.contains(Self.apiV3Name) }
 }
 
 /// Cechy klienta w nagłówku `X-Client-Features` (contracts/android/program-2.0-integration.md §2): `horse-status-injured`
