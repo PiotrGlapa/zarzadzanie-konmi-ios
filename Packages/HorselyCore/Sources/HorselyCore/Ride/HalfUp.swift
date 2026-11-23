@@ -8,8 +8,8 @@ public enum HalfUp {
     /// Zaokrągla `value` do `scale` miejsc po przecinku, HALF_UP „od zera".
     /// Przykład: `2.345` → `2.35`, `-2.345` → `-2.35`, `2.5` → `3`.
     public static func round(_ value: Decimal, scale: Int) -> Decimal {
-        let handler = NSDecimalNumberHandler(roundingMode: .plain, scale: scale, raiseOnExact: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: false)
+        let handler = NSDecimalNumberHandler(roundingMode: .plain, scale: Int16(scale), raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: false)
         let number = NSDecimalNumber(decimal: value)
-        return number.decimalNumber(byRoundingAgainst: handler).decimalValue
+        return number.rounding(with: handler).decimalValue
     }
 }
