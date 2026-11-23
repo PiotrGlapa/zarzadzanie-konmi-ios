@@ -15,8 +15,10 @@
 			<false/>
 			<key>NSPrivacyCollectedDataTypeTracking</key>
 			<false/>
-			<key>NSPrivacyCollectedDataTypePurpose</key>
-			<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			<key>NSPrivacyCollectedDataTypePurposes</key>
+			<array>
+				<string>NSPrivacyCollectedDataTypePurposeAppFunctionality</string>
+			</array>
 		</dict>
 	</array>
 	<key>NSPrivacyAccessedAPITypes</key>
