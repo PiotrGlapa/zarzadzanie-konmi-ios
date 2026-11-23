@@ -54,6 +54,9 @@ public enum RecordCodec {
         case .training: try JSONDecoder().decode(LocalTraining.self, from: data)
         case .reminder: try JSONDecoder().decode(LocalReminder.self, from: data)
         case .attachment: try JSONDecoder().decode(LocalAttachment.self, from: data)
+        case .trainingRecording: try JSONDecoder().decode(LocalTrainingRecording.self, from: data)
+        case .horseRideProfile: try JSONDecoder().decode(LocalHorseRideProfile.self, from: data)
+        case .rideDefaults: try JSONDecoder().decode(LocalRideDefaults.self, from: data)
         }
     }
 

@@ -95,6 +95,9 @@ public enum OperationKind: String, Codable, Sendable, CaseIterable {
         case .reminder: .createReminder
         case .attachment: .createAttachment
         case .dictionary: nil
+        case .trainingRecording: nil
+        case .horseRideProfile: nil
+        case .rideDefaults: nil
         }
     }
 
