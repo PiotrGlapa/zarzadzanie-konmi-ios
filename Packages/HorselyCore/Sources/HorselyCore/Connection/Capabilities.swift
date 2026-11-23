@@ -27,7 +27,7 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     /// Program bez listy możliwości (1.5.0–1.6.x) i tryb samodzielny.
     public static let none = ProgramCapabilities(names: [])
 
-    public let names: Set<String>
+    public var names: Set<String>
 
     /// Z listy z `system/info`; nieznane nazwy są pomijane.
     public init(names: some Sequence<String>) {
