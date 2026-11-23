@@ -65,9 +65,9 @@
 **Files:**
 - Modify: `.specify/memory/constitution.md`, `SPECYFIKACJA_MOBILE_IOS.md`
 
-- [ ] **Step 1:** Konstytucja → 3.0.0 (raport synchronizacji na górze: MAJOR, zasady II i VIII). Zasada II: wyjątki z [ZAK] 6.1 dokładnie tymi warunkami (lokalizacja „Podczas używania” tylko w czasie nagrywania uruchomionego przez użytkownika, bez „Zawsze”; kafle Apple Maps; Open‑Meteo z położeniem zaokrąglonym do 0,01° i godziną startu, z wyłącznikiem; dziennik bez współrzędnych); zdanie „NIE MOŻE prosić o lokalizację” zastąpione powyższym; lista zgód 9.2 + lokalizacja, mikrofon, dodawanie do galerii. Zasada VIII: „Android 2.1.0” → „Android 3.0.2”. `Version: 3.0.0`, `Last Amended:` data wykonania.
-- [ ] **Step 2:** Specyfikacja: sekcja „Zakres wersji 3.0” odsyłająca do [ZAK] i [WYM] (FR z prefiksami ZAT/NAG/STA/MAP/POG/PAR/RAJ/SYN), w US10 usunięte „Treningi nie mają załączników…” (wiersz 544), sekcja 9 z różnicami z [ZAK] 6 (MapKit, lokalizacja w tle, Live Activity), 9.2 zgody.
-- [ ] **Step 3: Commit** — `docs: konstytucja 3.0.0 i zakres wersji 3.0 w specyfikacji`
+- [x] **Step 1:** Konstytucja → 3.0.0 (raport synchronizacji na górze: MAJOR, zasady II i VIII). Zasada II: wyjątki z [ZAK] 6.1 dokładnie tymi warunkami (lokalizacja „Podczas używania" tylko w czasie nagrywania uruchomionego przez użytkownika, bez „Zawsze"; kafle Apple Maps; Open‑Meteo z położeniem zaokrąglonym do 0,01° i godziną startu, z wyłącznikiem; dziennik bez współrzędnych); zdanie „NIE MOŻE prosić o lokalizację" zastąpione powyższym; lista zgód 9.2 + lokalizacja, mikrofon, dodawanie do galerii. Zasada VIII: „Android 2.1.0" → „Android 3.0.2". `Version: 3.0.0`, `Last Amended:` data wykonania.
+- [x] **Step 2:** Specyfikacja: sekcja „Zakres wersji 3.0" odsyłająca do [ZAK] i [WYM] (FR z prefiksami ZAT/NAG/STA/MAP/POG/PAR/RAJ/SYN), w US10 usunięte „Treningi nie mają załączników…" (wiersz 544), sekcja 9 z różnicami z [ZAK] 6 (MapKit, lokalizacja w tle, Live Activity), 9.2 zgody.
+- [x] **Step 3: Commit** — `docs: konstytucja 3.0.0 i zakres wersji 3.0 w specyfikacji`
 
 ### Task 2: Teksty 3.0.2 z Androida
 
