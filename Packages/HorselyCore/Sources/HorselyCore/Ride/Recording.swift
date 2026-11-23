@@ -620,6 +620,19 @@ public struct LocalHorseRideProfile: Codable, Hashable, Sendable, LocalRecord {
     }
 
     public var recordType: RecordType { .horseRideProfile }
+
+    public func withAudit(version: Int, updatedAt: LocalDateTime) -> LocalHorseRideProfile {
+        var copy = self
+        copy.version = version
+        copy.updatedAt = updatedAt
+        return copy
+    }
+
+    public func withCreated(at time: LocalDateTime) -> LocalHorseRideProfile {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 // MARK: - LocalRideDefaults
@@ -641,6 +654,19 @@ public struct LocalRideDefaults: Codable, Hashable, Sendable, LocalRecord {
     }
 
     public var recordType: RecordType { .rideDefaults }
+
+    public func withAudit(version: Int, updatedAt: LocalDateTime) -> LocalRideDefaults {
+        var copy = self
+        copy.version = version
+        copy.updatedAt = updatedAt
+        return copy
+    }
+
+    public func withCreated(at time: LocalDateTime) -> LocalRideDefaults {
+        var copy = self
+        copy.createdAt = time
+        return copy
+    }
 }
 
 // MARK: - RecordingDto → RecordingInput (rozszerzenie)
