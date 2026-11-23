@@ -286,11 +286,11 @@ import Testing
     #expect(Gait.canter.rawValue == "Canter")
 }
 
-@Test func gaitFromRawValue() throws {
-    #expect(try Gait(rawValue: "Stop") == .stop)
-    #expect(try Gait(rawValue: "Walk") == .walk)
-    #expect(try Gait(rawValue: "Trot") == .trot)
-    #expect(try Gait(rawValue: "Canter") == .canter)
+@Test func gaitFromRawValue() {
+    #expect(Gait(rawValue: "Stop") == .stop)
+    #expect(Gait(rawValue: "Walk") == .walk)
+    #expect(Gait(rawValue: "Trot") == .trot)
+    #expect(Gait(rawValue: "Canter") == .canter)
 }
 
 // MARK: - WeatherStatus
