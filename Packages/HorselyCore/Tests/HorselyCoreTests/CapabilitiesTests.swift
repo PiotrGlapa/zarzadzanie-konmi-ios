@@ -1,4 +1,5 @@
 import Testing
+import Foundation
 @testable import HorselyCore
 
 /// Możliwość `push` w `capabilities` programu 2.0 (spec 003, T006) oraz nowe możliwości 3.0.
