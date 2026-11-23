@@ -15,6 +15,10 @@
 #   - liczba mnoga PL: one / few / many / other (wariant plural w xcstrings)
 #   - znaki specjalne Androida: \n, \t, \', \", \\, \@, \?, \uXXXX; białe znaki poza cudzysłowem scalane do jednej spacji
 #   - odwołania @string/nazwa są podstawiane wartością
+#
+# Teksty iOS-only: App/Resources/ios/strings.xml
+#   - skrypt dołącza klucze z tego plika PO Androidzie, ale zgłasza błąd,
+#     jeśli klucz występuje już w Androidzie (konflikt nazw).
 [CmdletBinding()]
 param(
     [string]$AndroidRepo,
@@ -160,6 +164,27 @@ foreach ($f in $sourceFiles) {
             $plurals[$name] = $items
         } else {
             throw "Nieobsługiwany element <$($node.LocalName)> '$name' ($f)"
+        }
+    }
+}
+
+# Teksty iOS-only: App/Resources/ios/strings.xml (bez plurals, bez @string refs)
+$iosDir = Join-Path $root 'App/Resources/ios'
+$iosFile = Join-Path $iosDir 'strings.xml'
+if (Test-Path $iosFile) {
+    $iosXml = New-Object System.Xml.XmlDocument
+    $iosXml.PreserveWhitespace = $false
+    $iosXml.Load($iosFile)
+    foreach ($node in $iosXml.DocumentElement.ChildNodes) {
+        if ($node.NodeType -ne 'Element') { continue }
+        $name = $node.GetAttribute('name')
+        if ($strings.ContainsKey($name) -or $plurals.ContainsKey($name)) { throw "Konflikt: klucz '$name' występuje w Androidzie i iOS" }
+        if ($node.LocalName -eq 'string') {
+            $strings[$name] = ConvertFrom-AndroidText $node.InnerText
+        } elseif ($node.LocalName -eq 'plurals') {
+            throw "Liczby mnogie w iOS/strings.xml nie są obsługiwane"
+        } else {
+            throw "Nieobsługiwany element <$($node.LocalName)> '$name' w iOS/strings.xml"
         }
     }
 }

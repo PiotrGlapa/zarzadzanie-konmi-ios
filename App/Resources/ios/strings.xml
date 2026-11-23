@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Teksty TYLKO dla iOS — nie dodawać do Androida. sync-strings.ps1 dołącza ten plik automatycznie. -->
+<resources>
+    <!-- tylko iOS (Horsely iOS 2.1.1) -->
+    <string name="push_state_waiting_permission">Serwer Horsely może wysyłać powiadomienia na ten telefon, ale telefon nie ma jeszcze na nie zgody. Do tego czasu powiadomienia planuje telefon.</string>
+    <!-- tylko iOS (Horsely iOS 2.1.1) -->
+    <string name="push_allow">Zezwól na powiadomienia</string>
+</resources>

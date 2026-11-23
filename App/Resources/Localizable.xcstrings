@@ -9475,6 +9475,17 @@
         }
       }
     },
+    "push_allow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zezwól na powiadomienia"
+          }
+        }
+      }
+    },
     "push_device_removed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9735,6 +9746,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Włączone — powiadomienia o terminach wysyła serwer Horsely."
+          }
+        }
+      }
+    },
+    "push_state_waiting_permission" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serwer Horsely może wysyłać powiadomienia na ten telefon, ale telefon nie ma jeszcze na nie zgody. Do tego czasu powiadomienia planuje telefon."
           }
         }
       }
