@@ -137,6 +137,8 @@ public enum HTTPMethod: String, Sendable {
 }
 
 /// Żądanie do programu: ścieżka względem `/api/v1/` (z zapytaniem), treść JSON albo plik (`multipart/form-data`).
+/// Gdy_capabilities_ ma `apiV3`, ścieżka bazowa `/api/v1/` jest zamieniana na `/api/v3/`
+/// (z zachowaniem query string i zakodowanych segmentów); `system/info` zawsze idzie do `/api/v1/`.
 public struct ApiRequest: Sendable {
     public var method: HTTPMethod
     public var path: String

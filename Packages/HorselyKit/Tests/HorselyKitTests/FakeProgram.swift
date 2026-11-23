@@ -19,6 +19,7 @@ final class FakeProgram: @unchecked Sendable {
     struct Recorded: Sendable {
         let method: String
         let path: String
+        let url: String
         let headers: [String: String]
         let body: Data?
 
@@ -77,7 +78,9 @@ final class FakeProgram: @unchecked Sendable {
         let method = request.httpMethod ?? "GET"
         lock.lock()
         defer { lock.unlock() }
-        recorded.append(Recorded(method: method, path: path, headers: request.allHTTPHeaderFields ?? [:], body: body))
+        var allHeaders = request.allHTTPHeaderFields ?? [:]
+        allHeaders["url"] = url.absoluteString
+        recorded.append(Recorded(method: method, path: path, url: url.absoluteString, headers: allHeaders, body: body))
         guard let index = routes.lastIndex(where: { $0.method == method && ($0.path == path || ($0.path.hasSuffix("*") && path.hasPrefix(String($0.path.dropLast())))) }) else {
             if pushEnabled, let pushed = pushReply(method: method, path: path, body: body) { return pushed }
             return .json(404, #"{"title":"Nie znaleziono"}"#)

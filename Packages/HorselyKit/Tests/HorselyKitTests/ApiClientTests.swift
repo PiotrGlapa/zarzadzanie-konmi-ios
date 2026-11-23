@@ -159,6 +159,55 @@ struct ApiClientTests {
         guard case .suspended(.certificateChanged, _)? = await client.get("system/info").failure else { Issue.record("adres nie wstrzymany"); return }
         #expect(transport.calls == 1)
     }
+
+    // MARK: Task 4 — przełączanie /api/v1 ↔ /api/v3
+
+    @Test func v1PathIsRewrittenWhenServerHasV3() async {
+        let program = FakeProgram()
+        program.on("GET", "trainings", .json(200, #"{"items":[],"totalCount":0}"#))
+        let caps = ProgramCapabilities(names: ["apiV3"])
+        let (client, _) = program.client(capabilities: caps)
+        _ = await client.get("trainings")
+        #expect(program.requests.count == 1)
+        let url = program.requests.first!.url
+        #expect(url.contains("/api/v3/"))
+        #expect(!url.contains("/api/v1/"))
+    }
+
+    @Test func systemInfoAlwaysGoesToV1() async {
+        let program = FakeProgram()
+        program.on("GET", "system/info", .json(200, #"{"appVersion":"3.0.0","apiVersion":"v1","capabilities":["apiV3"],"apiVersions":["1","3"],"dataSchemaVersion":"3.0"}"#))
+        let caps = ProgramCapabilities(names: ["apiV3"])
+        let (client, _) = program.client(capabilities: caps)
+        _ = await client.systemInfo()
+        #expect(program.requests.count == 1)
+        let url = program.requests.first!.url
+        #expect(url.contains("/api/v1/"))
+    }
+
+    @Test func nothingChangesWithoutV3() async {
+        let program = FakeProgram()
+        program.on("GET", "trainings", .json(200, #"{"items":[],"totalCount":0}"#))
+        let caps = ProgramCapabilities(names: ["horseStatusInjured"])
+        let (client, _) = program.client(capabilities: caps)
+        _ = await client.get("trainings")
+        #expect(program.requests.count == 1)
+        let url = program.requests.first!.url
+        #expect(url.contains("/api/v1/"))
+    }
+
+    @Test func queryAndEncodedSegmentsAreKept() async {
+        let program = FakeProgram()
+        program.on("GET", "trainings", .json(200, #"{"items":[],"totalCount":0}"#))
+        let caps = ProgramCapabilities(names: ["apiV3"])
+        let (client, _) = program.client(capabilities: caps)
+        _ = await client.pages("trainings")
+        #expect(program.requests.count == 1)
+        let url = program.requests.first!.url
+        #expect(url.contains("/api/v3/"))
+        #expect(url.contains("page="))
+        #expect(url.contains("pageSize="))
+    }
 }
 
 /// Transport, w którym uzgodnienie TLS zawsze odrzuca certyfikat (żądanie z kluczem nie wychodzi).

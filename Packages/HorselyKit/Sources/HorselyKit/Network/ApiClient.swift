@@ -237,7 +237,17 @@ public final class ApiClient: Sendable {
         // Wstrzymanie czasowe wygasło — adres znów jest aktywny.
         if address.hold.reason != nil { await book.setHold(address.id, .active) }
 
-        guard let url = URL(string: address.url + "/" + request.path) else { return .failure(.noUsableAddress) }
+        let featureSet: ProgramCapabilities
+        if let features { featureSet = features } else { featureSet = await capabilities() }
+        let apiV3 = featureSet.apiV3
+        // system/info zawsze idzie do v1 — nie zamieniaj ścieżki.
+        let isSystemInfo = request.path == "system/info"
+        let url: URL
+        if isSystemInfo || !apiV3 {
+            url = URL(string: address.url + "/" + request.path) ?? URL(string: "/" + request.path)!
+        } else {
+            url = Self.versionedPath(URL(string: address.url)!, apiV3: apiV3, relative: request.path)
+        }
         let conditions = network()
 
         // Limit połączenia 3 s: niedostępny adres nie zatrzymuje żądania na 30 s.
@@ -268,8 +278,6 @@ public final class ApiClient: Sendable {
         urlRequest.httpMethod = request.method.rawValue
         urlRequest.setValue(key, forHTTPHeaderField: Self.apiKeyHeader)
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
-        let featureSet: ProgramCapabilities
-        if let features { featureSet = features } else { featureSet = await capabilities() }
         if let value = ClientFeatures.value(for: featureSet) { urlRequest.setValue(value, forHTTPHeaderField: ClientFeatures.header) }
         if let version = request.ifMatch { urlRequest.setValue("\"\(version)\"", forHTTPHeaderField: "If-Match") }
         if let idempotencyKey = request.idempotencyKey { urlRequest.setValue(idempotencyKey, forHTTPHeaderField: "Idempotency-Key") }
@@ -326,6 +334,15 @@ public final class ApiClient: Sendable {
     static func host(of address: ServerAddress) -> (name: String, port: Int) {
         let checked = AddressRules(treatLoopbackAsLocal: true).check(address.url).address
         return (checked?.host ?? address.hostAndPort, checked?.port ?? (address.isHttps ? 443 : 80))
+    }
+
+    /// Zamienia ostatnie `api/v1` w ścieżce bazowej na `api/v3`.
+    static func versionedPath(_ base: URL, apiV3: Bool, relative: String) -> URL {
+        guard apiV3, let range = base.absoluteString.range(of: "/api/v1/", options: .backwards) else {
+            return URL(string: base.absoluteString + "/" + relative) ?? URL(string: "/" + relative)!
+        }
+        let v3 = base.absoluteString.replacingCharacters(in: range, with: "/api/v3/")
+        return URL(string: v3 + "/" + relative) ?? URL(string: "/" + relative)!
     }
 
     // MARK: Skróty
