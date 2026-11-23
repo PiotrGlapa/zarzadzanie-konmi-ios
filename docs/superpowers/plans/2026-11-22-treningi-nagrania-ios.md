@@ -74,9 +74,9 @@
 **Files:**
 - Modify: `App/Resources/Localizable.xcstrings` (generowany), ewentualnie `scripts/sync-strings.ps1` (mapowanie nowych kluczy)
 
-- [ ] **Step 1:** `pwsh -NoProfile -File scripts/sync-strings.ps1` z `../zarzadzanie_konmi_android/app/src/main/res/values/strings.xml` (3.0.2) — nowe klucze jazdy, mapy, pogody, raportu, Live Activity bierze teksty powiadomienia nagrywania.
-- [ ] **Step 2:** `pwsh -NoProfile -File scripts/sync-strings.ps1 -Check` → bez różnic (działa lokalnie).
-- [ ] **Step 3: Commit** — `chore: teksty Androida 3.0.2`
+- [x] **Step 1:** `pwsh -NoProfile -File scripts/sync-strings.ps1` z `../zarzadzanie_konmi_android/app/src/main/res/values/strings.xml` (3.0.2) — nowe klucze jazdy, mapy, pogody, raportu, Live Activity bierze teksty powiadomienia nagrywania.
+- [x] **Step 2:** `pwsh -NoProfile -File scripts/sync-strings.ps1 -Check` → bez różnic (działa lokalnie).
+- [x] **Step 3: Commit** — `chore: teksty Androida 3.0.2`
 
 ### Task 3: Wersje API i nowe możliwości = [PLAN-A] Task 2
 
