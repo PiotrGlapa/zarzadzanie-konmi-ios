@@ -10,6 +10,6 @@ public enum HalfUp {
     public static func round(_ value: Decimal, scale: Int) -> Decimal {
         let handler = NSDecimalNumberHandler(roundingMode: .plain, scale: Int16(scale), raiseOnExactness: false, raiseOnOverflow: false, raiseOnUnderflow: false, raiseOnDivideByZero: false)
         let number = NSDecimalNumber(decimal: value)
-        return number.rounding(with: handler).decimalValue
+        return number.rounding(accordingToBehavior: handler).decimalValue
     }
 }
