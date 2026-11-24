@@ -2,6 +2,7 @@
 // Oparte na [PLAN-A] Task 4 Step 1 i kontrakcie [K].
 
 import Testing
+import Foundation
 @testable import HorselyCore
 
 @Test func recordingDtoFromContractParsesAndRoundTrips() throws {
