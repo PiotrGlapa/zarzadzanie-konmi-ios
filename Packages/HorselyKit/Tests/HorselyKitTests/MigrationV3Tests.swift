@@ -131,14 +131,14 @@ import Testing
 
     // 2. Wstaw rekord do v1 — symulacja bazy z v2
     try queue.write { db in
-        let now = LocalDateTime.now()
+        let now = Date()
         let body = try JSONEncoder().encode(["test": "value"])
-        try db.insert(
-            into: "local_record",
-            columns: ["type", "id", "version", "createdAt", "updatedAt", "syncState", "body"],
-            value: [
+        let nowISO = ISO8601DateFormatter().string(from: now)
+        try db.execute(
+            sql: "INSERT INTO local_record (type, id, version, createdAt, updatedAt, syncState, body) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            arguments: [
                 "Training", "rec-1", 0,
-                now.toISO8601(), now.toISO8601(),
+                nowISO, nowISO,
                 "Pending", String(data: body, encoding: .utf8)!
             ]
         )
@@ -201,19 +201,19 @@ import Testing
 
     // 4. Weryfikacja — rekord nadal istnieje
     try queue.read { db in
-        let count = try db.fetchCount(from: "local_record")
+        let count = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_record") ?? 0
         #expect(count == 1)
     }
 
     // 5. Nowe tabele istnieją i są puste
     try queue.read { db in
-        let trackCount = try db.fetchCount(from: "local_track")
+        let trackCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_track") ?? 0
         #expect(trackCount == 0)
-        let sessionCount = try db.fetchCount(from: "ride_session")
+        let sessionCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_session") ?? 0
         #expect(sessionCount == 0)
-        let pointCount = try db.fetchCount(from: "ride_point")
+        let pointCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_point") ?? 0
         #expect(pointCount == 0)
-        let mediaCount = try db.fetchCount(from: "ride_media")
+        let mediaCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_media") ?? 0
         #expect(mediaCount == 0)
     }
 }
@@ -238,16 +238,15 @@ import Testing
 
     // Zapis
     try queue.write { db in
-        try db.insert(
-            into: "local_track",
-            columns: ["recordingId", "version", "format", "data"],
-            value: [recordingId, version, format, trackData]
+        try db.execute(
+            sql: "INSERT INTO local_track (recordingId, version, format, data) VALUES (?, ?, ?, ?)",
+            arguments: [recordingId, version, format, trackData]
         )
     }
 
     // Odczyt
     let track = try queue.read { db in
-        guard let row = try Row.fetchOne(db, table: "local_track", where: "recordingId = ?", arguments: recordingId) else {
+        guard let row = try Row.fetchOne(db, sql: "SELECT * FROM local_track WHERE recordingId = ?", arguments: [recordingId]) else {
             return nil
         }
         return StoredTrack(
@@ -319,42 +318,38 @@ import Testing
 
     // Wstaw dane
     try queue.write { db in
-        try db.insert(
-            into: "local_track",
-            columns: ["recordingId", "version", "format", "data"],
-            value: ["ride-1", 1, "zk-track/1", Data()]
+        try db.execute(
+            sql: "INSERT INTO local_track (recordingId, version, format, data) VALUES (?, ?, ?, ?)",
+            arguments: ["ride-1", 1, "zk-track/1", Data()]
         )
-        try db.insert(
-            into: "ride_session",
-            columns: ["id", "horseId", "horseName", "state", "startedAtMillis", "timeZone", "lastFlushMillis"],
-            value: ["sess-1", "horse-1", "Kongo", "Recording", 1000, "Europe/Warsaw", 1000]
+        try db.execute(
+            sql: "INSERT INTO ride_session (id, horseId, horseName, state, startedAtMillis, timeZone, lastFlushMillis) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            arguments: ["sess-1", "horse-1", "Kongo", "Recording", 1000, "Europe/Warsaw", 1000]
         )
-        try db.insert(
-            into: "ride_point",
-            columns: ["sessionId", "seq", "tMillis", "lat", "lon"],
-            value: ["sess-1", 0, 0, 52.0, 21.0]
+        try db.execute(
+            sql: "INSERT INTO ride_point (sessionId, seq, tMillis, lat, lon) VALUES (?, ?, ?, ?, ?)",
+            arguments: ["sess-1", 0, 0, 52.0, 21.0]
         )
-        try db.insert(
-            into: "ride_media",
-            columns: ["sessionId", "uri", "contentType", "capturedAtMillis"],
-            value: ["sess-1", "content://uri/1", "image/jpeg", 1000]
+        try db.execute(
+            sql: "INSERT INTO ride_media (sessionId, uri, contentType, capturedAtMillis) VALUES (?, ?, ?, ?)",
+            arguments: ["sess-1", "content://uri/1", "image/jpeg", 1000]
         )
     }
 
     // Usunięcie tras i sesji (jak w clearStore)
     try queue.write { db in
-        try db.deleteAll("ride_point")
-        try db.deleteAll("ride_media")
-        try db.deleteAll("ride_session")
-        try db.deleteAll("local_track")
+        try db.execute(sql: "DELETE FROM ride_point")
+        try db.execute(sql: "DELETE FROM ride_media")
+        try db.execute(sql: "DELETE FROM ride_session")
+        try db.execute(sql: "DELETE FROM local_track")
     }
 
     // Weryfikacja — wszystko puste
     try queue.read { db in
-        #expect(try db.fetchCount(from: "local_track") == 0)
-        #expect(try db.fetchCount(from: "ride_session") == 0)
-        #expect(try db.fetchCount(from: "ride_point") == 0)
-        #expect(try db.fetchCount(from: "ride_media") == 0)
+        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_track") ?? 0 == 0)
+        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_session") ?? 0 == 0)
+        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_point") ?? 0 == 0)
+        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_media") ?? 0 == 0)
     }
 }
 
