@@ -245,7 +245,7 @@ import Testing
     }
 
     // Odczyt
-    let track = try queue.read { db in
+    let track: StoredTrack? = try queue.read { db in
         guard let row = try Row.fetchOne(db, sql: "SELECT * FROM local_track WHERE recordingId = ?", arguments: [recordingId]) else {
             return nil
         }
