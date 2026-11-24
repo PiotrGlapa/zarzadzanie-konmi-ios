@@ -2,6 +2,7 @@
 // Oparte na [PLAN-A] Task 4 Step 2/3.
 
 import Testing
+import Foundation
 @testable import HorselyCore
 
 // MARK: - HalfUp
@@ -253,7 +254,7 @@ import Testing
                           distanceMeters: 1000, avgSpeedKmh: Decimal(string: "5")!, maxSpeedKmh: Decimal(string: "7")!)
 
     #expect(s1 == s2)
-    #expect(Set([s1, s2]).count == 1)
+    #expect(Set<GaitSegment>([s1, s2]).count == 1)
 }
 
 @Test func gaitSegmentCodable() throws {
