@@ -49,6 +49,9 @@ struct RecordStoreTests {
             training("t1", horse: "h1", day: 9),
             LocalReminder(id: "r1", createdAt: stamp, updatedAt: stamp, horseId: "h1", kind: .farrier, dueDate: date(20), title: "Kowal", sourceId: "f1"),
             LocalAttachment(id: "a1", createdAt: stamp, updatedAt: stamp, ownerType: .note, ownerId: "n1", horseId: "h1", fileName: "a.jpg", contentType: "image/jpeg", sizeBytes: 10, sha256: "abc"),
+            LocalTrainingRecording(id: "tr1", createdAt: stamp, updatedAt: stamp, version: 1, horseId: "h1", trainingDate: date(10), startedAt: "08:00", endedAt: "09:00", timeZone: "Europe/Warsaw", totalSeconds: 3600, movingSeconds: 3000, stoppedSeconds: 600, pausedSeconds: 0, distanceMeters: 5000, avgMovingSpeedKmh: Decimal(string: "15")!, maxSpeedKmh: Decimal(string: "25")!, elevationGainM: 100, elevationLossM: 80, minAltitudeM: 100, maxAltitudeM: 200, walkSeconds: 1200, walkMeters: 1500, trotSeconds: 1500, trotMeters: 2500, canterSeconds: 300, canterMeters: 800, intensity: 50),
+            LocalHorseRideProfile(id: "hp1", createdAt: stamp, updatedAt: stamp, version: 1, horseId: "h1", profile: RideProfile(gaitStopMaxKmh: Decimal(string: "0.5")!, gaitWalkMaxKmh: Decimal(string: "4.5")!, gaitTrotMaxKmh: Decimal(string: "8.0")!, loadWeightWalk: Decimal(string: "0.1")!, loadWeightTrot: Decimal(string: "0.3")!, loadWeightCanter: Decimal(string: "0.6")!, loadClimbPer10m: Decimal(string: "1.0")!, loadWarnPercent: 5, heavyRidePoints: 1)),
+            LocalRideDefaults(id: "rd1", createdAt: stamp, updatedAt: stamp, version: 1, profile: RideDefaults(gaitStopMaxKmh: Decimal(string: "0.5")!, gaitWalkMaxKmh: Decimal(string: "4.5")!, gaitTrotMaxKmh: Decimal(string: "8.0")!, loadWeightWalk: Decimal(string: "0.1")!, loadWeightTrot: Decimal(string: "0.3")!, loadWeightCanter: Decimal(string: "0.6")!, loadClimbPer10m: Decimal(string: "1.0")!, loadWarnPercent: 5, heavyRidePoints: 1, recordedRideTrainingTypeId: "trening-nagranie", version: 1)),
         ]
         #expect(Set(records.map(\.recordType)) == Set(RecordType.allCases))
 
@@ -241,6 +244,6 @@ struct RecordStoreTests {
         let tables = try database.writer.read { db in
             try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'grdb_%'")
         }
-        #expect(Set(tables) == ["local_record", "record_horse", "local_file", "queue_operation", "queue_history", "conflict", "local_meta", "address"])
+        #expect(Set(tables) == ["local_record", "record_horse", "local_file", "queue_operation", "queue_history", "conflict", "local_meta", "address", "local_track", "ride_session", "ride_point", "ride_media"])
     }
 }
