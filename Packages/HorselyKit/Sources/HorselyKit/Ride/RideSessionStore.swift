@@ -211,16 +211,18 @@ struct RideSessionStore {
     /// Zapisz lub zaktualizuj sesję.
     func saveSession(_ session: RideSessionRow) async throws {
         try await db.write { db in
-            try db.insert(
-                into: "ride_session",
-                columns: ["id", "horseId", "horseName", "state", "startedAtMillis", "endedAtMillis", "timeZone", "pausesJson", "thresholdsJson", "loadJson", "accelerometerUsed", "lastFlushMillis", "distanceMeters", "activeSeconds"],
-                value: [
+            try db.execute(
+                sql: """
+                    INSERT OR REPLACE INTO ride_session
+                        (id, horseId, horseName, state, startedAtMillis, endedAtMillis, timeZone, pausesJson, thresholdsJson, loadJson, accelerometerUsed, lastFlushMillis, distanceMeters, activeSeconds)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                arguments: [
                     session.id, session.horseId, session.horseName, session.state,
                     session.startedAtMillis, session.endedAtMillis, session.timeZone,
                     session.pausesJson, session.thresholdsJson, session.loadJson,
                     session.accelerometerUsed, session.lastFlushMillis, session.distanceMeters, session.activeSeconds
-                ],
-                onConflict: "id"
+                ]
             )
         }
     }
@@ -228,9 +230,9 @@ struct RideSessionStore {
     /// Usuń sesję i kaskadowo punkty/media.
     func deleteSession(id: String) async throws {
         try await db.write { db in
-            try db.deleteAll("ride_point", where: "sessionId = ?", arguments: id)
-            try db.deleteAll("ride_media", where: "sessionId = ?", arguments: id)
-            try db.deleteAll("ride_session", where: "id = ?", arguments: id)
+            try db.execute(sql: "DELETE FROM ride_point WHERE sessionId = ?", arguments: [id])
+            try db.execute(sql: "DELETE FROM ride_media WHERE sessionId = ?", arguments: [id])
+            try db.execute(sql: "DELETE FROM ride_session WHERE id = ?", arguments: [id])
         }
     }
 
@@ -248,14 +250,16 @@ struct RideSessionStore {
     func insertPoints(_ points: [RidePointRow]) async throws {
         try await db.write { db in
             for point in points {
-                try db.insert(
-                    into: "ride_point",
-                    columns: ["sessionId", "seq", "tMillis", "lat", "lon", "altM", "speedMs", "hAccM", "vAccM", "cadence", "intensity"],
-                    value: [
+                try db.execute(
+                    sql: """
+                        INSERT OR REPLACE INTO ride_point
+                            (sessionId, seq, tMillis, lat, lon, altM, speedMs, hAccM, vAccM, cadence, intensity)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """,
+                    arguments: [
                         point.sessionId, point.seq, point.tMillis, point.lat, point.lon,
                         point.altM, point.speedMs, point.hAccM, point.vAccM, point.cadence, point.intensity
-                    ],
-                    onConflict: ["sessionId", "seq"]
+                    ]
                 )
             }
         }
@@ -274,11 +278,13 @@ struct RideSessionStore {
     /// Dodaj wpis media.
     func insertMedia(_ media: RideMediaRow) async throws {
         try await db.write { db in
-            try db.insert(
-                into: "ride_media",
-                columns: ["sessionId", "uri", "contentType", "capturedAtMillis", "lat", "lon"],
-                value: [media.sessionId, media.uri, media.contentType, media.capturedAtMillis, media.lat, media.lon],
-                onConflict: ["sessionId", "uri"]
+            try db.execute(
+                sql: """
+                    INSERT OR REPLACE INTO ride_media
+                        (sessionId, uri, contentType, capturedAtMillis, lat, lon)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                arguments: [media.sessionId, media.uri, media.contentType, media.capturedAtMillis, media.lat, media.lon]
             )
         }
     }
@@ -303,11 +309,13 @@ struct RideSessionStore {
     /// Zapisz trasę.
     func putTrack(_ track: StoredTrack) async throws {
         try await db.write { db in
-            try db.insert(
-                into: "local_track",
-                columns: ["recordingId", "version", "format", "data"],
-                value: [track.recordingId, track.version, track.format, track.data],
-                onConflict: "recordingId"
+            try db.execute(
+                sql: """
+                    INSERT OR REPLACE INTO local_track
+                        (recordingId, version, format, data)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                arguments: [track.recordingId, track.version, track.format, track.data]
             )
         }
     }
@@ -315,7 +323,7 @@ struct RideSessionStore {
     /// Usuń trasę.
     func deleteTrack(recordingId: String) async throws {
         try await db.write { db in
-            try db.deleteAll("local_track", where: "recordingId = ?", arguments: recordingId)
+            try db.execute(sql: "DELETE FROM local_track WHERE recordingId = ?", arguments: [recordingId])
         }
     }
 
@@ -324,10 +332,10 @@ struct RideSessionStore {
     /// Czyszczenie magazynu — usuwa trasy i sesje.
     func clearRideData() async throws {
         try await db.write { db in
-            try db.deleteAll("ride_point")
-            try db.deleteAll("ride_media")
-            try db.deleteAll("ride_session")
-            try db.deleteAll("local_track")
+            try db.execute(sql: "DELETE FROM ride_point")
+            try db.execute(sql: "DELETE FROM ride_media")
+            try db.execute(sql: "DELETE FROM ride_session")
+            try db.execute(sql: "DELETE FROM local_track")
         }
     }
 }
