@@ -174,6 +174,58 @@ public final class AppDatabase: Sendable {
                 t.add(column: "resultId", .text)
             }
         }
+        // Treningi i nagrania (T061): tabele `local_track`, `ride_session`, `ride_point`, `ride_media`.
+        migrator.registerMigration("v3") { db in
+            try db.create(table: "local_track") { t in
+                t.column("recordingId", .text).primaryKey()
+                t.column("version", .integer).notNull()
+                t.column("format", .text).notNull()
+                t.column("data", .blob).notNull()
+            }
+
+            try db.create(table: "ride_session") { t in
+                t.column("id", .text).primaryKey()
+                t.column("horseId", .text).notNull()
+                t.column("horseName", .text).notNull()
+                t.column("state", .text).notNull()
+                t.column("startedAtMillis", .integer).notNull()
+                t.column("endedAtMillis", .integer)
+                t.column("timeZone", .text).notNull()
+                t.column("pausesJson", .text)
+                t.column("thresholdsJson", .text)
+                t.column("loadJson", .text)
+                t.column("accelerometerUsed", .integer).notNull().defaults(to: 0)
+                t.column("lastFlushMillis", .integer).notNull()
+                t.column("distanceMeters", .integer).notNull().defaults(to: 0)
+                t.column("activeSeconds", .integer).notNull().defaults(to: 0)
+            }
+
+            try db.create(table: "ride_point") { t in
+                t.column("sessionId", .text).notNull()
+                t.column("seq", .integer).notNull()
+                t.column("tMillis", .integer).notNull()
+                t.column("lat", .real).notNull()
+                t.column("lon", .real).notNull()
+                t.column("altM", .real)
+                t.column("speedMs", .real)
+                t.column("hAccM", .real)
+                t.column("vAccM", .real)
+                t.column("cadence", .real)
+                t.column("intensity", .real)
+                t.primaryKey(["sessionId", "seq"])
+            }
+            try db.create(index: "ride_point_session_seq", on: "ride_point", columns: ["sessionId", "seq"])
+
+            try db.create(table: "ride_media") { t in
+                t.column("sessionId", .text).notNull()
+                t.column("uri", .text).notNull()
+                t.column("contentType", .text).notNull()
+                t.column("capturedAtMillis", .integer).notNull()
+                t.column("lat", .real)
+                t.column("lon", .real)
+                t.primaryKey(["sessionId", "uri"])
+            }
+        }
         return migrator
     }
 }
