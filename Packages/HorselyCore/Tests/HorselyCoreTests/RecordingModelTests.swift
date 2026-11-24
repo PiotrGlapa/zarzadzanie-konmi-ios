@@ -158,9 +158,9 @@ import Foundation
     #expect(RideParameters.validate(boundary, RideDefaults.builtIn).isEmpty)
 
     let boundary2 = RideProfile(
-        gaitStopMaxKmh: Decimal(string: "39.5"),
-        gaitWalkMaxKmh: Decimal(string: "40"),
-        gaitTrotMaxKmh: Decimal(string: "40.5"),
+        gaitStopMaxKmh: Decimal(string: "39"),
+        gaitWalkMaxKmh: Decimal(string: "39.5"),
+        gaitTrotMaxKmh: Decimal(string: "40"),
         loadWeightWalk: Decimal(string: "10"),
         loadWeightTrot: Decimal(string: "10"),
         loadWeightCanter: Decimal(string: "10"),
