@@ -148,6 +148,9 @@ enum RecordLabels {
         case .training: "trening"
         case .reminder: "termin"
         case .attachment: "załącznik"
+        case .trainingRecording: "nagranie treningu"
+        case .horseRideProfile: "profil konia"
+        case .rideDefaults: "ustawienia jazdy"
         }
     }
 }
