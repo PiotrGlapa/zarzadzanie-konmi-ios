@@ -146,7 +146,7 @@ import Foundation
     // Granice przechodzą.
     let boundary = RideProfile(
         gaitStopMaxKmh: Decimal(string: "0.5"),
-        gaitWalkMaxKmh: Decimal(string: "40"),
+        gaitWalkMaxKmh: Decimal(string: "39.5"),
         gaitTrotMaxKmh: Decimal(string: "40"),
         loadWeightWalk: Decimal(string: "0.1"),
         loadWeightTrot: Decimal(string: "10"),
