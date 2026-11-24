@@ -166,6 +166,16 @@ struct RideMediaRow: Sendable {
     }
 }
 
+// MARK: - StoredTrack
+
+/// Przechowana trasa nagrania (kopia Androida `StoredTrack`).
+struct StoredTrack: Sendable {
+    let recordingId: String
+    let version: Int
+    let format: String
+    let data: Data
+}
+
 // MARK: - RideSessionStore
 
 /// Interfejs do sesji nagrywania i tras — typy wierszy i zapytania (logika w Task 14).
@@ -181,7 +191,7 @@ struct RideSessionStore {
     /// Aktywna sesja nagrywania — zwraca `nil`, gdy nie ma sesji.
     func activeSession() async throws -> RideSessionRow? {
         try await db.read { db in
-            guard let row = try Row.fetchOne(db, table: "ride_session", where: "state != 'Finished'") else {
+            guard let row = try Row.fetchOne(db, sql: "SELECT * FROM ride_session WHERE state != 'Finished' LIMIT 1") else {
                 return nil
             }
             return RideSessionRow(row: row)
@@ -191,7 +201,7 @@ struct RideSessionStore {
     /// Sesja o podanym id.
     func session(id: String) async throws -> RideSessionRow? {
         try await db.read { db in
-            guard let row = try Row.fetchOne(db, table: "ride_session", where: "id = ?", arguments: id) else {
+            guard let row = try Row.fetchOne(db, sql: "SELECT * FROM ride_session WHERE id = ?", arguments: [id]) else {
                 return nil
             }
             return RideSessionRow(row: row)
@@ -229,7 +239,7 @@ struct RideSessionStore {
     /// Punkty dla sesji, posortowane po seq.
     func points(sessionId: String) async throws -> [RidePointRow] {
         try await db.read { db in
-            let rows = try Row.fetchAll(db, table: "ride_point", where: "sessionId = ?", arguments: sessionId, order: ["seq ASC"])
+            let rows = try Row.fetchAll(db, sql: "SELECT * FROM ride_point WHERE sessionId = ? ORDER BY seq ASC", arguments: [sessionId])
             return rows.map { RidePointRow(row: $0) }
         }
     }
@@ -256,7 +266,7 @@ struct RideSessionStore {
     /// Pliki multimediów dla sesji.
     func media(sessionId: String) async throws -> [RideMediaRow] {
         try await db.read { db in
-            let rows = try Row.fetchAll(db, table: "ride_media", where: "sessionId = ?", arguments: sessionId)
+            let rows = try Row.fetchAll(db, sql: "SELECT * FROM ride_media WHERE sessionId = ?", arguments: [sessionId])
             return rows.map { RideMediaRow(row: $0) }
         }
     }
@@ -278,7 +288,7 @@ struct RideSessionStore {
     /// Pobierz trasę dla nagrania.
     func track(recordingId: String) async throws -> StoredTrack? {
         try await db.read { db in
-            guard let row = try Row.fetchOne(db, table: "local_track", where: "recordingId = ?", arguments: recordingId) else {
+            guard let row = try Row.fetchOne(db, sql: "SELECT * FROM local_track WHERE recordingId = ?", arguments: [recordingId]) else {
                 return nil
             }
             return StoredTrack(
