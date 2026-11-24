@@ -183,13 +183,13 @@ import Foundation
     )
     // 180s stępa = 3 min * 1 = 3 pkt
     // 180s kłusa = 3 min * 2 = 6 pkt
-    // 0.5 pkt → zaokrąglenie do 1 pkt
-    // = 3 + 6 + 0.5 = 9.5 → 10 pkt
+    // 0.5 pkt → zaokrąglenie do 0,1 pkt
+    // = 3 + 6 + 0.5 = 9.5 → 9,5 pkt
     let result = RideParameters.loadPoints(
         walkSeconds: 180, trotSeconds: 180, canterSeconds: 0,
         elevationGainM: 5, load: load
     )
-    #expect(result == Decimal(string: "10.0"))
+    #expect(result == Decimal(string: "9.5"))
 }
 
 // MARK: - RideParameters.exampleText
