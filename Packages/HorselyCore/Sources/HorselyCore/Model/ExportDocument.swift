@@ -147,15 +147,80 @@ public struct ExportDocument: Sendable {
         add(content.trainings)
         add(content.reminders)
         add(content.attachments)
-        for env in content.trainingRecordings {
-            records.append(ExportedRecord(record: env.recording, dateKey: env.trainingDate.flatMap { LocalDate($0) }))
+
+        // Zbuduj mapę treningów po trainingId, żeby pobrać horseId i datę dla nagrań.
+        var trainingMap: [String: LocalTraining] = [:]
+        for t in content.trainings { trainingMap[t.id] = t }
+
+        // Dekoduj nagrania ręcznie z surowego JSON, uzupełniając horseId z treningu.
+        let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
+        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)
+        for rawEnv in content.trainingRecordings {
+            guard let training = trainingMap[rawEnv.recording.trainingId] else { continue }
+            let recording = LocalTrainingRecording(
+                id: rawEnv.recording.id,
+                createdAt: LocalDateTime(rawEnv.recording.createdAt) ?? baseTs,
+                updatedAt: LocalDateTime(rawEnv.recording.updatedAt) ?? baseTs,
+                version: rawEnv.recording.version,
+                horseId: training.horseId,
+                trainingDate: LocalDate(rawEnv.trainingDate) ?? training.trainingDate,
+                startedAt: rawEnv.recording.startedAt,
+                endedAt: rawEnv.recording.endedAt,
+                timeZone: rawEnv.recording.timeZone,
+                totalSeconds: rawEnv.recording.totalSeconds,
+                movingSeconds: rawEnv.recording.movingSeconds,
+                stoppedSeconds: rawEnv.recording.stoppedSeconds,
+                pausedSeconds: rawEnv.recording.pausedSeconds,
+                distanceMeters: rawEnv.recording.distanceMeters,
+                avgMovingSpeedKmh: rawEnv.recording.avgMovingSpeedKmh,
+                maxSpeedKmh: rawEnv.recording.maxSpeedKmh,
+                elevationGainM: rawEnv.recording.elevationGainM,
+                elevationLossM: rawEnv.recording.elevationLossM,
+                minAltitudeM: rawEnv.recording.minAltitudeM,
+                maxAltitudeM: rawEnv.recording.maxAltitudeM,
+                walkSeconds: rawEnv.recording.walkSeconds,
+                walkMeters: rawEnv.recording.walkMeters,
+                trotSeconds: rawEnv.recording.trotSeconds,
+                trotMeters: rawEnv.recording.trotMeters,
+                canterSeconds: rawEnv.recording.canterSeconds,
+                canterMeters: rawEnv.recording.canterMeters,
+                walkAvgSpeedKmh: rawEnv.recording.walkAvgSpeedKmh,
+                trotAvgSpeedKmh: rawEnv.recording.trotAvgSpeedKmh,
+                canterAvgSpeedKmh: rawEnv.recording.canterAvgSpeedKmh,
+                walkAvgCadence: rawEnv.recording.walkAvgCadence,
+                trotAvgCadence: rawEnv.recording.trotAvgCadence,
+                canterAvgCadence: rawEnv.recording.canterAvgCadence,
+                canterCount: rawEnv.recording.canterCount,
+                longestCanterSeconds: rawEnv.recording.longestCanterSeconds,
+                longestCanterMeters: rawEnv.recording.longestCanterMeters,
+                loadPoints: rawEnv.recording.loadPoints,
+                gaitThresholdsUsed: rawEnv.recording.gaitThresholdsUsed,
+                loadParamsUsed: rawEnv.recording.loadParamsUsed,
+                accelerometerUsed: rawEnv.recording.accelerometerUsed,
+                weatherStatus: rawEnv.recording.weatherStatus,
+                weatherTempC: rawEnv.recording.weatherTempC,
+                weatherFeelsLikeC: rawEnv.recording.weatherFeelsLikeC,
+                weatherPrecipMm: rawEnv.recording.weatherPrecipMm,
+                weatherWindKmh: rawEnv.recording.weatherWindKmh,
+                weatherHumidityPct: rawEnv.recording.weatherHumidityPct,
+                weatherCode: rawEnv.recording.weatherCode,
+                trimmedStartSeconds: rawEnv.recording.trimmedStartSeconds,
+                trimmedEndSeconds: rawEnv.recording.trimmedEndSeconds,
+                algorithmVersion: rawEnv.recording.algorithmVersion,
+                source: rawEnv.recording.source,
+                trackFormat: rawEnv.recording.trackFormat,
+                pointCount: rawEnv.recording.pointCount,
+                segments: rawEnv.recording.segments
+            )
+            let trainingDate = LocalDate(rawEnv.trainingDate) ?? training.trainingDate
+            records.append(ExportedRecord(record: recording, dateKey: trainingDate))
         }
+
         for env in content.horseRideProfiles {
-            let ts = LocalDateTime(year: 1, month: 1, day: 1, hour: 0, minute: 0) ?? LocalDateTime()
-            records.append(ExportedRecord(record: LocalHorseRideProfile(id: env.horseId, createdAt: ts, updatedAt: ts, version: 0, horseId: env.horseId, profile: env.profile), dateKey: nil))
+            records.append(ExportedRecord(record: LocalHorseRideProfile(id: env.horseId, createdAt: baseTs, updatedAt: baseTs, version: 0, horseId: env.horseId, profile: env.profile), dateKey: nil))
         }
         if let env = content.rideDefaults {
-            records.append(ExportedRecord(record: LocalRideDefaults(id: "rideDefaults", createdAt: ts, updatedAt: ts, version: 0, profile: env.defaults), dateKey: nil))
+            records.append(ExportedRecord(record: LocalRideDefaults(id: "rideDefaults", createdAt: baseTs, updatedAt: baseTs, version: 0, profile: env.defaults), dateKey: nil))
         }
 
         var removals: [ExportRemoval] = []
@@ -368,11 +433,18 @@ private struct TrainingRecordingEnvelope: Codable {
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
+        let trainingDateStr = try c.decode(String.self, forKey: .trainingDate)
         let dto = try c.decode(RecordingDto.self, forKey: .recording)
-        let ts = LocalDateTime(description: dto.createdAt) ?? LocalDateTime()
+        // Uwaga: RecordingDto nie zawiera horseId ani daty treningu — te pochodzą z treningu (ExportDocument.parse uzupełnia).
+        // Tutaj używamy placeholdera dla horseId; nadpiszemy go w parse().
+        let placeholderHorseId = "placeholder"
+        let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
+        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)
+        let ts = LocalDateTime(dto.createdAt) ?? baseTs
+        let trainingDate = LocalDate(trainingDateStr) ?? baseDate
         self.recording = LocalTrainingRecording(
-            id: dto.id, createdAt: ts, updatedAt: LocalDateTime(description: dto.updatedAt) ?? LocalDateTime(),
-            version: dto.version, horseId: dto.horseId, trainingDate: LocalDate(dto.startedAt) ?? LocalDate(),
+            id: dto.id, createdAt: ts, updatedAt: LocalDateTime(dto.updatedAt) ?? baseTs,
+            version: dto.version, horseId: placeholderHorseId, trainingDate: trainingDate,
             startedAt: dto.startedAt, endedAt: dto.endedAt, timeZone: dto.timeZone, totalSeconds: dto.totalSeconds,
             movingSeconds: dto.movingSeconds, stoppedSeconds: dto.stoppedSeconds, pausedSeconds: dto.pausedSeconds,
             distanceMeters: dto.distanceMeters, avgMovingSpeedKmh: dto.avgMovingSpeedKmh, maxSpeedKmh: dto.maxSpeedKmh,
@@ -389,7 +461,7 @@ private struct TrainingRecordingEnvelope: Codable {
             trimmedEndSeconds: dto.trimmedEndSeconds, algorithmVersion: dto.algorithmVersion, source: dto.source,
             trackFormat: dto.trackFormat, pointCount: dto.pointCount, segments: dto.segments
         )
-        self.trainingDate = try c.decode(String.self, forKey: .trainingDate)
+        self.trainingDate = trainingDateStr
     }
 }
 
