@@ -346,10 +346,14 @@ import Testing
 
     // Weryfikacja — wszystko puste
     try queue.read { db in
-        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_track") ?? 0 == 0)
-        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_session") ?? 0 == 0)
-        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_point") ?? 0 == 0)
-        #expect(try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_media") ?? 0 == 0)
+        let trackCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_track") ?? 0
+        let sessionCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_session") ?? 0
+        let pointCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_point") ?? 0
+        let mediaCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_media") ?? 0
+        #expect(trackCount == 0)
+        #expect(sessionCount == 0)
+        #expect(pointCount == 0)
+        #expect(mediaCount == 0)
     }
 }
 
