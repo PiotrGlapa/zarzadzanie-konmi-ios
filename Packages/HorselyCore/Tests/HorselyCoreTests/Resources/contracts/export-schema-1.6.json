@@ -1,0 +1,1935 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://zarzadzanie-konmi.local/schemas/export-1.6.json",
+  "title": "Horsely — eksport danych",
+  "description": "Schemat pliku eksportu w wersji 1.6 (akceptuje także pliki 1.0, 1.1, 1.2, 1.3, 1.4 i 1.5) (SPECYFIKACJA.md sekcja 8.1). Pola rekordów odpowiadają modelowi (camelCase). Kwoty w PLN jako liczby. Rekordy w koszu nie są eksportowane. Dodatkowe pola dopuszczalne w wersjach MINOR (additionalProperties nie jest zamknięte dla rekordów). Od 1.2: pola zakupu, sprzedaży i wartości konia, kolekcja trainings i typ słownika TrainingType. Od 1.3: typ kontaktu Trainer oraz trener i koszt treningu (trainerContactId, cost, originalAmount, originalCurrency). Od 1.4: typ kontaktu Rider oraz riderContactId w treningu i starcie w zawodach (zastępuje tekstowe pole rider). Od 1.5: status konia Injured (Kontuzjowany); w scope opcjonalne updatedSince, fullRequired i nextUpdatedSince (eksport przyrostowy przez API); na najwyższym poziomie opcjonalne tablice trashed (rekordy przeniesione do kosza od updatedSince) i purged (rekordy trwale usunięte od updatedSince). Eksport z programu nie zawiera updatedSince, trashed ani purged; import odrzuca plik z scope.updatedSince. Od 1.6 (tylko eksport serwera przez /api/v3): załączniki treningu (ownerType Training), w każdym załączniku capturedAt, latitude i longitude (null, gdy brak); eksport pełny dodatkowo zawiera trainingRecordings (nagrania jazd z odcinkami chodów i trackData w base64), horseRideProfiles (profile jazdy koni) i rideDefaults (ustawienia domyślne jazd albo null). Eksport przyrostowy nie zawiera tych trzech kolekcji.",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "exportedAt",
+    "appVersion",
+    "scope",
+    "data"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^1\\.\\d+$"
+    },
+    "exportedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "appVersion": {
+      "type": "string"
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "type",
+        "includesAttachmentFiles"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "full",
+            "horse"
+          ]
+        },
+        "horseId": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "uuid"
+        },
+        "from": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "to": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date"
+        },
+        "includesAttachmentFiles": {
+          "type": "boolean"
+        },
+        "updatedSince": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Chwila graniczna eksportu przyrostowego (włącznie); brak lub null = eksport pełny."
+        },
+        "fullRequired": {
+          "type": "boolean",
+          "default": false,
+          "description": "true: updatedSince jest wcześniejsze niż linia bazowa synchronizacji — data zawiera pełny eksport, a klient zastępuje całą lokalną kopię (brak trashed i purged)."
+        },
+        "nextUpdatedSince": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Wartość updatedSince do następnego żądania przyrostowego (chwila odczytu minus 60 s)."
+        }
+      },
+      "if": {
+        "properties": {
+          "type": {
+            "const": "horse"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "horseId"
+        ],
+        "properties": {
+          "horseId": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "data": {
+      "type": "object",
+      "required": [
+        "dictionaries",
+        "contacts",
+        "horses",
+        "vetVisits",
+        "farrierVisits",
+        "physioVisits",
+        "specialistVisits",
+        "competitions",
+        "purchases",
+        "notes",
+        "reminders",
+        "attachments"
+      ],
+      "properties": {
+        "dictionaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/dictionaryItem"
+          }
+        },
+        "contacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/contact"
+          }
+        },
+        "horses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/horse"
+          }
+        },
+        "vetVisits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vetVisit"
+          }
+        },
+        "farrierVisits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/farrierVisit"
+          }
+        },
+        "physioVisits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/physioVisit"
+          }
+        },
+        "specialistVisits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/specialistVisit"
+          }
+        },
+        "competitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/competition"
+          }
+        },
+        "purchases": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/purchase"
+          }
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/note"
+          }
+        },
+        "reminders": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/reminder"
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachment"
+          }
+        },
+        "trainings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/training"
+          },
+          "description": "Od 1.2; brak w pliku 1.0 i 1.1 = pusta lista."
+        },
+        "trainingRecordings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/trainingRecording"
+          },
+          "description": "Od 1.6, tylko eksport pełny; brak = pusta lista."
+        },
+        "horseRideProfiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/horseRideProfile"
+          },
+          "description": "Od 1.6, tylko eksport pełny; brak = pusta lista."
+        },
+        "rideDefaults": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/rideDefaults"
+            }
+          ],
+          "description": "Od 1.6, tylko eksport pełny; null lub brak = serwer nie ma zapisanych ustawień."
+        }
+      },
+      "additionalProperties": true
+    },
+    "trashed": {
+      "type": "array",
+      "description": "Tylko odpowiedź przyrostowa: rekordy przeniesione do kosza od updatedSince (nie występują w data).",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "deletedAt",
+          "batchId"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Horse",
+              "VetVisit",
+              "FarrierVisit",
+              "PhysioVisit",
+              "SpecialistVisit",
+              "Competition",
+              "CompetitionStart",
+              "Purchase",
+              "Note",
+              "Training",
+              "Reminder",
+              "Contact",
+              "DictionaryItem",
+              "Attachment"
+            ]
+          },
+          "id": {
+            "$ref": "#/$defs/uuid"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "batchId": {
+            "$ref": "#/$defs/uuid"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "purged": {
+      "type": "array",
+      "description": "Tylko odpowiedź przyrostowa: rekordy trwale usunięte od updatedSince.",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "id",
+          "purgedAt"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "Horse",
+              "VetVisit",
+              "FarrierVisit",
+              "PhysioVisit",
+              "SpecialistVisit",
+              "Competition",
+              "CompetitionStart",
+              "Purchase",
+              "Note",
+              "Training",
+              "Reminder",
+              "Contact",
+              "DictionaryItem",
+              "Attachment"
+            ]
+          },
+          "id": {
+            "$ref": "#/$defs/uuid"
+          },
+          "purgedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "description": "Plik zadeklarowany jako 1.4, 1.5 lub 1.6 nie ma tekstowego pola rider w treningach i startach (zastępuje je riderContactId); pliki 1.0–1.3 z rider są nadal przyjmowane — import pomija to pole.",
+      "if": {
+        "properties": {
+          "schemaVersion": {
+            "enum": [
+              "1.4",
+              "1.5",
+              "1.6"
+            ]
+          }
+        },
+        "required": [
+          "schemaVersion"
+        ]
+      },
+      "then": {
+        "properties": {
+          "data": {
+            "properties": {
+              "trainings": {
+                "items": {
+                  "not": {
+                    "required": [
+                      "rider"
+                    ]
+                  }
+                }
+              },
+              "competitions": {
+                "items": {
+                  "properties": {
+                    "starts": {
+                      "items": {
+                        "not": {
+                          "required": [
+                            "rider"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "uuidOrNull": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "dateOrNull": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "money": {
+      "type": "number",
+      "minimum": 0,
+      "multipleOf": 0.01
+    },
+    "moneyOrNull": {
+      "type": [
+        "number",
+        "null"
+      ],
+      "minimum": 0,
+      "multipleOf": 0.01
+    },
+    "textOrNull": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "audit": {
+      "type": "object",
+      "required": [
+        "id",
+        "createdAt",
+        "updatedAt",
+        "version"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/uuid"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "foreignAmount": {
+      "type": "object",
+      "properties": {
+        "originalAmount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "originalCurrency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "dictionaryItem": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "type",
+        "value",
+        "sortOrder",
+        "isActive",
+        "isSystem"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "VetVisitType",
+            "FarrierService",
+            "PhysioBodyArea",
+            "PhysioTechnique",
+            "SpecialistType",
+            "CompetitionRank",
+            "CompetitionDiscipline",
+            "PurchaseCategory",
+            "Unit",
+            "TrainingType"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "sortOrder": {
+          "type": "integer"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "isSystem": {
+          "type": "boolean"
+        },
+        "systemKey": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "contact": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "name",
+        "types",
+        "isArchived"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "types": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "Vet",
+              "Farrier",
+              "Physio",
+              "Specialist",
+              "Shop",
+              "Organizer",
+              "Other",
+              "Trainer",
+              "Rider"
+            ]
+          }
+        },
+        "company": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "phone": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "email": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "address": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "specialization": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "notes": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "isArchived": {
+          "type": "boolean"
+        }
+      }
+    },
+    "horse": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "name",
+        "status",
+        "farrierIntervalWeeks",
+        "birthYearOnly"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "passportNumber": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 50,
+          "description": "Od 1.1 może być pusty (źrebak bez paszportu); wymagany, gdy isFoal = false."
+        },
+        "isFoal": {
+          "type": "boolean",
+          "default": false,
+          "description": "Od 1.1; brak w pliku 1.0 = false."
+        },
+        "stableName": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "ueln": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "microchipNumber": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "passportIssuer": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "passportIssueDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "breed": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "sex": {
+          "enum": [
+            "Mare",
+            "Stallion",
+            "Gelding",
+            null
+          ]
+        },
+        "color": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "birthDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "birthYearOnly": {
+          "type": "boolean"
+        },
+        "birthCountry": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "sire": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "dam": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "damSire": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "breeder": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "owner": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "markings": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "photoAttachmentId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "farrierIntervalWeeks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 26
+        },
+        "status": {
+          "enum": [
+            "Active",
+            "Sold",
+            "Deceased",
+            "Leased",
+            "Injured"
+          ]
+        },
+        "statusDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "statusNote": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "notes": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "purchasePrice": {
+          "$ref": "#/$defs/moneyOrNull",
+          "description": "Od 1.2; brak = null."
+        },
+        "purchaseDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "salePrice": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "saleDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "estimatedValue": {
+          "$ref": "#/$defs/moneyOrNull",
+          "description": "Wartość konia — ocena własna właściciela."
+        }
+      }
+    },
+    "vetMedication": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "name",
+        "sortOrder"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "dosage": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "startDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "endDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "administration": {
+          "enum": [
+            "AdministeredAtVisit",
+            "Prescribed",
+            null
+          ]
+        },
+        "notes": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "sortOrder": {
+          "type": "integer"
+        }
+      }
+    },
+    "vetVisit": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        },
+        {
+          "$ref": "#/$defs/foreignAmount"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId",
+        "visitDateTime",
+        "visitTypeId",
+        "medications"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "visitDateTime": {
+          "type": "string"
+        },
+        "contactId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "visitTypeId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "reason": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "diagnosis": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "recommendations": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "vaccineOrProduct": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "batchNumber": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "cost": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "nextVisitDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "nextVisitPurpose": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "medications": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/vetMedication"
+          }
+        }
+      }
+    },
+    "farrierVisit": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        },
+        {
+          "$ref": "#/$defs/foreignAmount"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId",
+        "visitDate",
+        "serviceId"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "visitDate": {
+          "$ref": "#/$defs/date"
+        },
+        "contactId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "serviceId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "hoofNotes": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "cost": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "nextVisitDate": {
+          "$ref": "#/$defs/dateOrNull"
+        }
+      }
+    },
+    "physioVisit": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        },
+        {
+          "$ref": "#/$defs/foreignAmount"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId",
+        "visitDate",
+        "bodyAreaIds",
+        "techniqueIds"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "visitDate": {
+          "$ref": "#/$defs/date"
+        },
+        "contactId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "reason": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "bodyAreaIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/uuid"
+          }
+        },
+        "techniqueIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/uuid"
+          }
+        },
+        "observations": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "recommendations": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "cost": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "nextVisitDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "nextVisitPurpose": {
+          "$ref": "#/$defs/textOrNull"
+        }
+      }
+    },
+    "specialistVisit": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        },
+        {
+          "$ref": "#/$defs/foreignAmount"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId",
+        "visitDate",
+        "specialistTypeId"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "visitDate": {
+          "$ref": "#/$defs/date"
+        },
+        "specialistTypeId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "contactId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "reason": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "description": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "recommendations": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "cost": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "nextVisitDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "nextVisitPurpose": {
+          "$ref": "#/$defs/textOrNull"
+        }
+      }
+    },
+    "competitionStart": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        },
+        {
+          "$ref": "#/$defs/foreignAmount"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "startDate": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "disciplineId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "className": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "riderContactId": {
+          "$ref": "#/$defs/uuidOrNull",
+          "description": "Kontakt jeźdźca (od 1.4); musi występować w kolekcji contacts pliku."
+        },
+        "placement": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "participantsCount": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1
+        },
+        "resultStatus": {
+          "enum": [
+            "Completed",
+            "Eliminated",
+            "Retired",
+            "DidNotStart",
+            null
+          ]
+        },
+        "penaltyPoints": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "scorePercent": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 100
+        },
+        "timeSeconds": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "description": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "subjectiveRating": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 5
+        },
+        "entryFee": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "otherCosts": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "prizeMoney": {
+          "$ref": "#/$defs/moneyOrNull"
+        }
+      }
+    },
+    "competition": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "name",
+        "dateFrom",
+        "starts"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "dateFrom": {
+          "$ref": "#/$defs/date"
+        },
+        "dateTo": {
+          "$ref": "#/$defs/dateOrNull"
+        },
+        "city": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "venue": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "organizerContactId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "rankId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "disciplineId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "notes": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "starts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/competitionStart"
+          }
+        }
+      }
+    },
+    "purchase": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        },
+        {
+          "$ref": "#/$defs/foreignAmount"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "purchaseDate",
+        "productName",
+        "categoryId",
+        "totalAmount",
+        "assignment",
+        "horseIds"
+      ],
+      "properties": {
+        "purchaseDate": {
+          "$ref": "#/$defs/date"
+        },
+        "productName": {
+          "type": "string"
+        },
+        "categoryId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "supplierContactId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "quantity": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unitId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "unitPrice": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "totalAmount": {
+          "$ref": "#/$defs/money",
+          "description": "Kwota zakupu bez kosztu dostawy."
+        },
+        "deliveryCost": {
+          "type": "number",
+          "minimum": 0,
+          "multipleOf": 0.01,
+          "default": 0,
+          "description": "Od 1.1; brak w pliku 1.0 = 0."
+        },
+        "assignment": {
+          "enum": [
+            "SingleHorse",
+            "MultipleHorses",
+            "General"
+          ]
+        },
+        "horseIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/uuid"
+          },
+          "description": "W eksporcie konia może zawierać identyfikatory koni spoza eksportu (pozostali współwłaściciele zakupu)."
+        },
+        "notes": {
+          "$ref": "#/$defs/textOrNull"
+        }
+      }
+    },
+    "note": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId",
+        "noteDate",
+        "title",
+        "isPinned"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "noteDate": {
+          "$ref": "#/$defs/date"
+        },
+        "title": {
+          "type": "string"
+        },
+        "content": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "isPinned": {
+          "type": "boolean"
+        }
+      }
+    },
+    "training": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId",
+        "trainingDate",
+        "trainingTypeId"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "trainingDate": {
+          "$ref": "#/$defs/date"
+        },
+        "trainingTypeId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "durationMinutes": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 600
+        },
+        "intensity": {
+          "enum": [
+            "Light",
+            "Medium",
+            "Hard",
+            null
+          ]
+        },
+        "obstacleHeightCm": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 10,
+          "maximum": 200,
+          "description": "Tylko dla rodzaju z systemKey training.jumping."
+        },
+        "riderContactId": {
+          "$ref": "#/$defs/uuidOrNull",
+          "description": "Kontakt jeźdźca (od 1.4); musi występować w kolekcji contacts pliku."
+        },
+        "rating": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 5
+        },
+        "description": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "trainerContactId": {
+          "$ref": "#/$defs/uuidOrNull",
+          "description": "Od 1.3; kontakt z data.contacts. Brak = null."
+        },
+        "cost": {
+          "$ref": "#/$defs/moneyOrNull"
+        },
+        "originalAmount": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "originalCurrency": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{3}$"
+        }
+      }
+    },
+    "reminder": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "horseId",
+        "kind",
+        "dueDate",
+        "title",
+        "status"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "kind": {
+          "enum": [
+            "Vet",
+            "Vaccination",
+            "Deworming",
+            "Farrier",
+            "Physio",
+            "Specialist",
+            "Competition",
+            "Other"
+          ]
+        },
+        "dueDate": {
+          "$ref": "#/$defs/date"
+        },
+        "title": {
+          "type": "string"
+        },
+        "sourceType": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "sourceId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "specialistTypeId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "status": {
+          "enum": [
+            "Open",
+            "Completed",
+            "Dismissed"
+          ]
+        },
+        "completedByType": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "completedById": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "completedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "notes": {
+          "$ref": "#/$defs/textOrNull"
+        }
+      }
+    },
+    "attachment": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "ownerType",
+        "ownerId",
+        "fileName",
+        "contentType",
+        "sizeBytes",
+        "sha256"
+      ],
+      "properties": {
+        "ownerType": {
+          "enum": [
+            "Horse",
+            "VetVisit",
+            "FarrierVisit",
+            "PhysioVisit",
+            "SpecialistVisit",
+            "Competition",
+            "CompetitionStart",
+            "Purchase",
+            "Note",
+            "Contact",
+            "Training"
+          ]
+        },
+        "ownerId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "horseId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "contentType": {
+          "type": "string"
+        },
+        "sizeBytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "description": {
+          "$ref": "#/$defs/textOrNull"
+        },
+        "capturedAt": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Od 1.6: chwila wykonania pliku; null, gdy brak."
+        },
+        "latitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -90,
+          "maximum": 90,
+          "description": "Od 1.6: szerokość WGS84; null, gdy brak."
+        },
+        "longitude": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": -180,
+          "maximum": 180,
+          "description": "Od 1.6: długość WGS84; null, gdy brak."
+        }
+      }
+    },
+    "trainingRecording": {
+      "description": "Od 1.6: nagranie jazdy treningu (jak RecordingDto API v3) z odcinkami chodów i punktami trasy.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/audit"
+        }
+      ],
+      "type": "object",
+      "required": [
+        "trainingId",
+        "startedAt",
+        "endedAt",
+        "timeZone",
+        "totalSeconds",
+        "movingSeconds",
+        "stoppedSeconds",
+        "pausedSeconds",
+        "distanceMeters",
+        "walkSeconds",
+        "walkMeters",
+        "trotSeconds",
+        "trotMeters",
+        "canterSeconds",
+        "canterMeters",
+        "canterCount",
+        "longestCanterSeconds",
+        "longestCanterMeters",
+        "loadPoints",
+        "gaitThresholdsUsed",
+        "loadParamsUsed",
+        "accelerometerUsed",
+        "weatherStatus",
+        "trimmedStartSeconds",
+        "trimmedEndSeconds",
+        "algorithmVersion",
+        "source",
+        "trackFormat",
+        "pointCount",
+        "segments",
+        "trackData"
+      ],
+      "properties": {
+        "trainingId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timeZone": {
+          "type": "string",
+          "minLength": 1
+        },
+        "totalSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "movingSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "stoppedSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pausedSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "distanceMeters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgMovingSpeedKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "maxSpeedKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "elevationGainM": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "elevationLossM": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "minAltitudeM": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "maxAltitudeM": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "walkSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "walkMeters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trotSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trotMeters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canterSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "canterMeters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "walkAvgSpeedKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "trotAvgSpeedKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "canterAvgSpeedKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "walkAvgCadence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "trotAvgCadence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "canterAvgCadence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "canterCount": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "longestCanterSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "longestCanterMeters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "loadPoints": {
+          "type": "number",
+          "minimum": 0
+        },
+        "gaitThresholdsUsed": {
+          "type": "object"
+        },
+        "loadParamsUsed": {
+          "type": "object"
+        },
+        "accelerometerUsed": {
+          "type": "boolean"
+        },
+        "weatherStatus": {
+          "enum": [
+            "None",
+            "Pending",
+            "Fetched",
+            "Disabled",
+            "Failed"
+          ]
+        },
+        "weatherTempC": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "weatherFeelsLikeC": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "weatherPrecipMm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "weatherWindKmh": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "weatherHumidityPct": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "weatherCode": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "trimmedStartSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "trimmedEndSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "algorithmVersion": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source": {
+          "type": "object"
+        },
+        "trackFormat": {
+          "const": "zk-track/1"
+        },
+        "pointCount": {
+          "type": "integer",
+          "minimum": 2
+        },
+        "segments": {
+          "type": "array",
+          "maxItems": 20000,
+          "items": {
+            "$ref": "#/$defs/gaitSegment"
+          }
+        },
+        "trackData": {
+          "type": "string",
+          "contentEncoding": "base64",
+          "maxLength": 6990508,
+          "description": "Skompresowane punkty trasy zk-track/1 w base64; po zdekodowaniu najwyżej 5 242 880 B."
+        }
+      }
+    },
+    "gaitSegment": {
+      "type": "object",
+      "required": [
+        "seq",
+        "gait",
+        "startOffsetSeconds",
+        "endOffsetSeconds",
+        "distanceMeters",
+        "avgSpeedKmh",
+        "maxSpeedKmh"
+      ],
+      "properties": {
+        "seq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "gait": {
+          "enum": [
+            "Stop",
+            "Walk",
+            "Trot",
+            "Canter"
+          ]
+        },
+        "startOffsetSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "endOffsetSeconds": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "distanceMeters": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "avgSpeedKmh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxSpeedKmh": {
+          "type": "number",
+          "minimum": 0
+        },
+        "avgCadence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "elevationGainM": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "horseRideProfile": {
+      "description": "Od 1.6: profil jazdy konia; null = wartość dziedziczona z ustawień domyślnych jazd.",
+      "type": "object",
+      "required": [
+        "horseId",
+        "gaitStopMaxKmh",
+        "gaitWalkMaxKmh",
+        "gaitTrotMaxKmh",
+        "loadWeightWalk",
+        "loadWeightTrot",
+        "loadWeightCanter",
+        "loadClimbPer10m",
+        "loadWarnPercent",
+        "heavyRidePoints"
+      ],
+      "properties": {
+        "horseId": {
+          "$ref": "#/$defs/uuid"
+        },
+        "gaitStopMaxKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.5,
+          "maximum": 40
+        },
+        "gaitWalkMaxKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.5,
+          "maximum": 40
+        },
+        "gaitTrotMaxKmh": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.5,
+          "maximum": 40
+        },
+        "loadWeightWalk": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "loadWeightTrot": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "loadWeightCanter": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "loadClimbPer10m": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0,
+          "maximum": 10
+        },
+        "loadWarnPercent": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 5,
+          "maximum": 200
+        },
+        "heavyRidePoints": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 10000
+        }
+      }
+    },
+    "rideDefaults": {
+      "description": "Od 1.6: ustawienia domyślne jazd stajni (jak RideDefaultsDto API v3).",
+      "type": "object",
+      "required": [
+        "gaitStopMaxKmh",
+        "gaitWalkMaxKmh",
+        "gaitTrotMaxKmh",
+        "loadWeightWalk",
+        "loadWeightTrot",
+        "loadWeightCanter",
+        "loadClimbPer10m",
+        "loadWarnPercent",
+        "heavyRidePoints",
+        "version"
+      ],
+      "properties": {
+        "gaitStopMaxKmh": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 40
+        },
+        "gaitWalkMaxKmh": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 40
+        },
+        "gaitTrotMaxKmh": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 40
+        },
+        "loadWeightWalk": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "loadWeightTrot": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "loadWeightCanter": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "loadClimbPer10m": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "loadWarnPercent": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 200
+        },
+        "heavyRidePoints": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "recordedRideTrainingTypeId": {
+          "$ref": "#/$defs/uuidOrNull"
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

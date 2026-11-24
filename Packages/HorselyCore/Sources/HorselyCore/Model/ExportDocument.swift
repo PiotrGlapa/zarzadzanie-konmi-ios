@@ -147,6 +147,16 @@ public struct ExportDocument: Sendable {
         add(content.trainings)
         add(content.reminders)
         add(content.attachments)
+        for env in content.trainingRecordings {
+            records.append(ExportedRecord(record: env.recording, dateKey: env.trainingDate.flatMap { LocalDate($0) }))
+        }
+        for env in content.horseRideProfiles {
+            let ts = LocalDateTime(year: 1, month: 1, day: 1, hour: 0, minute: 0) ?? LocalDateTime()
+            records.append(ExportedRecord(record: LocalHorseRideProfile(id: env.horseId, createdAt: ts, updatedAt: ts, version: 0, horseId: env.horseId, profile: env.profile), dateKey: nil))
+        }
+        if let env = content.rideDefaults {
+            records.append(ExportedRecord(record: LocalRideDefaults(id: "rideDefaults", createdAt: ts, updatedAt: ts, version: 0, profile: env.defaults), dateKey: nil))
+        }
 
         var removals: [ExportRemoval] = []
         var unknown: [String] = []
@@ -177,6 +187,13 @@ public struct ExportDocument: Sendable {
         }
         let starts = Dictionary(grouping: list(.competitionStart, as: LocalCompetitionStart.self), by: \.competitionId)
         let competitions = list(.competition, as: LocalCompetition.self).map { CompetitionEnvelope(competition: $0, starts: starts[$0.id] ?? []) }
+        let trainingRecordings = list(.trainingRecording, as: LocalTrainingRecording.self).map { envelope in
+            TrainingRecordingEnvelope(recording: envelope, trainingDate: envelope.trainingDate.description)
+        }
+        let horseRideProfiles = list(.horseRideProfile, as: LocalHorseRideProfile.self).map { envelope in
+            HorseRideProfileEnvelope(horseId: envelope.horseId, profile: envelope.profile)
+        }
+        let rideDefaults = list(.rideDefaults, as: LocalRideDefaults.self).first.map { RideDefaultsEnvelope(defaults: $0.profile) }
         let content = WriteData(
             dictionaries: list(.dictionary, as: LocalDictionaryItem.self),
             contacts: list(.contact, as: LocalContact.self),
@@ -191,11 +208,11 @@ public struct ExportDocument: Sendable {
             trainings: list(.training, as: LocalTraining.self),
             reminders: list(.reminder, as: LocalReminder.self),
             attachments: list(.attachment, as: LocalAttachment.self),
-            trainingRecordings: nil,
-            horseRideProfiles: nil,
-            rideDefaults: nil
+            trainingRecordings: trainingRecordings.isEmpty ? nil : trainingRecordings,
+            horseRideProfiles: horseRideProfiles.isEmpty ? nil : horseRideProfiles,
+            rideDefaults: rideDefaults
         )
-        let file = WriteFile(schemaVersion: header.schemaVersion, exportedAt: header.exportedAt, appVersion: header.appVersion, scope: header.scope, data: content)
+        let file = WriteFile(schemaVersion: header.schemaVersion, dataSchemaVersion: BackupManifest.dataSchemaVersion, exportedAt: header.exportedAt, appVersion: header.appVersion, scope: header.scope, data: content)
         return try RecordCodec.makeEncoder(pretty: pretty).encode(file)
     }
 }
@@ -279,6 +296,7 @@ private struct RemovalItem: Decodable {
 
 private struct ReadFile: Decodable {
     let schemaVersion: String?
+    let dataSchemaVersion: String?
     let exportedAt: String?
     let appVersion: String?
     let scope: ExportScope?
@@ -286,11 +304,12 @@ private struct ReadFile: Decodable {
     let trashed: [RemovalItem]
     let purged: [RemovalItem]
 
-    private enum CodingKeys: String, CodingKey { case schemaVersion, exportedAt, appVersion, scope, data, trashed, purged }
+    private enum CodingKeys: String, CodingKey { case schemaVersion, dataSchemaVersion, exportedAt, appVersion, scope, data, trashed, purged }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         schemaVersion = try c.decodeIfPresent(String.self, forKey: .schemaVersion)
+        dataSchemaVersion = try c.decodeIfPresent(String.self, forKey: .dataSchemaVersion)
         exportedAt = try c.decodeIfPresent(String.self, forKey: .exportedAt)
         appVersion = try c.decodeIfPresent(String.self, forKey: .appVersion)
         scope = try c.decodeIfPresent(ExportScope.self, forKey: .scope)
@@ -324,6 +343,7 @@ private struct WriteData: Encodable {
 
 private struct WriteFile: Encodable {
     let schemaVersion: String
+    let dataSchemaVersion: String
     let exportedAt: String?
     let appVersion: String?
     let scope: ExportScope
@@ -332,18 +352,44 @@ private struct WriteFile: Encodable {
 
 // MARK: - Obiekty-wrappery dla nowych kolekcji eksportu 1.6
 
-/// Obiekt-wraper dla nagrania w eksporcie — zawiera `RecordingDto` (bez `trackData`) i `trainingDate`.
+/// Obiekt-wraper dla nagrania w eksporcie — zawiera `LocalTrainingRecording` (bez `trackData`) i `trainingDate`.
 private struct TrainingRecordingEnvelope: Codable {
-    let recording: RecordingDto
+    let recording: LocalTrainingRecording
     let trainingDate: String
 
     private enum CodingKeys: String, CodingKey {
         case recording, trainingDate
     }
 
-    init(recording: RecordingDto, trainingDate: String) {
+    init(recording: LocalTrainingRecording, trainingDate: String) {
         self.recording = recording
         self.trainingDate = trainingDate
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let dto = try c.decode(RecordingDto.self, forKey: .recording)
+        let ts = LocalDateTime(description: dto.createdAt) ?? LocalDateTime()
+        self.recording = LocalTrainingRecording(
+            id: dto.id, createdAt: ts, updatedAt: LocalDateTime(description: dto.updatedAt) ?? LocalDateTime(),
+            version: dto.version, horseId: dto.horseId, trainingDate: LocalDate(dto.startedAt) ?? LocalDate(),
+            startedAt: dto.startedAt, endedAt: dto.endedAt, timeZone: dto.timeZone, totalSeconds: dto.totalSeconds,
+            movingSeconds: dto.movingSeconds, stoppedSeconds: dto.stoppedSeconds, pausedSeconds: dto.pausedSeconds,
+            distanceMeters: dto.distanceMeters, avgMovingSpeedKmh: dto.avgMovingSpeedKmh, maxSpeedKmh: dto.maxSpeedKmh,
+            elevationGainM: dto.elevationGainM, elevationLossM: dto.elevationLossM, minAltitudeM: dto.minAltitudeM,
+            maxAltitudeM: dto.maxAltitudeM, walkSeconds: dto.walkSeconds, walkMeters: dto.walkMeters, trotSeconds: dto.trotSeconds,
+            trotMeters: dto.trotMeters, canterSeconds: dto.canterSeconds, canterMeters: dto.canterMeters,
+            walkAvgSpeedKmh: dto.walkAvgSpeedKmh, trotAvgSpeedKmh: dto.trotAvgSpeedKmh, canterAvgSpeedKmh: dto.canterAvgSpeedKmh,
+            walkAvgCadence: dto.walkAvgCadence, trotAvgCadence: dto.trotAvgCadence, canterAvgCadence: dto.canterAvgCadence,
+            canterCount: dto.canterCount, longestCanterSeconds: dto.longestCanterSeconds, longestCanterMeters: dto.longestCanterMeters,
+            loadPoints: dto.loadPoints, gaitThresholdsUsed: dto.gaitThresholdsUsed, loadParamsUsed: dto.loadParamsUsed,
+            accelerometerUsed: dto.accelerometerUsed, weatherStatus: dto.weatherStatus, weatherTempC: dto.weatherTempC,
+            weatherFeelsLikeC: dto.weatherFeelsLikeC, weatherPrecipMm: dto.weatherPrecipMm, weatherWindKmh: dto.weatherWindKmh,
+            weatherHumidityPct: dto.weatherHumidityPct, weatherCode: dto.weatherCode, trimmedStartSeconds: dto.trimmedStartSeconds,
+            trimmedEndSeconds: dto.trimmedEndSeconds, algorithmVersion: dto.algorithmVersion, source: dto.source,
+            trackFormat: dto.trackFormat, pointCount: dto.pointCount, segments: dto.segments
+        )
+        self.trainingDate = try c.decode(String.self, forKey: .trainingDate)
     }
 }
 

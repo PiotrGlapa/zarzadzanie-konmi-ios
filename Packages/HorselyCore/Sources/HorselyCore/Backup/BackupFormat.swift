@@ -30,8 +30,9 @@ public struct BackupCounts: Codable, Equatable, Sendable {
 public struct BackupManifest: Codable, Equatable, Sendable {
     public static let format = "zk-kopia"
     /// Najwyższy `formatVersion`, który ta aplikacja odtworzy (zgodność wstecz, FR-KOP-04).
-    public static let formatVersion = 2
-    public static let exportSchemaVersion = "1.5"
+    public static let formatVersion = 3
+    public static let exportSchemaVersion = "1.6"
+    public static let dataSchemaVersion = "3.0"
     public static let manifestName = "manifest.json"
     public static let exportName = "export.json"
     public static let phoneName = "phone.json"
@@ -43,6 +44,7 @@ public struct BackupManifest: Codable, Equatable, Sendable {
     public var createdAt: String
     public var appVersion: String
     public var exportSchemaVersion: String
+    public var dataSchemaVersion: String
     public var counts: BackupCounts
     public var entries: [String: String]
 
@@ -52,6 +54,7 @@ public struct BackupManifest: Codable, Equatable, Sendable {
         self.createdAt = createdAt
         self.appVersion = appVersion
         exportSchemaVersion = Self.exportSchemaVersion
+        dataSchemaVersion = Self.dataSchemaVersion
         self.counts = counts
         self.entries = entries
     }
@@ -63,6 +66,7 @@ public struct BackupManifest: Codable, Equatable, Sendable {
         createdAt = try c.decode(String.self, forKey: .createdAt)
         appVersion = try c.decode(String.self, forKey: .appVersion)
         exportSchemaVersion = try c.decodeIfPresent(String.self, forKey: .exportSchemaVersion) ?? Self.exportSchemaVersion
+        dataSchemaVersion = try c.decodeIfPresent(String.self, forKey: .dataSchemaVersion) ?? Self.dataSchemaVersion
         counts = try c.decodeIfPresent(BackupCounts.self, forKey: .counts) ?? BackupCounts()
         entries = try c.decodeIfPresent([String: String].self, forKey: .entries) ?? [:]
     }
