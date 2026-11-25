@@ -93,14 +93,16 @@ struct MigrationV3Tests {
         let database = try AppDatabase.inMemory()
         let (notNull, foreignKeys, extraIndexes) = try database.writer.read { db in
             let notNull = try db.columns(in: "ride_session").filter(\.isNotNull).map(\.name)
-            let foreignKeys = try ["ride_point", "ride_media"].map { table in
-                try Row.fetchAll(db, sql: "SELECT \"table\", \"on_delete\" FROM pragma_foreign_key_list(?)", arguments: [table])
-                    .map { row -> String in
-                        let parent: String = row["table"]
-                        let onDelete: String = row["on_delete"]
-                        return "\(table)->\(parent):\(onDelete)"
-                    }
-            }.flatMap { $0 }
+            var foreignKeys: [String] = []
+            let children: [String] = ["ride_point", "ride_media"]
+            for child in children {
+                let rows = try Row.fetchAll(db, sql: "SELECT \"table\", \"on_delete\" FROM pragma_foreign_key_list(?)", arguments: [child])
+                for row in rows {
+                    let parent: String = row["table"]
+                    let onDelete: String = row["on_delete"]
+                    foreignKeys.append(child + "->" + parent + ":" + onDelete)
+                }
+            }
             let extraIndexes = try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'ride_point' AND sql IS NOT NULL")
             return (notNull, foreignKeys, extraIndexes)
         }
