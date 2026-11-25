@@ -312,7 +312,7 @@ struct BackupRidesTests {
         // Zamknij prepared i odczyaj plik z powrotem jako ZIP
         source.service.discard(prepared)
         let newerZip = source.root.appendingPathComponent("nowsza.zkkopia")
-        try FileManager.default.removeItem(at: newerZip)
+        _ = try? FileManager.default.removeItem(at: newerZip)
         try FileManager.default.copyItem(at: file, to: newerZip)
 
         let target = try setup()
