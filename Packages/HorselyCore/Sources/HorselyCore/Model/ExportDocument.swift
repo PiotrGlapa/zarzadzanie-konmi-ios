@@ -444,7 +444,7 @@ private struct TrainingRecordingEnvelope: Codable {
         // Tutaj używamy placeholdera dla horseId; nadpiszemy go w parse().
         let placeholderHorseId = "placeholder"
         let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
-        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)
+        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)!
         let ts = LocalDateTime(dto.createdAt) ?? baseTs
         let trainingDate = LocalDate(trainingDateStr) ?? baseDate
         self.recording = LocalTrainingRecording(
