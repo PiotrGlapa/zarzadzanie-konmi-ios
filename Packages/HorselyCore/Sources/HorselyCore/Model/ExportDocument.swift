@@ -152,9 +152,11 @@ public struct ExportDocument: Sendable {
         var trainingMap: [String: LocalTraining] = [:]
         for t in content.trainings { trainingMap[t.id] = t }
 
-        // Dekoduj nagrania ręcznie z surowego JSON, uzupełniając horseId z treningu.
+        // Domyślne wartości audit dla rekordów bez daty.
         let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
         let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)
+
+        // Dekoduj nagrania ręcznie z surowego JSON, uzupełniając horseId z treningu.
         for rawEnv in content.trainingRecordings {
             guard let training = trainingMap[rawEnv.trainingId] else { continue }
             let recording = LocalTrainingRecording(
