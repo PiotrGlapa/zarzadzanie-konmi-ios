@@ -158,6 +158,13 @@ struct BackupRidesTests {
         let read = try #require(try await target.store.get(.trainingRecording, id: recording.id)?.record(as: LocalTrainingRecording.self))
         #expect(read.recording.segments.count == 3)
         #expect(read.recording.segments == recording.segments)
+        var stripped = recording
+        stripped.trackData = nil
+        #expect(read.recording.toJSON().textKeepingScale() == stripped.toJSON().textKeepingScale(), "nagranie wraca z tą samą skalą liczb (24.60, 7.00, 98.0)")
+        let exportText = String(decoding: try #require(try entries(file)[BackupManifest.exportName]), as: UTF8.self)
+        for fragment in [#""maxSpeedKmh":24.60"#, #""trotAvgSpeedKmh":12.00"#, #""walkAvgCadence":98.0"#, #""loadPoints":100.0"#, #""weatherPrecipMm":0.0"#, #""loadWeightTrot":2.5"#] {
+            #expect(exportText.contains(fragment), "export.json zawiera \(fragment)")
+        }
         #expect(read.horseId == horseId)
         #expect(read.trainingDate == trainingDate)
         #expect(read.recording.trackData == nil, "punkty leżą w magazynie tras, nie w rekordzie")
@@ -206,7 +213,7 @@ struct BackupRidesTests {
         let withMetadata = LocalAttachment(
             id: "9c1d2e3f-0000-4000-8000-000000000001", createdAt: stamp, updatedAt: stamp, version: 1, ownerType: .horse, ownerId: horseId, horseId: horseId,
             fileName: "film.mp4", contentType: "video/mp4", sizeBytes: Int64(bytes.count), sha256: filmInfo.sha256, description: "Film",
-            capturedAt: InstantText.parse("2026-09-01T08:15:00Z"), latitude: Decimal(string: "52.2297000"), longitude: Decimal(string: "21.0122000")
+            capturedAt: InstantText.parse("2026-09-01T08:15:00Z"), latitude: DecimalText.parse("52.2297000"), longitude: DecimalText.parse("21.0122000")
         )
         let plain = LocalAttachment(
             id: "9c1d2e3f-0000-4000-8000-000000000002", createdAt: stamp, updatedAt: stamp, version: 1, ownerType: .horse, ownerId: horseId, horseId: horseId,
@@ -227,8 +234,10 @@ struct BackupRidesTests {
         let attachments = try #require(try JSONValue.parseKeepingScale(export)["data"]?["attachments"]?.arrayValue)
         let exported = try #require(attachments.first { $0["id"] == .string(withMetadata.id) })
         #expect(exported["capturedAt"] == .string("2026-09-01T08:15:00Z"))
-        #expect(exported["latitude"] == .number(Decimal(string: "52.2297")!), "szerokość jako liczba")
-        #expect(exported["longitude"] == .number(Decimal(string: "21.0122")!), "długość jako liczba")
+        #expect(exported["latitude"]?.textKeepingScale() == "52.2297000", "szerokość jako liczba ze skalą zapisu")
+        #expect(exported["longitude"]?.textKeepingScale() == "21.0122000", "długość jako liczba ze skalą zapisu")
+        let exportText = String(decoding: export, as: UTF8.self)
+        #expect(exportText.contains(#""latitude":52.2297000"#) && exportText.contains(#""longitude":21.0122000"#))
         let bare = try #require(attachments.first { $0["id"] == .string(plain.id) })
         #expect(bare["capturedAt"] == nil && bare["latitude"] == nil && bare["longitude"] == nil, "bez metadanych pól nie ma — schemat dopuszcza brak")
 
@@ -236,8 +245,8 @@ struct BackupRidesTests {
         let summary = try await restore(target, file)
         let back = try #require(try await target.store.get(.attachment, id: withMetadata.id)?.record(as: LocalAttachment.self))
         #expect(back.capturedAt == withMetadata.capturedAt)
-        #expect(back.latitude == withMetadata.latitude)
-        #expect(back.longitude == withMetadata.longitude)
+        #expect(back.latitude.map(DecimalText.text) == "52.2297000")
+        #expect(back.longitude.map(DecimalText.text) == "21.0122000")
         #expect(try await target.store.get(.attachment, id: plain.id)?.record(as: LocalAttachment.self) == plain)
         #expect(summary.attachmentsWithFiles == [withMetadata.id, plain.id])
     }
@@ -355,6 +364,7 @@ struct BackupRidesTests {
             let want = try Recording(json: try #require(item["recording"]))
             let stored = try #require(try await target.store.get(.trainingRecording, id: want.id)?.record(as: LocalTrainingRecording.self))
             #expect(stored.recording == want, "nagranie \(want.id)")
+            #expect(stored.recording.toJSON().textKeepingScale() == want.toJSON().textKeepingScale(), "nagranie \(want.id) ze skalą liczb")
             #expect(stored.recording.segments == want.segments)
             #expect(stored.horseId == item["horseId"]?.stringValue)
             #expect(stored.trainingDate.description == item["trainingDate"]?.stringValue)
@@ -371,17 +381,17 @@ struct BackupRidesTests {
                 Issue.record("profil bez konia w expected-stats.json")
                 continue
             }
-            let want = try JSONDecoder().decode(RideProfile.self, from: JSONValue.object(fields).data())
+            let want = try RideProfile(json: .object(fields))
             let stored = try #require(try await target.store.get(.horseRideProfile, id: owner)?.record(as: LocalHorseRideProfile.self))
-            #expect(stored.profile.sameValues(want))
+            #expect(stored.profile.toJSON().textKeepingScale() == want.toJSON().textKeepingScale())
             let horse = try #require(try await target.store.get(.horse, id: owner)?.record(as: LocalHorse.self))
             #expect(stored.version == horse.version)
         }
 
         // Ustawienia jazd.
-        let wantDefaults = try JSONDecoder().decode(RideDefaults.self, from: try #require(expected["rideDefaults"]).data())
+        let wantDefaults = try RideDefaults(json: try #require(expected["rideDefaults"]))
         let storedDefaults = try #require(try await target.store.get(.rideDefaults, id: LocalRideDefaults.ID)?.record(as: LocalRideDefaults.self))
-        #expect(storedDefaults.defaults == wantDefaults)
+        #expect(storedDefaults.defaults.toJSON().textKeepingScale() == wantDefaults.toJSON().textKeepingScale())
 
         // Załącznik z czasem i miejscem wykonania oraz plikiem.
         for item in try #require(expected["attachments"]?.arrayValue) {
@@ -390,6 +400,8 @@ struct BackupRidesTests {
             let capturedText = item["capturedAt"]?.stringValue
             #expect(stored.sha256 == item["sha256"]?.stringValue)
             #expect(stored.capturedAt == capturedText.flatMap { InstantText.parse($0) })
+            // `expected-stats.json` serializuje rekord Androida wprost (`52.2297000`), a `export.json` tego samego pliku niesie
+            // `52.2297` — iOS przyjmuje skalę z `export.json` (porównanie ze skalą z plikiem Androida — niżej); tu wartość.
             #expect(stored.latitude == item["latitude"]?.decimalValue)
             #expect(stored.longitude == item["longitude"]?.decimalValue)
             #expect(summary.attachmentsWithFiles.contains(id))
@@ -408,9 +420,13 @@ struct BackupRidesTests {
             let mine = Self.byId(ios["data"]?[collection]?.arrayValue ?? [])
             let theirs = Self.byId(android["data"]?[collection]?.arrayValue ?? [])
             #expect(!theirs.isEmpty, "\(collection) w pliku Androida")
-            #expect(mine == theirs, "\(collection): iOS zapisuje to samo co Android")
+            #expect(mine.mapValues { $0.textKeepingScale() } == theirs.mapValues { $0.textKeepingScale() }, "\(collection): iOS zapisuje to samo co Android, ze skalą liczb")
         }
-        #expect(ios["data"]?["rideDefaults"] == android["data"]?["rideDefaults"])
+        #expect(ios["data"]?["rideDefaults"]?.textKeepingScale() == android["data"]?["rideDefaults"]?.textKeepingScale())
+        let iosText = String(decoding: iosExport, as: UTF8.self)
+        for fragment in [#""maxSpeedKmh":18.00"#, #""avgSpeedKmh":11.00"#, #""loadPoints":21.0"#, #""weatherPrecipMm":0.0"#, #""gaitWalkMaxKmh":6.5"#, #""latitude":52.2297"#] {
+            #expect(iosText.contains(fragment), "kopia iOS zawiera \(fragment) jak plik Androida")
+        }
     }
 
     /// Elementy kolekcji po `id` (profil konia — po `horseId`).

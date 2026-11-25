@@ -152,7 +152,8 @@ public final class BackupService: Sendable {
 
         var trash: [JSONValue] = []
         for row in try access.trashed() {
-            guard case var .object(fields) = try JSONValue.parse(row.body), let deletedAt = row.deletedAt else { continue }
+            // Treść czytana i zapisywana ze skalą liczb — nagranie z kosza zachowuje `18.00` jak w Androidzie.
+            guard case var .object(fields) = try JSONValue.parseKeepingScale(row.body), let deletedAt = row.deletedAt else { continue }
             fields["recordType"] = .string(row.type.rawValue)
             fields["deletedAt"] = .string(deletedAt.description)
             fields["deletionBatchId"] = row.deletionBatchId.map(JSONValue.string) ?? .null
@@ -162,9 +163,9 @@ public final class BackupService: Sendable {
             }
             trash.append(.object(fields))
         }
-        let phone = try JSONValue.object([
+        let phone = Data(JSONValue.object([
             "trash": .array(trash), "dataSettings": .object(["attachmentsCacheMb": .number(Decimal(attachmentsCacheMb))]),
-        ]).data()
+        ]).textKeepingScale().utf8)
         let attachments = try access.query(.attachment, includeDeleted: true).compactMap { try $0.record(as: LocalAttachment.self) }
         var originals: [String: LocalFileInfo] = [:]
         for attachment in attachments {
@@ -354,7 +355,7 @@ public final class BackupService: Sendable {
     }
 
     static func readTrash(_ url: URL) throws -> [TrashItem] {
-        guard let root = try? JSONValue.parse(Data(contentsOf: url)), case .object = root else { throw BackupError.corrupted("phone.json") }
+        guard let root = try? JSONValue.parseKeepingScale(Data(contentsOf: url)), case .object = root else { throw BackupError.corrupted("phone.json") }
         guard let items = root["trash"]?.arrayValue else { return [] }
         return try items.map { item in
             guard case var .object(body) = item, let rawType = item["recordType"]?.stringValue, let type = RecordType(rawValue: rawType),
@@ -365,7 +366,7 @@ public final class BackupService: Sendable {
             let trackText = body.removeValue(forKey: trashTrackKey)?.stringValue ?? ""
             let record: any LocalRecord
             do {
-                record = try RecordCodec.decode(type, from: try JSONValue.object(body).data())
+                record = try RecordCodec.decode(type, from: JSONValue.object(body).textKeepingScale())
             } catch {
                 throw BackupError.corrupted("phone.json")
             }

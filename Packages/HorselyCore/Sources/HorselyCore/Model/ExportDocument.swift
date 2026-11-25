@@ -127,10 +127,14 @@ public struct ExportDocument: Sendable {
     /// Dokument z pliku eksportu. Schemat 1.6 niesie też jazdy: nagranie bez konia i daty (biorą się z treningu o `trainingId`
     /// z tego samego pliku), profil bez wersji (wersja i czasy konia) i `rideDefaults` (obiekt albo `null` = brak). Nagranie bez
     /// treningu i profil konia spoza pliku są pomijane (jak `ExportCursor.kt`).
+    /// Plik 1.6 jest dodatkowo czytany raz przez `JSONValue.parseKeepingScale`: nagrania, profile, ustawienia jazd i załączniki
+    /// (współrzędne) zachowują skalę liczb jak `BigDecimal` w Androidzie (`18.00`, `52.2297000`).
     /// - Parameter lenientTracks: `true` (pobieranie z programu) — trasa, której nie da się odczytać (zły base64), nie psuje pobrania:
     ///   nagranie wchodzi bez trasy. `false` (odtwarzanie kopii) — uszkodzona trasa to uszkodzony plik (`DecodingError`).
     public static func parse(_ data: Data, lenientTracks: Bool = false) throws -> ExportDocument {
         let file = try JSONDecoder().decode(ReadFile.self, from: data)
+        var scaledData: JSONValue?
+        if RideExport.supportsRides(file.schemaVersion ?? "1.0") { scaledData = try JSONValue.parseKeepingScale(data)["data"] }
         var records: [ExportedRecord] = []
         func add<R: LocalRecord>(_ items: [R]) {
             for item in items { records.append(ExportedRecord(record: item, dateKey: item.dateKey)) }
@@ -154,8 +158,13 @@ public struct ExportDocument: Sendable {
         add(content.notes)
         add(content.trainings)
         add(content.reminders)
-        add(content.attachments)
-        records += try RideExport.read(content, lenientTracks: lenientTracks)
+        if let scaledData {
+            // Załączniki 1.6 ze skalą współrzędnych (ten sam rekord, czytany z tekstu z zachowaną skalą).
+            add(try (scaledData["attachments"]?.arrayValue ?? []).map { try LocalAttachment(scaledJSON: $0) })
+            records += try RideExport.read(scaledData, trainings: content.trainings, horses: content.horses, lenientTracks: lenientTracks)
+        } else {
+            add(content.attachments)
+        }
 
         var removals: [ExportRemoval] = []
         var unknown: [String] = []
@@ -181,14 +190,16 @@ public struct ExportDocument: Sendable {
 
     /// Tekst w formacie eksportu programu (zawody ze startami zagnieżdżonymi) — wejście kopii zapasowej. Dokument schematu 1.6 niesie
     /// też jazdy: `trainingRecordings[]` (z `trackData` w base64 z `ExportedRecord.track`), `horseRideProfiles[]` i `rideDefaults`
-    /// (obiekt albo `null`); schemat 1.5 ich nie zna (`additionalProperties: false`), więc ich nie dostaje.
-    public func toJSON(pretty: Bool = false) throws -> Data {
+    /// (obiekt albo `null`); schemat 1.5 ich nie zna (`additionalProperties: false`), więc ich nie dostaje. Liczby jazd i współrzędne
+    /// załączników zachowują skalę: plik jest składany jako `JSONValue` i zapisywany `textKeepingScale()` (klucze w porządku
+    /// alfabetycznym, jak dotąd `sortedKeys`).
+    public func toJSON() throws -> Data {
         func list<R: LocalRecord>(_ type: RecordType, as _: R.Type) -> [R] {
             records(of: type).compactMap { $0 as? R }
         }
         let starts = Dictionary(grouping: list(.competitionStart, as: LocalCompetitionStart.self), by: \.competitionId)
         let competitions = list(.competition, as: LocalCompetition.self).map { CompetitionEnvelope(competition: $0, starts: starts[$0.id] ?? []) }
-        var content = WriteData(
+        let content = WriteData(
             dictionaries: list(.dictionary, as: LocalDictionaryItem.self),
             contacts: list(.contact, as: LocalContact.self),
             horses: list(.horse, as: LocalHorse.self),
@@ -203,15 +214,20 @@ public struct ExportDocument: Sendable {
             reminders: list(.reminder, as: LocalReminder.self),
             attachments: list(.attachment, as: LocalAttachment.self)
         )
-        if RideExport.supportsRides(header.schemaVersion) {
-            content.trainingRecordings = records.compactMap { exported in
-                (exported.record as? LocalTrainingRecording).map { RideExport.recording($0, track: exported.track) }
-            }
-            content.horseRideProfiles = list(.horseRideProfile, as: LocalHorseRideProfile.self).compactMap(RideExport.profile)
-            content.rideDefaults = try RideExport.defaults(list(.rideDefaults, as: LocalRideDefaults.self).first)
-        }
         let file = WriteFile(schemaVersion: header.schemaVersion, exportedAt: header.exportedAt, appVersion: header.appVersion, scope: header.scope, data: content)
-        return try RecordCodec.makeEncoder(pretty: pretty).encode(file)
+        guard case var .object(root) = try JSONValue.parseKeepingScale(RecordCodec.makeEncoder().encode(file)), case var .object(data)? = root["data"] else {
+            throw EncodingError.invalidValue(file.schemaVersion, .init(codingPath: [], debugDescription: "Plik eksportu bez obiektu data"))
+        }
+        data["attachments"] = .array(list(.attachment, as: LocalAttachment.self).map { $0.scaledJSON() })
+        if RideExport.supportsRides(header.schemaVersion) {
+            data[RideExport.recordingsKey] = .array(records.compactMap { exported in
+                (exported.record as? LocalTrainingRecording).map { RideExport.recording($0, track: exported.track) }
+            })
+            data[RideExport.profilesKey] = .array(list(.horseRideProfile, as: LocalHorseRideProfile.self).compactMap(RideExport.profile))
+            data[RideExport.defaultsKey] = RideExport.defaults(list(.rideDefaults, as: LocalRideDefaults.self).first)
+        }
+        root["data"] = .object(data)
+        return Data(JSONValue.object(root).textKeepingScale().utf8)
     }
 }
 
@@ -254,15 +270,11 @@ private struct ReadData: Decodable {
     var notes: [LocalNote] = []
     var trainings: [LocalTraining] = []
     var reminders: [LocalReminder] = []
+    /// Plik 1.6 czyta załączniki i jazdy (`trainingRecordings`, `horseRideProfiles`, `rideDefaults`) ze skalą liczb — `ExportDocument.parse`.
     var attachments: [LocalAttachment] = []
-    /// Od 1.6 (tylko eksport pełny): nagrania jazd, profile koni i ustawienia jazd — czytane przez `RideExport.read`.
-    var trainingRecordings: [JSONValue] = []
-    var horseRideProfiles: [JSONValue] = []
-    var rideDefaults: JSONValue?
 
     private enum CodingKeys: String, CodingKey {
         case dictionaries, contacts, horses, vetVisits, farrierVisits, physioVisits, specialistVisits, competitions, purchases, notes, trainings, reminders, attachments
-        case trainingRecordings, horseRideProfiles, rideDefaults
     }
 
     init(from decoder: Decoder) throws {
@@ -280,9 +292,6 @@ private struct ReadData: Decodable {
         trainings = try c.decodeIfPresent([LocalTraining].self, forKey: .trainings) ?? []
         reminders = try c.decodeIfPresent([LocalReminder].self, forKey: .reminders) ?? []
         attachments = try c.decodeIfPresent([LocalAttachment].self, forKey: .attachments) ?? []
-        trainingRecordings = try c.decodeIfPresent([JSONValue].self, forKey: .trainingRecordings) ?? []
-        horseRideProfiles = try c.decodeIfPresent([JSONValue].self, forKey: .horseRideProfiles) ?? []
-        rideDefaults = try c.decodeIfPresent(JSONValue.self, forKey: .rideDefaults)
     }
 }
 
@@ -327,12 +336,8 @@ private struct WriteData: Encodable {
     let notes: [LocalNote]
     let trainings: [LocalTraining]
     let reminders: [LocalReminder]
+    /// Zastępowane w `toJSON` treścią ze skalą współrzędnych (`LocalAttachment.scaledJSON`).
     let attachments: [LocalAttachment]
-    /// Od 1.6; `nil` — pole pominięte (schemat 1.5 go nie zna).
-    var trainingRecordings: [JSONValue]?
-    var horseRideProfiles: [JSONValue]?
-    /// `.null` — zapisane jawnie jako `null` (brak ustawień); `nil` — pole pominięte.
-    var rideDefaults: JSONValue?
 }
 
 private struct WriteFile: Encodable {
@@ -350,6 +355,9 @@ private struct WriteFile: Encodable {
 /// z jawnymi `null`, a `rideDefaults` to obiekt albo `null`.
 enum RideExport {
     static let trackDataKey = "trackData"
+    static let recordingsKey = "trainingRecordings"
+    static let profilesKey = "horseRideProfiles"
+    static let defaultsKey = "rideDefaults"
 
     /// Czy plik o tym schemacie niesie jazdy (od 1.6).
     static func supportsRides(_ schemaVersion: String) -> Bool {
@@ -390,23 +398,24 @@ enum RideExport {
         return .object(fields)
     }
 
-    /// Ustawienia domyślne do pliku; `.null`, gdy ich brak albo jeszcze nie zapisane (wersja 0 — wartości wbudowane).
-    static func defaults(_ record: LocalRideDefaults?) throws -> JSONValue {
+    /// Ustawienia domyślne do pliku (ze skalą liczb); `.null`, gdy ich brak albo jeszcze nie zapisane (wersja 0 — wartości wbudowane).
+    static func defaults(_ record: LocalRideDefaults?) -> JSONValue {
         guard let record, record.defaults.version > 0 else { return .null }
-        return try JSONValue.parse(RecordCodec.makeEncoder().encode(record.defaults))
+        return record.defaults.toJSON()
     }
 
     // MARK: Odczyt
 
-    /// Nagrania, profile i ustawienia jazd z `data` pliku: koń i data nagrania z treningu o `trainingId`, wersja i czasy profilu z konia.
-    fileprivate static func read(_ content: ReadData, lenientTracks: Bool) throws -> [ExportedRecord] {
+    /// Nagrania, profile i ustawienia jazd z `data` pliku (czytanego ze skalą liczb): koń i data nagrania z treningu o `trainingId`,
+    /// wersja i czasy profilu z konia.
+    static func read(_ data: JSONValue, trainings trainingList: [LocalTraining], horses horseList: [LocalHorse], lenientTracks: Bool) throws -> [ExportedRecord] {
         var trainings: [String: LocalTraining] = [:]
-        for training in content.trainings { trainings[training.id] = training }
+        for training in trainingList { trainings[training.id] = training }
         var horses: [String: LocalHorse] = [:]
-        for horse in content.horses { horses[horse.id] = horse }
+        for horse in horseList { horses[horse.id] = horse }
 
         var records: [ExportedRecord] = []
-        for json in content.trainingRecordings {
+        for json in data[recordingsKey]?.arrayValue ?? [] {
             guard case var .object(fields) = json, let trainingId = fields["trainingId"]?.stringValue, let training = trainings[trainingId] else { continue }
             let text = fields.removeValue(forKey: trackDataKey)?.stringValue ?? ""
             var bytes: Data?
@@ -420,16 +429,15 @@ enum RideExport {
             let track = bytes.map { StoredTrack(recordingId: local.id, version: local.version, format: local.recording.trackFormat, data: $0) }
             records.append(ExportedRecord(record: local, dateKey: local.dateKey, track: track))
         }
-        for json in content.horseRideProfiles {
+        for json in data[profilesKey]?.arrayValue ?? [] {
             guard case var .object(fields) = json, let horseId = fields.removeValue(forKey: "horseId")?.stringValue, let horse = horses[horseId] else { continue }
-            let profile = try JSONDecoder().decode(RideProfile.self, from: JSONValue.object(fields).data())
+            let profile = try RideProfile(json: .object(fields))
             guard !profile.isEmpty else { continue }
             let record = LocalHorseRideProfile(horseId: horseId, profile: profile, createdAt: horse.createdAt, updatedAt: horse.updatedAt, version: horse.version)
             records.append(ExportedRecord(record: record, dateKey: nil))
         }
         // `rideDefaults`: obiekt ustawień; `null` (albo nieprawidłowa treść) — „brak w pliku”.
-        if let json = content.rideDefaults, case .object = json, let data = try? json.data(),
-           let defaults = try? JSONDecoder().decode(RideDefaults.self, from: data) {
+        if let json = data[defaultsKey], case .object = json, let defaults = try? RideDefaults(json: json) {
             records.append(ExportedRecord(record: defaults.toRecord(), dateKey: nil))
         }
         return records
