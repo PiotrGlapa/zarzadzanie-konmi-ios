@@ -74,22 +74,6 @@ public struct StoredRecord: Sendable, Hashable {
     public var isDeleted: Bool { deletedAt != nil }
 }
 
-/// Trasa nagrania (tabela `local_track`, Android `StoredTrack`): bajty `trackData` w formacie `format` (np. `zk-track/1`) i wersja
-/// nagrania, z którą je pobrano. Trzymana osobno od rekordu nagrania — rekord nie niesie `trackData` (decyzja A4).
-public struct StoredTrack: Sendable, Hashable {
-    public var recordingId: String
-    public var version: Int
-    public var format: String
-    public var data: Data
-
-    public init(recordingId: String, version: Int, format: String, data: Data) {
-        self.recordingId = recordingId
-        self.version = version
-        self.format = format
-        self.data = data
-    }
-}
-
 /// Zbiór operacji na magazynie w jednej transakcji bazy. Tworzony tylko wewnątrz `RecordStore.write`/`read`. Każda transakcja
 /// zapisu, w której coś zapisano, zwiększa licznik zmian dokładnie raz (kopia automatyczna, przypomnienie o kopii).
 public struct RecordAccess {

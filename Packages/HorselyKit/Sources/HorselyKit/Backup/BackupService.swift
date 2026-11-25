@@ -29,10 +29,12 @@ public struct RestoreSummary: Sendable {
     public let attachmentsWithFiles: Set<String>
 }
 
-/// Kopia zapasowa (T125, FR-KOP-01…09, contracts/android/backup-format.md; `BackupWriter.kt`/`BackupReader.kt` Androida 2.0.1):
-/// ZIP z `manifest.json` (pierwszy), `export.json` (schemat 1.5, aktywne rekordy), `phone.json` (kosz, ustawienia danych) i
-/// `attachments/<id>` (oryginały, także rekordów z kosza); z hasłem — całość szyfrowana `BackupCrypto`. Plik jest wymienny z Androidem
-/// w obie strony. Odtwarzanie: najpierw weryfikacja i rozpakowanie do katalogu tymczasowego, dopiero potem jedna transakcja.
+/// Kopia zapasowa (T125, FR-KOP-01…09, contracts/android/backup-format.md; `BackupWriter.kt`/`BackupReader.kt` Androida 3.0.2):
+/// ZIP z `manifest.json` (pierwszy, format 3), `export.json` (schemat 1.6, aktywne rekordy, w tym nagrania jazd z trasami w base64,
+/// profile jazd koni i ustawienia jazd), `phone.json` (kosz — z trasami usuniętych nagrań — i ustawienia danych) i `attachments/<id>`
+/// (oryginały, także rekordów z kosza); z hasłem — całość szyfrowana `BackupCrypto`. Plik jest wymienny z Androidem w obie strony;
+/// kopie formatów 1 i 2 (aplikacja 2.x) nadal się odtwarzają. Odtwarzanie: najpierw weryfikacja i rozpakowanie do katalogu
+/// tymczasowego, dopiero potem jedna transakcja (rekordy, trasy i pliki razem).
 public final class BackupService: Sendable {
     private let store: RecordStore
     private let files: LocalFileStore
@@ -131,7 +133,10 @@ public final class BackupService: Sendable {
         var entries = 0
         for type in RecordType.allCases {
             for row in try access.query(type) {
-                records.append(ExportedRecord(record: try row.record(), dateKey: row.dateKey))
+                // Nagranie jazdy niesie w pliku swoją trasę (`trackData` w base64) — trasa leży poza rekordem, w magazynie tras.
+                var track: StoredTrack?
+                if type == .trainingRecording { track = try access.track(recordingId: row.id) }
+                records.append(ExportedRecord(record: try row.record(), dateKey: row.dateKey, track: track))
                 switch type {
                 case .horse: horses += 1
                 case .vetVisit, .farrierVisit, .physioVisit, .specialistVisit, .note, .training, .purchase, .competition, .competitionStart: entries += 1
@@ -151,6 +156,10 @@ public final class BackupService: Sendable {
             fields["recordType"] = .string(row.type.rawValue)
             fields["deletedAt"] = .string(deletedAt.description)
             fields["deletionBatchId"] = row.deletionBatchId.map(JSONValue.string) ?? .null
+            // Nagranie z kosza niesie swoją trasę (`trackData` w base64) — poza koszem trasa jest w `export.json`.
+            if row.type == .trainingRecording, let track = try access.track(recordingId: row.id) {
+                fields[Self.trashTrackKey] = .string(track.data.base64EncodedString())
+            }
             trash.append(.object(fields))
         }
         let phone = try JSONValue.object([
@@ -215,7 +224,8 @@ public final class BackupService: Sendable {
         let exportData = try Data(contentsOf: prepared.directory.appendingPathComponent(BackupManifest.exportName))
         let document: ExportDocument
         do {
-            document = try ExportDocument.parse(exportData)
+            // Uszkodzona trasa nagrania w kopii to uszkodzony plik (bez trybu tolerancyjnego pobierania z programu).
+            document = try ExportDocument.parse(exportData, lenientTracks: false)
         } catch {
             throw BackupError.corrupted("export.json")
         }
@@ -247,6 +257,10 @@ public final class BackupService: Sendable {
                 rows.append(try StoredRecord.of(item.record, syncState: .local, deletedAt: item.deletedAt, deletionBatchId: item.batchId))
             }
             try access.upsert(rows)
+            // Trasy nagrań (z `export.json` i z kosza) w tej samej transakcji co rekordy — wycofują się razem z nimi.
+            for track in document.records.compactMap(\.track) + trash.compactMap(\.track) {
+                try access.putTrack(track)
+            }
             if upgrade {
                 let dictionaries = rows.filter { $0.type == .dictionary }.compactMap { try? $0.record(as: LocalDictionaryItem.self) }
                 let added = DictionaryUpgrades.missingTrainingTypes(existing: dictionaries, newId: newId, now: now)
@@ -328,10 +342,15 @@ public final class BackupService: Sendable {
         return hasher.hex
     }
 
+    /// Klucz w pozycji kosza `phone.json`: trasa usuniętego nagrania jazdy (base64), bo poza koszem trasy są w `export.json`.
+    static let trashTrackKey = "trackData"
+
+    /// Pozycja kosza z `phone.json`: rekord, czas i partia usunięcia oraz — dla nagrania jazdy — jego trasa.
     struct TrashItem: Sendable {
         let record: any LocalRecord
         let deletedAt: LocalDateTime
         let batchId: String?
+        let track: StoredTrack?
     }
 
     static func readTrash(_ url: URL) throws -> [TrashItem] {
@@ -343,12 +362,21 @@ public final class BackupService: Sendable {
             body.removeValue(forKey: "recordType")
             body.removeValue(forKey: "deletedAt")
             body.removeValue(forKey: "deletionBatchId")
+            let trackText = body.removeValue(forKey: trashTrackKey)?.stringValue ?? ""
+            let record: any LocalRecord
             do {
-                let record = try RecordCodec.decode(type, from: try JSONValue.object(body).data())
-                return TrashItem(record: record, deletedAt: deletedAt, batchId: item["deletionBatchId"]?.stringValue)
+                record = try RecordCodec.decode(type, from: try JSONValue.object(body).data())
             } catch {
                 throw BackupError.corrupted("phone.json")
             }
+            var track: StoredTrack?
+            if !trackText.isEmpty {
+                guard let recording = record as? LocalTrainingRecording, let bytes = Data(base64Encoded: trackText) else {
+                    throw BackupError.corrupted("phone.json")
+                }
+                track = StoredTrack(recordingId: recording.id, version: recording.version, format: recording.recording.trackFormat, data: bytes)
+            }
+            return TrashItem(record: record, deletedAt: deletedAt, batchId: item["deletionBatchId"]?.stringValue, track: track)
         }
     }
 

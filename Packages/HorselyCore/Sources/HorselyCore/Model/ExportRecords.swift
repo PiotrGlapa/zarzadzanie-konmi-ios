@@ -1870,7 +1870,8 @@ public struct LocalReminder: LocalRecord {
     }
 }
 
-/// Załącznik (metadane; plik leży w `local_file`).
+/// Załącznik (metadane; plik leży w `local_file`). Od schematu eksportu 1.6: `capturedAt` (chwila wykonania pliku), `latitude`
+/// i `longitude` (WGS84) — `nil`, gdy brak; w pliku pomijane, gdy brak (jak `LocalAttachment` Androida 3.0.2).
 public struct LocalAttachment: LocalRecord {
     public var id: String
     public var createdAt: LocalDateTime
@@ -1884,6 +1885,9 @@ public struct LocalAttachment: LocalRecord {
     public var sizeBytes: Int64
     public var sha256: String
     public var description: String?
+    public var capturedAt: Date?
+    public var latitude: Decimal?
+    public var longitude: Decimal?
 
     public init(
         id: String,
@@ -1897,7 +1901,10 @@ public struct LocalAttachment: LocalRecord {
         contentType: String,
         sizeBytes: Int64,
         sha256: String,
-        description: String? = nil
+        description: String? = nil,
+        capturedAt: Date? = nil,
+        latitude: Decimal? = nil,
+        longitude: Decimal? = nil
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -1911,6 +1918,9 @@ public struct LocalAttachment: LocalRecord {
         self.sizeBytes = sizeBytes
         self.sha256 = sha256
         self.description = description
+        self.capturedAt = capturedAt
+        self.latitude = latitude
+        self.longitude = longitude
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -1926,6 +1936,9 @@ public struct LocalAttachment: LocalRecord {
         case sizeBytes
         case sha256
         case description
+        case capturedAt
+        case latitude
+        case longitude
     }
 
     public init(from decoder: Decoder) throws {
@@ -1942,6 +1955,16 @@ public struct LocalAttachment: LocalRecord {
         sizeBytes = try c.decode(Int64.self, forKey: .sizeBytes)
         sha256 = try c.decode(String.self, forKey: .sha256)
         description = try c.decodeIfPresent(String.self, forKey: .description)
+        if let text = try c.decodeIfPresent(String.self, forKey: .capturedAt) {
+            guard let moment = InstantText.parse(text) else {
+                throw DecodingError.dataCorruptedError(forKey: .capturedAt, in: c, debugDescription: "Niepoprawna chwila: \(text)")
+            }
+            capturedAt = moment
+        } else {
+            capturedAt = nil
+        }
+        latitude = try c.decodeIfPresent(Decimal.self, forKey: .latitude)
+        longitude = try c.decodeIfPresent(Decimal.self, forKey: .longitude)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -1958,6 +1981,9 @@ public struct LocalAttachment: LocalRecord {
         try c.encode(sizeBytes, forKey: .sizeBytes)
         try c.encode(sha256, forKey: .sha256)
         try c.encodeIfPresent(description, forKey: .description)
+        try c.encodeIfPresent(capturedAt.map(InstantText.format), forKey: .capturedAt)
+        try c.encodeIfPresent(latitude, forKey: .latitude)
+        try c.encodeIfPresent(longitude, forKey: .longitude)
     }
 
     public var recordType: RecordType { .attachment }
