@@ -333,12 +333,13 @@ struct BackupRidesTests {
         try FileManager.default.createDirectory(at: workDir, withIntermediateDirectories: true)
         let filesDir = FileManager.default.temporaryDirectory.appendingPathComponent("test-files-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: filesDir, withIntermediateDirectories: true)
-        let manifest = BackupService(
+        let service = BackupService(
             store: RecordStore(database: try AppDatabase.inMemory()),
             files: try LocalFileStore(root: filesDir),
             workDirectory: workDir,
             appVersion: "2.0.1"
-        ).inspect(existingBackup, password: nil)
+        )
+        let manifest = try service.inspect(existingBackup, password: nil)
 
         #expect(manifest.formatVersion == 2)
         #expect(manifest.exportSchemaVersion == "1.5")
