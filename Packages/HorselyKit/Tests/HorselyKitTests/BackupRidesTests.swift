@@ -46,9 +46,9 @@ struct BackupRidesTests {
             loadWarnPercent: 30,
             heavyRidePoints: 60
         )
-        let localProfile = LocalHorseRideProfile(id: "profile-1", createdAt: stamp, updatedAt: stamp, version: 1, horseId: "horse-1", profile: profile)
+        let localProfile = LocalHorseRideProfile(horseId: "horse-1", profile: profile, createdAt: stamp, updatedAt: stamp, version: 1)
         let defaults = RideDefaults.builtIn
-        let localDefaults = LocalRideDefaults(id: "defaults-1", createdAt: stamp, updatedAt: stamp, version: 1, profile: defaults)
+        let localDefaults = LocalRideDefaults(defaults: defaults, createdAt: stamp, updatedAt: stamp)
 
         // Trening z nagraniem
         let training1 = LocalTraining(
@@ -56,10 +56,10 @@ struct BackupRidesTests {
             horseId: "horse-1", trainingDate: LocalDate("2026-11-10")!,
             trainingTypeId: "tt1", description: "Jazda testowa 1"
         )
-        let recording1 = RecordingDto(
+        let recording1 = Recording(
             id: "rec-1", trainingId: "train-1", version: 1,
-            createdAt: "2026-11-10T08:00:00+01:00", updatedAt: "2026-11-10T09:00:00+01:00",
-            startedAt: "2026-11-10T08:00:00+01:00", endedAt: "2026-11-10T09:00:00+01:00",
+            createdAt: InstantText.parse("2026-11-10T08:00:00+01:00")!, updatedAt: InstantText.parse("2026-11-10T09:00:00+01:00")!,
+            startedAt: InstantText.parse("2026-11-10T08:00:00+01:00")!, endedAt: InstantText.parse("2026-11-10T09:00:00+01:00")!,
             timeZone: "Europe/Warsaw", totalSeconds: 3600, movingSeconds: 3000,
             stoppedSeconds: 600, pausedSeconds: 0, distanceMeters: 5000,
             avgMovingSpeedKmh: 15.0, maxSpeedKmh: 25.0, elevationGainM: 50, elevationLossM: 40,
@@ -70,12 +70,12 @@ struct BackupRidesTests {
             walkAvgCadence: 90.0, trotAvgCadence: 100.0, canterAvgCadence: 110.0,
             canterCount: 5, longestCanterSeconds: 120, longestCanterMeters: 400,
             loadPoints: 100.0,
-            gaitThresholdsUsed: ["stopMaxKmh": Decimal(string: "2.0")!, "walkMaxKmh": Decimal(string: "7.0")!, "trotMaxKmh": Decimal(string: "15.0")!],
-            loadParamsUsed: ["weightWalk": Decimal(string: "1")!, "weightTrot": Decimal(string: "2")!, "weightCanter": Decimal(string: "3")!, "climbPer10m": Decimal(string: "1")!],
+            gaitThresholdsUsed: GaitThresholds(stopMaxKmh: Decimal(string: "2.0")!, walkMaxKmh: Decimal(string: "7.0")!, trotMaxKmh: Decimal(string: "15.0")!),
+            loadParamsUsed: LoadParams(weightWalk: Decimal(string: "1")!, weightTrot: Decimal(string: "2")!, weightCanter: Decimal(string: "3")!, climbPer10m: Decimal(string: "1")!),
             accelerometerUsed: true, weatherStatus: .fetched, weatherTempC: 20.0, weatherFeelsLikeC: 18.0,
             weatherPrecipMm: 0.0, weatherWindKmh: 10.0, weatherHumidityPct: 60, weatherCode: 1,
             trimmedStartSeconds: 10, trimmedEndSeconds: 5, algorithmVersion: 0,
-            source: ["gps": "GPS"], trackFormat: "zk-track/1", pointCount: 360,
+            source: ["gps": .string("GPS")], trackFormat: "zk-track/1", pointCount: 360,
             segments: [
                 GaitSegment(seq: 1, gait: .walk, startOffsetSeconds: 0, endOffsetSeconds: 600, distanceMeters: 500, avgSpeedKmh: 8.0, maxSpeedKmh: 10.0, avgCadence: 90.0, elevationGainM: 10),
                 GaitSegment(seq: 2, gait: .trot, startOffsetSeconds: 600, endOffsetSeconds: 2400, distanceMeters: 3000, avgSpeedKmh: 12.0, maxSpeedKmh: 18.0, avgCadence: 100.0, elevationGainM: 30),
@@ -83,8 +83,8 @@ struct BackupRidesTests {
             ],
             trackData: "AQIDBA==" // base64: [1,2,3,4]
         )
-        var training1WithRecording = training1
-        training1WithRecording.recordingSummary = RecordingSummary(recordingId: "rec-1", distanceMeters: 5000, totalSeconds: 3600, version: 1)
+        // `recordingSummary` jest tylko w odpowiedzi API, nie w rekordzie treningu (decyzja A4, R-B).
+        let training1WithRecording = training1
 
         // Trening bez nagrania
         let training2 = LocalTraining(
@@ -93,38 +93,8 @@ struct BackupRidesTests {
             trainingTypeId: "tt1", description: "Jazda testowa 2"
         )
 
-        // Nagranie jako osobny rekord — RecordingDto nie ma horseId, pobieramy z treningu.
-        let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
-        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)!
-        let ts = LocalDateTime(recording1.createdAt) ?? baseTs
-        let localRecording = LocalTrainingRecording(
-            id: recording1.id, createdAt: ts, updatedAt: LocalDateTime(recording1.updatedAt) ?? baseTs,
-            version: recording1.version, horseId: "horse-1",
-            trainingDate: LocalDate(recording1.startedAt) ?? baseDate,
-            startedAt: recording1.startedAt, endedAt: recording1.endedAt, timeZone: recording1.timeZone,
-            totalSeconds: recording1.totalSeconds, movingSeconds: recording1.movingSeconds,
-            stoppedSeconds: recording1.stoppedSeconds, pausedSeconds: recording1.pausedSeconds,
-            distanceMeters: recording1.distanceMeters, avgMovingSpeedKmh: recording1.avgMovingSpeedKmh,
-            maxSpeedKmh: recording1.maxSpeedKmh, elevationGainM: recording1.elevationGainM,
-            elevationLossM: recording1.elevationLossM, minAltitudeM: recording1.minAltitudeM,
-            maxAltitudeM: recording1.maxAltitudeM, walkSeconds: recording1.walkSeconds,
-            walkMeters: recording1.walkMeters, trotSeconds: recording1.trotSeconds,
-            trotMeters: recording1.trotMeters, canterSeconds: recording1.canterSeconds,
-            canterMeters: recording1.canterMeters, walkAvgSpeedKmh: recording1.walkAvgSpeedKmh,
-            trotAvgSpeedKmh: recording1.trotAvgSpeedKmh, canterAvgSpeedKmh: recording1.canterAvgSpeedKmh,
-            walkAvgCadence: recording1.walkAvgCadence, trotAvgCadence: recording1.trotAvgCadence,
-            canterAvgCadence: recording1.canterAvgCadence, canterCount: recording1.canterCount,
-            longestCanterSeconds: recording1.longestCanterSeconds, longestCanterMeters: recording1.longestCanterMeters,
-            loadPoints: recording1.loadPoints, gaitThresholdsUsed: recording1.gaitThresholdsUsed,
-            loadParamsUsed: recording1.loadParamsUsed, accelerometerUsed: recording1.accelerometerUsed,
-            weatherStatus: recording1.weatherStatus, weatherTempC: recording1.weatherTempC,
-            weatherFeelsLikeC: recording1.weatherFeelsLikeC, weatherPrecipMm: recording1.weatherPrecipMm,
-            weatherWindKmh: recording1.weatherWindKmh, weatherHumidityPct: recording1.weatherHumidityPct,
-            weatherCode: recording1.weatherCode, trimmedStartSeconds: recording1.trimmedStartSeconds,
-            trimmedEndSeconds: recording1.trimmedEndSeconds, algorithmVersion: recording1.algorithmVersion,
-            source: recording1.source, trackFormat: recording1.trackFormat, pointCount: recording1.pointCount,
-            segments: recording1.segments
-        )
+        // Nagranie jako osobny rekord — Recording nie ma horseId, pobieramy z treningu.
+        let localRecording = recording1.toRecord(horseId: "horse-1", trainingDate: training1.trainingDate)
 
         // Wiersze
         var rows: [StoredRecord] = try dictionaries.map { try StoredRecord.of($0, syncState: .local) }
@@ -179,12 +149,12 @@ struct BackupRidesTests {
             return
         }
         #expect(localRec.id == "rec-1")
-        #expect(localRec.distanceMeters == 5000)
-        #expect(localRec.totalSeconds == 3600)
-        #expect(localRec.segments.count == 3)
-        #expect(localRec.segments[0].gait == .walk)
-        #expect(localRec.segments[1].gait == .trot)
-        #expect(localRec.segments[2].gait == .canter)
+        #expect(localRec.recording.distanceMeters == 5000)
+        #expect(localRec.recording.totalSeconds == 3600)
+        #expect(localRec.recording.segments.count == 3)
+        #expect(localRec.recording.segments[0].gait == .walk)
+        #expect(localRec.recording.segments[1].gait == .trot)
+        #expect(localRec.recording.segments[2].gait == .canter)
 
         // Sprawdź, że profil jazdy i rideDefaults też zostały odtworzone
         let profiles = try await target.store.read { access in
@@ -368,12 +338,12 @@ struct BackupRidesTests {
         let rec = try #require(recordings.first)
         #expect(rec.id == "rec-1")
         #expect(rec.trainingDate.description == "2026-11-10")
-        #expect(rec.segments.count == 3)
-        #expect(rec.segments[0].gait == .walk)
-        #expect(rec.segments[1].gait == .trot)
-        #expect(rec.segments[2].gait == .canter)
-        #expect(rec.distanceMeters == 5000)
-        #expect(rec.totalSeconds == 3600)
+        #expect(rec.recording.segments.count == 3)
+        #expect(rec.recording.segments[0].gait == .walk)
+        #expect(rec.recording.segments[1].gait == .trot)
+        #expect(rec.recording.segments[2].gait == .canter)
+        #expect(rec.recording.distanceMeters == 5000)
+        #expect(rec.recording.totalSeconds == 3600)
 
         let profiles = try await target.store.read { access in
             try access.query(.horseRideProfile).compactMap { try? $0.record(as: LocalHorseRideProfile.self) }
@@ -385,6 +355,6 @@ struct BackupRidesTests {
             try access.query(.rideDefaults).compactMap { try? $0.record(as: LocalRideDefaults.self) }
         }
         #expect(defaults.count == 1)
-        #expect(defaults.first?.profile.gaitStopMaxKmh == Decimal(string: "1.5")!)
+        #expect(defaults.first?.defaults.gaitStopMaxKmh == Decimal(string: "1.5")!)
     }
 }

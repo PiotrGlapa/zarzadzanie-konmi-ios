@@ -113,11 +113,14 @@ public enum RecordType: String, Codable, Sendable, CaseIterable {
     case training = "Training"
     case reminder = "Reminder"
     case attachment = "Attachment"
-    case trainingRecording = "trainingRecordings"
-    case horseRideProfile = "horseRideProfiles"
-    case rideDefaults = "rideDefaults"
+    /// Nagranie jazdy treningu (3.0, decyzja A4): `parentId` = trening, treść bez `trackData` — punkty w magazynie tras.
+    case trainingRecording = "TrainingRecording"
+    /// Własne parametry jazd konia (`id` = `horseId`) — osobny rekord, żeby przetrwał pełne pobranie z serwera 2.x, który nie zna `rideProfile`.
+    case horseRideProfile = "HorseRideProfile"
+    /// Ustawienia domyślne jazd: jeden rekord o stałym `id`; w eksporcie 1.6 to obiekt `rideDefaults`, nie kolekcja.
+    case rideDefaults = "RideDefaults"
 
-    /// Nazwa kolekcji w `data` pliku eksportu; `nil` dla startów (zagnieżdżone w zawodach).
+    /// Nazwa kolekcji w `data` pliku eksportu; `nil` dla startów (zagnieżdżone w zawodach) i ustawień jazd (obiekt `rideDefaults`).
     public var exportCollection: String? {
         switch self {
         case .dictionary: "dictionaries"
@@ -136,7 +139,7 @@ public enum RecordType: String, Codable, Sendable, CaseIterable {
         case .attachment: "attachments"
         case .trainingRecording: "trainingRecordings"
         case .horseRideProfile: "horseRideProfiles"
-        case .rideDefaults: "rideDefaults"
+        case .rideDefaults: nil
         }
     }
 

@@ -110,7 +110,7 @@
 
 **Files:**
 - Create: `Packages/HorselyCore/Sources/HorselyCore/Ride/{Recording,RideParameters,HalfUp}.swift`, `Resources/v3/recording.json`
-- Modify: `Model/Enums.swift` (`RecordType.trainingRecording = "trainingRecordings"`, `.horseRideProfile = "horseRideProfiles"`, `.rideDefaults`), `Model/ExportRecords.swift`, `Model/ExportDocument.swift`, `Sync/ApiRecordMapping.swift`, modele konia (`rideProfile: RideProfile?`, pomijane w wejściu, gdy `nil`) i treningu (`recordingSummary: RecordingSummary?`)
+- Modify: `Model/Enums.swift` (wartości surowe jak nazwy typów Androida: `RecordType.trainingRecording = "TrainingRecording"`, `.horseRideProfile = "HorseRideProfile"`, `.rideDefaults = "RideDefaults"`; `exportCollection`: `"trainingRecordings"`, `"horseRideProfiles"`, `nil` — `rideDefaults` to obiekt, nie kolekcja), `Model/ExportRecords.swift`, `Model/ExportDocument.swift`, `Sync/ApiRecordMapping.swift` (profil konia `rideProfile` tylko w odpowiedzi/wejściu API — pomijany w wejściu, gdy `nil` — i jako osobny rekord `LocalHorseRideProfile`; `recordingSummary` tylko w odpowiedzi treningu API; `LocalHorse`/`LocalTraining` tych pól nie mają, decyzja A4)
 - Test: `Packages/HorselyCore/Tests/HorselyCoreTests/RecordingModelTests.swift`, `RideParametersTests.swift`
 
 **Interfaces:**

@@ -51,11 +51,12 @@
   "trackFormat": "zk-track/1",
   "pointCount": 3900,
   "segments": [
-    { "seq": 1, "gait": "Walk",   "startOffsetSeconds": 0,    "endOffsetSeconds": 2400, "distanceMeters": 3000,
-      "avgSpeedKmh": 4.50,  "maxSpeedKmh": 7.00,  "avgCadence": 98.0,  "elevationGainM": 20 },
-    { "seq": 2, "gait": "Trot",   "startOffsetSeconds": 2400, "endOffsetSeconds": 3600, "distanceMeters": 4000,
+    { "seq": 1, "gait": "Walk", "startOffsetSeconds": 0, "endOffsetSeconds": 2400, "distanceMeters": 3000,
+      "avgSpeedKmh": 4.50, "maxSpeedKmh": 7.00, "avgCadence": 98.0, "elevationGainM": 20 },
+    { "seq": 2, "gait": "Trot", "startOffsetSeconds": 2400, "endOffsetSeconds": 3600, "distanceMeters": 4000,
       "avgSpeedKmh": 12.00, "maxSpeedKmh": 14.90, "avgCadence": 142.0, "elevationGainM": 12 },
     { "seq": 3, "gait": "Canter", "startOffsetSeconds": 3600, "endOffsetSeconds": 3900, "distanceMeters": 1500,
       "avgSpeedKmh": 18.00, "maxSpeedKmh": 24.60, "avgCadence": 168.0, "elevationGainM": 18 }
-  ]
+  ],
+  "trackData": "H4sIAAAAAAAAA6tWKkktLlGyUlAqS8wpTVWqBQBIvF1MFgAAAA=="
 }

@@ -336,8 +336,6 @@ public struct LocalHorse: LocalRecord {
     public var salePrice: Money?
     public var saleDate: LocalDate?
     public var estimatedValue: Money?
-    /// Profil jazdy konia — tylko v3; `nil` = brak własnego profilu.
-    public var rideProfile: RideProfile?
 
     public init(
         id: String,
@@ -374,8 +372,7 @@ public struct LocalHorse: LocalRecord {
         purchaseDate: LocalDate? = nil,
         salePrice: Money? = nil,
         saleDate: LocalDate? = nil,
-        estimatedValue: Money? = nil,
-        rideProfile: RideProfile? = nil
+        estimatedValue: Money? = nil
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -412,7 +409,6 @@ public struct LocalHorse: LocalRecord {
         self.salePrice = salePrice
         self.saleDate = saleDate
         self.estimatedValue = estimatedValue
-        self.rideProfile = rideProfile
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -451,7 +447,6 @@ public struct LocalHorse: LocalRecord {
         case salePrice
         case saleDate
         case estimatedValue
-        case rideProfile
     }
 
     public init(from decoder: Decoder) throws {
@@ -491,7 +486,6 @@ public struct LocalHorse: LocalRecord {
         salePrice = try c.decodeIfPresent(Money.self, forKey: .salePrice)
         saleDate = try c.decodeIfPresent(LocalDate.self, forKey: .saleDate)
         estimatedValue = try c.decodeIfPresent(Money.self, forKey: .estimatedValue)
-        rideProfile = try c.decodeIfPresent(RideProfile.self, forKey: .rideProfile)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -531,7 +525,6 @@ public struct LocalHorse: LocalRecord {
         try c.encodeIfPresent(salePrice, forKey: .salePrice)
         try c.encodeIfPresent(saleDate, forKey: .saleDate)
         try c.encodeIfPresent(estimatedValue, forKey: .estimatedValue)
-        try c.encodeIfPresent(rideProfile, forKey: .rideProfile)
     }
 
     public var recordType: RecordType { .horse }
@@ -1625,8 +1618,6 @@ public struct LocalTraining: LocalRecord {
     public var cost: Money?
     public var originalAmount: Money?
     public var originalCurrency: String?
-    /// Podsumowanie nagrania jazdy — tylko odpowiedź z `/api/v3`.
-    public var recordingSummary: RecordingSummary?
 
     public init(
         id: String,
@@ -1645,8 +1636,7 @@ public struct LocalTraining: LocalRecord {
         trainerContactId: String? = nil,
         cost: Money? = nil,
         originalAmount: Money? = nil,
-        originalCurrency: String? = nil,
-        recordingSummary: RecordingSummary? = nil
+        originalCurrency: String? = nil
     ) {
         self.id = id
         self.createdAt = createdAt
@@ -1665,7 +1655,6 @@ public struct LocalTraining: LocalRecord {
         self.cost = cost
         self.originalAmount = originalAmount
         self.originalCurrency = originalCurrency
-        self.recordingSummary = recordingSummary
     }
 
     private enum CodingKeys: String, CodingKey {
@@ -1686,7 +1675,6 @@ public struct LocalTraining: LocalRecord {
         case cost
         case originalAmount
         case originalCurrency
-        case recordingSummary
     }
 
     public init(from decoder: Decoder) throws {
@@ -1708,7 +1696,6 @@ public struct LocalTraining: LocalRecord {
         cost = try c.decodeIfPresent(Money.self, forKey: .cost)
         originalAmount = try c.decodeIfPresent(Money.self, forKey: .originalAmount)
         originalCurrency = try c.decodeIfPresent(String.self, forKey: .originalCurrency)
-        recordingSummary = try c.decodeIfPresent(RecordingSummary.self, forKey: .recordingSummary)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -1730,7 +1717,6 @@ public struct LocalTraining: LocalRecord {
         try c.encodeIfPresent(cost, forKey: .cost)
         try c.encodeIfPresent(originalAmount, forKey: .originalAmount)
         try c.encodeIfPresent(originalCurrency, forKey: .originalCurrency)
-        try c.encodeIfPresent(recordingSummary, forKey: .recordingSummary)
     }
 
     public var recordType: RecordType { .training }

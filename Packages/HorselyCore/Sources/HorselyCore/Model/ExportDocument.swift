@@ -160,69 +160,19 @@ public struct ExportDocument: Sendable {
         for rawEnv in content.trainingRecordings {
             guard let training = trainingMap[rawEnv.trainingId] else { continue }
             let recording = LocalTrainingRecording(
-                id: rawEnv.recording.id,
-                createdAt: rawEnv.recording.createdAt,
-                updatedAt: rawEnv.recording.updatedAt,
-                version: rawEnv.recording.version,
+                recording: rawEnv.recording.recording,
                 horseId: training.horseId,
-                trainingDate: LocalDate(rawEnv.trainingDate) ?? training.trainingDate,
-                startedAt: rawEnv.recording.startedAt,
-                endedAt: rawEnv.recording.endedAt,
-                timeZone: rawEnv.recording.timeZone,
-                totalSeconds: rawEnv.recording.totalSeconds,
-                movingSeconds: rawEnv.recording.movingSeconds,
-                stoppedSeconds: rawEnv.recording.stoppedSeconds,
-                pausedSeconds: rawEnv.recording.pausedSeconds,
-                distanceMeters: rawEnv.recording.distanceMeters,
-                avgMovingSpeedKmh: rawEnv.recording.avgMovingSpeedKmh,
-                maxSpeedKmh: rawEnv.recording.maxSpeedKmh,
-                elevationGainM: rawEnv.recording.elevationGainM,
-                elevationLossM: rawEnv.recording.elevationLossM,
-                minAltitudeM: rawEnv.recording.minAltitudeM,
-                maxAltitudeM: rawEnv.recording.maxAltitudeM,
-                walkSeconds: rawEnv.recording.walkSeconds,
-                walkMeters: rawEnv.recording.walkMeters,
-                trotSeconds: rawEnv.recording.trotSeconds,
-                trotMeters: rawEnv.recording.trotMeters,
-                canterSeconds: rawEnv.recording.canterSeconds,
-                canterMeters: rawEnv.recording.canterMeters,
-                walkAvgSpeedKmh: rawEnv.recording.walkAvgSpeedKmh,
-                trotAvgSpeedKmh: rawEnv.recording.trotAvgSpeedKmh,
-                canterAvgSpeedKmh: rawEnv.recording.canterAvgSpeedKmh,
-                walkAvgCadence: rawEnv.recording.walkAvgCadence,
-                trotAvgCadence: rawEnv.recording.trotAvgCadence,
-                canterAvgCadence: rawEnv.recording.canterAvgCadence,
-                canterCount: rawEnv.recording.canterCount,
-                longestCanterSeconds: rawEnv.recording.longestCanterSeconds,
-                longestCanterMeters: rawEnv.recording.longestCanterMeters,
-                loadPoints: rawEnv.recording.loadPoints,
-                gaitThresholdsUsed: rawEnv.recording.gaitThresholdsUsed,
-                loadParamsUsed: rawEnv.recording.loadParamsUsed,
-                accelerometerUsed: rawEnv.recording.accelerometerUsed,
-                weatherStatus: rawEnv.recording.weatherStatus,
-                weatherTempC: rawEnv.recording.weatherTempC,
-                weatherFeelsLikeC: rawEnv.recording.weatherFeelsLikeC,
-                weatherPrecipMm: rawEnv.recording.weatherPrecipMm,
-                weatherWindKmh: rawEnv.recording.weatherWindKmh,
-                weatherHumidityPct: rawEnv.recording.weatherHumidityPct,
-                weatherCode: rawEnv.recording.weatherCode,
-                trimmedStartSeconds: rawEnv.recording.trimmedStartSeconds,
-                trimmedEndSeconds: rawEnv.recording.trimmedEndSeconds,
-                algorithmVersion: rawEnv.recording.algorithmVersion,
-                source: rawEnv.recording.source,
-                trackFormat: rawEnv.recording.trackFormat,
-                pointCount: rawEnv.recording.pointCount,
-                segments: rawEnv.recording.segments
+                trainingDate: LocalDate(rawEnv.trainingDate) ?? training.trainingDate
             )
             let trainingDate = LocalDate(rawEnv.trainingDate) ?? training.trainingDate
             records.append(ExportedRecord(record: recording, dateKey: trainingDate))
         }
 
         for env in content.horseRideProfiles {
-            records.append(ExportedRecord(record: LocalHorseRideProfile(id: env.horseId, createdAt: baseTs, updatedAt: baseTs, version: 0, horseId: env.horseId, profile: env.profile), dateKey: nil))
+            records.append(ExportedRecord(record: LocalHorseRideProfile(horseId: env.horseId, profile: env.profile, createdAt: baseTs, updatedAt: baseTs, version: 0), dateKey: nil))
         }
         if let env = content.rideDefaults {
-            records.append(ExportedRecord(record: LocalRideDefaults(id: "rideDefaults", createdAt: baseTs, updatedAt: baseTs, version: 0, profile: env.defaults), dateKey: nil))
+            records.append(ExportedRecord(record: LocalRideDefaults(defaults: env.defaults, createdAt: baseTs, updatedAt: baseTs), dateKey: nil))
         }
 
         var removals: [ExportRemoval] = []
@@ -260,7 +210,7 @@ public struct ExportDocument: Sendable {
         let horseRideProfiles = list(.horseRideProfile, as: LocalHorseRideProfile.self).map { envelope in
             HorseRideProfileEnvelope(horseId: envelope.horseId, profile: envelope.profile)
         }
-        let rideDefaults = list(.rideDefaults, as: LocalRideDefaults.self).first.map { RideDefaultsEnvelope(defaults: $0.profile) }
+        let rideDefaults = list(.rideDefaults, as: LocalRideDefaults.self).first.map { RideDefaultsEnvelope(defaults: $0.defaults) }
         let content = WriteData(
             dictionaries: list(.dictionary, as: LocalDictionaryItem.self),
             contacts: list(.contact, as: LocalContact.self),
