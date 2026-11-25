@@ -53,8 +53,7 @@ struct BackupRidesTests {
         let training1 = LocalTraining(
             id: "train-1", createdAt: stamp, updatedAt: stamp, version: 2,
             horseId: "horse-1", trainingDate: LocalDate("2026-11-10")!,
-            dictionaryTypeId: "dt1", description: "Jazda testowa 1",
-            cost: nil, originalAmount: nil, originalCurrency: nil
+            trainingTypeId: "tt1", description: "Jazda testowa 1"
         )
         let recording1 = RecordingDto(
             id: "rec-1", trainingId: "train-1", version: 1,
@@ -90,16 +89,17 @@ struct BackupRidesTests {
         let training2 = LocalTraining(
             id: "train-2", createdAt: stamp, updatedAt: stamp, version: 2,
             horseId: "horse-1", trainingDate: LocalDate("2026-11-12")!,
-            dictionaryTypeId: "dt1", description: "Jazda testowa 2",
-            cost: nil, originalAmount: nil, originalCurrency: nil
+            trainingTypeId: "tt1", description: "Jazda testowa 2"
         )
 
-        // Nagranienie jako osobny rekord
-        let ts = LocalDateTime(description: recording1.createdAt) ?? LocalDateTime()
+        // Nagranie jako osobny rekord — RecordingDto nie ma horseId, pobieramy z treningu.
+        let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
+        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)!
+        let ts = LocalDateTime(recording1.createdAt) ?? baseTs
         let localRecording = LocalTrainingRecording(
-            id: recording1.id, createdAt: ts, updatedAt: LocalDateTime(description: recording1.updatedAt) ?? LocalDateTime(),
-            version: recording1.version, horseId: recording1.horseId,
-            trainingDate: LocalDate(recording1.startedAt) ?? LocalDate(),
+            id: recording1.id, createdAt: ts, updatedAt: LocalDateTime(recording1.updatedAt) ?? baseTs,
+            version: recording1.version, horseId: "horse-1",
+            trainingDate: LocalDate(recording1.startedAt) ?? baseDate,
             startedAt: recording1.startedAt, endedAt: recording1.endedAt, timeZone: recording1.timeZone,
             totalSeconds: recording1.totalSeconds, movingSeconds: recording1.movingSeconds,
             stoppedSeconds: recording1.stoppedSeconds, pausedSeconds: recording1.pausedSeconds,
