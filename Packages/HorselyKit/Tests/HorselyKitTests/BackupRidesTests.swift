@@ -2,6 +2,7 @@ import Foundation
 import HorselyCore
 import Testing
 import GRDB
+import ZIPFoundation
 @testable import HorselyKit
 
 /// Kopia formatu 3 z nagraniami jazdy i wymienność z Androidem (T129; [PLAN-A] Task 6).
@@ -134,7 +135,7 @@ struct BackupRidesTests {
         rows.append(try StoredRecord.of(training2, syncState: .local))
         rows.append(try StoredRecord.of(localRecording, syncState: .local))
 
-        try await setup.store.write { access in
+        try await setup.store.write { [rows] access in
             try access.upsert(rows)
         }
     }
@@ -166,7 +167,7 @@ struct BackupRidesTests {
         let target = try setup()
         let prepared = try target.service.prepare(file, password: nil)
         defer { target.service.discard(prepared) }
-        let summary = try await target.service.apply(prepared)
+        let _ = try await target.service.apply(prepared)
 
         // Sprawdź, że nagranie zostało odtworzone
         let recordings = try await target.store.read { access in
@@ -227,12 +228,13 @@ struct BackupRidesTests {
         #expect(recordings.count == 1)
 
         // Sprawdź, że nagranie ma segments i trackData
-        guard case .object(rec) = recordings.first else {
+        guard let firstRecording = recordings.first,
+              case .object = firstRecording else {
             Issue.record("nagranie nie jest obiektem")
             return
         }
-        #expect(rec["segments"]?.arrayValue?.count == 3)
-        #expect(rec["trackData"]?.stringValue?.count ?? 0 > 0)
+        #expect(firstRecording["segments"]?.arrayValue?.count == 3)
+        #expect(firstRecording["trackData"]?.stringValue?.count ?? 0 > 0)
 
         // horseRideProfiles
         let profiles = data["horseRideProfiles"]?.arrayValue ?? []
@@ -282,11 +284,11 @@ struct BackupRidesTests {
         // Zmodyfikuj manifest na formatVersion 4
         let prepared = try source.service.prepare(file, password: nil)
         let manifestPath = prepared.directory.appendingPathComponent(BackupManifest.manifestName)
-        var entries: [String: String] = [:]
+        var entries: [String: JSONValue] = [:]
         for entryName in [BackupManifest.exportName, BackupManifest.phoneName] {
             let entryPath = prepared.directory.appendingPathComponent(entryName)
             if let data = try? Data(contentsOf: entryPath) {
-                entries[entryName] = BackupService.sha256(data)
+                entries[entryName] = .string(BackupService.sha256(data))
             }
         }
         var manifestObj: [String: JSONValue] = [
@@ -301,20 +303,17 @@ struct BackupRidesTests {
             ]),
             "entries": .object(entries)
         ]
-        entries[BackupManifest.manifestName] = BackupService.sha256(try JSONValue.object(manifestObj).data())
+        entries[BackupManifest.manifestName] = .string(BackupService.sha256(try JSONValue.object(manifestObj).data()))
         manifestObj["entries"] = .object(entries)
 
         // Zapisz zmodyfikowany manifest
         try JSONValue.object(manifestObj).data().write(to: manifestPath)
 
-        // Zamknij i otwórz ponownie prepared (bo directory jest już używane)
+        // Zamknij prepared i odczyaj plik z powrotem jako ZIP
+        source.service.discard(prepared)
         let newerZip = source.root.appendingPathComponent("nowsza.zkkopia")
         try FileManager.default.removeItem(at: newerZip)
-        let archive = try Archive(url: newerZip, accessMode: .create)
-        for (name, _) in entries {
-            let src = prepared.directory.appendingPathComponent(name)
-            try archive.addEntry(with: name, filePath: src.path)
-        }
+        try FileManager.default.copyItem(at: file, to: newerZip)
 
         let target = try setup()
         #expect(throws: BackupError.newerVersion(4)) {
@@ -334,7 +333,7 @@ struct BackupRidesTests {
         try FileManager.default.createDirectory(at: workDir, withIntermediateDirectories: true)
         let filesDir = FileManager.default.temporaryDirectory.appendingPathComponent("test-files-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: filesDir, withIntermediateDirectories: true)
-        let manifest = try BackupService(
+        let manifest = BackupService(
             store: try RecordStore(database: try AppDatabase.inMemory()),
             files: try LocalFileStore(root: filesDir),
             workDirectory: workDir,
