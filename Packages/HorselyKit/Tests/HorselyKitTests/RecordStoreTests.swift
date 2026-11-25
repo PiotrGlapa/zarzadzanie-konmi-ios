@@ -25,7 +25,7 @@ struct RecordStoreTests {
 
     /// Nagranie jazdy treningu (chwile UTC jak w kontrakcie, bez `trackData`).
     private func recording(_ id: String, training: String, horse: String, day: Int) -> LocalTrainingRecording {
-        let started = InstantText.parse("2026-10-0\(day)T08:00:00Z")!
+        let started = InstantText.parse("2026-10-\(String(format: "%02d", day))T08:00:00Z")!
         return Recording(
             id: id, trainingId: training, version: 1, createdAt: started, updatedAt: started,
             startedAt: started, endedAt: started.addingTimeInterval(3600), timeZone: "Europe/Warsaw",

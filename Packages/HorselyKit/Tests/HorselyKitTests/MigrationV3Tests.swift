@@ -1,368 +1,273 @@
 import Foundation
 import GRDB
+import HorselyCore
 import Testing
 @testable import HorselyKit
-@testable import HorselyCore
 
-/// Testy migracji v2 → v3: tworzenie tabel ride, zapis/odczyt tras, czyszczenie magazynu.
-@Test func migrationV2ToV3KeepsRecordsAndCreatesRideTables() throws {
-    // 1. Stwórz bazę z migracją v1 (tabela local_record)
-    let queue = try DatabaseQueue()
-    var migrator = DatabaseMigrator()
-    migrator.registerMigration("v1") { db in
-        try db.create(table: "local_record") { t in
-            t.column("type", .text).notNull()
-            t.column("id", .text).notNull()
-            t.column("version", .integer).notNull()
-            t.column("createdAt", .text).notNull()
-            t.column("updatedAt", .text).notNull()
-            t.column("horseId", .text)
-            t.column("dateKey", .text)
-            t.column("ownerId", .text)
-            t.column("deletedAt", .text)
-            t.column("deletionBatchId", .text)
-            t.column("syncState", .text).notNull()
-            t.column("baseVersion", .integer)
-            t.column("body", .text).notNull()
-            t.primaryKey(["type", "id"])
-        }
-        try db.create(index: "local_record_type_horse_date", on: "local_record", columns: ["type", "horseId", "dateKey"])
-        try db.create(index: "local_record_type_date", on: "local_record", columns: ["type", "dateKey"])
-        try db.create(index: "local_record_type_owner", on: "local_record", columns: ["type", "ownerId"])
-        try db.create(index: "local_record_batch", on: "local_record", columns: ["deletionBatchId"])
-        try db.create(index: "local_record_state", on: "local_record", columns: ["syncState"])
+/// Baza `v3` (Task 6 = Android Task 5): migracja `v2 → v3` produkcyjnym migratorem `AppDatabase`, magazyn tras w `RecordStore`
+/// (Android `Migration3To4Test` i `RecordingModelTest`: `the store keeps tracks apart from records`,
+/// `clear removes tracks and hard delete of a recording removes its track`, `a track rolls back with its transaction`)
+/// oraz schemat sesji nagrywania 1:1 z `Migration3To4.kt`.
+struct MigrationV3Tests {
+    private let stamp = LocalDateTime(year: 2026, month: 9, day: 1, hour: 10)!
+    private let rideTables = ["local_track", "ride_session", "ride_point", "ride_media"]
 
-        try db.create(table: "record_horse") { t in
-            t.column("type", .text).notNull()
-            t.column("id", .text).notNull()
-            t.column("horseId", .text).notNull()
-            t.primaryKey(["type", "id", "horseId"])
-        }
-        try db.create(index: "record_horse_horse", on: "record_horse", columns: ["horseId"])
+    private struct Boom: Error {}
 
-        try db.create(table: "local_file") { t in
-            t.column("attachmentId", .text).notNull()
-            t.column("kind", .text).notNull()
-            t.column("relativePath", .text).notNull()
-            t.column("sizeBytes", .integer).notNull()
-            t.column("sha256", .text).notNull()
-            t.column("lastOpenedAt", .text)
-            t.column("pinned", .boolean).notNull().defaults(to: false)
-            t.primaryKey(["attachmentId", "kind"])
-        }
-        try db.create(index: "local_file_opened", on: "local_file", columns: ["lastOpenedAt"])
-
-        try db.create(table: "queue_operation") { t in
-            t.column("id", .text).primaryKey()
-            t.column("seq", .integer).notNull().unique()
-            t.column("kind", .text).notNull()
-            t.column("recordType", .text)
-            t.column("recordId", .text)
-            t.column("baseVersion", .integer)
-            t.column("payload", .text)
-            t.column("fileRef", .text)
-            t.column("dependsOn", .text)
-            t.column("state", .text).notNull()
-            t.column("attempts", .integer).notNull().defaults(to: 0)
-            t.column("nextAttemptAt", .text)
-            t.column("lastError", .text)
-            t.column("countBefore", .integer)
-            t.column("createdAt", .text).notNull()
-            t.column("updatedAt", .text).notNull()
-        }
-        try db.create(index: "queue_operation_state_seq", on: "queue_operation", columns: ["state", "seq"])
-
-        try db.create(table: "queue_history") { t in
-            t.autoIncrementedPrimaryKey("id")
-            t.column("operationId", .text).notNull()
-            t.column("kind", .text).notNull()
-            t.column("outcome", .text).notNull()
-            t.column("summary", .text).notNull()
-            t.column("at", .text).notNull()
-        }
-        try db.create(index: "queue_history_at", on: "queue_history", columns: ["at"])
-
-        try db.create(table: "conflict") { t in
-            t.column("id", .text).primaryKey()
-            t.column("operationId", .text)
-            t.column("recordType", .text).notNull()
-            t.column("recordId", .text).notNull()
-            t.column("kind", .text).notNull()
-            t.column("mine", .text)
-            t.column("theirs", .text)
-            t.column("theirsVersion", .integer)
-            t.column("trashBatchId", .text)
-            t.column("trashBatchSize", .integer)
-            t.column("detectedAt", .text).notNull()
-            t.column("resolvedAt", .text)
-            t.column("resolution", .text)
-        }
-        try db.create(index: "conflict_resolved", on: "conflict", columns: ["resolvedAt"])
-
-        try db.create(table: "local_meta") { t in
-            t.column("key", .text).primaryKey()
-            t.column("value", .text).notNull()
-        }
-
-        try db.create(table: "address") { t in
-            t.column("id", .text).primaryKey()
-            t.column("url", .text).notNull()
-            t.column("position", .integer).notNull()
-            t.column("trustMode", .text).notNull()
-            t.column("certSha256", .text)
-            t.column("issuerSummary", .text)
-            t.column("isRemote", .boolean).notNull().defaults(to: false)
-            t.column("lastOkAt", .text)
-            t.column("heldUntil", .text)
-            t.column("heldReason", .text)
-        }
-        try db.create(index: "address_position", on: "address", columns: ["position"])
+    private func count(_ table: String, in database: AppDatabase) throws -> Int {
+        try database.writer.read { db in try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM \(table)") ?? 0 }
     }
-    // v2 — bez zmian
-    migrator.registerMigration("v2") { db in
-        try db.alter(table: "queue_operation") { t in
-            t.add(column: "localRef", .text)
-            t.add(column: "horseRefs", .text)
-            t.add(column: "summary", .text).notNull().defaults(to: "")
-            t.add(column: "resultId", .text)
-        }
-    }
-    try migrator.migrate(queue)
 
-    // 2. Wstaw rekord do v1 — symulacja bazy z v2
-    try queue.write { db in
-        let now = Date()
-        let body = try JSONEncoder().encode(["test": "value"])
-        let nowISO = ISO8601DateFormatter().string(from: now)
-        try db.execute(
-            sql: "INSERT INTO local_record (type, id, version, createdAt, updatedAt, syncState, body) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            arguments: [
-                "Training", "rec-1", 0,
-                nowISO, nowISO,
-                "Pending", String(data: body, encoding: .utf8)!
-            ]
+    /// Nagranie jazdy z treningu `t1` konia `h1` (chwile UTC jak w kontrakcie).
+    private func recording(_ id: String) -> LocalTrainingRecording {
+        let started = InstantText.parse("2026-09-01T08:00:00Z")!
+        return Recording(
+            id: id, trainingId: "t1", version: 1, createdAt: started, updatedAt: started,
+            startedAt: started, endedAt: started.addingTimeInterval(3600), timeZone: "Europe/Warsaw",
+            totalSeconds: 3600, movingSeconds: 3000, stoppedSeconds: 600, pausedSeconds: 0, distanceMeters: 5000,
+            avgMovingSpeedKmh: Decimal(string: "15")!, maxSpeedKmh: Decimal(string: "25")!, elevationGainM: 100, elevationLossM: 80, minAltitudeM: 100, maxAltitudeM: 200,
+            walkSeconds: 1200, walkMeters: 1500, trotSeconds: 1500, trotMeters: 2500, canterSeconds: 300, canterMeters: 800,
+            canterCount: 1, longestCanterSeconds: 300, longestCanterMeters: 800, loadPoints: Decimal(string: "75.5")!,
+            gaitThresholdsUsed: RideDefaults.builtIn.thresholds, loadParamsUsed: RideDefaults.builtIn.load,
+            accelerometerUsed: false, weatherStatus: .none, trimmedStartSeconds: 0, trimmedEndSeconds: 0, algorithmVersion: 1,
+            source: ["platform": .string("ios")], trackFormat: "zk-track/1", pointCount: 3600, segments: []
+        ).toRecord(horseId: "h1", trainingDate: LocalDate(year: 2026, month: 9, day: 1)!)
+    }
+
+    private func session(_ id: String, distanceMeters: Int = 0) -> RideSessionRow {
+        RideSessionRow(
+            id: id, horseId: "h1", horseName: "Grom", state: "Recording", startedAtMillis: 1000, endedAtMillis: nil, timeZone: "Europe/Warsaw",
+            pausesJson: "[]", thresholdsJson: "{}", loadJson: "{}", accelerometerUsed: 0, lastFlushMillis: 1000,
+            distanceMeters: distanceMeters, activeSeconds: 0
         )
     }
 
-    // 3. Załóż migrację v3 na tej samej bazie
-    var v3Migrator = DatabaseMigrator()
-    v3Migrator.registerMigration("v3") { db in
-        try db.create(table: "local_track") { t in
-            t.column("recordingId", .text).primaryKey()
-            t.column("version", .integer).notNull()
-            t.column("format", .text).notNull()
-            t.column("data", .blob).notNull()
-        }
-
-        try db.create(table: "ride_session") { t in
-            t.column("id", .text).primaryKey()
-            t.column("horseId", .text).notNull()
-            t.column("horseName", .text).notNull()
-            t.column("state", .text).notNull()
-            t.column("startedAtMillis", .integer).notNull()
-            t.column("endedAtMillis", .integer)
-            t.column("timeZone", .text).notNull()
-            t.column("pausesJson", .text)
-            t.column("thresholdsJson", .text)
-            t.column("loadJson", .text)
-            t.column("accelerometerUsed", .integer).notNull().defaults(to: 0)
-            t.column("lastFlushMillis", .integer).notNull()
-            t.column("distanceMeters", .integer).notNull().defaults(to: 0)
-            t.column("activeSeconds", .integer).notNull().defaults(to: 0)
-        }
-
-        try db.create(table: "ride_point") { t in
-            t.column("sessionId", .text).notNull()
-            t.column("seq", .integer).notNull()
-            t.column("tMillis", .integer).notNull()
-            t.column("lat", .real).notNull()
-            t.column("lon", .real).notNull()
-            t.column("altM", .real)
-            t.column("speedMs", .real)
-            t.column("hAccM", .real)
-            t.column("vAccM", .real)
-            t.column("cadence", .real)
-            t.column("intensity", .real)
-            t.primaryKey(["sessionId", "seq"])
-        }
-        try db.create(index: "ride_point_session_seq", on: "ride_point", columns: ["sessionId", "seq"])
-
-        try db.create(table: "ride_media") { t in
-            t.column("sessionId", .text).notNull()
-            t.column("uri", .text).notNull()
-            t.column("contentType", .text).notNull()
-            t.column("capturedAtMillis", .integer).notNull()
-            t.column("lat", .real)
-            t.column("lon", .real)
-            t.primaryKey(["sessionId", "uri"])
-        }
-    }
-    try v3Migrator.migrate(queue)
-
-    // 4. Weryfikacja — rekord nadal istnieje
-    try queue.read { db in
-        let count = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_record") ?? 0
-        #expect(count == 1)
+    private func point(_ sessionId: String, seq: Int) -> RidePointRow {
+        RidePointRow(sessionId: sessionId, seq: seq, tMillis: seq * 1000, lat: 52.0, lon: 21.0, altM: nil, speedMs: nil, hAccM: nil, vAccM: nil, cadence: nil, intensity: nil)
     }
 
-    // 5. Nowe tabele istnieją i są puste
-    try queue.read { db in
-        let trackCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_track") ?? 0
-        #expect(trackCount == 0)
-        let sessionCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_session") ?? 0
-        #expect(sessionCount == 0)
-        let pointCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_point") ?? 0
-        #expect(pointCount == 0)
-        let mediaCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_media") ?? 0
-        #expect(mediaCount == 0)
+    private func media(_ sessionId: String) -> RideMediaRow {
+        RideMediaRow(sessionId: sessionId, uri: "file:///ride/1.jpg", contentType: "image/jpeg", capturedAtMillis: 1500, lat: nil, lon: nil)
     }
-}
 
-// MARK: - trackRoundTrip
+    // MARK: Migracja
 
-@Test func trackRoundTrip() throws {
-    let queue = try DatabaseQueue()
-    try queue.write { db in
-        try db.create(table: "local_track") { t in
-            t.column("recordingId", .text).primaryKey()
-            t.column("version", .integer).notNull()
-            t.column("format", .text).notNull()
-            t.column("data", .blob).notNull()
+    /// Baza 2.x: produkcyjny migrator `AppDatabase` zatrzymany na `v2`, rekord i licznik zmian zapisane kodem magazynu.
+    private func databaseAtV2(with row: StoredRecord) throws -> DatabaseQueue {
+        let queue = try DatabaseQueue()
+        try AppDatabase.migrator().migrate(queue, upTo: "v2")
+        try queue.write { db in
+            let access = RecordAccess(db: db, state: RecordAccess.WriteState())
+            try access.upsert([row])
+            try access.setMeta(RecordStore.changeCounterKey, "7")
+        }
+        return queue
+    }
+
+    private func existingTables(_ names: [String], in queue: DatabaseQueue) throws -> [String] {
+        try queue.read { db in try names.filter { try db.tableExists($0) } }
+    }
+
+    @Test func migrationV2ToV3KeepsRecordsAndCreatesRideTables() async throws {
+        let note = LocalNote(id: "n1", createdAt: stamp, updatedAt: stamp, version: 2, horseId: "h1", noteDate: LocalDate(year: 2026, month: 9, day: 1)!, title: "Notatka")
+        let row = try StoredRecord.of(note, syncState: .synced)
+        let queue = try databaseAtV2(with: row)
+        #expect(try existingTables(rideTables, in: queue).isEmpty, "w v2 nie ma tabel jazd")
+
+        // Otwarcie kodem 3.0 dokańcza migrację.
+        let database = try AppDatabase(writer: queue)
+        let store = RecordStore(database: database)
+        #expect(try existingTables(rideTables, in: queue) == rideTables)
+
+        let stored = try #require(try await store.get(.note, id: "n1"))
+        #expect(stored.version == 2)
+        #expect(stored.body == row.body)
+        #expect(try stored.record(as: LocalNote.self)?.title == "Notatka")
+        #expect(try await store.changeCounter() == 7)
+        for table in rideTables {
+            #expect(try count(table, in: database) == 0, "\(table)")
         }
     }
 
-    let recordingId = "ride-001"
-    let version = 1
-    let format = "zk-track/1"
-    let trackData = Data([0x1F, 0x8B, 0x08, 0x00]) // gzip header
-
-    // Zapis
-    try queue.write { db in
-        try db.execute(
-            sql: "INSERT INTO local_track (recordingId, version, format, data) VALUES (?, ?, ?, ?)",
-            arguments: [recordingId, version, format, trackData]
-        )
-    }
-
-    // Odczyt
-    let track: StoredTrack? = try queue.read { db in
-        guard let row = try Row.fetchOne(db, sql: "SELECT * FROM local_track WHERE recordingId = ?", arguments: [recordingId]) else {
-            return nil
+    @Test func rideTablesFollowTheAndroidSchema() throws {
+        let database = try AppDatabase.inMemory()
+        let (notNull, foreignKeys, extraIndexes) = try database.writer.read { db in
+            let notNull = try db.columns(in: "ride_session").filter(\.isNotNull).map(\.name)
+            let foreignKeys = try ["ride_point", "ride_media"].map { table in
+                try Row.fetchAll(db, sql: "SELECT \"table\", \"on_delete\" FROM pragma_foreign_key_list(?)", arguments: [table])
+                    .map { row -> String in
+                        let parent: String = row["table"]
+                        let onDelete: String = row["on_delete"]
+                        return "\(table)->\(parent):\(onDelete)"
+                    }
+            }.flatMap { $0 }
+            let extraIndexes = try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'ride_point' AND sql IS NOT NULL")
+            return (notNull, foreignKeys, extraIndexes)
         }
-        return StoredTrack(
-            recordingId: row["recordingId"] as String,
-            version: row["version"] as Int,
-            format: row["format"] as String,
-            data: row["data"] as Data
-        )
+        // Jak w `Migration3To4.kt`: tylko `endedAtMillis` może być puste.
+        #expect(Set(notNull) == [
+            "id", "horseId", "horseName", "state", "startedAtMillis", "timeZone", "pausesJson", "thresholdsJson", "loadJson",
+            "accelerometerUsed", "lastFlushMillis", "distanceMeters", "activeSeconds",
+        ])
+        #expect(foreignKeys == ["ride_point->ride_session:CASCADE", "ride_media->ride_session:CASCADE"])
+        #expect(extraIndexes.isEmpty, "klucz główny (sessionId, seq) wystarcza")
     }
 
-    #expect(track != nil)
-    #expect(track!.recordingId == recordingId)
-    #expect(track!.version == version)
-    #expect(track!.format == format)
-    #expect(track!.data == trackData)
-}
+    // MARK: Trasy w magazynie
 
-// MARK: - clearRemovesTracks
+    @Test func trackRoundTrip() async throws {
+        let store = RecordStore(database: try AppDatabase.inMemory())
+        let track = StoredTrack(recordingId: "r1", version: 3, format: "zk-track/1", data: Data([1, 2, 3, 0, 0xFF]))
 
-@Test func clearRemovesTracks() throws {
-    let queue = try DatabaseQueue()
-    try queue.write { db in
-        try db.create(table: "local_track") { t in
-            t.column("recordingId", .text).primaryKey()
-            t.column("version", .integer).notNull()
-            t.column("format", .text).notNull()
-            t.column("data", .blob).notNull()
+        try await store.putTrack(track)
+
+        #expect(try await store.track(recordingId: "r1") == track)
+        #expect(try await store.track(recordingId: "r2") == nil)
+    }
+
+    /// Android: `the store keeps tracks apart from records`.
+    @Test func theStoreKeepsTracksApartFromRecords() async throws {
+        let store = RecordStore(database: try AppDatabase.inMemory())
+        let track = StoredTrack(recordingId: "r1", version: 2, format: "zk-track/1", data: Data([1, 2, 3]))
+
+        #expect(try await store.track(recordingId: "r1") == nil)
+        try await store.putTrack(track)
+        let read = try #require(try await store.track(recordingId: "r1"))
+        #expect(read == track)
+        #expect(read.data == Data([1, 2, 3]))
+        #expect(try await store.count(.trainingRecording) == 0)
+
+        var newer = track
+        newer.version = 3
+        newer.data = Data([9])
+        try await store.putTrack(newer)
+        #expect(try await store.track(recordingId: "r1")?.version == 3)
+        #expect(try await store.track(recordingId: "r1")?.data == Data([9]))
+
+        try await store.deleteTrack(recordingId: "r1")
+        #expect(try await store.track(recordingId: "r1") == nil)
+        try await store.deleteTrack(recordingId: "r1")
+    }
+
+    /// Plan Task 6 `clearRemovesTracks`: czyszczenie magazynu usuwa trasy, sesje nagrywania, punkty i pliki z jazdy.
+    @Test func clearRemovesTracks() async throws {
+        let database = try AppDatabase.inMemory()
+        let store = RecordStore(database: database)
+        let sessions = RideSessionStore(db: database.writer)
+        try await store.putTrack(StoredTrack(recordingId: "r1", version: 1, format: "zk-track/1", data: Data([1])))
+        try await store.putTrack(StoredTrack(recordingId: "r2", version: 1, format: "zk-track/1", data: Data([2])))
+        try await sessions.saveSession(session("s1"))
+        try await sessions.insertPoints([point("s1", seq: 0), point("s1", seq: 1)])
+        try await sessions.insertMedia(media("s1"))
+        #expect(try await store.track(recordingId: "r2") != nil)
+
+        try await store.write { try $0.clear() }
+
+        #expect(try await store.track(recordingId: "r1") == nil)
+        #expect(try await store.track(recordingId: "r2") == nil)
+        #expect(try await sessions.session(id: "s1") == nil)
+        #expect(try await sessions.points(sessionId: "s1").isEmpty)
+        #expect(try await sessions.media(sessionId: "s1").isEmpty)
+        for table in rideTables {
+            #expect(try count(table, in: database) == 0, "\(table)")
         }
-        try db.create(table: "ride_session") { t in
-            t.column("id", .text).primaryKey()
-            t.column("horseId", .text).notNull()
-            t.column("horseName", .text).notNull()
-            t.column("state", .text).notNull()
-            t.column("startedAtMillis", .integer).notNull()
-            t.column("endedAtMillis", .integer)
-            t.column("timeZone", .text).notNull()
-            t.column("pausesJson", .text)
-            t.column("thresholdsJson", .text)
-            t.column("loadJson", .text)
-            t.column("accelerometerUsed", .integer).notNull().defaults(to: 0)
-            t.column("lastFlushMillis", .integer).notNull()
-            t.column("distanceMeters", .integer).notNull().defaults(to: 0)
-            t.column("activeSeconds", .integer).notNull().defaults(to: 0)
+    }
+
+    /// Android: `clear removes tracks and hard delete of a recording removes its track`.
+    @Test func hardDeleteOfARecordingRemovesItsTrack() async throws {
+        let store = RecordStore(database: try AppDatabase.inMemory())
+        let local = recording("rec-1")
+        try await store.upsert([try StoredRecord.of(local, syncState: .synced)])
+        try await store.putTrack(StoredTrack(recordingId: local.id, version: 1, format: "zk-track/1", data: Data([1])))
+        try await store.putTrack(StoredTrack(recordingId: "inny", version: 1, format: "zk-track/1", data: Data([2])))
+
+        try await store.write { try $0.deleteHard(.trainingRecording, id: local.id) }
+        #expect(try await store.get(.trainingRecording, id: local.id) == nil)
+        #expect(try await store.track(recordingId: local.id) == nil, "trwałe usunięcie nagrania usuwa trasę")
+        #expect(try await store.track(recordingId: "inny") != nil)
+
+        try await store.write { try $0.clear() }
+        #expect(try await store.track(recordingId: "inny") == nil, "clear czyści też trasy")
+    }
+
+    /// Android `deleteState`: rekordy usuwane według stanu zabierają trasy swoich nagrań.
+    @Test func deletingRecordsByStateRemovesTheirTracks() async throws {
+        let store = RecordStore(database: try AppDatabase.inMemory())
+        try await store.upsert([
+            try StoredRecord.of(recording("projected"), syncState: .projected),
+            try StoredRecord.of(recording("synced"), syncState: .synced),
+        ])
+        try await store.putTrack(StoredTrack(recordingId: "projected", version: 1, format: "zk-track/1", data: Data([1])))
+        try await store.putTrack(StoredTrack(recordingId: "synced", version: 1, format: "zk-track/1", data: Data([2])))
+
+        try await store.write { try $0.deleteState(.projected) }
+
+        #expect(try await store.track(recordingId: "projected") == nil)
+        #expect(try await store.track(recordingId: "synced") != nil)
+    }
+
+    /// Android: `a track rolls back with its transaction`.
+    @Test func aTrackRollsBackWithItsTransaction() async throws {
+        let store = RecordStore(database: try AppDatabase.inMemory())
+        try await store.putTrack(StoredTrack(recordingId: "r1", version: 1, format: "zk-track/1", data: Data([1])))
+        let counter = try await store.changeCounter()
+
+        do {
+            try await store.write { access in
+                try access.putTrack(StoredTrack(recordingId: "r1", version: 2, format: "zk-track/1", data: Data([2])))
+                try access.deleteTrack(recordingId: "r1")
+                throw Boom()
+            }
+            Issue.record("transakcja powinna się nie udać")
+        } catch is Boom {}
+
+        #expect(try await store.track(recordingId: "r1")?.version == 1)
+        #expect(try await store.changeCounter() == counter)
+    }
+
+    @Test func aTrackWriteRaisesTheChangeCounter() async throws {
+        let store = RecordStore(database: try AppDatabase.inMemory())
+        try await store.putTrack(StoredTrack(recordingId: "r1", version: 1, format: "zk-track/1", data: Data([1])))
+        #expect(try await store.changeCounter() == 1)
+        try await store.deleteTrack(recordingId: "r1")
+        #expect(try await store.changeCounter() == 2)
+    }
+
+    // MARK: Sesje nagrywania
+
+    @Test func deletingASessionCascadesToItsPointsAndMedia() async throws {
+        let database = try AppDatabase.inMemory()
+        let sessions = RideSessionStore(db: database.writer)
+        try await sessions.saveSession(session("s1"))
+        try await sessions.saveSession(session("s2"))
+        try await sessions.insertPoints([point("s1", seq: 0), point("s2", seq: 0)])
+        try await sessions.insertMedia(media("s1"))
+
+        try await sessions.deleteSession(id: "s1")
+
+        #expect(try await sessions.points(sessionId: "s1").isEmpty)
+        #expect(try await sessions.media(sessionId: "s1").isEmpty)
+        #expect(try await sessions.points(sessionId: "s2").count == 1)
+    }
+
+    @Test func savingASessionAgainKeepsItsPoints() async throws {
+        let database = try AppDatabase.inMemory()
+        let sessions = RideSessionStore(db: database.writer)
+        try await sessions.saveSession(session("s1"))
+        try await sessions.insertPoints([point("s1", seq: 0), point("s1", seq: 1)])
+        try await sessions.insertMedia(media("s1"))
+
+        try await sessions.saveSession(session("s1", distanceMeters: 120))
+
+        #expect(try await sessions.session(id: "s1")?.distanceMeters == 120)
+        #expect(try await sessions.points(sessionId: "s1").map(\.seq) == [0, 1])
+        #expect(try await sessions.media(sessionId: "s1").count == 1)
+    }
+
+    @Test func aPointOfAMissingSessionIsRejected() async throws {
+        let sessions = RideSessionStore(db: try AppDatabase.inMemory().writer)
+        await #expect(throws: DatabaseError.self) {
+            try await sessions.insertPoints([point("brak", seq: 0)])
         }
-        try db.create(table: "ride_point") { t in
-            t.column("sessionId", .text).notNull()
-            t.column("seq", .integer).notNull()
-            t.column("tMillis", .integer).notNull()
-            t.column("lat", .real).notNull()
-            t.column("lon", .real).notNull()
-            t.column("altM", .real)
-            t.column("speedMs", .real)
-            t.column("hAccM", .real)
-            t.column("vAccM", .real)
-            t.column("cadence", .real)
-            t.column("intensity", .real)
-            t.primaryKey(["sessionId", "seq"])
-        }
-        try db.create(table: "ride_media") { t in
-            t.column("sessionId", .text).notNull()
-            t.column("uri", .text).notNull()
-            t.column("contentType", .text).notNull()
-            t.column("capturedAtMillis", .integer).notNull()
-            t.column("lat", .real)
-            t.column("lon", .real)
-            t.primaryKey(["sessionId", "uri"])
-        }
     }
-
-    // Wstaw dane
-    try queue.write { db in
-        try db.execute(
-            sql: "INSERT INTO local_track (recordingId, version, format, data) VALUES (?, ?, ?, ?)",
-            arguments: ["ride-1", 1, "zk-track/1", Data()]
-        )
-        try db.execute(
-            sql: "INSERT INTO ride_session (id, horseId, horseName, state, startedAtMillis, timeZone, lastFlushMillis) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            arguments: ["sess-1", "horse-1", "Kongo", "Recording", 1000, "Europe/Warsaw", 1000]
-        )
-        try db.execute(
-            sql: "INSERT INTO ride_point (sessionId, seq, tMillis, lat, lon) VALUES (?, ?, ?, ?, ?)",
-            arguments: ["sess-1", 0, 0, 52.0, 21.0]
-        )
-        try db.execute(
-            sql: "INSERT INTO ride_media (sessionId, uri, contentType, capturedAtMillis) VALUES (?, ?, ?, ?)",
-            arguments: ["sess-1", "content://uri/1", "image/jpeg", 1000]
-        )
-    }
-
-    // Usunięcie tras i sesji (jak w clearStore)
-    try queue.write { db in
-        try db.execute(sql: "DELETE FROM ride_point")
-        try db.execute(sql: "DELETE FROM ride_media")
-        try db.execute(sql: "DELETE FROM ride_session")
-        try db.execute(sql: "DELETE FROM local_track")
-    }
-
-    // Weryfikacja — wszystko puste
-    try queue.read { db in
-        let trackCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM local_track") ?? 0
-        let sessionCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_session") ?? 0
-        let pointCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_point") ?? 0
-        let mediaCount = try Int.fetchOne(db, sql: "SELECT COUNT(*) FROM ride_media") ?? 0
-        #expect(trackCount == 0)
-        #expect(sessionCount == 0)
-        #expect(pointCount == 0)
-        #expect(mediaCount == 0)
-    }
-}
-
-// MARK: - StoredTrack
-
-/// Struktura trasy zapisanej w bazie.
-struct StoredTrack: Sendable, Equatable {
-    let recordingId: String
-    let version: Int
-    let format: String
-    let data: Data
 }

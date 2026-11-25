@@ -13,9 +13,9 @@ struct RideSessionRow: Sendable {
     let startedAtMillis: Int64
     let endedAtMillis: Int64?
     let timeZone: String
-    let pausesJson: String?
-    let thresholdsJson: String?
-    let loadJson: String?
+    let pausesJson: String
+    let thresholdsJson: String
+    let loadJson: String
     let accelerometerUsed: Int
     let lastFlushMillis: Int64
     let distanceMeters: Int
@@ -29,9 +29,9 @@ struct RideSessionRow: Sendable {
         startedAtMillis: Int64,
         endedAtMillis: Int64?,
         timeZone: String,
-        pausesJson: String?,
-        thresholdsJson: String?,
-        loadJson: String?,
+        pausesJson: String,
+        thresholdsJson: String,
+        loadJson: String,
         accelerometerUsed: Int,
         lastFlushMillis: Int64,
         distanceMeters: Int,
@@ -62,9 +62,9 @@ struct RideSessionRow: Sendable {
         self.startedAtMillis = row["startedAtMillis"] as Int64
         self.endedAtMillis = row["endedAtMillis"] as Int64?
         self.timeZone = row["timeZone"] as String
-        self.pausesJson = row["pausesJson"] as String?
-        self.thresholdsJson = row["thresholdsJson"] as String?
-        self.loadJson = row["loadJson"] as String?
+        self.pausesJson = row["pausesJson"] as String
+        self.thresholdsJson = row["thresholdsJson"] as String
+        self.loadJson = row["loadJson"] as String
         self.accelerometerUsed = row["accelerometerUsed"] as Int
         self.lastFlushMillis = row["lastFlushMillis"] as Int64
         self.distanceMeters = row["distanceMeters"] as Int
@@ -166,19 +166,10 @@ struct RideMediaRow: Sendable {
     }
 }
 
-// MARK: - StoredTrack
-
-/// Przechowana trasa nagrania (kopia Androida `StoredTrack`).
-struct StoredTrack: Sendable {
-    let recordingId: String
-    let version: Int
-    let format: String
-    let data: Data
-}
-
 // MARK: - RideSessionStore
 
-/// Interfejs do sesji nagrywania i tras — typy wierszy i zapytania (logika w Task 14).
+/// Sesje nagrywania jazdy z punktami i plikami — typy wierszy i zapytania (logika w Task 14). Trasy nagrań są w `RecordStore`
+/// (`track`/`putTrack`/`deleteTrack`), bo należą do transakcji magazynu rekordów; czyszczenie sesji robi `RecordAccess.clear()`.
 struct RideSessionStore {
     private let db: any DatabaseWriter
 
@@ -208,14 +199,21 @@ struct RideSessionStore {
         }
     }
 
-    /// Zapisz lub zaktualizuj sesję.
+    /// Zapisz lub zaktualizuj sesję. Aktualizacja w miejscu (`ON CONFLICT … DO UPDATE`), nie `INSERT OR REPLACE`: zastąpienie
+    /// usuwa wiersz, a `ON DELETE CASCADE` zabrałby wtedy punkty i pliki sesji (Android: `insertSession` + `updateSession`).
     func saveSession(_ session: RideSessionRow) async throws {
         try await db.write { db in
             try db.execute(
                 sql: """
-                    INSERT OR REPLACE INTO ride_session
+                    INSERT INTO ride_session
                         (id, horseId, horseName, state, startedAtMillis, endedAtMillis, timeZone, pausesJson, thresholdsJson, loadJson, accelerometerUsed, lastFlushMillis, distanceMeters, activeSeconds)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(id) DO UPDATE SET
+                        horseId = excluded.horseId, horseName = excluded.horseName, state = excluded.state,
+                        startedAtMillis = excluded.startedAtMillis, endedAtMillis = excluded.endedAtMillis, timeZone = excluded.timeZone,
+                        pausesJson = excluded.pausesJson, thresholdsJson = excluded.thresholdsJson, loadJson = excluded.loadJson,
+                        accelerometerUsed = excluded.accelerometerUsed, lastFlushMillis = excluded.lastFlushMillis,
+                        distanceMeters = excluded.distanceMeters, activeSeconds = excluded.activeSeconds
                     """,
                 arguments: [
                     session.id, session.horseId, session.horseName, session.state,
@@ -227,11 +225,9 @@ struct RideSessionStore {
         }
     }
 
-    /// Usuń sesję i kaskadowo punkty/media.
+    /// Usuń sesję; punkty i pliki z jazdy usuwa klucz obcy `ON DELETE CASCADE`.
     func deleteSession(id: String) async throws {
         try await db.write { db in
-            try db.execute(sql: "DELETE FROM ride_point WHERE sessionId = ?", arguments: [id])
-            try db.execute(sql: "DELETE FROM ride_media WHERE sessionId = ?", arguments: [id])
             try db.execute(sql: "DELETE FROM ride_session WHERE id = ?", arguments: [id])
         }
     }
@@ -286,56 +282,6 @@ struct RideSessionStore {
                     """,
                 arguments: [media.sessionId, media.uri, media.contentType, media.capturedAtMillis, media.lat, media.lon]
             )
-        }
-    }
-
-    // MARK: - Track
-
-    /// Pobierz trasę dla nagrania.
-    func track(recordingId: String) async throws -> StoredTrack? {
-        try await db.read { db in
-            guard let row = try Row.fetchOne(db, sql: "SELECT * FROM local_track WHERE recordingId = ?", arguments: [recordingId]) else {
-                return nil
-            }
-            return StoredTrack(
-                recordingId: row["recordingId"] as String,
-                version: row["version"] as Int,
-                format: row["format"] as String,
-                data: row["data"] as Data
-            )
-        }
-    }
-
-    /// Zapisz trasę.
-    func putTrack(_ track: StoredTrack) async throws {
-        try await db.write { db in
-            try db.execute(
-                sql: """
-                    INSERT OR REPLACE INTO local_track
-                        (recordingId, version, format, data)
-                    VALUES (?, ?, ?, ?)
-                    """,
-                arguments: [track.recordingId, track.version, track.format, track.data]
-            )
-        }
-    }
-
-    /// Usuń trasę.
-    func deleteTrack(recordingId: String) async throws {
-        try await db.write { db in
-            try db.execute(sql: "DELETE FROM local_track WHERE recordingId = ?", arguments: [recordingId])
-        }
-    }
-
-    // MARK: - Clear
-
-    /// Czyszczenie magazynu — usuwa trasy i sesje.
-    func clearRideData() async throws {
-        try await db.write { db in
-            try db.execute(sql: "DELETE FROM ride_point")
-            try db.execute(sql: "DELETE FROM ride_media")
-            try db.execute(sql: "DELETE FROM ride_session")
-            try db.execute(sql: "DELETE FROM local_track")
         }
     }
 }
