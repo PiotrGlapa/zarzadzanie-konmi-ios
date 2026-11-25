@@ -156,11 +156,11 @@ public struct ExportDocument: Sendable {
         let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
         let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)
         for rawEnv in content.trainingRecordings {
-            guard let training = trainingMap[rawEnv.recording.trainingId] else { continue }
+            guard let training = trainingMap[rawEnv.trainingId] else { continue }
             let recording = LocalTrainingRecording(
                 id: rawEnv.recording.id,
-                createdAt: LocalDateTime(rawEnv.recording.createdAt) ?? baseTs,
-                updatedAt: LocalDateTime(rawEnv.recording.updatedAt) ?? baseTs,
+                createdAt: rawEnv.recording.createdAt,
+                updatedAt: rawEnv.recording.updatedAt,
                 version: rawEnv.recording.version,
                 horseId: training.horseId,
                 trainingDate: LocalDate(rawEnv.trainingDate) ?? training.trainingDate,
@@ -421,21 +421,24 @@ private struct WriteFile: Encodable {
 private struct TrainingRecordingEnvelope: Codable {
     let recording: LocalTrainingRecording
     let trainingDate: String
+    let trainingId: String
 
     private enum CodingKeys: String, CodingKey {
-        case recording, trainingDate
+        case recording, trainingDate, trainingId
     }
 
     init(recording: LocalTrainingRecording, trainingDate: String) {
         self.recording = recording
         self.trainingDate = trainingDate
+        self.trainingId = "placeholder"
     }
 
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let trainingDateStr = try c.decode(String.self, forKey: .trainingDate)
         let dto = try c.decode(RecordingDto.self, forKey: .recording)
-        // Uwaga: RecordingDto nie zawiera horseId ani daty treningu — te pochodzą z treningu (ExportDocument.parse uzupełnia).
+        self.trainingId = dto.trainingId
+        // Uwaga: RecordingDto nie zawiera horseId — to pochodzi z treningu (ExportDocument.parse uzupełnia).
         // Tutaj używamy placeholdera dla horseId; nadpiszemy go w parse().
         let placeholderHorseId = "placeholder"
         let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
