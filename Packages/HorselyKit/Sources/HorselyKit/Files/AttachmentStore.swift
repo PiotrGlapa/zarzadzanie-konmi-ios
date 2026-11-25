@@ -206,13 +206,29 @@ public final class AttachmentStore: Sendable {
 
     private func record(_ id: String, _ owner: AttachmentOwner, _ pending: PendingAttachment, now: LocalDateTime) -> LocalAttachment {
         let text = pending.description?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let place = Self.place(latitude: pending.latitude, longitude: pending.longitude)
         return LocalAttachment(
             id: id, createdAt: now, updatedAt: now, version: 1, ownerType: owner.type, ownerId: owner.id, horseId: owner.horseId,
             fileName: pending.file.fileName, contentType: pending.file.contentType, sizeBytes: pending.file.sizeBytes, sha256: pending.file.sha256,
             description: (text?.isEmpty ?? true) ? nil : String(text!.prefix(Self.descriptionLimit)),
             // Metadane jak w programie 3.0: chwila wykonania i współrzędne z 7 miejscami po przecinku (HALF_UP).
-            capturedAt: pending.capturedAt, latitude: pending.latitude.map(DecimalText.coordinate), longitude: pending.longitude.map(DecimalText.coordinate)
+            capturedAt: pending.capturedAt, latitude: place.latitude, longitude: place.longitude
         )
+    }
+
+    /// Miejsce wykonania pliku: współrzędne z 7 miejscami po przecinku (HALF_UP) w zakresie WGS84 (szerokość -90…90, długość -180…180).
+    /// Wartość spoza zakresu (albo `NaN`) odrzuca całe miejsce — jak `MediaMetadataReader` Androida, który traktuje taką parę jako „brak
+    /// położenia”; plik jest dodawany bez miejsca. Rekord spoza zakresu psułby kopię i eksport (schemat 1.6 ma `minimum`/`maximum`).
+    static func place(latitude: Decimal?, longitude: Decimal?) -> (latitude: Decimal?, longitude: Decimal?) {
+        func rounded(_ value: Decimal?, limit: Decimal) -> (value: Decimal?, valid: Bool) {
+            guard let value else { return (nil, true) }
+            guard !value.isNaN else { return (nil, false) }
+            let result = DecimalText.coordinate(value)
+            return (result, result >= -limit && result <= limit)
+        }
+        let lat = rounded(latitude, limit: 90)
+        let lon = rounded(longitude, limit: 180)
+        return lat.valid && lon.valid ? (lat.value, lon.value) : (nil, nil)
     }
 
     /// Miniatura filmu (JPEG ≤ 1 MB) w magazynie plików, przypięta; `nil`, gdy jej nie ma albo jest za duża.

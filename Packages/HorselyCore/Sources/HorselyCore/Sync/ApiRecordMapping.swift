@@ -54,8 +54,10 @@ public enum ApiRecordMapping {
                 })
             }
         case .attachment:
-            // Załącznik z programu może nie mieć `updatedAt` (DTO ma tylko `createdAt`) — jak `Attachment.toRecord` Androida.
+            // Załącznik z programu może nie mieć `updatedAt` ani `version` (DTO ma tylko `createdAt`) — jak `Attachment.toRecord(version = 1,
+            // updatedAt = createdAt)` Androida; wersja 0 psułaby eksport (schemat 1.6 wymaga `version >= 1`).
             if fields["updatedAt"] == nil || fields["updatedAt"] == .null { fields["updatedAt"] = fields["createdAt"] ?? .null }
+            if fields["version"] == nil || fields["version"] == .null { fields["version"] = .number(1) }
         case .competitionStart:
             if let parentId, fields["competitionId"] == nil || fields["competitionId"] == .null { fields["competitionId"] = .string(parentId) }
         default:

@@ -128,7 +128,7 @@ struct AttachmentOperationTests {
         let pending = try video(setup, thumbnail: try thumbnailFile(setup, Self.jpegBytes))
         let sha = pending.file.sha256
         setup.program.on("POST", "attachments", .json(201, #"""
-        [{"id":"srv-a1","version":1,"ownerType":"Training","ownerId":"t1","horseId":"h1","fileName":"jazda.mp4","contentType":"video/mp4","sizeBytes":2048,
+        [{"id":"srv-a1","ownerType":"Training","ownerId":"t1","horseId":"h1","fileName":"jazda.mp4","contentType":"video/mp4","sizeBytes":2048,
           "sha256":"\#(sha)","hasThumbnail":true,"fileAvailable":true,"createdAt":"2026-09-01T08:20:41","updatedAt":"2026-09-01T08:20:41",
           "capturedAt":"2026-09-01T08:15:00Z","latitude":52.2297000,"longitude":21.0122000}]
         """#))
@@ -160,6 +160,7 @@ struct AttachmentOperationTests {
         // Po wysyłce: rekord z odpowiedzi programu zachowuje skalę współrzędnych (bez `Double`), a plik i miniatura znikają.
         let stored = try #require(try await setup.store.get(.attachment, id: "srv-a1")?.record(as: LocalAttachment.self))
         #expect(stored.ownerType == .training)
+        #expect(stored.version == 1, "odpowiedź programu bez `version` — rekord dostaje wersję 1 (eksport 1.6 wymaga >= 1)")
         #expect(stored.capturedAt == InstantText.parse("2026-09-01T08:15:00Z"))
         #expect(stored.latitude.map(DecimalText.text) == "52.2297000")
         #expect(stored.longitude.map(DecimalText.text) == "21.0122000")
@@ -267,7 +268,42 @@ struct AttachmentOperationTests {
             #expect(attachment.capturedAt == nil)
             #expect(attachment.latitude == nil)
             #expect(attachment.longitude == nil)
+            #expect(attachment.version == 1, "DTO bez `version` — wersja 1 jak `Attachment.toRecord` Androida")
+            #expect(attachment.updatedAt == attachment.createdAt)
         }
+    }
+
+    @Test func coordinatesOutsideTheWgs84RangeAreDroppedAndTheBoundsAreKept() async throws {
+        let setup = try makeSetup(capabilities: Self.withTrainingAttachments)
+        setup.program.on("POST", "attachments", .json(201, #"{"id":"srv-a1"}"#), .json(201, #"{"id":"srv-a2"}"#), .json(201, #"{"id":"srv-a3"}"#))
+        let owner = AttachmentOwner(type: .training, id: "t1", horseId: "h1")
+        let ids = try await setup.attachments.add(owner, [
+            try video(setup, latitude: "91", longitude: "21.0122"),
+            try video(setup, latitude: "52.2297", longitude: "181"),
+            try video(setup, latitude: "90", longitude: "-180"),
+        ])
+
+        var records: [LocalAttachment] = []
+        for id in ids { records.append(try #require(try await setup.store.get(.attachment, id: id)?.record(as: LocalAttachment.self))) }
+        for dropped in records.prefix(2) {
+            #expect(dropped.latitude == nil && dropped.longitude == nil, "miejsce spoza zakresu odrzucone w całości")
+            #expect(dropped.capturedAt == InstantText.parse("2026-09-01T08:15:00Z"), "chwila zostaje")
+        }
+        #expect(records[2].latitude.map(DecimalText.text) == "90.0000000")
+        #expect(records[2].longitude.map(DecimalText.text) == "-180.0000000")
+        let queued = try await setup.store.read { access in try access.operations().compactMap { try access.outboxFile($0.id) } }
+        #expect(queued.map { $0.latitude == nil && $0.longitude == nil } == [true, true, false])
+
+        #expect(await setup.processor.processAll().sent == 3)
+
+        let requests = setup.program.requests("POST", "attachments")
+        #expect(requests.count == 3)
+        for request in requests.prefix(2) {
+            #expect(try parts(of: request).map(\.name) == ["ownerType", "ownerId", "capturedAt", "file"])
+        }
+        let bounds = Dictionary(uniqueKeysWithValues: try parts(of: requests[2]).map { ($0.name, $0.text) })
+        #expect(bounds["latitude"] == "90.0000000")
+        #expect(bounds["longitude"] == "-180.0000000")
     }
 
     @Test func aLostUploadIsSettledByCountingTheSha256BeforeAndAfter() async throws {
