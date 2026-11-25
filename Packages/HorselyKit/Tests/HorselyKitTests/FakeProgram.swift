@@ -78,8 +78,7 @@ final class FakeProgram: @unchecked Sendable {
         let method = request.httpMethod ?? "GET"
         lock.lock()
         defer { lock.unlock() }
-        var allHeaders = request.allHTTPHeaderFields ?? [:]
-        allHeaders["url"] = url.absoluteString
+        let allHeaders = request.allHTTPHeaderFields ?? [:]
         recorded.append(Recorded(method: method, path: path, url: url.absoluteString, headers: allHeaders, body: body))
         guard let index = routes.lastIndex(where: { $0.method == method && ($0.path == path || ($0.path.hasSuffix("*") && path.hasPrefix(String($0.path.dropLast())))) }) else {
             if pushEnabled, let pushed = pushReply(method: method, path: path, body: body) { return pushed }

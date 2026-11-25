@@ -162,51 +162,70 @@ struct ApiClientTests {
 
     // MARK: Task 4 — przełączanie /api/v1 ↔ /api/v3
 
+    private let v3Capabilities = ProgramCapabilities(names: ["apiV3"])
+
+    /// Klient z jednym adresem o podanym adresie bazowym (np. za pośrednikiem `/proxy/api/v1/`).
+    private func makeClient(_ program: FakeProgram, baseUrl: String, capabilities: ProgramCapabilities) -> ApiClient {
+        let address = ServerAddress(id: "a", url: baseUrl, position: 0, trustMode: .plainHttpConfirmed, isRemote: false)
+        return program.client(addresses: [address], capabilities: capabilities).0
+    }
+
     @Test func v1PathIsRewrittenWhenServerHasV3() async {
         let program = FakeProgram()
-        program.on("GET", "trainings", .json(200, #"{"items":[],"totalCount":0}"#))
-        let caps = ProgramCapabilities(names: ["apiV3"])
-        let (client, _) = program.client(capabilities: caps)
+        let client = makeClient(program, baseUrl: "http://\(program.host):5080/proxy/api/v1/", capabilities: v3Capabilities)
         _ = await client.get("trainings")
-        #expect(program.requests.count == 1)
-        let url = program.requests.first!.url
-        #expect(url.contains("/api/v3/"))
-        #expect(!url.contains("/api/v1/"))
+        #expect(program.requests.map(\.url) == ["http://\(program.host):5080/proxy/api/v3/trainings"])
     }
 
     @Test func systemInfoAlwaysGoesToV1() async {
         let program = FakeProgram()
         program.on("GET", "system/info", .json(200, #"{"appVersion":"3.0.0","apiVersion":"v1","capabilities":["apiV3"],"apiVersions":["1","3"],"dataSchemaVersion":"3.0"}"#))
-        let caps = ProgramCapabilities(names: ["apiV3"])
-        let (client, _) = program.client(capabilities: caps)
+        let (client, _) = program.client(capabilities: v3Capabilities)
         _ = await client.systemInfo()
-        #expect(program.requests.count == 1)
-        let url = program.requests.first!.url
-        #expect(url.contains("/api/v1/"))
+        _ = await client.get("system/info?verbose=1")
+        #expect(program.requests.map(\.url) == [program.baseUrl + "/system/info", program.baseUrl + "/system/info?verbose=1"])
     }
 
     @Test func nothingChangesWithoutV3() async {
         let program = FakeProgram()
         program.on("GET", "trainings", .json(200, #"{"items":[],"totalCount":0}"#))
-        let caps = ProgramCapabilities(names: ["horseStatusInjured"])
-        let (client, _) = program.client(capabilities: caps)
+        let (client, _) = program.client(capabilities: ProgramCapabilities(names: ["horseStatusInjured"]))
         _ = await client.get("trainings")
-        #expect(program.requests.count == 1)
-        let url = program.requests.first!.url
-        #expect(url.contains("/api/v1/"))
+        #expect(program.requests.map(\.url) == [program.baseUrl + "/trainings"])
+
+        let proxied = FakeProgram()
+        let proxiedClient = makeClient(proxied, baseUrl: "http://\(proxied.host):5080/proxy/api/v1", capabilities: .none)
+        _ = await proxiedClient.get("trainings")
+        #expect(proxied.requests.map(\.url) == ["http://\(proxied.host):5080/proxy/api/v1/trainings"])
     }
 
     @Test func queryAndEncodedSegmentsAreKept() async {
         let program = FakeProgram()
-        program.on("GET", "trainings", .json(200, #"{"items":[],"totalCount":0}"#))
-        let caps = ProgramCapabilities(names: ["apiV3"])
-        let (client, _) = program.client(capabilities: caps)
-        _ = await client.pages("trainings")
-        #expect(program.requests.count == 1)
-        let url = program.requests.first!.url
-        #expect(url.contains("/api/v3/"))
-        #expect(url.contains("page="))
-        #expect(url.contains("pageSize="))
+        let (client, _) = program.client(capabilities: v3Capabilities)
+        _ = await client.get("horses/a%2Fb/trainings?name=Jan%20Kowalski&page=2&pageSize=200")
+        #expect(program.requests.map(\.url) == [program.baseUrl.replacingOccurrences(of: "/api/v1", with: "/api/v3") + "/horses/a%2Fb/trainings?name=Jan%20Kowalski&page=2&pageSize=200"])
+    }
+
+    @Test func aBadAddressGivesNoUsableAddressWithAndWithoutV3() async {
+        let program = FakeProgram()
+        let withV3 = makeClient(program, baseUrl: "", capabilities: v3Capabilities)
+        #expect(await withV3.get("trainings").failure == .noUsableAddress)
+        let withoutV3 = makeClient(program, baseUrl: "", capabilities: .none)
+        #expect(await withoutV3.get("trainings").failure == .noUsableAddress)
+        #expect(program.requests.isEmpty)
+    }
+
+    @Test func versionedPathReplacesOnlyTheLastApiV1() throws {
+        func rewritten(_ base: String, apiV3: Bool) throws -> String? {
+            ApiClient.versionedPath(try #require(URL(string: base)), apiV3: apiV3, relative: "trainings")?.absoluteString
+        }
+        #expect(try rewritten("https://h/api/v1x/api/v1", apiV3: true) == "https://h/api/v1x/api/v3/trainings")
+        #expect(try rewritten("https://h/api/v1/proxy/api/v1", apiV3: true) == "https://h/api/v1/proxy/api/v3/trainings")
+        #expect(try rewritten("https://h/proxy/api/v1/", apiV3: true) == "https://h/proxy/api/v3/trainings")
+        #expect(try rewritten("https://h/api/v1x", apiV3: true) == "https://h/api/v1x/trainings")
+        #expect(try rewritten("https://h/other", apiV3: true) == "https://h/other/trainings")
+        #expect(try rewritten("https://h/api/v1x/api/v1", apiV3: false) == "https://h/api/v1x/api/v1/trainings")
+        #expect(ApiClient.versionedPath(try #require(URL(string: "https://h/api/v1")), apiV3: true, relative: "horses/a%2Fb?q=1%202")?.absoluteString == "https://h/api/v3/horses/a%2Fb?q=1%202")
     }
 }
 

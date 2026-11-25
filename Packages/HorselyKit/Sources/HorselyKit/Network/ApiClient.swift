@@ -240,14 +240,11 @@ public final class ApiClient: Sendable {
         let featureSet: ProgramCapabilities
         if let features { featureSet = features } else { featureSet = await capabilities() }
         let apiV3 = featureSet.apiV3
-        // system/info zawsze idzie do v1 — nie zamieniaj ścieżki.
-        let isSystemInfo = request.path == "system/info"
-        let url: URL
-        if isSystemInfo || !apiV3 {
-            url = URL(string: address.url + "/" + request.path) ?? URL(string: "/" + request.path)!
-        } else {
-            url = Self.versionedPath(URL(string: address.url)!, apiV3: apiV3, relative: request.path)
-        }
+        // system/info (także z zapytaniem) zawsze idzie do v1 — nie zamieniaj ścieżki.
+        let isSystemInfo = request.path.hasPrefix("system/info")
+        guard let base = URL(string: address.url),
+              let url = Self.versionedPath(base, apiV3: apiV3 && !isSystemInfo, relative: request.path)
+        else { return .failure(.noUsableAddress) }
         let conditions = network()
 
         // Limit połączenia 3 s: niedostępny adres nie zatrzymuje żądania na 30 s.
@@ -336,13 +333,22 @@ public final class ApiClient: Sendable {
         return (checked?.host ?? address.hostAndPort, checked?.port ?? (address.isHttps ? 443 : 80))
     }
 
-    /// Zamienia ostatnie `api/v1` w ścieżce bazowej na `api/v3`.
-    static func versionedPath(_ base: URL, apiV3: Bool, relative: String) -> URL {
-        guard apiV3, let range = base.absoluteString.range(of: "/api/v1", options: .backwards) else {
-            return URL(string: base.absoluteString + "/" + relative) ?? URL(string: "/" + relative)!
+    /// Adres żądania: ścieżka bazowa + `/` + `relative` (zapytanie i zakodowane segmenty bez zmian). Przy `apiV3` zamienia **ostatni**
+    /// segment `api/v1` w ścieżce bazowej na `api/v3`. Zły adres → `nil`.
+    static func versionedPath(_ base: URL, apiV3: Bool, relative: String) -> URL? {
+        var text = base.absoluteString
+        while text.hasSuffix("/") { text.removeLast() }
+        if apiV3 {
+            var searched = text.startIndex..<text.endIndex
+            while let range = text.range(of: "/api/v1", options: .backwards, range: searched) {
+                if range.upperBound == text.endIndex || text[range.upperBound] == "/" {
+                    text.replaceSubrange(range, with: "/api/v3")
+                    break
+                }
+                searched = text.startIndex..<range.lowerBound
+            }
         }
-        let v3 = base.absoluteString.replacingCharacters(in: range, with: "/api/v3")
-        return URL(string: v3 + "/" + relative) ?? URL(string: "/" + relative)!
+        return URL(string: text + "/" + relative)
     }
 
     // MARK: Skróty

@@ -39,30 +39,37 @@ struct CapabilitiesTests {
 
     // MARK: - Task 3: Wersje API i nowe możliwości
 
-    /// `system/info` z wersją 3.0.0 — parsuje `apiVersions`, `dataSchemaVersion` i wszystkie trzy nowe możliwości.
+    /// `system/info` z wersją 3.0.0 — plik `v3/system-info.json` to kopia 1:1 przykładu z Androida ([K] 1).
     @Test func systemInfo300IsParsed() throws {
-        // Przykład z [K] 1 — plik system-info.json w v3/
-        let json = """
-            {
-                "appVersion": "3.0.0",
-                "apiVersion": "v3",
-                "schemaVersion": "1.6",
-                "serverTime": "2026-11-22T10:00:00Z",
-                "capabilities": ["updatedSince", "dataStamp", "ifMatchDelete", "idempotencyKey", "horsePhotoField", "horseStatusInjured", "push", "trainingAttachments", "trainingRecordings"],
-                "dataStamp": "2026-11-22T09:00:00Z",
-                "apiVersions": ["1", "3"],
-                "dataSchemaVersion": "3.0"
-            }
-            """
-        let decoder = JSONDecoder()
-        let info = try decoder.decode(ProgramInfo.self, from: json.data(using: .utf8)!)
-        #expect(info.appVersion == "3.0.0")
+        let info = try JSONDecoder().decode(ProgramInfo.self, from: Fixtures.data("v3/system-info.json"))
+        #expect(info.appVersion == "2.0.0+java.3.0.0")
+        #expect(info.apiVersion == "v1")
+        #expect(info.schemaVersion == "1.5")
+        #expect(info.serverTime == "2026-11-14T10:00:00")
+        #expect(info.dataStamp == "9f2c4a7e1b3d5a60")
         #expect(info.apiVersions == ["1", "3"])
         #expect(info.dataSchemaVersion == "3.0")
+        #expect(info.capabilities == ["updatedSince", "ifMatchDelete", "idempotencyKey", "horsePhotoField", "dataStamp", "horseStatusInjured", "reportExport", "trainingAttachments", "trainingRecordings"])
         let caps = ProgramCapabilities.of(info)
         #expect(caps.apiV3)
         #expect(caps.trainingAttachments)
         #expect(caps.trainingRecordings)
+        #expect(!caps.names.contains("reportExport"))
+    }
+
+    /// Produkcyjna ścieżka (`ProgramInfo.programCapabilities`, używana przez parowanie i synchronizację) też wylicza `apiV3`.
+    @Test func programCapabilitiesOfDecodedSystemInfoHaveApiV3() throws {
+        let info = try JSONDecoder().decode(ProgramInfo.self, from: Fixtures.data("v3/system-info.json"))
+        #expect(info.programCapabilities.apiV3)
+        #expect(info.programCapabilities == ProgramCapabilities.of(info))
+        #expect(ProgramCapabilities(serialized: info.programCapabilities.serialized).apiV3)
+    }
+
+    /// Program bez `apiVersions` (2.x) nie dostaje `apiV3` także przez `programCapabilities`.
+    @Test func programCapabilitiesOfServer2xHaveNoApiV3() {
+        let info = ProgramInfo(appVersion: "2.1.0", capabilities: ["updatedSince", "dataStamp"], apiVersions: ["1"])
+        #expect(!info.programCapabilities.apiV3)
+        #expect(info.programCapabilities.updatedSince)
     }
 
     /// Serwer 2.x nie ma `apiVersions` → `apiV3` jest false.

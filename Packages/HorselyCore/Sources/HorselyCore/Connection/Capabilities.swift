@@ -27,7 +27,7 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     /// Program bez listy możliwości (1.5.0–1.6.x) i tryb samodzielny.
     public static let none = ProgramCapabilities(names: [])
 
-    public var names: Set<String>
+    public let names: Set<String>
 
     /// Z listy z `system/info`; nieznane nazwy są pomijane.
     public init(names: some Sequence<String>) {
@@ -68,11 +68,7 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
 
     /// Oblicza możliwości z `ProgramInfo` — dodaje `apiV3`, gdy `apiVersions` zawiera `"3"`.
     public static func of(_ info: ProgramInfo) -> ProgramCapabilities {
-        var caps = ProgramCapabilities(names: info.capabilities)
-        if info.apiVersions.contains("3") {
-            caps.names.insert(Self.apiV3Name)
-        }
-        return caps
+        ProgramCapabilities(names: info.capabilities + (info.apiVersions.contains("3") ? [Self.apiV3Name] : []))
     }
 }
 
@@ -153,5 +149,6 @@ public struct ProgramInfo: Decodable, Equatable, Sendable {
         dataSchemaVersion = try c.decodeIfPresent(String.self, forKey: .dataSchemaVersion)
     }
 
-    public var programCapabilities: ProgramCapabilities { ProgramCapabilities(names: capabilities) }
+    /// Możliwości zapisywane po `system/info`: lista z programu plus `apiV3`, gdy `apiVersions` zawiera `"3"`.
+    public var programCapabilities: ProgramCapabilities { ProgramCapabilities.of(self) }
 }
