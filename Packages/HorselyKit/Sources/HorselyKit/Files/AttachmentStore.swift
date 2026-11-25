@@ -34,14 +34,25 @@ public struct ImportedFile: Hashable, Sendable {
     }
 }
 
-/// Plik wybrany przez użytkownika z opisem (≤ 500 znaków).
+/// Plik wybrany przez użytkownika z opisem (≤ 500 znaków). Od 3.0 także chwila i miejsce wykonania (`capturedAt`, `latitude`,
+/// `longitude` — WGS84) oraz miniatura filmu JPEG ≤ 1 MB (`thumbnail`; plik przechodzi na własność operacji albo rekordu).
 public struct PendingAttachment: Hashable, Sendable {
     public let file: ImportedFile
     public let description: String?
+    public let capturedAt: Date?
+    public let latitude: Decimal?
+    public let longitude: Decimal?
+    public let thumbnail: URL?
 
-    public init(file: ImportedFile, description: String? = nil) {
+    public init(
+        file: ImportedFile, description: String? = nil, capturedAt: Date? = nil, latitude: Decimal? = nil, longitude: Decimal? = nil, thumbnail: URL? = nil
+    ) {
         self.file = file
         self.description = description
+        self.capturedAt = capturedAt
+        self.latitude = latitude
+        self.longitude = longitude
+        self.thumbnail = thumbnail
     }
 }
 
@@ -198,17 +209,28 @@ public final class AttachmentStore: Sendable {
         return LocalAttachment(
             id: id, createdAt: now, updatedAt: now, version: 1, ownerType: owner.type, ownerId: owner.id, horseId: owner.horseId,
             fileName: pending.file.fileName, contentType: pending.file.contentType, sizeBytes: pending.file.sizeBytes, sha256: pending.file.sha256,
-            description: (text?.isEmpty ?? true) ? nil : String(text!.prefix(Self.descriptionLimit))
+            description: (text?.isEmpty ?? true) ? nil : String(text!.prefix(Self.descriptionLimit)),
+            // Metadane jak w programie 3.0: chwila wykonania i współrzędne z 7 miejscami po przecinku (HALF_UP).
+            capturedAt: pending.capturedAt, latitude: pending.latitude.map(DecimalText.coordinate), longitude: pending.longitude.map(DecimalText.coordinate)
         )
+    }
+
+    /// Miniatura filmu (JPEG ≤ 1 MB) w magazynie plików, przypięta; `nil`, gdy jej nie ma albo jest za duża.
+    private func storeVideoThumbnail(_ source: URL?, attachmentId: String) -> LocalFileInfo? {
+        guard let source, let data = FileManager.default.contents(atPath: source.path), !data.isEmpty, Int64(data.count) <= OutboxFile.maxThumbnailBytes else {
+            return nil
+        }
+        return try? files.write(data, attachmentId: attachmentId, kind: .thumbnail, pinned: true)
     }
 
     private func addLocal(_ owner: AttachmentOwner, _ pending: PendingAttachment) async throws -> String {
         let id = UUID().uuidString.lowercased()
         // Najpierw plik, potem rekord: przerwanie zostawia najwyżej osierocony plik, a nie rekord bez pliku.
         let original = try files.move(pending.file.url, attachmentId: id, kind: .original, pinned: true)
+        // Film z jazdy: miniaturę (JPEG ≤ 1 MB) przygotował telefon przy nagrywaniu — zapisujemy ją jak miniaturę zdjęcia.
         let thumbnail = FilePolicy.isImage(pending.file.contentType)
             ? (try? ImagePreparer.thumbnail(try Data(contentsOf: files.url(for: original)))).flatMap { try? files.write($0, attachmentId: id, kind: .thumbnail, pinned: true) }
-            : nil
+            : storeVideoThumbnail(pending.thumbnail, attachmentId: id)
         let attachment = record(id, owner, pending, now: dates.now())
         do {
             try await store.write { access in
@@ -221,6 +243,7 @@ public final class AttachmentStore: Sendable {
             throw error
         }
         try? FileManager.default.removeItem(at: pending.file.url.deletingLastPathComponent())
+        if let source = pending.thumbnail { try? FileManager.default.removeItem(at: source) }
         return id
     }
 
@@ -232,6 +255,13 @@ public final class AttachmentStore: Sendable {
         let target = folder.appendingPathComponent(pending.file.fileName)
         try FileManager.default.moveItem(at: pending.file.url, to: target)
         try? FileManager.default.removeItem(at: pending.file.url.deletingLastPathComponent())
+        // Miniatura filmu to druga kopia w katalogu operacji — znika razem z plikiem.
+        var thumbnailPath: String?
+        if let source = pending.thumbnail {
+            let copy = folder.appendingPathComponent("thumbnail.jpg")
+            try? FileManager.default.removeItem(at: copy)
+            if (try? FileManager.default.moveItem(at: source, to: copy)) != nil { thumbnailPath = copy.path }
+        }
         let thumbnail = FilePolicy.isImage(pending.file.contentType)
             ? (try? ImagePreparer.thumbnail(try Data(contentsOf: target))).flatMap { try? files.write($0, attachmentId: id, kind: .thumbnail, pinned: true) }
             : nil
@@ -239,7 +269,8 @@ public final class AttachmentStore: Sendable {
         let moment = Date()
         let file = OutboxFile(
             operationId: operationId, path: target.path, fileName: pending.file.fileName, contentType: pending.file.contentType,
-            sizeBytes: pending.file.sizeBytes, sha256: pending.file.sha256, description: attachment.description
+            sizeBytes: pending.file.sizeBytes, sha256: pending.file.sha256, description: attachment.description,
+            capturedAt: attachment.capturedAt, latitude: attachment.latitude, longitude: attachment.longitude, thumbnailPath: thumbnailPath
         )
         do {
             try await store.write { access in

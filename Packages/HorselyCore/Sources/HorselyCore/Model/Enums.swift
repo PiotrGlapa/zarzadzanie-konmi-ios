@@ -94,6 +94,8 @@ public enum AttachmentOwnerType: String, Codable, Sendable, CaseIterable {
     case purchase = "Purchase"
     case note = "Note"
     case contact = "Contact"
+    /// Od 3.0 (możliwość `trainingAttachments`): załączniki treningu — zdjęcia i filmy z jazdy.
+    case training = "Training"
 }
 
 /// Rodzaje rekordów magazynu lokalnego (data-model.md §1) — 1:1 z `$defs` schematu eksportu. Starty zawodów są osobnymi

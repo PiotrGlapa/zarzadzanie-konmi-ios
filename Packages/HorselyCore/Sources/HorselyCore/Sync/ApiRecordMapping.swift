@@ -58,7 +58,9 @@ public enum ApiRecordMapping {
         default:
             break
         }
-        guard let data = try? JSONValue.object(fields).data() else { return nil }
+        // Załącznik: współrzędne zachowują skalę zapisu (`52.2297000`), a `JSONEncoder` jej nie gwarantuje — treść idzie tekstem ze skalą.
+        let body = JSONValue.object(fields)
+        guard let data = type == .attachment ? Data(body.textKeepingScale().utf8) : (try? body.data()) else { return nil }
         return try? RecordCodec.decode(type, from: data)
     }
 

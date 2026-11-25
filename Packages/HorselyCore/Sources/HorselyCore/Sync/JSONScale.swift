@@ -76,6 +76,25 @@ public enum DecimalText {
         return value.sign == .minus && !value.isZero ? "-" + digits : digits
     }
 
+    /// Współrzędna z 7 miejscami po przecinku (HALF_UP — remis od zera, jak `RoundingMode.HALF_UP`): tyle zapisuje program ([K] 2.1).
+    /// `52.2297` → `52.2297000`, `-0.00000005` → `-0.0000001`.
+    public static func coordinateText(_ value: Decimal) -> String {
+        var source = value
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &source, coordinateScale, .plain)
+        var text = Self.text(rounded)
+        if !text.contains(".") { text += "." }
+        let fraction = text.split(separator: ".", omittingEmptySubsequences: false).last.map(\.count) ?? 0
+        return text + String(repeating: "0", count: max(0, coordinateScale - fraction))
+    }
+
+    /// Współrzędna jak w `coordinateText`, jako `Decimal` o skali 7 (zapis w rekordzie załącznika).
+    public static func coordinate(_ value: Decimal) -> Decimal {
+        parse(coordinateText(value)) ?? value
+    }
+
+    public static let coordinateScale = 7
+
     private static func isDigit(_ byte: UInt8) -> Bool {
         byte >= UInt8(ascii: "0") && byte <= UInt8(ascii: "9")
     }

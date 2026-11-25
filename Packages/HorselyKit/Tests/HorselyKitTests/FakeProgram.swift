@@ -67,7 +67,8 @@ final class FakeProgram: @unchecked Sendable {
             stream.open()
             var data = Data()
             var buffer = [UInt8](repeating: 0, count: 4096)
-            while stream.hasBytesAvailable {
+            // Czytamy do końca strumienia (0 bajtów) — wysyłka pliku (`multipart`) ma treść większą niż jedna porcja.
+            while true {
                 let read = stream.read(&buffer, maxLength: buffer.count)
                 if read <= 0 { break }
                 data.append(buffer, count: read)

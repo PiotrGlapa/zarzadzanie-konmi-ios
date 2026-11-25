@@ -79,6 +79,7 @@ extension AppEnvironment {
         case .purchase: .purchase
         case .note: .note
         case .contact: .contact
+        case .training: .training
         }
     }
 }

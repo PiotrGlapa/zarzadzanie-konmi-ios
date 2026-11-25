@@ -24,6 +24,9 @@ public struct ApiResponse: Sendable, Equatable {
 
     public var json: JSONValue? { try? JSONValue.parse(body) }
 
+    /// Treść z liczbami o skali zapisu (`52.2297000`) — `JSONDecoder` czyta liczby przez `Double` i ją gubi (współrzędne załączników).
+    public var scaledJSON: JSONValue? { try? JSONValue.parseKeepingScale(body) }
+
     public func decode<T: Decodable>(_ type: T.Type) -> T? {
         try? JSONDecoder().decode(type, from: body)
     }

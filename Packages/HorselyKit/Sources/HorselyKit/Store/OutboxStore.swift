@@ -130,6 +130,8 @@ extension RecordAccess {
 
     // MARK: Zapis wiersza
 
+    /// Zapis pliku w `fileRef` (JSON). Pola 3.0 są opcjonalne, więc wiersze zapisane wcześniej czytają się bez zmian; chwila i
+    /// współrzędne — jako tekst (`Instant.toString()`, liczba ze skalą zapisu), bez pośrednictwa `Double`.
     private struct StoredFile: Codable {
         let path: String
         let fileName: String
@@ -137,6 +139,10 @@ extension RecordAccess {
         let sizeBytes: Int64
         let sha256: String
         let description: String?
+        let capturedAt: String?
+        let latitude: String?
+        let longitude: String?
+        let thumbnailPath: String?
 
         init(_ file: OutboxFile) {
             path = file.path
@@ -145,10 +151,18 @@ extension RecordAccess {
             sizeBytes = file.sizeBytes
             sha256 = file.sha256
             description = file.description
+            capturedAt = file.capturedAt.map(InstantText.format)
+            latitude = file.latitude.map(DecimalText.text)
+            longitude = file.longitude.map(DecimalText.text)
+            thumbnailPath = file.thumbnailPath
         }
 
         func file(_ operationId: String) -> OutboxFile {
-            OutboxFile(operationId: operationId, path: path, fileName: fileName, contentType: contentType, sizeBytes: sizeBytes, sha256: sha256, description: description)
+            OutboxFile(
+                operationId: operationId, path: path, fileName: fileName, contentType: contentType, sizeBytes: sizeBytes, sha256: sha256,
+                description: description, capturedAt: capturedAt.flatMap(InstantText.parse), latitude: latitude.flatMap(DecimalText.parse),
+                longitude: longitude.flatMap(DecimalText.parse), thumbnailPath: thumbnailPath
+            )
         }
     }
 

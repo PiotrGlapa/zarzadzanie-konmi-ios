@@ -245,8 +245,9 @@ public actor OutboxProcessor {
         let all = await operations()
         let byId = Dictionary(all.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
         let moment = now()
+        let program = await capabilities()
         return all.first { op in
-            op.state == .pending && !skipped.contains(op.id) && (only?.contains(op.id) ?? true)
+            op.state == .pending && !op.waitsForProgramUpdate(program) && !skipped.contains(op.id) && (only?.contains(op.id) ?? true)
                 && (op.nextAttemptAt.map { $0 <= moment } ?? true)
                 && op.dependsOn.allSatisfy { byId[$0]?.state == .sent }
                 // Zmiany tego samego rekordu wychodzą po kolei.
@@ -431,15 +432,15 @@ public actor OutboxProcessor {
             guard let file else { return .failure(.badResponse) }
             let upload: URL
             do {
-                upload = try MultipartBody.write(fields: [("ownerType", op.text("ownerType") ?? ""), ("ownerId", op.text("ownerId") ?? "")]
-                    + (file.description.map { [("description", $0)] } ?? []), file: file)
+                upload = try MultipartBody.write(fields: Self.attachmentFields(op, file: file), file: file, thumbnail: Self.thumbnail(of: file))
             } catch {
                 return .failure(.badResponse)
             }
             defer { try? FileManager.default.removeItem(at: upload) }
             let request = ApiRequest(.post, "attachments", contentType: "multipart/form-data; boundary=\(MultipartBody.boundary)", bodyFile: upload, idempotencyKey: key, forFile: true)
             return await client.execute(request, progress: Self.progress(uploadProgress, operationId: op.id)).map { response in
-                let json = response.json
+                // Współrzędne załącznika zachowują skalę zapisu (7 miejsc) — bez pośrednictwa `Double`.
+                let json = response.scaledJSON ?? response.json
                 let first = json?.arrayValue?.first ?? json
                 return (first?["id"]?.stringValue, first)
             }
@@ -456,6 +457,28 @@ public actor OutboxProcessor {
                 return (first?["id"]?.stringValue ?? response.location.map { String($0.split(separator: "/").last ?? "") }, json)
             }
         }
+    }
+
+    /// Pola tekstowe żądania `POST attachments`: właściciel i opis, a od 3.0 chwila (`Instant.toString()`) i miejsce wykonania pliku
+    /// (współrzędne z 7 miejscami po przecinku, HALF_UP). Brak metadanych — brak części.
+    static func attachmentFields(_ op: OutboxOperation, file: OutboxFile) -> [(String, String)] {
+        var fields = [("ownerType", op.text("ownerType") ?? ""), ("ownerId", op.text("ownerId") ?? "")]
+        if let description = file.description { fields.append(("description", description)) }
+        if let capturedAt = file.capturedAt { fields.append(("capturedAt", InstantText.format(capturedAt))) }
+        if let latitude = file.latitude { fields.append(("latitude", DecimalText.coordinateText(latitude))) }
+        if let longitude = file.longitude { fields.append(("longitude", DecimalText.coordinateText(longitude))) }
+        return fields
+    }
+
+    private static let jpegSignature: [UInt8] = [0xFF, 0xD8, 0xFF]
+
+    /// Miniatura filmu jako część `thumbnail`. Jest dodatkiem: brak pliku, rozmiar ponad 1 MB albo plik, który nie jest JPEG-iem
+    /// (sygnatura `FF D8 FF`), pomija miniaturę, zamiast zatrzymywać wysyłkę filmu — program odrzuciłby cały załącznik z błędem `400`.
+    static func thumbnail(of file: OutboxFile) -> (name: String, data: Data)? {
+        guard let path = file.thumbnailPath, let data = FileManager.default.contents(atPath: path),
+              !data.isEmpty, Int64(data.count) <= OutboxFile.maxThumbnailBytes, data.starts(with: jpegSignature)
+        else { return nil }
+        return ((path as NSString).lastPathComponent, data)
     }
 
     private func handleResult(_ op: OutboxOperation, _ result: Result<(id: String?, json: JSONValue?), ApiFailure>) async -> Step {
@@ -609,7 +632,7 @@ public actor OutboxProcessor {
     }
 
     static func release(_ file: OutboxFile) {
-        try? FileManager.default.removeItem(atPath: file.path)
+        file.deleteFiles()
     }
 
     // MARK: Wynik nieznany: licznik przed i po
@@ -773,7 +796,7 @@ extension OperationCoalescer {
 enum MultipartBody {
     static let boundary = "HorselyBoundary7d1c9a"
 
-    static func write(fields: [(String, String)], file: OutboxFile) throws -> URL {
+    static func write(fields: [(String, String)], file: OutboxFile, thumbnail: (name: String, data: Data)? = nil) throws -> URL {
         let target = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-upload-\(UUID().uuidString)")
         FileManager.default.createFile(atPath: target.path, contents: nil)
         let handle = try FileHandle(forWritingTo: target)
@@ -789,7 +812,14 @@ enum MultipartBody {
         while let chunk = try source.read(upToCount: 1 << 20), !chunk.isEmpty {
             try handle.write(contentsOf: chunk)
         }
-        try text("\r\n--\(boundary)--\r\n")
+        try text("\r\n")
+        if let thumbnail {
+            let name = thumbnail.name.replacingOccurrences(of: "\"", with: "")
+            try text("--\(boundary)\r\nContent-Disposition: form-data; name=\"thumbnail\"; filename=\"\(name)\"\r\nContent-Type: image/jpeg\r\n\r\n")
+            try handle.write(contentsOf: thumbnail.data)
+            try text("\r\n")
+        }
+        try text("--\(boundary)--\r\n")
         return target
     }
 }

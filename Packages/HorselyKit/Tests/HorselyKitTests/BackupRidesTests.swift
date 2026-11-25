@@ -207,16 +207,17 @@ struct BackupRidesTests {
     @Test func exportJsonCarriesAttachmentMetadataAndValidatesAgainstExportSchema16() async throws {
         let source = try setup()
         try await withRides(source)
+        let trainingId = try contractRecording().trainingId
         let bytes = Data((0 ..< 500).map { UInt8(truncatingIfNeeded: $0 &* 31 &+ 21) })
         let filmInfo = try source.files.write(bytes, attachmentId: "9c1d2e3f-0000-4000-8000-000000000001", kind: .original, fileExtension: "mp4", pinned: true)
         let photoInfo = try source.files.write(bytes, attachmentId: "9c1d2e3f-0000-4000-8000-000000000002", kind: .original, fileExtension: "pdf", pinned: true)
         let withMetadata = LocalAttachment(
-            id: "9c1d2e3f-0000-4000-8000-000000000001", createdAt: stamp, updatedAt: stamp, version: 1, ownerType: .horse, ownerId: horseId, horseId: horseId,
+            id: "9c1d2e3f-0000-4000-8000-000000000001", createdAt: stamp, updatedAt: stamp, version: 1, ownerType: .training, ownerId: trainingId, horseId: horseId,
             fileName: "film.mp4", contentType: "video/mp4", sizeBytes: Int64(bytes.count), sha256: filmInfo.sha256, description: "Film",
             capturedAt: InstantText.parse("2026-09-01T08:15:00Z"), latitude: DecimalText.parse("52.2297000"), longitude: DecimalText.parse("21.0122000")
         )
         let plain = LocalAttachment(
-            id: "9c1d2e3f-0000-4000-8000-000000000002", createdAt: stamp, updatedAt: stamp, version: 1, ownerType: .horse, ownerId: horseId, horseId: horseId,
+            id: "9c1d2e3f-0000-4000-8000-000000000002", createdAt: stamp, updatedAt: stamp, version: 1, ownerType: .training, ownerId: trainingId, horseId: horseId,
             fileName: "plan.pdf", contentType: "application/pdf", sizeBytes: Int64(bytes.count), sha256: photoInfo.sha256
         )
         let rows = [try StoredRecord.of(withMetadata, syncState: .local), try StoredRecord.of(plain, syncState: .local)]
@@ -233,6 +234,7 @@ struct BackupRidesTests {
         #expect(errors.isEmpty, "\(Array(errors.prefix(5)))")
         let attachments = try #require(try JSONValue.parseKeepingScale(export)["data"]?["attachments"]?.arrayValue)
         let exported = try #require(attachments.first { $0["id"] == .string(withMetadata.id) })
+        #expect(exported["ownerType"] == .string("Training"))
         #expect(exported["capturedAt"] == .string("2026-09-01T08:15:00Z"))
         #expect(exported["latitude"]?.textKeepingScale() == "52.2297000", "szerokość jako liczba ze skalą zapisu")
         #expect(exported["longitude"]?.textKeepingScale() == "21.0122000", "długość jako liczba ze skalą zapisu")
@@ -244,6 +246,8 @@ struct BackupRidesTests {
         let target = try setup()
         let summary = try await restore(target, file)
         let back = try #require(try await target.store.get(.attachment, id: withMetadata.id)?.record(as: LocalAttachment.self))
+        #expect(back.ownerType == .training, "metadane sprawdzone na załączniku treningu po odtworzeniu z kopii")
+        #expect(back.ownerId == trainingId)
         #expect(back.capturedAt == withMetadata.capturedAt)
         #expect(back.latitude.map(DecimalText.text) == "52.2297000")
         #expect(back.longitude.map(DecimalText.text) == "21.0122000")
