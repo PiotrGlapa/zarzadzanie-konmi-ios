@@ -209,7 +209,7 @@ struct BackupRidesTests {
         defer { source.service.discard(prepared) }
 
         let exportData = try Data(contentsOf: prepared.directory.appendingPathComponent(BackupManifest.exportName))
-        let json = try #require(String(data: exportData, encoding: .utf8))
+        let _ = try #require(String(data: exportData, encoding: .utf8))
 
         // Walidacja: check schema version
         let parsed = try JSONValue.parse(exportData)
@@ -217,8 +217,8 @@ struct BackupRidesTests {
         #expect(parsed["dataSchemaVersion"]?.stringValue == "3.0")
 
         // Sprawdź, że export.json ma trainingRecordings
-        guard case var .object(root) = parsed,
-              case var .object(data)? = root["data"] else {
+        guard case let .object(root) = parsed,
+              case let .object(data)? = root["data"] else {
             Issue.record("export.json ma zły format")
             return
         }
@@ -334,7 +334,7 @@ struct BackupRidesTests {
         let filesDir = FileManager.default.temporaryDirectory.appendingPathComponent("test-files-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: filesDir, withIntermediateDirectories: true)
         let manifest = BackupService(
-            store: try RecordStore(database: try AppDatabase.inMemory()),
+            store: RecordStore(database: try AppDatabase.inMemory()),
             files: try LocalFileStore(root: filesDir),
             workDirectory: workDir,
             appVersion: "2.0.1"
