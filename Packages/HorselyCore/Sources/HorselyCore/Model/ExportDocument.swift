@@ -1,17 +1,17 @@
-import Foundation
+﻿import Foundation
 
-/// Zakres eksportu (`scope`): pełny albo jednego konia; `includesAttachmentFiles` — czy plik zawiera treść załączników.
+/// Zakres eksportu (`scope`): peĹ‚ny albo jednego konia; `includesAttachmentFiles` â€” czy plik zawiera treĹ›Ä‡ zaĹ‚Ä…cznikĂłw.
 public struct ExportScope: Codable, Hashable, Sendable {
     public var type: String
     public var horseId: String?
     public var from: LocalDate?
     public var to: LocalDate?
     public var includesAttachmentFiles: Bool
-    /// Eksport przyrostowy programu 2.0.0 (schemat 1.5): chwila, od której liczone są zmiany; brak — eksport pełny.
+    /// Eksport przyrostowy programu 2.0.0 (schemat 1.5): chwila, od ktĂłrej liczone sÄ… zmiany; brak â€” eksport peĹ‚ny.
     public var updatedSince: String?
-    /// `true`: chwila graniczna jest starsza niż linia bazowa programu — `data` zawiera komplet, klient zastępuje całą kopię.
+    /// `true`: chwila graniczna jest starsza niĹĽ linia bazowa programu â€” `data` zawiera komplet, klient zastÄ™puje caĹ‚Ä… kopiÄ™.
     public var fullRequired: Bool?
-    /// Wartość `updatedSince` do następnego żądania (napis programu, przekazywany bez zmian).
+    /// WartoĹ›Ä‡ `updatedSince` do nastÄ™pnego ĹĽÄ…dania (napis programu, przekazywany bez zmian).
     public var nextUpdatedSince: String?
 
     public init(
@@ -57,7 +57,7 @@ public struct ExportScope: Codable, Hashable, Sendable {
     }
 }
 
-/// Nagłówek pliku eksportu (wszystko poza `data`).
+/// NagĹ‚Ăłwek pliku eksportu (wszystko poza `data`).
 public struct ExportHeader: Hashable, Sendable {
     public var schemaVersion: String
     public var exportedAt: String?
@@ -72,8 +72,8 @@ public struct ExportHeader: Hashable, Sendable {
     }
 }
 
-/// Rekord, który w eksporcie przyrostowym opuścił dane (schemat 1.5): przeniesiony do kosza (`trashed[]`) albo usunięty na stałe
-/// (`purged[]`). Dla telefonu oba znaczą to samo co nieobecność w pełnym eksporcie.
+/// Rekord, ktĂłry w eksporcie przyrostowym opuĹ›ciĹ‚ dane (schemat 1.5): przeniesiony do kosza (`trashed[]`) albo usuniÄ™ty na staĹ‚e
+/// (`purged[]`). Dla telefonu oba znaczÄ… to samo co nieobecnoĹ›Ä‡ w peĹ‚nym eksporcie.
 public struct ExportRemoval: Hashable, Sendable {
     public let type: RecordType
     public let id: String
@@ -86,7 +86,7 @@ public struct ExportRemoval: Hashable, Sendable {
     }
 }
 
-/// Rekord z pliku z datą porządkującą (start bez daty dziedziczy datę zawodów).
+/// Rekord z pliku z datÄ… porzÄ…dkujÄ…cÄ… (start bez daty dziedziczy datÄ™ zawodĂłw).
 public struct ExportedRecord: Sendable {
     public let record: any LocalRecord
     public let dateKey: LocalDate?
@@ -97,13 +97,13 @@ public struct ExportedRecord: Sendable {
     }
 }
 
-/// Dokument eksportu w pamięci — testy, kopia zapasowa i małe pliki. Duże pobranie (50 000 rekordów) czyta strumień
-/// w zadaniu T083, bez budowania całości.
+/// Dokument eksportu w pamiÄ™ci â€” testy, kopia zapasowa i maĹ‚e pliki. DuĹĽe pobranie (50 000 rekordĂłw) czyta strumieĹ„
+/// w zadaniu T083, bez budowania caĹ‚oĹ›ci.
 public struct ExportDocument: Sendable {
     public var header: ExportHeader
     public var records: [ExportedRecord]
     public var removals: [ExportRemoval]
-    /// Nazwy typów z `trashed[]` i `purged[]`, których telefon nie zna — pominięte.
+    /// Nazwy typĂłw z `trashed[]` i `purged[]`, ktĂłrych telefon nie zna â€” pominiÄ™te.
     public var unknownRemovalTypes: [String]
 
     public init(header: ExportHeader, records: [ExportedRecord], removals: [ExportRemoval] = [], unknownRemovalTypes: [String] = []) {
@@ -148,15 +148,15 @@ public struct ExportDocument: Sendable {
         add(content.reminders)
         add(content.attachments)
 
-        // Zbuduj mapę treningów po trainingId, żeby pobrać horseId i datę dla nagrań.
+        // Zbuduj mapÄ™ treningĂłw po trainingId, ĹĽeby pobraÄ‡ horseId i datÄ™ dla nagraĹ„.
         var trainingMap: [String: LocalTraining] = [:]
         for t in content.trainings { trainingMap[t.id] = t }
 
-        // Domyślne wartości audit dla rekordów bez daty.
+        // DomyĹ›lne wartoĹ›ci audit dla rekordĂłw bez daty.
         let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
         let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)!
 
-        // Dekoduj nagrania ręcznie z surowego JSON, uzupełniając horseId z treningu.
+        // Dekoduj nagrania rÄ™cznie z surowego JSON, uzupeĹ‚niajÄ…c horseId z treningu.
         for rawEnv in content.trainingRecordings {
             guard let training = trainingMap[rawEnv.trainingId] else { continue }
             let recording = LocalTrainingRecording(
@@ -247,7 +247,7 @@ public struct ExportDocument: Sendable {
 
     // MARK: Zapis
 
-    /// Tekst w formacie eksportu programu (zawody ze startami zagnieżdżonymi) — wejście kopii zapasowej.
+    /// Tekst w formacie eksportu programu (zawody ze startami zagnieĹĽdĹĽonymi) â€” wejĹ›cie kopii zapasowej.
     public func toJSON(pretty: Bool = false) throws -> Data {
         func list<R: LocalRecord>(_ type: RecordType, as _: R.Type) -> [R] {
             records(of: type).compactMap { $0 as? R }
@@ -284,7 +284,7 @@ public struct ExportDocument: Sendable {
     }
 }
 
-// MARK: - Kształty pliku
+// MARK: - KsztaĹ‚ty pliku
 
 private struct CompetitionEnvelope: Codable {
     let competition: LocalCompetition
@@ -324,11 +324,11 @@ private struct ReadData: Decodable {
     var trainings: [LocalTraining] = []
     var reminders: [LocalReminder] = []
     var attachments: [LocalAttachment] = []
-    /// Nagrania jazdy — tylko eksport pełny schematu 1.6.
+    /// Nagrania jazdy â€” tylko eksport peĹ‚ny schematu 1.6.
     var trainingRecordings: [TrainingRecordingEnvelope] = []
-    /// Profile jazdy koni — tylko eksport pełny schematu 1.6.
+    /// Profile jazdy koni â€” tylko eksport peĹ‚ny schematu 1.6.
     var horseRideProfiles: [HorseRideProfileEnvelope] = []
-    /// Ustawienia domyślne jazd — tylko eksport pełny schematu 1.6.
+    /// Ustawienia domyĹ›lne jazd â€” tylko eksport peĹ‚ny schematu 1.6.
     var rideDefaults: RideDefaultsEnvelope?
 
     private enum CodingKeys: String, CodingKey {
@@ -400,11 +400,11 @@ private struct WriteData: Encodable {
     let trainings: [LocalTraining]
     let reminders: [LocalReminder]
     let attachments: [LocalAttachment]
-    /// Nagrania jazdy — tylko eksport pełny schematu 1.6.
+    /// Nagrania jazdy â€” tylko eksport peĹ‚ny schematu 1.6.
     let trainingRecordings: [TrainingRecordingEnvelope]?
-    /// Profile jazdy koni — tylko eksport pełny schematu 1.6.
+    /// Profile jazdy koni â€” tylko eksport peĹ‚ny schematu 1.6.
     let horseRideProfiles: [HorseRideProfileEnvelope]?
-    /// Ustawienia domyślne jazd — tylko eksport pełny schematu 1.6.
+    /// Ustawienia domyĹ›lne jazd â€” tylko eksport peĹ‚ny schematu 1.6.
     let rideDefaults: RideDefaultsEnvelope?
 }
 
@@ -419,7 +419,7 @@ private struct WriteFile: Encodable {
 
 // MARK: - Obiekty-wrappery dla nowych kolekcji eksportu 1.6
 
-/// Obiekt-wraper dla nagrania w eksporcie — zawiera `LocalTrainingRecording` (bez `trackData`) i `trainingDate`.
+/// Obiekt-wraper dla nagrania w eksporcie â€” zawiera `LocalTrainingRecording` (bez `trackData`) i `trainingDate`.
 private struct TrainingRecordingEnvelope: Codable {
     let recording: LocalTrainingRecording
     let trainingDate: String
@@ -438,34 +438,9 @@ private struct TrainingRecordingEnvelope: Codable {
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let trainingDateStr = try c.decode(String.self, forKey: .trainingDate)
-        let dto = try c.decode(RecordingDto.self, forKey: .recording)
-        self.trainingId = dto.trainingId
-        // Uwaga: RecordingDto nie zawiera horseId — to pochodzi z treningu (ExportDocument.parse uzupełnia).
-        // Tutaj używamy placeholdera dla horseId; nadpiszemy go w parse().
-        let placeholderHorseId = "placeholder"
-        let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
-        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)!
-        let ts = LocalDateTime(dto.createdAt) ?? baseTs
-        let trainingDate = LocalDate(trainingDateStr) ?? baseDate
-        self.recording = LocalTrainingRecording(
-            id: dto.id, createdAt: ts, updatedAt: LocalDateTime(dto.updatedAt) ?? baseTs,
-            version: dto.version, horseId: placeholderHorseId, trainingDate: trainingDate,
-            startedAt: dto.startedAt, endedAt: dto.endedAt, timeZone: dto.timeZone, totalSeconds: dto.totalSeconds,
-            movingSeconds: dto.movingSeconds, stoppedSeconds: dto.stoppedSeconds, pausedSeconds: dto.pausedSeconds,
-            distanceMeters: dto.distanceMeters, avgMovingSpeedKmh: dto.avgMovingSpeedKmh, maxSpeedKmh: dto.maxSpeedKmh,
-            elevationGainM: dto.elevationGainM, elevationLossM: dto.elevationLossM, minAltitudeM: dto.minAltitudeM,
-            maxAltitudeM: dto.maxAltitudeM, walkSeconds: dto.walkSeconds, walkMeters: dto.walkMeters, trotSeconds: dto.trotSeconds,
-            trotMeters: dto.trotMeters, canterSeconds: dto.canterSeconds, canterMeters: dto.canterMeters,
-            walkAvgSpeedKmh: dto.walkAvgSpeedKmh, trotAvgSpeedKmh: dto.trotAvgSpeedKmh, canterAvgSpeedKmh: dto.canterAvgSpeedKmh,
-            walkAvgCadence: dto.walkAvgCadence, trotAvgCadence: dto.trotAvgCadence, canterAvgCadence: dto.canterAvgCadence,
-            canterCount: dto.canterCount, longestCanterSeconds: dto.longestCanterSeconds, longestCanterMeters: dto.longestCanterMeters,
-            loadPoints: dto.loadPoints, gaitThresholdsUsed: dto.gaitThresholdsUsed, loadParamsUsed: dto.loadParamsUsed,
-            accelerometerUsed: dto.accelerometerUsed, weatherStatus: dto.weatherStatus, weatherTempC: dto.weatherTempC,
-            weatherFeelsLikeC: dto.weatherFeelsLikeC, weatherPrecipMm: dto.weatherPrecipMm, weatherWindKmh: dto.weatherWindKmh,
-            weatherHumidityPct: dto.weatherHumidityPct, weatherCode: dto.weatherCode, trimmedStartSeconds: dto.trimmedStartSeconds,
-            trimmedEndSeconds: dto.trimmedEndSeconds, algorithmVersion: dto.algorithmVersion, source: dto.source,
-            trackFormat: dto.trackFormat, pointCount: dto.pointCount, segments: dto.segments
-        )
+        let recording = try c.decode(LocalTrainingRecording.self, forKey: .recording)
+        self.trainingId = "unknown"
+        self.recording = recording
         self.trainingDate = trainingDateStr
     }
 }
@@ -485,7 +460,7 @@ private struct HorseRideProfileEnvelope: Codable {
     }
 }
 
-/// Obiekt-wraper dla ustawień domyślnych jazd w eksporcie.
+/// Obiekt-wraper dla ustawieĹ„ domyĹ›lnych jazd w eksporcie.
 private struct RideDefaultsEnvelope: Codable {
     let defaults: RideDefaults
 
