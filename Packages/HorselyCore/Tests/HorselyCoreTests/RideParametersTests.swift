@@ -1,9 +1,22 @@
-// Testy RideParameters i HalfUp — Task 5, krok 2.
-// Oparte na [PLAN-A] Task 4 Step 2/3.
+// Testy RideParameters i HalfUp — port 1:1 testu Androida 3.0.2 `core/src/test/.../ride/RideParametersTest.kt`
+// (progi chodów i parametry obciążenia: dziedziczenie profilu konia, punkty jazdy, walidacja; PAR-01, PAR-02, PAR-05).
+// Testy o nazwach z planu (`profileInheritsFieldByField`, `exampleFromPar02Gives100Points`, `walkThresholdNotAboveStopIsRejected`,
+// `rangesFromPar05`) są w `RecordingModelTests.swift`.
 
 import Testing
 import Foundation
 @testable import HorselyCore
+
+private func bd(_ text: String) -> Decimal { Decimal(string: text)! }
+
+private let defaults = RideDefaults.builtIn
+
+/// Odpowiednik `defaults.copy(...)` z Kotlina.
+private func changedDefaults(_ change: (inout RideDefaults) -> Void) -> RideDefaults {
+    var copy = RideDefaults.builtIn
+    change(&copy)
+    return copy
+}
 
 // MARK: - HalfUp
 
@@ -19,207 +32,198 @@ import Foundation
     #expect(HalfUp.round(Decimal(string: "-0.0")!, scale: 2) == Decimal(string: "0.0"))
 }
 
-// MARK: - RideDefaults.builtIn
+// MARK: - RideDefaults
 
-@Test func builtInHasExpectedValues() {
-    let defaults = RideDefaults.builtIn
-    #expect(defaults.gaitStopMaxKmh == Decimal(string: "1.5"))
-    #expect(defaults.gaitWalkMaxKmh == Decimal(string: "7"))
-    #expect(defaults.gaitTrotMaxKmh == Decimal(string: "15"))
-    #expect(defaults.loadWeightWalk == Decimal(string: "1"))
-    #expect(defaults.loadWeightTrot == Decimal(string: "2"))
-    #expect(defaults.loadWeightCanter == Decimal(string: "3"))
-    #expect(defaults.loadClimbPer10m == Decimal(string: "1"))
+@Test func builtInDefaultsAreTheValuesOfPar01AndPar02() {
+    #expect([defaults.gaitStopMaxKmh, defaults.gaitWalkMaxKmh, defaults.gaitTrotMaxKmh] == ["1.5", "7", "15"].map(bd))
+    #expect([defaults.loadWeightWalk, defaults.loadWeightTrot, defaults.loadWeightCanter, defaults.loadClimbPer10m] == ["1", "2", "3", "1"].map(bd))
     #expect(defaults.loadWarnPercent == 30)
     #expect(defaults.heavyRidePoints == 60)
-    #expect(defaults.recordedRideTrainingTypeId == nil)
     #expect(defaults.version == 0)
+    #expect(defaults.recordedRideTrainingTypeId == nil)
+}
+
+@Test func defaultsGiveTheirThresholdsAndLoad() {
+    #expect(defaults.thresholds == GaitThresholds(stopMaxKmh: bd("1.5"), walkMaxKmh: bd("7"), trotMaxKmh: bd("15")))
+    #expect(defaults.load == LoadParams(weightWalk: bd("1"), weightTrot: bd("2"), weightCanter: bd("3"), climbPer10m: bd("1")))
+}
+
+@Test func defaultsInputHasTheValuesWithoutTheVersion() {
+    let saved = changedDefaults { $0.loadWeightTrot = bd("2.5"); $0.recordedRideTrainingTypeId = "t1"; $0.version = 4 }
+
+    #expect(saved.toInput() == RideDefaultsInput(
+        gaitStopMaxKmh: bd("1.5"), gaitWalkMaxKmh: bd("7"), gaitTrotMaxKmh: bd("15"),
+        loadWeightWalk: bd("1"), loadWeightTrot: bd("2.5"), loadWeightCanter: bd("3"), loadClimbPer10m: bd("1"),
+        loadWarnPercent: 30, heavyRidePoints: 60, recordedRideTrainingTypeId: "t1"
+    ))
+}
+
+@Test func sameValuesCompareDecimalsByValueAndIgnoreTheVersion() {
+    #expect(defaults.sameValues(changedDefaults { $0.gaitStopMaxKmh = bd("1.50"); $0.version = 7 }))
+    #expect(!defaults.sameValues(changedDefaults { $0.loadWeightTrot = bd("2.5") }))
+    #expect(!defaults.sameValues(changedDefaults { $0.recordedRideTrainingTypeId = "t1" }))
+
+    #expect(RideProfile(loadWeightTrot: bd("2.5")).sameValues(RideProfile(loadWeightTrot: bd("2.50"))))
+    #expect(!RideProfile(loadWeightTrot: bd("2.5")).sameValues(RideProfile()))
+    #expect(!RideProfile(heavyRidePoints: 80).sameValues(RideProfile(heavyRidePoints: 81)))
+}
+
+@Test func aProfileWithoutOwnValuesIsEmpty() {
+    #expect(RideProfile().isEmpty)
+    #expect(!RideProfile(loadWarnPercent: 20).isEmpty)
+    #expect(!RideProfile(gaitStopMaxKmh: bd("1")).isEmpty)
 }
 
 // MARK: - RideParameters.resolve
 
-@Test func resolveWithNilProfileReturnsDefaults() {
-    let defaults = RideDefaults.builtIn
-    let p = RideParameters.resolve(defaults, nil)
-
-    #expect(p.thresholds.stopMaxKmh == Decimal(string: "1.5"))
-    #expect(p.thresholds.walkMaxKmh == Decimal(string: "7"))
-    #expect(p.thresholds.trotMaxKmh == Decimal(string: "15"))
-    #expect(p.load.weightWalk == Decimal(string: "1"))
-    #expect(p.load.weightTrot == Decimal(string: "2"))
-    #expect(p.load.weightCanter == Decimal(string: "3"))
-    #expect(p.load.climbPer10m == Decimal(string: "1"))
-    #expect(p.warnPercent == 30)
-    #expect(p.heavyRidePoints == 60)
-    #expect(p.ownFields.isEmpty)
-}
-
-@Test func resolveWithPartialProfileOverridesOnlySetFields() {
-    let defaults = RideDefaults.builtIn
+@Test func ownFieldsFollowTheOrderOfTheProfileFields() {
     let profile = RideProfile(
-        gaitWalkMaxKmh: Decimal(string: "8"),
-        loadWeightTrot: Decimal(string: "3"),
-        loadWarnPercent: 25
+        gaitStopMaxKmh: bd("1"), gaitWalkMaxKmh: bd("6"), gaitTrotMaxKmh: bd("16"),
+        loadWeightWalk: bd("1.2"), loadWeightTrot: bd("2.5"), loadWeightCanter: bd("4"), loadClimbPer10m: bd("2"),
+        loadWarnPercent: 15, heavyRidePoints: 80
     )
+
     let p = RideParameters.resolve(defaults, profile)
 
-    // Pola ustawione w profilu → nadpisane.
-    #expect(p.thresholds.walkMaxKmh == Decimal(string: "8"))
-    #expect(p.load.weightTrot == Decimal(string: "3"))
-    #expect(p.warnPercent == 25)
-    #expect(p.ownFields == ["gaitWalkMaxKmh", "loadWeightTrot", "loadWarnPercent"])
-
-    // Pola nieustawione → z defaults.
-    #expect(p.thresholds.stopMaxKmh == Decimal(string: "1.5"))
-    #expect(p.thresholds.trotMaxKmh == Decimal(string: "15"))
-    #expect(p.load.weightWalk == Decimal(string: "1"))
-    #expect(p.load.weightCanter == Decimal(string: "3"))
-    #expect(p.load.climbPer10m == Decimal(string: "1"))
-    #expect(p.heavyRidePoints == 60)
+    #expect(p.ownFields == [
+        "gaitStopMaxKmh", "gaitWalkMaxKmh", "gaitTrotMaxKmh", "loadWeightWalk", "loadWeightTrot", "loadWeightCanter", "loadClimbPer10m",
+        "loadWarnPercent", "heavyRidePoints"
+    ])
+    #expect(p.load == LoadParams(weightWalk: bd("1.2"), weightTrot: bd("2.5"), weightCanter: bd("4"), climbPer10m: bd("2")))
 }
 
-@Test func resolveWithFullProfileOverridesAll() {
-    let defaults = RideDefaults.builtIn
-    let profile = RideProfile(
-        gaitStopMaxKmh: Decimal(string: "2"),
-        gaitWalkMaxKmh: Decimal(string: "10"),
-        gaitTrotMaxKmh: Decimal(string: "20"),
-        loadWeightWalk: Decimal(string: "1.5"),
-        loadWeightTrot: Decimal(string: "2.5"),
-        loadWeightCanter: Decimal(string: "3.5"),
-        loadClimbPer10m: Decimal(string: "1.2"),
-        loadWarnPercent: 40,
-        heavyRidePoints: 80
-    )
-    let p = RideParameters.resolve(defaults, profile)
-
-    #expect(p.thresholds.stopMaxKmh == Decimal(string: "2"))
-    #expect(p.thresholds.walkMaxKmh == Decimal(string: "10"))
-    #expect(p.thresholds.trotMaxKmh == Decimal(string: "20"))
-    #expect(p.load.weightWalk == Decimal(string: "1.5"))
-    #expect(p.load.weightTrot == Decimal(string: "2.5"))
-    #expect(p.load.weightCanter == Decimal(string: "3.5"))
-    #expect(p.load.climbPer10m == Decimal(string: "1.2"))
-    #expect(p.warnPercent == 40)
-    #expect(p.heavyRidePoints == 80)
-    #expect(p.ownFields.count == 9)
+@Test func aHorseWithoutAProfileGetsTheDefaults() {
+    for profile in [nil, RideProfile()] as [RideProfile?] {
+        let p = RideParameters.resolve(defaults, profile)
+        #expect(p.thresholds == GaitThresholds(stopMaxKmh: bd("1.5"), walkMaxKmh: bd("7"), trotMaxKmh: bd("15")))
+        #expect(p.load == LoadParams(weightWalk: bd("1"), weightTrot: bd("2"), weightCanter: bd("3"), climbPer10m: bd("1")))
+        #expect(p.warnPercent == 30)
+        #expect(p.heavyRidePoints == 60)
+        #expect(p.ownFields.isEmpty)
+    }
 }
 
-// MARK: - RideParameters.validate
+@Test func savedDefaultsReplaceTheBuiltInOnesForHorsesThatInherit() {
+    let saved = changedDefaults { $0.loadWeightTrot = bd("2.5"); $0.gaitWalkMaxKmh = bd("6.5"); $0.version = 3 }
 
-@Test func validateDefaultsReturnsNoErrors() {
-    let errors = RideParameters.validate(RideDefaults.builtIn)
-    #expect(errors.isEmpty)
-}
+    let p = RideParameters.resolve(saved, RideProfile(loadWeightCanter: bd("4")))
 
-@Test func validateEmptyProfileWithDefaultsReturnsNoErrors() {
-    let empty = RideProfile()
-    let errors = RideParameters.validate(empty, RideDefaults.builtIn)
-    #expect(errors.isEmpty)
-}
-
-@Test func validateWalkBelowStopReturnsError() {
-    let profile = RideProfile(gaitWalkMaxKmh: Decimal(string: "1.0"))
-    let errors = RideParameters.validate(profile, RideDefaults.builtIn)
-    #expect(errors.keys.contains("gaitWalkMaxKmh"))
-    #expect(errors["gaitWalkMaxKmh"] == "Próg stępa musi być większy niż próg postoju.")
-}
-
-@Test func validateTrotBelowWalkReturnsError() {
-    let profile = RideProfile(gaitTrotMaxKmh: Decimal(string: "5"))
-    let errors = RideParameters.validate(profile, RideDefaults.builtIn)
-    #expect(errors.keys.contains("gaitTrotMaxKmh"))
-    #expect(errors["gaitTrotMaxKmh"] == "Próg kłusa musi być większy niż próg stępa.")
-}
-
-@Test func validateTrotBelowWalkUsesProfileWalkThreshold() {
-    // Gdy profil ma ustawiony both walk i trot, używa profile walk, nie defaults.
-    let profile = RideProfile(
-        gaitWalkMaxKmh: Decimal(string: "10"),
-        gaitTrotMaxKmh: Decimal(string: "5")
-    )
-    let errors = RideParameters.validate(profile, RideDefaults.builtIn)
-    #expect(errors.keys.contains("gaitTrotMaxKmh"))
-    #expect(errors["gaitTrotMaxKmh"] == "Próg kłusa musi być większy niż próg stępa.")
+    #expect(p.load.weightTrot == bd("2.5"))
+    #expect(p.thresholds.walkMaxKmh == bd("6.5"))
+    #expect(p.load.weightCanter == bd("4"))
+    #expect(p.ownFields == ["loadWeightCanter"])
 }
 
 // MARK: - RideParameters.loadPoints
 
-@Test func loadPointsZeroSeconds() {
-    let load = LoadParams(
-        weightWalk: Decimal(string: "1")!,
-        weightTrot: Decimal(string: "2")!,
-        weightCanter: Decimal(string: "3")!,
-        climbPer10m: Decimal(string: "1")!
+@Test func pointsAreRoundedToATenthHalfUpAndAMissingClimbCountsAsZero() {
+    let load = defaults.load
+
+    #expect(RideParameters.loadPoints(walkSeconds: 3, trotSeconds: 0, canterSeconds: 0, elevationGainM: nil, load: load) == bd("0.1"), "0,05 → 0,1")
+    #expect(RideParameters.loadPoints(walkSeconds: 2, trotSeconds: 0, canterSeconds: 0, elevationGainM: nil, load: load) == bd("0.0"), "0,033 → 0,0")
+    #expect(RideParameters.loadPoints(walkSeconds: 0, trotSeconds: 2, canterSeconds: 0, elevationGainM: nil, load: load) == bd("0.1"), "0,067 → 0,1")
+    #expect(RideParameters.loadPoints(walkSeconds: 0, trotSeconds: 0, canterSeconds: 0, elevationGainM: 15, load: load) == bd("1.5"), "15 m podjazdu = 1,5 pkt")
+    #expect(RideParameters.loadPoints(walkSeconds: 0, trotSeconds: 0, canterSeconds: 0, elevationGainM: nil, load: load) == bd("0.0"))
+    #expect(
+        RideParameters.loadPoints(walkSeconds: 600, trotSeconds: 0, canterSeconds: 0, elevationGainM: 0, load: load)
+            == RideParameters.loadPoints(walkSeconds: 600, trotSeconds: 0, canterSeconds: 0, elevationGainM: nil, load: load)
     )
-    #expect(RideParameters.loadPoints(
-        walkSeconds: 0, trotSeconds: 0, canterSeconds: 0,
-        elevationGainM: 0, load: load
-    ) == Decimal(string: "0"))
 }
 
-@Test func loadPointsWithElevation() {
-    let load = LoadParams(
-        weightWalk: Decimal(string: "1")!,
-        weightTrot: Decimal(string: "2")!,
-        weightCanter: Decimal(string: "3")!,
-        climbPer10m: Decimal(string: "1")!
-    )
-    // 600s stępa (10 min) + 100m podjazdu (10 * 1 = 10 pkt)
-    // = 10 * 1 + 10 = 20 pkt
-    let result = RideParameters.loadPoints(
-        walkSeconds: 600, trotSeconds: 0, canterSeconds: 0,
-        elevationGainM: 100, load: load
-    )
-    #expect(result == Decimal(string: "20.0"))
+@Test func pointsAreDividedOnceSoATieOfComponentsRoundsHalfUp() {
+    // Audyt K7: 2 s · 1 + 2 s · 0,5 = 3 / 60 = 0,05 dokładnie → 0,1. Dzielenie każdego składnika osobno dałoby 0,0499… → 0,0.
+    let load = LoadParams(weightWalk: bd("1"), weightTrot: bd("0.5"), weightCanter: bd("3"), climbPer10m: bd("1"))
+
+    #expect(RideParameters.loadPoints(walkSeconds: 2, trotSeconds: 2, canterSeconds: 0, elevationGainM: nil, load: load) == bd("0.1"))
 }
 
-@Test func loadPointsRoundsHalfUp() {
-    let load = LoadParams(
-        weightWalk: Decimal(string: "1")!,
-        weightTrot: Decimal(string: "2")!,
-        weightCanter: Decimal(string: "3")!,
-        climbPer10m: Decimal(string: "1")!
-    )
-    // 180s stępa = 3 min * 1 = 3 pkt
-    // 180s kłusa = 3 min * 2 = 6 pkt
-    // 0.5 pkt → zaokrąglenie do 0,1 pkt
-    // = 3 + 6 + 0.5 = 9.5 → 9,5 pkt
-    let result = RideParameters.loadPoints(
-        walkSeconds: 180, trotSeconds: 180, canterSeconds: 0,
-        elevationGainM: 5, load: load
-    )
-    #expect(result == Decimal(string: "9.5"))
+@Test func pointsUseTheWeightsOfTheHorse() {
+    let heavyTrot = RideParameters.resolve(defaults, RideProfile(loadWeightTrot: bd("2.5"), loadClimbPer10m: bd("0.5")))
+
+    #expect(RideParameters.loadPoints(walkSeconds: 2400, trotSeconds: 1200, canterSeconds: 300, elevationGainM: 50, load: heavyTrot.load) == bd("107.5"))
 }
 
 // MARK: - RideParameters.exampleText
 
-@Test func exampleTextReturnsFormattedString() {
-    let load = LoadParams(
-        weightWalk: Decimal(string: "1")!,
-        weightTrot: Decimal(string: "2")!,
-        weightCanter: Decimal(string: "3")!,
-        climbPer10m: Decimal(string: "1")!
-    )
-    let text = RideParameters.exampleText(load)
-    #expect(text.contains("Jazda"))
-    #expect(text.contains("min stępa"))
-    #expect(text.contains("min kłusa"))
-    #expect(text.contains("min galopu"))
-    #expect(text.contains("pkt"))
+@Test func exampleTextShowsTheDefaultExample() {
+    #expect(RideParameters.exampleText(defaults.load) == "Jazda 40 min stępa, 20 min kłusa, 5 min galopu, 50 m podjazdu = 40 + 40 + 15 + 5 = 100 pkt")
 }
 
-@Test func exampleTextContainsCorrectCalculation() {
-    let load = LoadParams(
-        weightWalk: Decimal(string: "1")!,
-        weightTrot: Decimal(string: "2")!,
-        weightCanter: Decimal(string: "3")!,
-        climbPer10m: Decimal(string: "1")!
+@Test func exampleTextFollowsTheCurrentWeightsWithADecimalComma() {
+    let load = LoadParams(weightWalk: bd("1"), weightTrot: bd("2.5"), weightCanter: bd("2.25"), climbPer10m: bd("1"))
+
+    #expect(RideParameters.exampleText(load) == "Jazda 40 min stępa, 20 min kłusa, 5 min galopu, 50 m podjazdu = 40 + 50 + 11,25 + 5 = 106,3 pkt")
+}
+
+// MARK: - RideParameters.validate
+
+@Test func thresholdsAreCheckedOnTheMergedValues() {
+    let stopAboveInheritedWalk = RideParameters.validate(RideProfile(gaitStopMaxKmh: bd("8")), defaults)
+    #expect(stopAboveInheritedWalk.dictionary == ["rideProfile.gaitWalkMaxKmh": "Próg stępa musi być większy niż próg postoju."])
+
+    let trotNotAboveWalk = RideParameters.validate(RideProfile(gaitTrotMaxKmh: bd("7")), defaults)
+    #expect(trotNotAboveWalk.dictionary == ["rideProfile.gaitTrotMaxKmh": "Próg kłusa musi być większy niż próg stępa."])
+
+    let ownThresholdsInOrder = RideProfile(gaitStopMaxKmh: bd("2"), gaitWalkMaxKmh: bd("9"), gaitTrotMaxKmh: bd("18"))
+    #expect(RideParameters.validate(ownThresholdsInOrder, defaults).isEmpty)
+}
+
+@Test func anEmptyProfileAndTheBuiltInDefaultsAreValid() {
+    #expect(RideParameters.validate(RideProfile(), defaults).isEmpty)
+    #expect(RideParameters.validate(defaults).isEmpty)
+}
+
+@Test func rangeMessagesArePolish() {
+    let errors = RideParameters.validate(
+        RideProfile(gaitStopMaxKmh: bd("0.4"), loadWeightTrot: bd("11"), loadClimbPer10m: bd("11"), loadWarnPercent: 4, heavyRidePoints: 0),
+        defaults
     )
-    let text = RideParameters.exampleText(load)
-    // 40 * 1 = 40, 20 * 2 = 40, 5 * 3 = 15, 50/10 * 1 = 5
-    // = 40 + 40 + 15 + 5 = 100
-    #expect(text.contains("40 + 40 + 15 + 5 = 100 pkt"))
+
+    #expect(errors["rideProfile.gaitStopMaxKmh"] == "Wpisz wartość od 0,5 do 40 km/h.")
+    #expect(errors["rideProfile.loadWeightTrot"] == "Wpisz wartość od 0,1 do 10.")
+    #expect(errors["rideProfile.loadClimbPer10m"] == "Wpisz wartość od 0 do 10.")
+    #expect(errors["rideProfile.loadWarnPercent"] == "Wpisz wartość od 5 do 200.")
+    #expect(errors["rideProfile.heavyRidePoints"] == "Wpisz wartość od 1 do 10 000.")
+}
+
+@Test func aRangeErrorWinsOverTheOrderErrorOfTheSameField() {
+    let errors = RideParameters.validate(RideProfile(gaitWalkMaxKmh: bd("0.4")), defaults)
+
+    #expect(errors.dictionary == ["rideProfile.gaitWalkMaxKmh": "Wpisz wartość od 0,5 do 40 km/h."])
+}
+
+@Test func defaultsAreValidatedWithoutTheProfilePrefix() {
+    #expect(
+        RideParameters.validate(changedDefaults { $0.gaitWalkMaxKmh = bd("1.5") }).dictionary
+            == ["gaitWalkMaxKmh": "Próg stępa musi być większy niż próg postoju."]
+    )
+    #expect(Set(RideParameters.validate(changedDefaults { $0.gaitTrotMaxKmh = bd("7") }).keys) == ["gaitTrotMaxKmh"])
+    #expect(
+        Set(RideParameters.validate(changedDefaults { $0.loadWeightWalk = bd("0.05"); $0.heavyRidePoints = 10001; $0.loadWarnPercent = 3 }).keys)
+            == ["loadWeightWalk", "heavyRidePoints", "loadWarnPercent"]
+    )
+    #expect(RideParameters.validate(changedDefaults {
+        $0.gaitStopMaxKmh = bd("0.5"); $0.gaitWalkMaxKmh = bd("0.6"); $0.gaitTrotMaxKmh = bd("40"); $0.loadClimbPer10m = bd("0")
+    }).isEmpty)
+}
+
+@Test func theKeysOfTheProfileAreTheNamesOfTheContract() {
+    let all = RideProfile(
+        gaitStopMaxKmh: bd("0.1"), gaitWalkMaxKmh: bd("0.1"), gaitTrotMaxKmh: bd("0.1"),
+        loadWeightWalk: bd("0"), loadWeightTrot: bd("0"), loadWeightCanter: bd("0"), loadClimbPer10m: bd("-1"),
+        loadWarnPercent: 0, heavyRidePoints: 0
+    )
+    let names = [
+        "gaitStopMaxKmh", "gaitWalkMaxKmh", "gaitTrotMaxKmh", "loadWeightWalk", "loadWeightTrot", "loadWeightCanter", "loadClimbPer10m",
+        "loadWarnPercent", "heavyRidePoints"
+    ]
+
+    let errors = RideParameters.validate(all, defaults)
+
+    #expect(Set(errors.keys) == Set(names.map { "rideProfile.\($0)" }))
+    // Kolejność kluczy jak `LinkedHashMap` w Androidzie: kolejność pól profilu.
+    #expect(errors.keys == names.map { "rideProfile.\($0)" })
+    #expect(errors.values.allSatisfy { $0.hasSuffix(".") })
 }
 
 // MARK: - RecordingSummary
