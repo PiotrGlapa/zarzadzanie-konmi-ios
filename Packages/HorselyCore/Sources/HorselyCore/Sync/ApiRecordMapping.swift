@@ -53,6 +53,9 @@ public enum ApiRecordMapping {
                     return .object(medication)
                 })
             }
+        case .attachment:
+            // Załącznik z programu może nie mieć `updatedAt` (DTO ma tylko `createdAt`) — jak `Attachment.toRecord` Androida.
+            if fields["updatedAt"] == nil || fields["updatedAt"] == .null { fields["updatedAt"] = fields["createdAt"] ?? .null }
         case .competitionStart:
             if let parentId, fields["competitionId"] == nil || fields["competitionId"] == .null { fields["competitionId"] = .string(parentId) }
         default:
