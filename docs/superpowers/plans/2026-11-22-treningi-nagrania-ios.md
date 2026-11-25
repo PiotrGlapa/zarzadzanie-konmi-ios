@@ -130,9 +130,9 @@
 **Interfaces:**
 - Produces: tabele `local_track`, `ride_session`, `ride_point`, `ride_media` z kolumnami jak [PLAN-A] Task 5 (nazwy kolumn identyczne); `RecordStore.track(recordingId:) async throws -> StoredTrack?`, `putTrack(_:)`, `deleteTrack(recordingId:)`; `struct StoredTrack: Sendable { recordingId: String; version: Int; format: String; data: Data }`; czyszczenie magazynu usuwa też trasy i sesje.
 
-- [ ] **Step 1: Testy** — `migrationV2ToV3KeepsRecordsAndCreatesRideTables` (baza w `v2` z rekordem, migracja, rekord jest, nowe tabele puste), `trackRoundTrip`, `clearRemovesTracks`.
-- [ ] **Step 2:** Implementacja; push → PASS.
-- [ ] **Step 3: Commit** — `feat(db): baza v3 - trasy, sesje nagrywania, punkty i pliki z jazdy`
+- [x] **Step 1: Testy** — `migrationV2ToV3KeepsRecordsAndCreatesRideTables` (baza w `v2` z rekordem, migracja, rekord jest, nowe tabele puste), `trackRoundTrip`, `clearRemovesTracks`.
+- [x] **Step 2:** Implementacja; push → PASS.
+- [x] **Step 3: Commit** — `feat(db): baza v3 - trasy, sesje nagrywania, punkty i pliki z jazdy`
 
 ### Task 7: Kopia formatu 3 i wymienność z Androidem = [PLAN-A] Task 6
 
@@ -144,9 +144,9 @@
 **Interfaces:**
 - Produces: `export.json` kopii z `trainingRecordings[]` (z `segments` i `trackData` base64), `horseRideProfiles[]`, `rideDefaults`, załączniki z `capturedAt/latitude/longitude`; odczyt pełnego eksportu serwera 1.6 tymi samymi kolekcjami.
 
-- [ ] **Step 1: Testy** — lista z [PLAN-A] Task 6 (`backupWithRecordingRoundTripsTrackBytesAndSegments`, `exportJsonValidatesAgainstExportSchema16`, `backup2xWithoutRidesRestores`, `backupNewerThan3IsRefused` z komunikatem „Kopia z nowszej wersji aplikacji (format 4) — zaktualizuj aplikację.”, `format2ManifestWithoutDataSchemaVersionIsRead`) oraz `androidBackupWithRidesRestoresIdentically` (odtworzenie `backup-3/` → rekordy, trasy i statystyki równe `expected-stats.json`).
-- [ ] **Step 2:** Implementacja; push → PASS.
-- [ ] **Step 3: Commit** — `feat(backup): kopia formatu 3 ze schematem 1.6 i nagraniami, wymienna z Androidem`
+- [x] **Step 1: Testy** — lista z [PLAN-A] Task 6 (`backupWithRecordingRoundTripsTrackBytesAndSegments`, `exportJsonValidatesAgainstExportSchema16`, `backup2xWithoutRidesRestores`, `backupNewerThan3IsRefused` z komunikatem „Kopia z nowszej wersji aplikacji (format 4) — zaktualizuj aplikację.”, `format2ManifestWithoutDataSchemaVersionIsRead`) oraz `androidBackupWithRidesRestoresIdentically` (odtworzenie `backup-3/` → rekordy, trasy i statystyki równe `expected-stats.json`).
+- [x] **Step 2:** Implementacja; push → PASS.
+- [x] **Step 3: Commit** — `feat(backup): kopia formatu 3 ze schematem 1.6 i nagraniami, wymienna z Androidem`
 
 ---
 
