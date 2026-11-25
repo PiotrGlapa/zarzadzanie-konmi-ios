@@ -154,7 +154,7 @@ public struct ExportDocument: Sendable {
 
         // Domyślne wartości audit dla rekordów bez daty.
         let baseDate = LocalDate(year: 2000, month: 1, day: 1)!
-        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)
+        let baseTs = LocalDateTime(date: baseDate, hour: 0, minute: 0, second: 0, nanosecond: 0)!
 
         // Dekoduj nagrania ręcznie z surowego JSON, uzupełniając horseId z treningu.
         for rawEnv in content.trainingRecordings {
