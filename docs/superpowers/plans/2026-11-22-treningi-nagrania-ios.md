@@ -158,9 +158,9 @@
 - Modify: `Model/Enums.swift` (`AttachmentOwnerType.training = "Training"`), modele załącznika (`capturedAt: Date?`, `latitude: Decimal?`, `longitude: Decimal?`), `Sync/OutboxModel.swift` (`OutboxFile` + `thumbnailPath`, `capturedAt`, `latitude`, `longitude`), `HorselyKit/Network/ApiClient.swift` (części multipart `capturedAt`, `latitude`, `longitude`, `thumbnail` `image/jpeg`), `Outbox/OutboxProcessor.swift` (wstrzymanie A6: `ownerType=Training` bez `trainingAttachments` zostaje `pending`, kolejka pokazuje „Czeka na aktualizację programu”)
 - Test: `Packages/HorselyKit/Tests/HorselyKitTests/AttachmentOperationTests.swift`
 
-- [ ] **Step 1: Testy** — `trainingAttachmentMultipartCarriesMetadataAndThumbnail` (`FakeProgram`: `capturedAt=2026-09-01T08:15:00Z`, `latitude=52.2297000`, część `thumbnail`), `trainingAttachmentWaitsWithoutTrainingAttachments`, `attachmentDtoWithMetadataParses`.
-- [ ] **Step 2:** Implementacja; push → PASS.
-- [ ] **Step 3: Commit** — `feat(attachments): zalaczniki treningu z miejscem, czasem i miniatura filmu`
+- [x] **Step 1: Testy** — `trainingAttachmentMultipartCarriesMetadataAndThumbnail` (`FakeProgram`: `capturedAt=2026-09-01T08:15:00Z`, `latitude=52.2297000`, część `thumbnail`), `trainingAttachmentWaitsWithoutTrainingAttachments`, `attachmentDtoWithMetadataParses`.
+- [x] **Step 2:** Implementacja; push → PASS.
+- [x] **Step 3: Commit** — `feat(attachments): zalaczniki treningu z miejscem, czasem i miniatura filmu`
 
 ### Task 9: Przekodowanie filmów 720p i miniatura = [PLAN-A] Task 8
 
