@@ -1905,7 +1905,9 @@ Kryteria wersji 2.0.1: **SC-001** pliki wzorcowe programu 2.0.0 (słowniki, koń
 ### 9.3 Nagrywanie w tle
 
 - **`CLLocationUpdate.liveUpdates(.fitness)` + `CLBackgroundActivitySession`** — po zamknięciu przez system iOS uruchamia
-  ponownie w tle (odpowiednik `START_STICKY`); po przesunięciu — koniec, przy ponownym starcie „Zapisz / Odrzuć”.
+  ponownie w tle (odpowiednik `START_STICKY`); po przesunięciu — koniec, przy ponownym starcie „Zapisz / Odrzuć”. Wznowienie tylko
+  przy uruchomieniu w tle (klucz `location`; inne uruchomienie w tle — gdy ostatni zapis ma ≤ 10 min); otwarcie aplikacji przez
+  użytkownika z niezakończoną jazdą w bazie = jazda przerwana i „Zapisz / Odrzuć”.
 - **`CLServiceSession(authorization: .whenInUse)`** — dokładna lokalizacja wymagana; przybliżona blokuje start.
 - **Akcelerometr**: `CMMotionManager.deviceMotionUpdateInterval = 1/50`, okna 5 s → analizator rytmu; próbka to
   `userAcceleration + gravity` (w g, potem × 9,80665) — analizator, jak na Androidzie, potrzebuje przyspieszenia z grawitacją.

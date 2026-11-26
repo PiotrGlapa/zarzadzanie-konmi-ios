@@ -112,7 +112,7 @@ lokalizacji) odpada — [WYM] NAG-05 i brak sterowania bez odblokowania telefonu
 |---|---|---|
 | Uprawnienia | `ACCESS_FINE/COARSE_LOCATION`, `FOREGROUND_SERVICE_LOCATION` | `NSLocationWhenInUseUsageDescription`, `UIBackgroundModes` + `location`, `NSSupportsLiveActivities`; dokładna lokalizacja wymagana — przy „przybliżonej” prośba o dokładną (`requestTemporaryFullAccuracyAuthorization`) albo wyjaśnienie **[P]**; bez „Zawsze” |
 | Praca w tle | usługa pierwszoplanowa `location` | 5.2 |
-| Zabicie procesu | `START_STICKY`, stan `Interrupted` (A13) | zamknięcie przez system → ponowne uruchomienie w tle i wznowienie; zamknięcie przesunięciem → koniec, przy starcie „Zapisz / Odrzuć” (NAG-09) |
+| Zabicie procesu | `START_STICKY`, stan `Interrupted` (A13) | zamknięcie przez system → ponowne uruchomienie w tle i wznowienie; zamknięcie przesunięciem → koniec, przy starcie „Zapisz / Odrzuć” (NAG-09); otwarcie aplikacji przez użytkownika (pierwszy plan) z niezakończoną jazdą = przerwana, „Zapisz / Odrzuć” — wznawia tylko uruchomienie w tle |
 | Powiadomienie w trakcie | stałe powiadomienie | Live Activity (5.3); ostrzeżenia (bateria 15 %, 8 h, słaby GPS) jako powiadomienia lokalne |
 | Optymalizacja baterii | prośba o wyłączenie | nie dotyczy |
 | Bateria | `BatteryManager` | `UIDevice.isBatteryMonitoringEnabled` tylko w trakcie nagrywania |

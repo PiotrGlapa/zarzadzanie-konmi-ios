@@ -15,23 +15,28 @@ public struct LocationSample: Sendable, Hashable {
     public let speedMs: Double?
     public let hAccM: Double?
 
-    public init(lat: Double, lon: Double, altM: Double?, speedMs: Double?, hAccM: Double?) {
+    /// Core Location zgłosił bezruch (`CLLocationUpdate.stationary`) — kolejne punkty mogą nie przychodzić, dopóki urządzenie się nie ruszy.
+    public let stationary: Bool
+
+    public init(lat: Double, lon: Double, altM: Double?, speedMs: Double?, hAccM: Double?, stationary: Bool = false) {
         self.lat = lat
         self.lon = lon
         self.altM = altM
         self.speedMs = speedMs
         self.hAccM = hAccM
+        self.stationary = stationary
     }
 
     /// Punkt z `CLLocation`: wartości ujemne (Core Location oznacza tak wartość nieznaną) dają `nil` — jak `hasAltitude()`/`hasSpeed()`
     /// na Androidzie. Ujemna dokładność pozioma oznacza nieważne współrzędne, więc taki punkt (i punkt z nieważnymi współrzędnymi) to `nil`.
-    public init?(_ location: CLLocation) {
+    public init?(_ location: CLLocation, stationary: Bool = false) {
         guard location.horizontalAccuracy >= 0, CLLocationCoordinate2DIsValid(location.coordinate) else { return nil }
         self.lat = location.coordinate.latitude
         self.lon = location.coordinate.longitude
         self.altM = location.verticalAccuracy >= 0 ? location.altitude : nil
         self.speedMs = location.speed >= 0 ? location.speed : nil
         self.hAccM = location.horizontalAccuracy
+        self.stationary = stationary
     }
 
     /// Punkt trasy z czasem odbioru `tMillis` (epoka, ms), bez danych ruchu.
@@ -54,11 +59,15 @@ public enum LocationAuthorization: Sendable, Hashable {
 /// - `stopUpdates()` kończy tylko odbiór punktów — sesja aktywności w tle zostaje (pauza: „Wznów” z ekranu blokady musi móc
 ///   ponownie uruchomić lokalizację w tle);
 /// - `stop()` kończy odbiór i zwalnia sesje w tle (bezpieczne bez wcześniejszego startu);
-/// - `authorization` to bieżąca zgoda — kontroler sprawdza ją przed startem i przy każdym tiku (cofnięcie zgody w trakcie jazdy);
+/// - `authorization` to bieżąca zgoda — kontroler sprawdza ją przed startem i przy każdym tiku (cofnięcie zgody w trakcie jazdy, najpóźniej
+///   po 1 s); źródło systemowe uwzględnia w niej też flagi odmowy i przybliżonej lokalizacji z `CLLocationUpdate`;
+/// - strumień `updates()` może skończyć się sam (błąd systemu) — wtedy `lastStreamError` to nazwa typu błędu (bez danych), a kontroler
+///   ponawia odbiór;
 /// - `beginBackgroundActivity()` — tylko ponowne uruchomienie aplikacji przez system w tle: sesję aktywności w tle trzeba odtworzyć
 ///   synchronicznie, zanim skończy się uruchamianie aplikacji (zob. `RideRecordingController.prepareRelaunch()`).
 public protocol LocationSource: Sendable {
     var authorization: LocationAuthorization { get }
+    var lastStreamError: String? { get }
     func updates() -> AsyncStream<LocationSample>
     func stopUpdates()
     func stop()
@@ -79,13 +88,22 @@ public final class SystemLocationSource: LocationSource, @unchecked Sendable {
     private var continuation: AsyncStream<LocationSample>.Continuation?
     private var background: CLBackgroundActivitySession?
     private var service: CLServiceSession?
+    private var streamError: String?
+
+    /// Zgoda wynikająca z flag ostatniej aktualizacji (`authorizationDenied…` → `.denied`, `accuracyLimited` → `.reducedAccuracy`); `nil`, gdy
+    /// ostatnia aktualizacja nie zgłaszała problemu. Kontroler przy tiku traktuje ją jak cofnięcie zgody.
+    private var updateAuthorization: LocationAuthorization?
 
     public init() {}
 
     public var authorization: LocationAuthorization {
-        let (status, accuracy) = lock.withLock { (manager.authorizationStatus, manager.accuracyAuthorization) }
-        return Self.authorization(status: status, accuracy: accuracy)
+        let (status, accuracy, fromUpdate) = lock.withLock { (manager.authorizationStatus, manager.accuracyAuthorization, updateAuthorization) }
+        let system = Self.authorization(status: status, accuracy: accuracy)
+        guard system == .whenInUse, let fromUpdate else { return system }
+        return fromUpdate
     }
+
+    public var lastStreamError: String? { lock.withLock { streamError } }
 
     /// Zgoda z `CLAuthorizationStatus` i `CLAccuracyAuthorization`: „Zawsze” aplikacja nigdy nie prosi, ale gdyby ją miała — traktuje jak
     /// „Podczas używania”.
@@ -102,6 +120,19 @@ public final class SystemLocationSource: LocationSource, @unchecked Sendable {
         }
     }
 
+    /// Flagi diagnostyczne iOS 18: odmowa (także globalna i ograniczenie) i przybliżona lokalizacja.
+    private func noteFlags(_ update: CLLocationUpdate) {
+        let flagged: LocationAuthorization?
+        if update.authorizationDenied || update.authorizationDeniedGlobally || update.authorizationRestricted {
+            flagged = .denied
+        } else if update.accuracyLimited {
+            flagged = .reducedAccuracy
+        } else {
+            flagged = nil
+        }
+        lock.withLock { updateAuthorization = flagged }
+    }
+
     public func beginBackgroundActivity() {
         lock.withLock {
             if background == nil { background = CLBackgroundActivitySession() }
@@ -113,14 +144,22 @@ public final class SystemLocationSource: LocationSource, @unchecked Sendable {
         stopUpdates()
         beginBackgroundActivity()
         let (stream, continuation) = AsyncStream<LocationSample>.makeStream(bufferingPolicy: .bufferingNewest(120))
-        let task = Task {
+        lock.withLock {
+            streamError = nil
+            updateAuthorization = nil
+        }
+        let task = Task { [weak self] in
             do {
                 for try await update in CLLocationUpdate.liveUpdates(.fitness) {
                     if Task.isCancelled { break }
-                    if let location = update.location, let sample = LocationSample(location) { continuation.yield(sample) }
+                    self?.noteFlags(update)
+                    if let location = update.location, let sample = LocationSample(location, stationary: update.stationary) {
+                        continuation.yield(sample)
+                    }
                 }
             } catch {
-                // Strumień systemu zakończył się błędem — kontroler zobaczy koniec strumienia i brak punktów (słaby GPS).
+                // Kontroler zobaczy koniec strumienia, zapisze nazwę typu błędu w dzienniku i ponowi odbiór.
+                self?.lock.withLock { self?.streamError = String(describing: type(of: error)) }
             }
             continuation.finish()
         }

@@ -266,6 +266,19 @@ public struct UnfinishedRide: Sendable, Hashable {
     }
 }
 
+/// Aktywna sesja odczytana synchronicznie przy starcie aplikacji: id, stan (nieznany → `.interrupted`) i chwila ostatniego zapisu (epoka, ms).
+public struct ActiveSessionStatus: Sendable, Hashable {
+    public let id: String
+    public let state: RideState
+    public let lastFlushMillis: Int64
+
+    public init(id: String, state: RideState, lastFlushMillis: Int64) {
+        self.id = id
+        self.state = state
+        self.lastFlushMillis = lastFlushMillis
+    }
+}
+
 /// Trwająca (niezakończona) jazda dla paska NAG-01 i ekranu nagrywania: sesja, koń, początek i bieżąca migawka.
 public struct ActiveRide: Sendable, Hashable {
     public let sessionId: String
@@ -690,8 +703,13 @@ public final class RideSessionStore: Sendable {
     /// Stan aktywnej (niezakończonej) sesji odczytany SYNCHRONICZNIE — tylko przy starcie aplikacji, zanim skończy się uruchamianie
     /// (`RideRecordingController.prepareRelaunch()`); `nil`, gdy nie ma sesji albo odczyt się nie udał. Nieznany stan to `.interrupted`.
     public func activeSessionStateNow() -> RideState? {
+        activeSessionNow()?.state
+    }
+
+    /// To samo co `activeSessionStateNow()` razem z id sesji i chwilą ostatniego zapisu (decyzja o wznowieniu po ponownym uruchomieniu).
+    public func activeSessionNow() -> ActiveSessionStatus? {
         guard let row = try? db.read({ db in try Self.fetchActive(db) }) else { return nil }
-        return RideState(rawValue: row.state) ?? .interrupted
+        return ActiveSessionStatus(id: row.id, state: RideState(rawValue: row.state) ?? .interrupted, lastFlushMillis: row.lastFlushMillis)
     }
 
     // MARK: - Obserwacja (pasek NAG-01)

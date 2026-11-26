@@ -154,7 +154,7 @@ struct RideRecordingControllerTests {
     }
 
     /// Android: `a killed process continues after restart and the gap is not active time` + `sticky restart with the permission continues the
-    /// ride and counts the gap as a pause`. Nowy proces: `prepareRelaunch()` (synchronicznie, przy starcie aplikacji) odtwarza sesję aktywności
+    /// ride and counts the gap as a pause`. Nowy proces uruchomiony przez system w tle: `prepareRelaunch(launch: .backgroundLocation)` (synchronicznie, przy starcie aplikacji) odtwarza sesję aktywności
     /// w tle i wznawia odbiór GPS; luka po zabiciu jest pauzą.
     @Test func relaunchWithActiveSessionResumesUpdates() async throws {
         let h = ControllerHarness()
@@ -171,7 +171,7 @@ struct RideRecordingControllerTests {
         let locations = FakeLocationSource()
         let motion = FakeMotionSource()
         let restarted = h.controller(try h.openStore(), locations: locations, motion: motion)
-        let relaunch = try #require(restarted.prepareRelaunch())
+        let relaunch = try #require(restarted.prepareRelaunch(launch: .backgroundLocation))
         #expect(locations.backgroundBegun == 1, "sesja aktywności w tle odtworzona synchronicznie, przed zakończeniem uruchamiania")
         await relaunch.value
 
@@ -267,7 +267,7 @@ struct RideRecordingControllerTests {
         h.clock.millis = START + 90_000
         let locations = FakeLocationSource()
         let restarted = h.controller(try h.openStore(), locations: locations, log: write)
-        await restarted.prepareRelaunch()?.value
+        await restarted.prepareRelaunch(launch: .backgroundLocation)?.value
         h.clock.millis = START + 91_000
         await h.emit(krakow(41, 4.6), to: restarted, via: locations)
         locations.authorization = .denied
@@ -276,10 +276,11 @@ struct RideRecordingControllerTests {
         // Nowa jazda po odrzuceniu poprzedniej i zwykłe zakończenie.
         try await store.discard(sessionId: id)
         h.clock.millis = START + 200_000
-        let fresh = h.controller(try h.openStore(), log: write)
+        let freshLocations = FakeLocationSource()
+        let fresh = h.controller(try h.openStore(), locations: freshLocations, log: write)
         _ = try await fresh.start(horse: horse, params: params)
         h.clock.millis = START + 201_000
-        await h.emit(krakow(50, 4.6), to: fresh)
+        await h.emit(krakow(50, 4.6), to: fresh, via: freshLocations)
         h.clock.millis = START + 202_000
         await fresh.finish()
 
@@ -400,7 +401,7 @@ struct RideRecordingControllerTests {
         #expect(store.activeSessionStateNow() == .interrupted)
 
         let controller = h.controller(store)
-        #expect(controller.prepareRelaunch() == nil)
+        #expect(controller.prepareRelaunch(launch: .backgroundLocation) == nil)
         await controller.resumeAfterRelaunch()
         #expect(!controller.isRunning)
         #expect(!h.locations.active)
@@ -424,7 +425,7 @@ struct RideRecordingControllerTests {
         h.clock.millis = START + 60_000
         let locations = FakeLocationSource(authorization: .denied)
         let restarted = h.controller(try h.openStore(), locations: locations)
-        let relaunch = try #require(restarted.prepareRelaunch())
+        let relaunch = try #require(restarted.prepareRelaunch(launch: .backgroundLocation))
         #expect(locations.backgroundBegun == 0, "bez zgody nie zaczynamy aktywności w tle")
         await relaunch.value
 
@@ -445,14 +446,14 @@ struct RideRecordingControllerTests {
         defer { h.cleanUp() }
         let store = try h.openStore()
         let controller = h.controller(store)
-        #expect(controller.prepareRelaunch() == nil)
+        #expect(controller.prepareRelaunch(launch: .backgroundLocation) == nil)
         await controller.resumeAfterRelaunch()
         #expect(!h.locations.active)
 
         let id = try await store.start(horse: grom, params: params, startedAtMillis: START)
         for state in [RideState.finished, .interrupted] {
             try await store.setState(sessionId: id, state: state)
-            #expect(controller.prepareRelaunch() == nil)
+            #expect(controller.prepareRelaunch(launch: .backgroundLocation) == nil)
             await controller.resumeAfterRelaunch()
             #expect(!controller.isRunning)
             #expect(h.locations.starts == 0)
@@ -476,7 +477,7 @@ struct RideRecordingControllerTests {
         h.clock.millis = START + 60_000
         let locations = FakeLocationSource()
         let restarted = h.controller(try h.openStore(), locations: locations)
-        await restarted.prepareRelaunch()?.value
+        await restarted.prepareRelaunch(launch: .backgroundLocation)?.value
         #expect(!locations.active, "pauza użytkownika przetrwa restart")
         #expect(locations.backgroundActive)
         #expect(restarted.isRunning)
@@ -642,7 +643,7 @@ struct RideRecordingControllerTests {
         #expect(!controller.isRunning)
         #expect(h.alerts.bodies.isEmpty, "przerwanie przez zamknięcie aplikacji nie wysyła powiadomienia")
         // Po przerwaniu ponowne uruchomienie nie wznawia jazdy — czeka „Zapisz / Odrzuć”.
-        #expect(controller.prepareRelaunch() == nil)
+        #expect(controller.prepareRelaunch(launch: .backgroundLocation) == nil)
     }
 
     /// Android: `a second start while recording keeps the service in foreground` — drugi start nie rusza nagrywanej jazdy.
@@ -661,6 +662,198 @@ struct RideRecordingControllerTests {
         await #expect(throws: RideSessionError.onlyOneActiveSession) {
             _ = try await h.controller(store, locations: FakeLocationSource()).start(horse: grom, params: params)
         }
+    }
+
+    // MARK: Poprawki po recenzji (I1–I4)
+
+    /// I1: użytkownik otwiera aplikację (pierwszy plan), a w bazie jest jazda `.recording`/`.paused` — system jej nie wznowił w tle, więc to
+    /// przesunięcie: stan `.interrupted` („Zapisz / Odrzuć”), bez odbioru lokalizacji i bez sesji aktywności w tle (brak niebieskiego wskaźnika).
+    @Test(arguments: [false, true])
+    func foregroundLaunchWithUnfinishedRideInterruptsWithoutLocation(_ paused: Bool) async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let first = h.controller(store)
+        let id = try await first.start(horse: grom, params: params)
+        for s in 1...6 { await second(h, first, s) }
+        if paused {
+            h.clock.millis = START + 7_000
+            await first.pause()
+        }
+
+        h.clock.millis = START + 60_000
+        let locations = FakeLocationSource()
+        let reopened = h.controller(try h.openStore(), locations: locations, motion: FakeMotionSource())
+        let launch = try #require(reopened.prepareRelaunch(launch: .foreground))
+        await launch.value
+
+        let loaded = try await store.load(sessionId: id)
+        #expect(loaded.session.state == .interrupted)
+        #expect(loaded.track.points.count == (paused ? 6 : 5), "zapisane punkty zostają")
+        #expect(try await store.unfinished()?.state == .interrupted)
+        #expect(locations.starts == 0)
+        #expect(locations.backgroundBegun == 0)
+        #expect(!locations.backgroundActive)
+        #expect(!reopened.isRunning)
+        #expect(h.alerts.bodies.isEmpty, "użytkownik jest w aplikacji — odzyskanie pokaże „Zapisz / Odrzuć”")
+        let age = paused ? 53 : 55
+        #expect(h.logs.lines.contains("Uruchomienie na pierwszym planie z niezakończoną jazdą (ostatni zapis \(age) s temu) — jazda przerwana, bez wznowienia"))
+    }
+
+    /// I1, bezpiecznik: uruchomienie w tle bez klucza lokalizacji (push, odświeżanie) wznawia tylko jazdę ze świeżym zapisem (≤ 10 min).
+    @Test func backgroundLaunchWithoutLocationKeyResumesOnlyAFreshRide() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let first = h.controller(store)
+        let id = try await first.start(horse: grom, params: params)
+        for s in 1...6 { await second(h, first, s) }
+
+        // Świeży zapis (55 s): wznowienie.
+        h.clock.millis = START + 60_000
+        let freshLocations = FakeLocationSource()
+        let fresh = h.controller(try h.openStore(), locations: freshLocations, motion: FakeMotionSource())
+        await fresh.prepareRelaunch(launch: .background)?.value
+        #expect(fresh.isRunning)
+        #expect(freshLocations.active)
+        #expect(freshLocations.backgroundBegun == 1)
+        await fresh.interrupt()
+        try await store.setState(sessionId: id, state: .recording)
+
+        // Stary zapis (> 10 min): przerwanie bez lokalizacji.
+        h.clock.millis = START + 60_000 + RideRecordingController.relaunchFreshnessMillis + 1_000
+        let staleLocations = FakeLocationSource()
+        let stale = h.controller(try h.openStore(), locations: staleLocations, motion: FakeMotionSource())
+        await stale.prepareRelaunch(launch: .background)?.value
+        #expect(!stale.isRunning)
+        #expect(staleLocations.starts == 0)
+        #expect(staleLocations.backgroundBegun == 0)
+        #expect(try await store.load(sessionId: id).session.state == .interrupted)
+        #expect(h.logs.lines.contains { $0.hasPrefix("Uruchomienie w tle z niezakończoną jazdą") })
+    }
+
+    /// I2: zakończenie przy zepsutym zapisie (wyzwalacz SQLite) — próba ponowienia, potem stan `.interrupted` (nie `.recording`), punkty
+    /// zapisane wcześniej zostają, a ponowne uruchomienie nie włącza GPS dla jazdy zakończonej przez użytkownika.
+    @Test func finishWithFailingStoreMarksTheRideInterrupted() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let database = try #require(h.opened.last)
+        try await database.writer.write { db in
+            try db.execute(sql: "CREATE TABLE test_switch (failing INTEGER NOT NULL)")
+            try db.execute(sql: "INSERT INTO test_switch VALUES (0)")
+            try db.execute(sql: """
+                CREATE TRIGGER test_fail_points BEFORE INSERT ON ride_point WHEN (SELECT failing FROM test_switch) = 1
+                BEGIN SELECT RAISE(ABORT, 'test'); END
+                """)
+        }
+        let controller = h.controller(store)
+        let id = try await controller.start(horse: grom, params: params)
+        for s in 1...5 { await second(h, controller, s) }
+        try await database.writer.write { db in try db.execute(sql: "UPDATE test_switch SET failing = 1") }
+        for s in 6...8 { await second(h, controller, s) }
+        h.clock.millis = START + 9_000
+        #expect(await controller.finish() == id)
+
+        let loaded = try await store.load(sessionId: id)
+        #expect(loaded.session.state == .interrupted)
+        let expectedTimes: [Int64] = (1...5).map { step in START + Int64(step) * 1_000 }
+        #expect(loaded.track.points.map(\.tMillis) == expectedTimes)
+        #expect(h.logs.lines.contains { $0.hasPrefix("Zakończenie jazdy: zapis nie powiódł się (") && $0.hasSuffix("próba 2 z 2)") })
+        #expect(h.logs.lines.contains("Zakończenie jazdy: jazda oznaczona jako przerwana — do odzyskania przy starcie aplikacji (niezapisane punkty: 3)"))
+        #expect(!controller.isRunning)
+        #expect(!h.locations.backgroundActive)
+        let reopened = FakeLocationSource()
+        #expect(h.controller(store, locations: reopened).prepareRelaunch(launch: .backgroundLocation) == nil)
+        #expect(reopened.starts == 0)
+    }
+
+    /// I3a: bezruch (`CLLocationUpdate.stationary`) — iOS wstrzymuje dostawy, a kontroler podaje maszynie ostatni punkt przy każdym tiku:
+    /// postój dłuższy niż 30 s nie daje „Słaby sygnał GPS”, dystans się nie zmienia. Po zwykłym punkcie brak dostaw znów oznacza słaby GPS.
+    @Test func stationaryUpdatesDoNotLookLikeWeakGps() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let controller = h.controller(store)
+        let id = try await controller.start(horse: grom, params: params)
+        h.clock.millis = START + 1_000
+        let still = goodFix(1)
+        await h.emit(LocationSample(lat: still.lat, lon: still.lon, altM: still.altM, speedMs: 0, hAccM: still.hAccM, stationary: true), to: controller)
+        for s in 2...40 {
+            h.clock.millis = START + Int64(s) * 1_000
+            await controller.tick()
+        }
+        #expect(h.alerts.bodies.isEmpty)
+        #expect(await latestSnapshot(controller)?.weakGps == false)
+        let loaded = try await store.load(sessionId: id)
+        #expect(loaded.track.points.count == 40)
+        #expect(loaded.track.points.allSatisfy { $0.lat == still.lat && $0.lon == still.lon && $0.speedMs == 0 })
+        #expect(loaded.session.distanceMeters == 0)
+
+        h.clock.millis = START + 41_000
+        await h.emit(goodFix(2), to: controller)
+        for s in 42...72 {
+            h.clock.millis = START + Int64(s) * 1_000
+            await controller.tick()
+        }
+        #expect(h.alerts.bodies == ["Słaby sygnał GPS"], "bez flagi bezruchu brak punktów to słaby GPS")
+    }
+
+    /// I3c: strumień lokalizacji kończy się sam (błąd systemu) — wpis w dzienniku z nazwą typu błędu i ponowne uruchomienie odbioru; po
+    /// trzech ponowieniach bez punktu jazda jest przerywana (`.interrupted`, punkty zachowane, powiadomienie).
+    @Test func locationStreamEndRestartsAndThenInterrupts() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let controller = h.controller(store)
+        let id = try await controller.start(horse: grom, params: params)
+        for s in 1...2 { await second(h, controller, s) }
+
+        h.locations.finishStream(error: "SimulatedFailure")
+        #expect(await h.waitUntil { h.locations.starts == 2 && h.locations.active })
+        #expect(controller.isRunning)
+        #expect(h.logs.lines.contains { $0.hasPrefix("Odbiór GPS zakończył się (SimulatedFailure) — ponowne uruchomienie 1 z 3") })
+        await second(h, controller, 3)
+
+        for restart in 1...3 {
+            h.locations.finishStream(error: nil)
+            #expect(await h.waitUntil { h.locations.starts == 2 + restart && h.locations.active })
+        }
+        h.locations.finishStream(error: "SimulatedFailure")
+        #expect(await h.waitUntil { !controller.isRunning })
+
+        let loaded = try await store.load(sessionId: id)
+        #expect(loaded.session.state == .interrupted)
+        #expect(loaded.track.points.count == 3)
+        #expect(!h.locations.active)
+        #expect(!h.locations.backgroundActive)
+        #expect(h.alerts.bodies == ["Nagrywanie przerwane — otwórz aplikację, aby zapisać jazdę"])
+        #expect(h.logs.lines.contains { $0.hasPrefix("Odbiór GPS zakończył się (SimulatedFailure) — nagrywanie przerwane") })
+    }
+
+    /// I4: dwa równoczesne `resumeAfterRelaunch()` — drugie nic nie robi (nie zatrzymuje GPS i nie oznacza wznowionej jazdy jako przerwanej).
+    @Test func concurrentResumeAfterRelaunchResumesOnce() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let first = h.controller(store)
+        let id = try await first.start(horse: grom, params: params)
+        for s in 1...6 { await second(h, first, s) }
+
+        h.clock.millis = START + 60_000
+        let locations = FakeLocationSource()
+        let restarted = h.controller(try h.openStore(), locations: locations, motion: FakeMotionSource())
+        async let one: Void = restarted.resumeAfterRelaunch()
+        async let two: Void = restarted.resumeAfterRelaunch()
+        _ = await (one, two)
+
+        #expect(restarted.isRunning)
+        #expect(restarted.activeSessionId == id)
+        #expect(locations.active)
+        #expect(locations.starts == 1)
+        #expect(try await store.load(sessionId: id).session.state == .recording)
+        #expect(h.alerts.bodies.isEmpty)
+        #expect(!h.logs.lines.contains("Jazda oznaczona jako przerwana"))
     }
 
     // MARK: AccelWindowBuffer (Android: AccelWindowBufferTest)
@@ -774,6 +967,7 @@ private final class FakeLocationSource: LocationSource {
         var background = false
         var backgroundBegun = 0
         var starts = 0
+        var streamError: String?
     }
 
     private let state: Mutex<State>
@@ -826,6 +1020,17 @@ private final class FakeLocationSource: LocationSource {
 
     func emit(_ sample: LocationSample) {
         _ = state.withLock { $0.continuation }?.yield(sample)
+    }
+
+    var lastStreamError: String? { state.withLock { $0.streamError } }
+
+    /// Strumień kończy się sam (jak `liveUpdates` po błędzie systemu); sesja w tle zostaje.
+    func finishStream(error: String?) {
+        state.withLock { current -> AsyncStream<LocationSample>.Continuation? in
+            current.streamError = error
+            defer { current.continuation = nil }
+            return current.continuation
+        }?.finish()
     }
 }
 
@@ -943,7 +1148,7 @@ private final class ControllerHarness: @unchecked Sendable {
         #expect(handled, "kontroler nie odebrał próbki ruchu")
     }
 
-    private func waitUntil(_ condition: @Sendable () async -> Bool) async -> Bool {
+    func waitUntil(_ condition: @Sendable () async -> Bool) async -> Bool {
         let deadline = ContinuousClock.now.advanced(by: .seconds(20))
         while ContinuousClock.now < deadline {
             if await condition() { return true }

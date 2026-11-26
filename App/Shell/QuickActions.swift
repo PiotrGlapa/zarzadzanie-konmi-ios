@@ -22,6 +22,20 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         if !isTestRun, SettingsStore().pushActive {
             MainActor.assumeIsolated { FirebasePushTokenSource.shared.configureNow() }
         }
+        // Nagrywanie jazdy (Task 15, A13): system zamknął aplikację w trakcie jazdy → uruchamia ją ponownie W TLE (klucz `location`) i wtedy
+        // wznawiamy (sesja aktywności w tle powstaje synchronicznie, przed końcem uruchamiania). Otwarcie przez użytkownika (stan `.inactive`)
+        // z jazdą w bazie oznacza przesunięcie — jazda „przerwana”, przy starcie „Zapisz / Odrzuć”.
+        if let ride = RideBridge.shared.controller {
+            let launch: RideLaunchKind
+            if launchOptions?[.location] != nil {
+                launch = .backgroundLocation
+            } else if application.applicationState == .background {
+                launch = .background
+            } else {
+                launch = .foreground
+            }
+            ride.prepareRelaunch(launch: launch)
+        }
         return true
     }
 

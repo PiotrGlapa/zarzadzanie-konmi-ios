@@ -23,6 +23,19 @@ public enum RideStartError: Error, Sendable, Equatable {
     case locationUnavailable
 }
 
+/// Jak uruchomiono aplikację — decyduje, czy niezakończona jazda wraca do nagrywania (A13 na iOS, [ZAK] 6, SPECYFIKACJA 9.3).
+public enum RideLaunchKind: Sendable, Hashable {
+    /// Użytkownik otworzył aplikację (stan `.inactive` w `didFinishLaunching`). Niezakończona jazda NIE jest wznawiana: system, który
+    /// zamknął aplikację, wznawia ją w tle, więc uruchomienie na pierwszym planie z jazdą w bazie oznacza przesunięcie (albo nieudane
+    /// wznowienie) → stan `.interrupted` i „Zapisz / Odrzuć”.
+    case foreground
+    /// System uruchomił aplikację w tle z powodu lokalizacji (`UIApplication.LaunchOptionsKey.location`) — wznowienie.
+    case backgroundLocation
+    /// Inne uruchomienie w tle (push, odświeżanie w tle): wznowienie tylko jazdy wstrzymanej albo ze świeżym ostatnim zapisem
+    /// (≤ `RideRecordingController.relaunchFreshnessMillis`) — bezpiecznik na przesunięcie, po którym przyszło np. odświeżanie w tle.
+    case background
+}
+
 /// Poziom baterii w trakcie nagrywania (w testach zaślepka). `start`/`stop` nie czekają (wywołanie z `applicationWillTerminate`, kiedy
 /// wątek główny jest zajęty, nie może się zakleszczyć).
 public protocol BatteryMonitor: Sendable {
@@ -93,6 +106,12 @@ public actor RideRecordingController {
 
     private static let maxFailuresLogged = 5
 
+    /// Uruchomienie w tle bez klucza lokalizacji wznawia nagrywanie tylko, gdy ostatni zapis jest nie starszy niż 10 min.
+    public static let relaunchFreshnessMillis: Int64 = 10 * 60 * 1000
+
+    /// Ile razy z rzędu ponawiamy odbiór GPS po nieoczekiwanym końcu strumienia, zanim przerwiemy jazdę.
+    static let maxLocationRestarts = 3
+
     private struct Status: Sendable {
         var sessionId: String?
         var running = false
@@ -129,6 +148,17 @@ public actor RideRecordingController {
     private var lastBattery: Int?
     private var lastAccuracyM: Double?
     private var failuresLogged = 0
+
+    /// Wznawianie po ponownym uruchomieniu w toku — drugie równoczesne wywołanie nic nie robi.
+    private var relaunching = false
+
+    /// Numer bieżącego strumienia lokalizacji (koniec starego, anulowanego strumienia nie jest awarią) i liczba ponowień z rzędu.
+    private var locationGeneration = 0
+    private var locationRestarts = 0
+
+    /// Ostatni punkt z flagą bezruchu (`CLLocationUpdate.stationary`): iOS wstrzymuje wtedy dostawy, więc tik podaje maszynie ten punkt
+    /// z bieżącym czasem (prędkość 0) — postój konia nie jest „słabym GPS”, a dystans się nie zmienia (te same współrzędne).
+    private var stationarySample: LocationSample?
 
     /// Liczniki odebranych próbek (testy czekają na nie zamiast na czas).
     private(set) var receivedLocations = 0
@@ -256,20 +286,53 @@ public actor RideRecordingController {
         // Po oczekiwaniu na baterię jazda mogła się zakończyć (aktor jest współbieżny na `await`).
         guard recorder === machine, !finishing else { return }
         if let level { lastBattery = level }
+        if let still = stationarySample, sensorsRunning {
+            // Bezruch: iOS nie dostarcza punktów — podajemy ostatni z bieżącym czasem (zob. `stationarySample`).
+            let point = LocationSample(lat: still.lat, lon: still.lon, altM: still.altM, speedMs: 0, hAccM: still.hAccM, stationary: true)
+            await handle(machine.onLocation(point.trackPoint(tMillis: clock())), machine)
+            guard recorder === machine, !finishing else { return }
+        }
         await handle(machine.tick(tMillis: clock(), batteryPercent: level), machine)
         if !finishing { publish() }
     }
 
     // MARK: - Ponowne uruchomienie (A13)
 
-    /// Wołane synchronicznie przy starcie aplikacji, ZANIM skończy się uruchamianie (`HorselyApp.init`): gdy w bazie jest sesja
-    /// `.recording`/`.paused`, od razu odtwarza sesję aktywności w tle (iOS uruchamia aplikację ponownie w tle po zamknięciu jej przez
-    /// system i oczekuje tego natychmiast) i planuje `resumeAfterRelaunch()`. Zwraca zaplanowane zadanie albo `nil`, gdy nie ma czego wznawiać.
+    /// Wołane synchronicznie w `application(_:didFinishLaunchingWithOptions:)`, ZANIM skończy się uruchamianie: gdy w bazie jest sesja
+    /// `.recording`/`.paused`, decyduje według `launch`:
+    /// - wznowienie (`backgroundLocation`; `background` z jazdą wstrzymaną albo świeżym zapisem) — od razu odtwarza sesję aktywności w tle
+    ///   (iOS uruchamia aplikację ponownie w tle po zamknięciu jej przez system i oczekuje tego natychmiast) i planuje `resumeAfterRelaunch()`;
+    /// - w przeciwnym razie (`foreground`, nieświeży zapis) — bez lokalizacji: jazda dostaje `.interrupted` (punkty są już w bazie) i przy
+    ///   starcie jest „Zapisz / Odrzuć”.
+    /// Zwraca zaplanowane zadanie albo `nil`, gdy w bazie nie ma jazdy do wznowienia.
     @discardableResult
-    public nonisolated func prepareRelaunch() -> Task<Void, Never>? {
-        guard let state = store.activeSessionStateNow(), state == .recording || state == .paused else { return nil }
+    public nonisolated func prepareRelaunch(launch: RideLaunchKind) -> Task<Void, Never>? {
+        guard let active = store.activeSessionNow(), active.state == .recording || active.state == .paused else { return nil }
+        let ageMillis = clock() - active.lastFlushMillis
+        let resume: Bool
+        switch launch {
+        case .backgroundLocation: resume = true
+        case .background: resume = active.state == .paused || ageMillis <= Self.relaunchFreshnessMillis
+        case .foreground: resume = false
+        }
+        guard resume else {
+            return Task { await self.interruptStaleSession(active.id, launch: launch, ageMillis: ageMillis) }
+        }
         if locations.authorization == .whenInUse { locations.beginBackgroundActivity() }
         return Task { await self.resumeAfterRelaunch() }
+    }
+
+    /// Jazda, której system nie wznowił (przesunięcie albo nieudane wznowienie): `.interrupted` bez powiadomienia (użytkownik jest w aplikacji,
+    /// odzyskanie pokaże „Zapisz / Odrzuć”), bez włączania lokalizacji.
+    private func interruptStaleSession(_ id: String, launch: RideLaunchKind, ageMillis: Int64) async {
+        guard recorder == nil, !relaunching else { return }
+        let how = launch == .foreground ? "na pierwszym planie" : "w tle"
+        do {
+            try await store.setState(sessionId: id, state: .interrupted)
+            log("Uruchomienie \(how) z niezakończoną jazdą (ostatni zapis \(max(0, ageMillis) / 1000) s temu) — jazda przerwana, bez wznowienia")
+        } catch {
+            log("Uruchomienie \(how): nie ustawiono stanu przerwania (\(Self.typeName(error)))")
+        }
     }
 
     /// Wznowienie po ponownym uruchomieniu aplikacji (odpowiednik `START_STICKY` z A13). Niezakończona sesja `.recording` wraca do pracy:
@@ -278,7 +341,11 @@ public actor RideRecordingController {
     /// nie są wznawiane — czekają na „Zapisz / Odrzuć”. Bez zgody na dokładną lokalizację: stan `.interrupted` i powiadomienie
     /// „Nagrywanie przerwane — otwórz aplikację, aby zapisać jazdę” (punkty zapisane wcześniej zostają w bazie).
     public func resumeAfterRelaunch() async {
-        guard recorder == nil else { return }
+        // Strażnik przed pierwszym `await`: drugie równoczesne wywołanie nie może zatrzymać GPS ani oznaczyć jako przerwanej jazdy wznowionej
+        // przez pierwsze.
+        guard recorder == nil, !relaunching else { return }
+        relaunching = true
+        defer { relaunching = false }
         let pending: UnfinishedRide?
         do {
             pending = try await store.unfinished()
@@ -332,6 +399,8 @@ public actor RideRecordingController {
         backlog = []
         window.clear()
         lastAccuracyM = nil
+        stationarySample = nil
+        locationRestarts = 0
         if machine.snapshot().state == .recording && !startSensors() {
             recorder = nil
             sessionId = nil
@@ -355,6 +424,8 @@ public actor RideRecordingController {
         defer { receivedLocations += 1 }
         guard let machine = recorder, !finishing else { return }
         lastAccuracyM = sample.hAccM
+        stationarySample = sample.stationary ? sample : nil
+        locationRestarts = 0
         // Punkt dostaje czas odbioru z tego samego zegara co tiki; rytm i intensywność dopisują okna akcelerometru (`onMotion`).
         await handle(machine.onLocation(sample.trackPoint(tMillis: clock())), machine)
     }
@@ -461,14 +532,33 @@ public actor RideRecordingController {
         backlog.removeFirst(min(toWrite.count, backlog.count))
     }
 
-    /// Ostatni zapis zakończonej jazdy i oznaczenie `.finished` (zapis ustawia też chwilę końca).
+    /// Ostatni zapis zakończonej jazdy i oznaczenie `.finished` (zapis ustawia też chwilę końca). Nieudany zapis jest ponawiany raz (ta sama
+    /// partia z zaległymi punktami); gdy dalej się nie da — stan `.interrupted`, żeby przy starcie było „Zapisz / Odrzuć” z tym, co już jest
+    /// w bazie, a nie wznowienie GPS dla jazdy zakończonej przez użytkownika.
     private func closeRide(_ machine: RideRecorder, _ id: String) async {
         await flushChain?.value
+        var saved = false
+        for attempt in 1...2 where !saved {
+            do {
+                try await writeBatch(machine, id)
+                saved = true
+            } catch {
+                log("Zakończenie jazdy: zapis nie powiódł się (\(Self.typeName(error)), próba \(attempt) z 2)")
+            }
+        }
+        if saved {
+            do {
+                try await store.setState(sessionId: id, state: .finished)
+                return
+            } catch {
+                log("Zakończenie jazdy: nie ustawiono stanu zakończenia (\(Self.typeName(error)))")
+            }
+        }
         do {
-            try await writeBatch(machine, id)
-            try await store.setState(sessionId: id, state: .finished)
+            try await store.setState(sessionId: id, state: .interrupted)
+            log("Zakończenie jazdy: jazda oznaczona jako przerwana — do odzyskania przy starcie aplikacji (niezapisane punkty: \(backlog.count))")
         } catch {
-            log("Zakończenie jazdy: zapis nie powiódł się (\(Self.typeName(error))) — jazda do odzyskania przy starcie aplikacji")
+            log("Zakończenie jazdy: nie ustawiono stanu przerwania (\(Self.typeName(error)))")
         }
     }
 
@@ -517,10 +607,7 @@ public actor RideRecordingController {
     private func startSensors() -> Bool {
         if sensorsRunning { return true }
         guard locations.authorization == .whenInUse else { return false }
-        let points = locations.updates()
-        locationTask = Task {
-            for await sample in points { await self.onLocation(sample) }
-        }
+        startLocationUpdates()
         // Brak akcelerometru nie przerywa jazdy — tylko bez rytmu (strumień kończy się od razu).
         let samples = motion.samples()
         motionTask = Task {
@@ -530,7 +617,36 @@ public actor RideRecordingController {
         return true
     }
 
+    /// Nowy strumień lokalizacji; jego nieoczekiwany koniec (błąd systemu) obsługuje `locationStreamEnded`.
+    private func startLocationUpdates() {
+        locationGeneration += 1
+        let generation = locationGeneration
+        let points = locations.updates()
+        locationTask = Task {
+            for await sample in points { await self.onLocation(sample) }
+            if Task.isCancelled { return }
+            await self.locationStreamEnded(generation)
+        }
+    }
+
+    /// Strumień lokalizacji skończył się sam (nie przez `stopSensors`): wpis w dzienniku (tylko nazwa typu błędu), ponowne uruchomienie
+    /// odbioru, a po `maxLocationRestarts` próbach bez punktu albo bez zgody — przerwanie jazdy (`.interrupted`, powiadomienie).
+    private func locationStreamEnded(_ generation: Int) async {
+        guard generation == locationGeneration, sensorsRunning, let machine = recorder, let id = sessionId, !finishing else { return }
+        let cause = locations.lastStreamError ?? "bez błędu"
+        locationTask = nil
+        locationRestarts += 1
+        if locationRestarts <= Self.maxLocationRestarts && locations.authorization == .whenInUse {
+            log(entry("Odbiór GPS zakończył się (\(cause)) — ponowne uruchomienie \(locationRestarts) z \(Self.maxLocationRestarts)", machine))
+            startLocationUpdates()
+        } else {
+            await abort(machine, id, reason: "Odbiór GPS zakończył się (\(cause)) — nagrywanie przerwane", notify: true)
+        }
+    }
+
     private func stopSensors(keepBackgroundActivity: Bool) {
+        locationGeneration += 1
+        stationarySample = nil
         locationTask?.cancel()
         locationTask = nil
         motionTask?.cancel()
