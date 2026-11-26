@@ -49,6 +49,8 @@ struct DashboardView: View {
                 }
                 .padding(.horizontal, Spacing.screenEdge)
             }
+            // NAG-01: pasek trwającego nagrywania stoi nad listą (nie w niej), bo na górze przewiniętej listy znikałby z ekranu (jak Android).
+            .safeAreaInset(edge: .top, spacing: 0) { ActiveRideBanner() }
             .background(HorselyColor.background)
             .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle("nav_dashboard")

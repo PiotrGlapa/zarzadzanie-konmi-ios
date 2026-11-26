@@ -66,6 +66,16 @@ final class AppEnvironment {
     @ObservationIgnored let rideSessions: RideSessionStore
     /// JEDYNY kontroler nagrywania jazdy (aktor z maszyną `RideRecorder`).
     @ObservationIgnored let ride: RideRecordingController
+    /// Odzyskiwanie niezakończonej jazdy (pytanie przy starcie, ekran startu) — na tym samym sklepie i kontrolerze (Task 17).
+    @ObservationIgnored let rideRecovery: RideRecovery
+    /// Zdjęcia i filmy zrobione w trakcie jazdy (`ride-media/` w kontenerze aplikacji, ZAT-05).
+    @ObservationIgnored let rideMedia: RideMediaFiles
+    /// Parametry jazdy konia przy starcie nagrywania. Do Task 26 (ustawienia jazd i profil konia) — wartości wbudowane (`RideDefaults.builtIn`).
+    @ObservationIgnored var rideParameters: @Sendable (_ horseId: String) async -> EffectiveRideParameters = { _ in
+        RideParameters.resolve(RideDefaults.builtIn, nil)
+    }
+    /// Niezakończona jazda dla paska NAG-01 i ekranu nagrywania — migawka z JEDYNEGO sklepu sesji (`observeActiveRide`), uruchamia `RootView`.
+    private(set) var activeRide: ActiveRide?
     let router = DeepLinkRouter()
     /// Licznik zmian magazynu — widoki z danymi złożonymi z wielu rekordów (Pulpit, terminy, oś czasu) odświeżają się, gdy rośnie.
     private(set) var dataRevision: Int64 = 0
@@ -137,7 +147,7 @@ final class AppEnvironment {
     init(
         settings: SettingsStore, dates: any DateProvider, log: DiagnosticLog, store: RecordStore, files: LocalFileStore,
         launchOptions: LaunchOptions = LaunchOptions(arguments: []), secrets: SecretStore? = nil, transport: ProgramTransport? = nil,
-        probe: ConnectProbe? = nil, uploader: BackgroundUploader? = nil, pushTokens: (any PushTokenSource)? = nil
+        probe: ConnectProbe? = nil, uploader: BackgroundUploader? = nil, pushTokens: (any PushTokenSource)? = nil, rideMediaDirectory: URL? = nil
     ) {
         self.settings = settings
         self.dates = dates
@@ -153,9 +163,19 @@ final class AppEnvironment {
         self.trainings = TrainingRepository(entries: entries)
         let rideSessions = store.makeRideSessionStore()
         self.rideSessions = rideSessions
-        self.ride = RideRecordingController(
+        let rideNotifier = LocalRideNotifier(texts: .app)
+        let ride = RideRecordingController(
             store: rideSessions, locations: SystemLocationSource(), motion: CoreMotionSource(), battery: DeviceBatteryMonitor(),
-            notifier: LocalRideNotifier(texts: .app), activity: LiveRideActivityPresenter(log: { log.log(RideRecordingController.logCategory, $0) }),
+            notifier: rideNotifier, activity: LiveRideActivityPresenter(log: { log.log(RideRecordingController.logCategory, $0) }),
+            log: { log.log(RideRecordingController.logCategory, $0) }
+        )
+        self.ride = ride
+        let rideMedia = RideMediaFiles(
+            root: rideMediaDirectory ?? FileManager.default.temporaryDirectory.appendingPathComponent("horsely-ride-media-\(UUID().uuidString)", isDirectory: true)
+        )
+        self.rideMedia = rideMedia
+        self.rideRecovery = RideRecovery(
+            store: rideSessions, controller: ride, notifier: rideNotifier, deleteMedia: { rideMedia.delete($0) },
             log: { log.log(RideRecordingController.logCategory, $0) }
         )
         self.workMode = settings.workMode
@@ -471,6 +491,11 @@ final class AppEnvironment {
         workMode == .online ? queue.marker(type, id: id) : nil
     }
 
+    /// Niezakończona jazda z sklepu sesji (pasek NAG-01); uruchamia ją `RootView`.
+    func observeActiveRide() async {
+        for await ride in rideSessions.observeActiveRide() { activeRide = ride }
+    }
+
     /// Pętla odświeżania widoków po zmianach w magazynie; uruchamia ją `RootView`.
     func observeChanges() async {
         do {
@@ -523,7 +548,8 @@ final class AppEnvironment {
         return AppEnvironment(
             settings: settings, dates: dates, log: log, store: RecordStore(database: database), files: files, launchOptions: options,
             uploader: options.isTestRun ? nil : BackgroundUploader.shared,
-            pushTokens: options.isTestRun ? nil : FirebasePushTokenSource.shared
+            pushTokens: options.isTestRun ? nil : FirebasePushTokenSource.shared,
+            rideMediaDirectory: options.isTestRun ? nil : directory.appendingPathComponent(RideMediaFiles.directoryName, isDirectory: true)
         )
     }
 }

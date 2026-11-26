@@ -69,6 +69,14 @@ struct HorselyApp: App {
         // Przyciski Live Activity (Task 16): `LiveActivityIntent` wykonuje się w tym procesie i trafia do tego samego kontrolera.
         RideActivityActions.shared.setLog { [log = environment.log] in log.log(RideRecordingController.logCategory, $0) }
         RideActivityActions.shared.register(environment.ride)
+        // „Zakończ” z Live Activity (Task 17, hak ekranu zakończenia — Task 21): po zakończeniu jazdy ekran zakończenia tej sesji, także
+        // gdy aplikacja jest już na pierwszym planie. Id odbiera się raz (`RootView` próbuje też przy wejściu na pierwszy plan).
+        RideActivityActions.shared.setFinishObserver {
+            Task { @MainActor in
+                guard environment.workMode != .unset, let id = RideActivityActions.shared.takeFinishedSessionId() else { return }
+                environment.router.openRideFinish(sessionId: id)
+            }
+        }
         notificationDelegate = NotificationDelegate(
             open: { url in environment.router.handle(url: url, mode: environment.workMode) },
             presentServerMessage: { message in environment.presentation(forServerMessage: message) },

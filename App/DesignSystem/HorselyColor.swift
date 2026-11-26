@@ -155,6 +155,9 @@ enum HorselyColor {
     static var secondaryContainer: Color { Palette.secondaryContainer.color }
     static var onSecondaryContainer: Color { Palette.onSecondaryContainer.color }
     static var error: Color { Palette.error.color }
+    static var onError: Color { Palette.onError.color }
+    static var tertiaryContainer: Color { Palette.tertiaryContainer.color }
+    static var onTertiaryContainer: Color { Palette.onTertiaryContainer.color }
     static var errorContainer: Color { Palette.errorContainer.color }
     static var onErrorContainer: Color { Palette.onErrorContainer.color }
     static var background: Color { Palette.background.color }
