@@ -7,9 +7,11 @@ import HorselyCore
 /// (`LiveRideActivityPresenter`); pakiet i testy nie znają ActivityKit. Wołane z aktora kontrolera po kolei (każde wywołanie jest
 /// oczekiwane), więc kolejność start → aktualizacje → koniec jest zachowana.
 public protocol RideActivityPresenter: Sendable {
-    /// Pokazuje aktywność jazdy (albo przejmuje istniejącą — po ponownym uruchomieniu aplikacji w tle aktywność z poprzedniego procesu wciąż
-    /// jest na ekranie blokady, a nowej nie da się zacząć w tle). Nazwa konia trafia tylko na ekran telefonu, nigdy do dziennika.
-    func start(horseName: String, state: RideActivityState) async
+    /// Pokazuje aktywność jazdy. `resuming` — wznowienie tej samej jazdy po ponownym uruchomieniu aplikacji w tle: wtedy aktywność
+    /// z poprzedniego procesu (z tym samym koniem) jest przejmowana, bo nowej nie da się zacząć w tle. Przy nowej jazdzie wszystkie
+    /// istniejące aktywności są kończone i powstaje nowa (atrybut `horseName` jest niezmienny). Decyzja: `RideActivityAdoption`.
+    /// Nazwa konia trafia tylko na ekran telefonu, nigdy do dziennika.
+    func start(horseName: String, state: RideActivityState, resuming: Bool) async
     /// Nowa treść aktywności.
     func update(_ state: RideActivityState) async
     /// Zdejmuje aktywność jazdy (także pozostałą po poprzednim procesie); bez aktywności nic nie robi.
@@ -20,7 +22,7 @@ public protocol RideActivityPresenter: Sendable {
 public struct NoRideActivityPresenter: RideActivityPresenter {
     public init() {}
 
-    public func start(horseName: String, state: RideActivityState) async {}
+    public func start(horseName: String, state: RideActivityState, resuming: Bool) async {}
     public func update(_ state: RideActivityState) async {}
     public func end() async {}
 }

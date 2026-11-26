@@ -6,6 +6,9 @@ import HorselyCore
 // `LiveActivityIntent` wykonuje się w procesie APLIKACJI (system uruchamia ją w tle, gdy nie działa); typy są też w rozszerzeniu
 // widżetów, bo widok aktywności tworzy z nich przyciski. Do kontrolera nagrywania docierają przez `RideActivityActions.shared`, który
 // rejestruje aplikacja — w procesie rozszerzenia rejestr jest pusty i `perform()` nic nie robi.
+// Akcja bez skutku (brak kontrolera albo brak trwającej jazdy) nie jest cichym sukcesem: `RideActivityActions` zapisuje ją w dzienniku
+// diagnostycznym (bez nazwy konia i współrzędnych). Intencja nie rzuca błędu — ekran blokady nie pokazuje komunikatu błędu intencji,
+// a katalog tekstów nie ma na to napisu; użytkownik widzi stan jazdy w samej aktywności.
 
 /// „Pauza” — wstrzymuje nagrywanie (odbiór GPS zatrzymany, sesja w tle zostaje dla „Wznów”).
 struct PauseRideIntent: LiveActivityIntent {

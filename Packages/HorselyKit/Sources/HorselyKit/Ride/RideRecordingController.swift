@@ -238,18 +238,23 @@ public actor RideRecordingController {
 
     /// Wstrzymuje jazdę: zatrzymuje odbiór GPS i akcelerometr, zapisuje stan (pauza przetrwa zabicie procesu). Sesja aktywności w tle
     /// zostaje (iOS): bez niej „Wznów” z ekranu blokady (Live Activity, Task 16) nie mógłby ponownie uruchomić lokalizacji w tle.
-    public func pause() async {
-        guard let machine = recorder, !finishing, machine.snapshot().state == .recording else { return }
+    /// Zwraca `false`, gdy nie było czego wstrzymać (brak jazdy albo już pauza).
+    @discardableResult
+    public func pause() async -> Bool {
+        guard let machine = recorder, !finishing, machine.snapshot().state == .recording else { return false }
         machine.pause(tMillis: clock())
         stopSensors(keepBackgroundActivity: true)
         log(entry("Pauza", machine))
         await flush()
         await publish()
+        return true
     }
 
     /// Wznawia po pauzie: zeruje bufor okna akcelerometru (okno nie może obejmować przerwy) i włącza czujniki.
-    public func resume() async {
-        guard let machine = recorder, !finishing, machine.snapshot().state == .paused else { return }
+    /// Zwraca `false`, gdy nie było czego wznowić (brak jazdy albo jazda nie jest wstrzymana).
+    @discardableResult
+    public func resume() async -> Bool {
+        guard let machine = recorder, !finishing, machine.snapshot().state == .paused else { return false }
         machine.resume(tMillis: clock())
         window.clear()
         if startSensors() {
@@ -259,6 +264,7 @@ public actor RideRecordingController {
         }
         await flush()
         await publish()
+        return true
     }
 
     /// Kończy jazdę na prośbę użytkownika: zatrzymuje źródła, ostatni zapis punktów, stan `.finished`. Zwraca id sesji (ekran zakończenia)
@@ -268,6 +274,9 @@ public actor RideRecordingController {
         guard let machine = recorder, let id = sessionId, !finishing else { return nil }
         finishing = true
         stopSensors(keepBackgroundActivity: false)
+        // Live Activity znika PRZED zapisem końcowym: gdy proces zginie w trakcie zapisu, brak aktywności jest tańszy niż aktywność z martwymi
+        // przyciskami do limitu systemu (8 h); jazda i tak wraca przy starcie („Zapisz / Odrzuć” albo wznowienie).
+        await endActivity()
         // Czas maszyny dochodzi do chwili zakończenia (otwarta pauza dostaje właściwy koniec); tik może też zgłosić 8 h.
         let events = machine.tick(tMillis: clock(), batteryPercent: nil)
         await closeRide(machine, id)
@@ -318,7 +327,13 @@ public actor RideRecordingController {
     /// Zwraca zaplanowane zadanie albo `nil`, gdy w bazie nie ma jazdy do wznowienia.
     @discardableResult
     public nonisolated func prepareRelaunch(launch: RideLaunchKind) -> Task<Void, Never>? {
-        guard let active = store.activeSessionNow(), active.state == .recording || active.state == .paused else { return nil }
+        guard let active = store.activeSessionNow(), active.state == .recording || active.state == .paused else {
+            // Nie ma czego wznawiać, a Live Activity mogła przeżyć poprzedni proces (zginął między zapisem stanu końcowego a zdjęciem
+            // aktywności) — zdejmujemy ją, żeby na ekranie blokady nie wisiały martwe przyciski.
+            let cleanup = Task { await self.endOrphanedActivity() }
+            pendingRelaunch.withLock { $0 = cleanup }
+            return nil
+        }
         let ageMillis = clock() - active.lastFlushMillis
         let resume: Bool
         switch launch {
@@ -428,7 +443,7 @@ public actor RideRecordingController {
         status.withLock { $0 = Status(sessionId: id, running: true) }
         let initial = RideActivityState(machine.snapshot())
         activityState = initial
-        await activity.start(horseName: loaded.session.horse.name, state: initial)
+        await activity.start(horseName: loaded.session.horse.name, state: initial, resuming: afterRestart)
         if afterRestart {
             log(entry("Ponowne uruchomienie: wznowiono jazdę w stanie \(machine.snapshot().state.rawValue)", machine))
             await flush()
@@ -486,6 +501,7 @@ public actor RideRecordingController {
         guard !finishing, let id = sessionId else { return }
         finishing = true
         stopSensors(keepBackgroundActivity: false)
+        await endActivity()
         await closeRide(machine, id)
         await notifier.autoFinished()
         log(entry("Koniec nagrywania po 8 godzinach", machine))
@@ -498,6 +514,9 @@ public actor RideRecordingController {
         stopSensors(keepBackgroundActivity: false)
         ticker?.cancel()
         ticker = nil
+        // Najpierw zdjęcie Live Activity, potem zapis: `applicationWillTerminate` daje najwyżej 2 s, a zapis może się nie udać albo nie
+        // zdążyć — aktywność nie może przeżyć jazdy z martwymi przyciskami.
+        await endActivity()
         await flushChain?.value
         do {
             try await writeBatch(machine, id)
@@ -514,7 +533,6 @@ public actor RideRecordingController {
         last.state = .interrupted
         snapshotContinuation.yield(last)
         release()
-        await endActivity()
         if notify { await notifier.interrupted() }
     }
 
@@ -604,13 +622,19 @@ public actor RideRecordingController {
         last.state = .finished
         snapshotContinuation.yield(last)
         release()
-        await endActivity()
     }
 
     /// Zdejmuje Live Activity jazdy.
     private func endActivity() async {
         activityState = nil
         await activity.end()
+    }
+
+    /// Przy starcie aplikacji bez jazdy do wznowienia: zdejmuje aktywność pozostałą po poprzednim procesie — chyba że w międzyczasie
+    /// zaczęła się nowa jazda.
+    private func endOrphanedActivity() async {
+        guard recorder == nil, !relaunching else { return }
+        await endActivity()
     }
 
     private func release() {
@@ -736,14 +760,14 @@ public actor RideRecordingController {
 /// „Pauza”, „Wznów” i „Zakończ” z Live Activity (`RideActivityActions`, Task 16). Gdy przycisk uruchomił aplikację w tle, akcja czeka na
 /// zaplanowane wznowienie jazdy (`prepareRelaunch`).
 extension RideRecordingController: RideActivityActionHandler {
-    public func pauseRide() async {
+    public func pauseRide() async -> Bool {
         await awaitPendingRelaunch()
-        await pause()
+        return await pause()
     }
 
-    public func resumeRide() async {
+    public func resumeRide() async -> Bool {
         await awaitPendingRelaunch()
-        await resume()
+        return await resume()
     }
 
     public func finishRide() async -> String? {

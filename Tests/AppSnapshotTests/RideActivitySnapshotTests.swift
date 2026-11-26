@@ -128,6 +128,27 @@ final class RideActivityIntentTests: XCTestCase {
         XCTAssertFalse(ResumeRideIntent.openAppWhenRun)
     }
 
+    /// Poprawka I2: przycisk bez zarejestrowanego kontrolera nie jest cichym sukcesem — intencja kończy się, ale akcja trafia do dziennika
+    /// diagnostycznego (bez nazwy konia).
+    func testIntentWithoutAHandlerIsLogged() async throws {
+        let lines = LoggedLines()
+        RideActivityActions.shared.register(nil)
+        RideActivityActions.shared.setLog(lines.append)
+        defer {
+            RideActivityActions.shared.setLog(nil)
+            RideActivityActions.shared.register(RideBridge.shared.controller)
+        }
+
+        _ = try await PauseRideIntent().perform()
+        _ = try await FinishRideIntent().perform()
+
+        XCTAssertEqual(lines.all, [
+            "Live Activity: przycisk „Pauza” bez kontrolera nagrywania — pominięto",
+            "Live Activity: przycisk „Zakończ” bez kontrolera nagrywania — pominięto",
+        ])
+        XCTAssertNil(RideActivityActions.shared.takeFinishedSessionId())
+    }
+
     /// Napisy z katalogu (`strings.xml` Androida): przyciski powiadomienia nagrywania i treść stanu.
     func testTextsComeFromTheCatalog() {
         XCTAssertEqual(RideActivityButtonTexts.app, RideActivityButtonTexts(pause: "Pauza", resume: "Wznów", finish: "Zakończ"))
@@ -158,11 +179,27 @@ private final class RecordingRideActions: RideActivityActionHandler {
 
     var calls: [RideActivityAction] { state.withLock { $0 } }
 
-    func pauseRide() async { state.withLock { $0.append(.pause) } }
-    func resumeRide() async { state.withLock { $0.append(.resume) } }
+    func pauseRide() async -> Bool {
+        state.withLock { $0.append(.pause) }
+        return true
+    }
+
+    func resumeRide() async -> Bool {
+        state.withLock { $0.append(.resume) }
+        return true
+    }
 
     func finishRide() async -> String? {
         state.withLock { $0.append(.finish) }
         return "sesja-1"
     }
+}
+
+/// Wpisy dziennika z rejestru akcji.
+private final class LoggedLines: Sendable {
+    private let state = Mutex<[String]>([])
+
+    var all: [String] { state.withLock { $0 } }
+
+    var append: @Sendable (String) -> Void { { [self] line in self.state.withLock { $0.append(line) } } }
 }

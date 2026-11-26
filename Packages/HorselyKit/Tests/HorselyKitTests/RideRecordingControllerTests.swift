@@ -868,7 +868,7 @@ struct RideRecordingControllerTests {
         let controller = h.controller(store)
         let id = try await controller.start(horse: grom, params: params)
         let zero = RideActivityState(activeSeconds: 0, distanceMeters: 0, gait: nil, weakGps: false, paused: false)
-        #expect(h.activity.events == [.start(horseName: "Grom", zero)])
+        #expect(h.activity.events == [.start(horseName: "Grom", zero, resuming: false)])
 
         for s in 1...20 { await second(h, controller, s) }
         let moving = h.activity.updates
@@ -909,7 +909,7 @@ struct RideRecordingControllerTests {
         try await store.discard(sessionId: id)
         let secondRide = h.controller(store, locations: FakeLocationSource())
         let next = try await secondRide.start(horse: grom, params: params)
-        #expect(h.activity.events.last == .start(horseName: "Grom", zero))
+        #expect(h.activity.events.last == .start(horseName: "Grom", zero, resuming: false))
         await secondRide.interrupt()
         #expect(h.activity.events.last == .end)
         #expect(h.activity.ends == 2)
@@ -932,34 +932,126 @@ struct RideRecordingControllerTests {
         let store = try h.openStore()
         let controller = h.controller(store)
         let actions = RideActivityActions()
-        #expect(await actions.perform(.pause) == false)
+        actions.setLog(h.logs.append)
+        #expect(await actions.perform(.pause) == .noHandler, "bez kontrolera — nie cichy sukces")
+        #expect(h.logs.lines.last == "Live Activity: przycisk „Pauza” bez kontrolera nagrywania — pominięto")
 
         actions.register(controller)
+        #expect(await actions.perform(.resume) == .noRide, "przed jazdą nie ma czego wznowić")
+        #expect(h.logs.lines.last == "Live Activity: przycisk „Wznów” bez trwającej jazdy — pominięto")
         let id = try await controller.start(horse: grom, params: params)
         for s in 1...3 { await second(h, controller, s) }
         h.clock.millis = START + 3_500
-        #expect(await actions.perform(.pause))
+        #expect(await actions.perform(.pause) == .performed)
         #expect(try await store.load(sessionId: id).session.state == .paused)
         #expect(!h.locations.active)
         #expect(h.locations.backgroundActive, "sesja w tle zostaje, żeby „Wznów” z ekranu blokady mógł włączyć GPS")
         #expect(h.activity.updates.last?.paused == true)
+        #expect(await actions.perform(.pause) == .noRide, "druga pauza — jazda już wstrzymana")
 
         h.clock.millis = START + 10_000
-        #expect(await actions.perform(.resume))
+        #expect(await actions.perform(.resume) == .performed)
         #expect(try await store.load(sessionId: id).session.state == .recording)
         #expect(h.locations.active)
 
         #expect(actions.takeFinishedSessionId() == nil)
         h.clock.millis = START + 11_000
-        #expect(await actions.perform(.finish))
+        #expect(await actions.perform(.finish) == .performed)
         #expect(try await store.load(sessionId: id).session.state == .finished)
         #expect(actions.takeFinishedSessionId() == id)
         #expect(actions.takeFinishedSessionId() == nil, "ekran zakończenia odbiera id raz")
         #expect(h.activity.events.last == .end)
 
+        // Przycisk po końcu jazdy (aktywność jeszcze na ekranie): zalogowany brak skutku, bez nowego id dla ekranu zakończenia.
+        #expect(await actions.perform(.pause) == .noRide)
+        #expect(await actions.perform(.finish) == .noRide)
+        #expect(h.logs.lines.last == "Live Activity: przycisk „Zakończ” bez trwającej jazdy — pominięto")
+        #expect(actions.takeFinishedSessionId() == nil)
+
         actions.register(nil)
-        #expect(await actions.perform(.finish) == false)
+        #expect(await actions.perform(.finish) == .noHandler)
+        #expect(!h.logs.lines.contains { $0.contains("Grom") }, "dziennik bez nazwy konia")
     }
+
+    /// Poprawka I1a: start aplikacji bez jazdy do wznowienia (brak sesji, jazda zakończona albo przerwana) zdejmuje Live Activity, która
+    /// przeżyła poprzedni proces — bez martwych przycisków na ekranie blokady. Nie rusza aktywności nowej, właśnie nagrywanej jazdy.
+    @Test func relaunchWithoutARideEndsTheOrphanedActivity() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let controller = h.controller(store)
+        #expect(controller.prepareRelaunch(launch: .backgroundLocation) == nil)
+        #expect(await h.waitUntil { h.activity.ends == 1 })
+
+        let id = try await store.start(horse: grom, params: params, startedAtMillis: START)
+        for state in [RideState.finished, .interrupted] {
+            try await store.setState(sessionId: id, state: state)
+            let before = h.activity.ends
+            #expect(h.controller(store).prepareRelaunch(launch: .foreground) == nil)
+            #expect(await h.waitUntil { h.activity.ends == before + 1 })
+        }
+        #expect(h.activity.events.allSatisfy { $0 == .end }, "bez jazdy aktywność nie powstaje")
+    }
+
+    /// Poprawka I1b: przerwanie (zamknięcie przesunięciem, cofnięcie zgody) zdejmuje Live Activity PRZED zapisem końcowym — także gdy zapis
+    /// się nie udaje — a zakończenie przez użytkownika przed `closeRide`.
+    @Test func abortEndsTheActivityBeforeTheFailingWrite() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let database = try #require(h.opened.last)
+        let controller = h.controller(store)
+        _ = try await controller.start(horse: grom, params: params)
+        for s in 1...3 { await second(h, controller, s) }
+        try await database.writer.write { db in
+            try db.execute(sql: "CREATE TRIGGER test_fail_points BEFORE INSERT ON ride_point BEGIN SELECT RAISE(ABORT, 'test'); END")
+        }
+        await controller.interrupt()
+
+        let timeline = h.logs.timeline
+        let ended = try #require(timeline.firstIndex(of: FakeActivityPresenter.endMarker))
+        let failed = try #require(timeline.firstIndex { $0.hasPrefix("Przerwanie nagrywania: zapis nie powiódł się") })
+        #expect(ended < failed, "aktywność znika przed (nieudanym) zapisem")
+        #expect(h.activity.ends == 1)
+        #expect(!controller.isRunning)
+
+        // Zakończenie: aktywność znika przed zapisem końcowym i ustawieniem stanu (wpis „Zakończenie jazdy: zapis nie powiódł się”).
+        try await store.discard(sessionId: try #require(try await store.unfinished()?.sessionId))
+        let nextLocations = FakeLocationSource()
+        let next = h.controller(store, locations: nextLocations)
+        _ = try await next.start(horse: grom, params: params)
+        h.clock.millis = START + 10_000
+        await h.emit(goodFix(10), to: next, via: nextLocations)
+        h.clock.millis = START + 11_000
+        _ = await next.finish()
+        let after = h.logs.timeline
+        let secondEnd = try #require(after.lastIndex(of: FakeActivityPresenter.endMarker))
+        let closeFailed = try #require(after.firstIndex { $0.hasPrefix("Zakończenie jazdy: zapis nie powiódł się") })
+        #expect(secondEnd < closeFailed)
+    }
+
+    /// Poprawka I1c: wznowienie po ponownym uruchomieniu przejmuje aktywność (`resuming: true`), nowa jazda — nie (`resuming: false`, stara
+    /// aktywność z innym koniem znika, powstaje nowa). Decyzję o przejęciu sprawdza `RideActivityAdoptionTests` w rdzeniu.
+    @Test func relaunchResumesTheActivityAndANewRideStartsAFreshOne() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let first = h.controller(store)
+        _ = try await first.start(horse: grom, params: params)
+        for s in 1...6 { await second(h, first, s) }
+
+        h.clock.millis = START + 60_000
+        let restarted = h.controller(try h.openStore(), locations: FakeLocationSource(), motion: FakeMotionSource())
+        await restarted.prepareRelaunch(launch: .backgroundLocation)?.value
+        var resumed = false
+        for event in h.activity.events {
+            if case let .start(name, _, resuming) = event, resuming { resumed = name == "Grom" }
+        }
+        #expect(resumed, "wznowienie przejmuje aktywność tej samej jazdy")
+        #expect(h.activity.events.first == .start(horseName: "Grom", RideActivityState(activeSeconds: 0, distanceMeters: 0, gait: nil, weakGps: false, paused: false), resuming: false))
+    }
+
+    // MARK: AccelWindowBuffer (Android: AccelWindowBufferTest)
 
     // MARK: AccelWindowBuffer (Android: AccelWindowBufferTest)
 
@@ -1203,7 +1295,7 @@ private final class AlertRecorder: RideAlertPoster {
 /// Zapisuje wywołania Live Activity zamiast ActivityKit.
 private final class FakeActivityPresenter: RideActivityPresenter {
     enum Event: Equatable {
-        case start(horseName: String, RideActivityState)
+        case start(horseName: String, RideActivityState, resuming: Bool)
         case update(RideActivityState)
         case end
     }
@@ -1222,18 +1314,50 @@ private final class FakeActivityPresenter: RideActivityPresenter {
 
     var ends: Int { events.filter { $0 == .end }.count }
 
-    func start(horseName: String, state value: RideActivityState) async { state.withLock { $0.append(.start(horseName: horseName, value)) } }
+    /// Znacznik końca aktywności na wspólnej osi czasu z dziennikiem (kolejność względem zapisu).
+    static let endMarker = "[Live Activity: koniec]"
+
+    private let timeline: LogLines?
+
+    init(timeline: LogLines? = nil) {
+        self.timeline = timeline
+    }
+
+    func start(horseName: String, state value: RideActivityState, resuming: Bool) async {
+        state.withLock { $0.append(.start(horseName: horseName, value, resuming: resuming)) }
+    }
     func update(_ value: RideActivityState) async { state.withLock { $0.append(.update(value)) } }
-    func end() async { state.withLock { $0.append(.end) } }
+    func end() async {
+        state.withLock { $0.append(.end) }
+        timeline?.mark(Self.endMarker)
+    }
 }
 
 /// Wpisy dziennika kontrolera (bez pliku).
 private final class LogLines: Sendable {
-    private let state = Mutex<[String]>([])
+    private struct State {
+        var lines: [String] = []
+        /// Wpisy dziennika i znaczniki (np. koniec Live Activity) w kolejności zdarzeń.
+        var timeline: [String] = []
+    }
 
-    var lines: [String] { state.withLock { $0 } }
+    private let state = Mutex(State())
 
-    var append: @Sendable (String) -> Void { { [self] line in self.state.withLock { $0.append(line) } } }
+    var lines: [String] { state.withLock { $0.lines } }
+    var timeline: [String] { state.withLock { $0.timeline } }
+
+    var append: @Sendable (String) -> Void {
+        { [self] line in
+            self.state.withLock { current in
+                current.lines.append(line)
+                current.timeline.append(line)
+            }
+        }
+    }
+
+    func mark(_ marker: String) {
+        state.withLock { $0.timeline.append(marker) }
+    }
 }
 
 /// Katalog bazy w katalogu tymczasowym, zaślepki i fabryka kontrolerów.
@@ -1243,10 +1367,16 @@ private final class ControllerHarness: @unchecked Sendable {
     let motion = FakeMotionSource()
     let battery = FakeBattery()
     let alerts = AlertRecorder()
-    let logs = LogLines()
-    let activity = FakeActivityPresenter()
+    let logs: LogLines
+    let activity: FakeActivityPresenter
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-ride-controller-\(UUID().uuidString)", isDirectory: true)
     private(set) var opened: [AppDatabase] = []
+
+    init() {
+        let logs = LogLines()
+        self.logs = logs
+        self.activity = FakeActivityPresenter(timeline: logs)
+    }
 
     /// Nowa „instancja procesu”: baza z prawdziwego pliku i świeży sklep (ten sam zegar).
     func openStore() throws -> RideSessionStore {

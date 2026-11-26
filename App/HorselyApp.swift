@@ -67,6 +67,7 @@ struct HorselyApp: App {
         // przyczynę uruchomienia i stan aplikacji); `App.init` wykonuje się wcześniej, więc kontroler jest już wtedy dostępny.
         RideBridge.shared.controller = environment.ride
         // Przyciski Live Activity (Task 16): `LiveActivityIntent` wykonuje się w tym procesie i trafia do tego samego kontrolera.
+        RideActivityActions.shared.setLog { [log = environment.log] in log.log(RideRecordingController.logCategory, $0) }
         RideActivityActions.shared.register(environment.ride)
         notificationDelegate = NotificationDelegate(
             open: { url in environment.router.handle(url: url, mode: environment.workMode) },
