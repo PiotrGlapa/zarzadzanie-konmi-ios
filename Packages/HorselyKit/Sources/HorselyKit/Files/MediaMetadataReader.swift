@@ -195,8 +195,8 @@ public enum MediaMetadataReader {
         var fraction = 0.0
         if halves.count == 2 {
             let tail = halves[1]
-            guard (1 ... 9).contains(tail.count), tail.allSatisfy(Self.isDigit), let value = Double("0." + tail) else { return nil }
-            fraction = value
+            guard (1 ... 9).contains(tail.count), tail.allSatisfy(Self.isDigit), let parsed = Double("0." + tail) else { return nil }
+            fraction = parsed
         }
         func number(_ start: Int, _ length: Int) -> Int { Int(digits.dropFirst(start).prefix(length)) ?? 0 }
         let numbers = [number(0, 4), number(4, 2), number(6, 2), number(8, 2), number(10, 2), number(12, 2)]

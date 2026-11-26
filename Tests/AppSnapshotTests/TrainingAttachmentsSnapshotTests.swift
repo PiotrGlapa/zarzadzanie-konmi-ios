@@ -56,12 +56,22 @@ final class TrainingAttachmentsSnapshotTests: XCTestCase {
                 EntryDetailView.attachmentOwner(training, mode: env.workMode, capabilities: env.capabilities),
                 AttachmentOwner(type: .training, id: trainingId, horseId: horseId), "tryb samodzielny: trening ma sekcję załączników"
             )
-            await assertSettledScreen(detail(env, trainingId), name: "training-detail-attachments", variant: variant)
+            if variant == .xxxl {
+                // Przy tekście 200 % szczegóły treningu wypełniają cały ekran (przewijany), więc sekcję pokazuje sama.
+                let section = ScrollView {
+                    AttachmentsSection(owner: AttachmentOwner(type: .training, id: trainingId, horseId: horseId)).padding(Spacing.screenEdge)
+                }
+                .background(HorselyColor.background)
+                await assertSettledScreen(section.environment(env), name: "training-detail-attachments", variant: variant)
+            } else {
+                await assertSettledScreen(detail(env, trainingId), name: "training-detail-attachments", variant: variant)
+            }
         }
     }
 
     func testSectionHiddenOnlineWithoutTrainingAttachments() async throws {
-        for variant in SnapshotVariant.allCases {
+        // Bez wariantu 200 %: tam szczegóły przewijają się poza ekran, więc brak sekcji nie byłby widoczny na migawce.
+        for variant in [SnapshotVariant.light, .dark] {
             let (env, _, trainingId) = try await seeded(variant)
             env.workMode = .online
             let loaded = try await env.entries.record(.training, id: trainingId)
