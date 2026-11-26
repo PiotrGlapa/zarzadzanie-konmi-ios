@@ -1,0 +1,47 @@
+{
+  "opis": "Krótka trasa wzorcowa zk-track/1: 6 punktów, dwie pauzy, wartości puste (null), połówki zaokrąglane HALF_UP (także ujemne: -0,25 m wysokości -> -3 dm) i ujemna długość geograficzna. Trzy sekcje: 'zrodlo' (co zapisuje aplikacja, w jednostkach naturalnych), 'dokument' (dokładny dokument JSON po rozpakowaniu gzip), 'odczyt' (co po zdekodowaniu daje czytnik: wartości po zaokrągleniu do siatki formatu). Plik krotka.b64 to gzip dokumentu zakodowany w base64.",
+  "zrodlo": {
+    "startedAtMillis": 1767225600000,
+    "points": [
+      { "tMillis": 1767225601000, "lat": 51.752, "lon": -1.2577, "altM": 101.25, "speedMs": 0.0, "hAccM": 4.5, "cadence": null, "intensity": null },
+      { "tMillis": 1767225602000, "lat": 51.75200005, "lon": -1.25769985, "altM": 101.3, "speedMs": 1.005, "hAccM": 3.0, "cadence": null, "intensity": null },
+      { "tMillis": 1767225603000, "lat": 51.752001, "lon": -1.257698, "altM": null, "speedMs": 1.5, "hAccM": 3.5, "cadence": null, "intensity": null },
+      { "tMillis": 1767225604500, "lat": 51.752002, "lon": -1.257697, "altM": 100.0, "speedMs": 1.25, "hAccM": 2.0, "cadence": 87.25, "intensity": 0.0005 },
+      { "tMillis": 1767225605500, "lat": 51.752003, "lon": -1.257696, "altM": -0.25, "speedMs": null, "hAccM": null, "cadence": null, "intensity": null },
+      { "tMillis": 1767225606500, "lat": 51.752004, "lon": -1.257695, "altM": 0.04, "speedMs": 0.004, "hAccM": 1.0, "cadence": null, "intensity": null }
+    ],
+    "pauses": [
+      { "startMillis": 1767225602500, "endMillis": 1767225603500 },
+      { "startMillis": 1767225605200, "endMillis": 1767225606000 }
+    ]
+  },
+  "dokument": {
+    "v": 1,
+    "t0": 1767225600000,
+    "n": 6,
+    "dt": [1000, 1000, 1000, 1500, 1000, 1000],
+    "lat": [517520000, 1, 9, 10, 10, 10],
+    "lon": [-12577000, 1, 19, 10, 10, 10],
+    "alt": [1013, 1013, null, 1000, -3, 0],
+    "spd": [0, 101, 150, 125, null, 0],
+    "acc": [5, 3, 4, 2, null, 1],
+    "cad": [null, null, null, 873, null, null],
+    "int": [null, null, null, 1, null, null],
+    "pauses": [[2500, 3500], [5200, 6000]]
+  },
+  "odczyt": {
+    "startedAtMillis": 1767225600000,
+    "points": [
+      { "tMillis": 1767225601000, "lat": 51.752, "lon": -1.2577, "altM": 101.3, "speedMs": 0.0, "hAccM": 5.0, "cadence": null, "intensity": null },
+      { "tMillis": 1767225602000, "lat": 51.7520001, "lon": -1.2576999, "altM": 101.3, "speedMs": 1.01, "hAccM": 3.0, "cadence": null, "intensity": null },
+      { "tMillis": 1767225603000, "lat": 51.752001, "lon": -1.257698, "altM": null, "speedMs": 1.5, "hAccM": 4.0, "cadence": null, "intensity": null },
+      { "tMillis": 1767225604500, "lat": 51.752002, "lon": -1.257697, "altM": 100.0, "speedMs": 1.25, "hAccM": 2.0, "cadence": 87.3, "intensity": 0.001 },
+      { "tMillis": 1767225605500, "lat": 51.752003, "lon": -1.257696, "altM": -0.3, "speedMs": null, "hAccM": null, "cadence": null, "intensity": null },
+      { "tMillis": 1767225606500, "lat": 51.752004, "lon": -1.257695, "altM": 0.0, "speedMs": 0.0, "hAccM": 1.0, "cadence": null, "intensity": null }
+    ],
+    "pauses": [
+      { "startMillis": 1767225602500, "endMillis": 1767225603500 },
+      { "startMillis": 1767225605200, "endMillis": 1767225606000 }
+    ]
+  }
+}

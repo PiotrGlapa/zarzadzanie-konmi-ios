@@ -11,3 +11,8 @@ Skopiowane bez zmian z repozytorium `zarzadzanie_konmi_android`, ścieżka `core
 - Wersja programu, z którego pochodzą pliki: 2.0.0 (plik `parity/VERSION`)
 
 Nie edytuj tych plików ręcznie. Po zmianie w Androidzie skopiuj je ponownie i zaktualizuj commit powyżej.
+
+## `golden/zk-track/` (format trasy nagrania, aplikacja 3.0.2)
+
+Skopiowane bez zmian (bajt w bajt, `cmp`) z `core/src/test/resources/golden/zk-track/` Androida 3.0.2 (gałąź `007-treningi-nagrania`, commit
+`d001659`): `krotka.json`, `krotka.b64`, `README.md` (umowa formatu `zk-track/1`). Czyta je `ZkTrackTests`.
