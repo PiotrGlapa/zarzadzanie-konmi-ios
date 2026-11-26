@@ -7,8 +7,8 @@ import Testing
 @testable import HorselyKit
 
 /// Miniatura pierwszej klatki i odczyt parametrów filmu na prawdziwym pliku (`VideoThumbnailTest.kt` Androida). Próbka 1 s powstaje w teście
-/// (`AVAssetWriter`) zamiast binarnego `sample-1s.mov` w zasobach — tak samo dekodowalna na runnerze macOS, bez pliku w repozytorium.
-/// Testy idą po kolei: AVFoundation na maszynie wirtualnej runnera (bez sprzętowego skalera i kodera) nie znosi równoległych sesji.
+/// (`SampleVideo`, Photo-JPEG w `.mov`) zamiast binarnego `sample-1s.mov` w zasobach — dekodowalna na runnerze macOS, bez pliku w repozytorium.
+/// Testy idą po kolei, żeby ślad kroków (`SampleVideo.trace`) w dzienniku CI był jednoznaczny.
 @Suite(.serialized)
 struct VideoThumbnailTests {
     @Test func aSmallSampleIsWrittenAndInspected() async throws {
@@ -72,12 +72,18 @@ struct VideoThumbnailTests {
     }
 }
 
-/// Próbki filmów do testów: 1 s (10 klatek po 0,1 s) w `.mov` z kodekiem Motion JPEG — koder programowy, dostępny także na maszynie
-/// wirtualnej runnera CI, gdzie próbki H.264 razem z prawdziwym eksportem `AVAssetExportSession` kończyły proces testów sygnałem 11.
+/// Próbki filmów do testów: 1 s (10 klatek po 0,1 s) w `.mov` z kodekiem Photo-JPEG (`jpeg`). Plik jest składany bajt po bajcie
+/// (atomy QuickTime), a klatki koduje ImageIO — bez `AVAssetWriter`: na maszynie wirtualnej runnera CI (bez sprzętowego skalera
+/// i koderów) `AVAssetWriter.finishWriting()` kończył proces testów sygnałem 11, a próbka H.264 z eksportem `AVAssetExportSession` — tak samo.
+/// Odczyt (`AVURLAsset`, `AVAssetImageGenerator`) idzie już prawdziwą ścieżką AVFoundation.
 enum SampleVideo {
     struct WriteFailed: Error {
         let reason: String
     }
+
+    private static let frames = 10
+    private static let timescale: UInt32 = 600
+    private static let frameDuration: UInt32 = 60
 
     /// Ślad na stderr (bez buforowania) — przy awarii procesu w AVFoundation dziennik CI pokazuje, na którym kroku.
     static func trace(_ step: String) {
@@ -85,78 +91,79 @@ enum SampleVideo {
     }
 
     static func make(width: Int, height: Int) async throws -> URL {
-        var failures: [String] = []
-        for codec in [AVVideoCodecType.jpeg] {
-            do {
-                return try await write(codec: codec, width: width, height: height)
-            } catch {
-                failures.append("\(codec.rawValue): \(error)")
-            }
-        }
-        throw WriteFailed(reason: failures.joined(separator: "; "))
-    }
-
-    private static func write(codec: AVVideoCodecType, width: Int, height: Int) async throws -> URL {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-sample-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let url = folder.appendingPathComponent("sample-1s.mov")
-        trace("zapis \(width)x\(height) \(codec.rawValue): start")
-        let writer = try AVAssetWriter(outputURL: url, fileType: .mov)
-        let input = AVAssetWriterInput(mediaType: .video, outputSettings: [AVVideoCodecKey: codec, AVVideoWidthKey: width, AVVideoHeightKey: height])
-        input.expectsMediaDataInRealTime = false
-        let adaptor = AVAssetWriterInputPixelBufferAdaptor(assetWriterInput: input, sourcePixelBufferAttributes: [
-            kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA, kCVPixelBufferWidthKey as String: width,
-            kCVPixelBufferHeightKey as String: height,
-        ])
-        guard writer.canAdd(input) else { throw WriteFailed(reason: "canAdd") }
-        writer.add(input)
-        guard writer.startWriting() else { throw WriteFailed(reason: "startWriting: \(String(describing: writer.error))") }
-        writer.startSession(atSourceTime: .zero)
-        for frame in 0 ..< 10 {
-            var waited = 0
-            while !input.isReadyForMoreMediaData {
-                waited += 1
-                if waited > 500 { throw WriteFailed(reason: "isReadyForMoreMediaData") }
-                try await Task.sleep(for: .milliseconds(10))
-            }
-            guard let pool = adaptor.pixelBufferPool else { throw WriteFailed(reason: "pixelBufferPool: \(String(describing: writer.error))") }
-            var created: CVPixelBuffer?
-            CVPixelBufferPoolCreatePixelBuffer(nil, pool, &created)
-            guard let buffer = created else { throw WriteFailed(reason: "pixelBuffer") }
-            trace("klatka \(frame)")
-            fill(buffer, shade: UInt8(60 + frame * 15))
-            guard adaptor.append(buffer, withPresentationTime: CMTime(value: CMTimeValue(frame), timescale: 10)) else {
-                throw WriteFailed(reason: "append: \(String(describing: writer.error))")
-            }
+        var jpegs: [Data] = []
+        for frame in 0 ..< frames {
+            guard let image = frameImage(width: width, height: height, shade: UInt8(60 + frame * 15)) else { throw WriteFailed(reason: "klatka \(frame)") }
+            jpegs.append(try ImagePreparer.encodeJPEG(image, quality: 0.8))
         }
-        trace("koniec zapisu")
-        input.markAsFinished()
-        writer.endSession(atSourceTime: CMTime(value: 10, timescale: 10))
-        await writer.finishWriting()
-        guard writer.status == .completed else { throw WriteFailed(reason: "finishWriting: \(String(describing: writer.error))") }
-        trace("zapis \(width)x\(height): gotowy")
+        try movie(jpegs, width: width, height: height).write(to: url)
+        trace("próbka \(width)x\(height) zapisana")
         return url
     }
 
-    /// Zielone tło z jaśniejszym prostokątem w środku (BGRA).
-    private static func fill(_ buffer: CVPixelBuffer, shade: UInt8) {
-        CVPixelBufferLockBaseAddress(buffer, [])
-        defer { CVPixelBufferUnlockBaseAddress(buffer, []) }
-        guard let base = CVPixelBufferGetBaseAddress(buffer) else { return }
-        let width = CVPixelBufferGetWidth(buffer)
-        let height = CVPixelBufferGetHeight(buffer)
-        let row = CVPixelBufferGetBytesPerRow(buffer)
-        let pixels = base.assumingMemoryBound(to: UInt8.self)
-        for y in 0 ..< height {
-            for x in 0 ..< width {
-                let inner = x > width / 4 && x < width * 3 / 4 && y > height / 4 && y < height * 3 / 4
-                let offset = y * row + x * 4
-                pixels[offset] = inner ? 240 : 40
-                pixels[offset + 1] = inner ? 240 : shade
-                pixels[offset + 2] = inner ? 240 : 30
-                pixels[offset + 3] = 255
-            }
-        }
+    /// Zielone tło z jaśniejszym prostokątem w środku.
+    private static func frameImage(width: Int, height: Int, shade: UInt8) -> CGImage? {
+        guard let context = CGContext(
+            data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ) else { return nil }
+        context.setFillColor(red: 30 / 255, green: CGFloat(shade) / 255, blue: 40 / 255, alpha: 1)
+        context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        context.setFillColor(red: 0.94, green: 0.94, blue: 0.94, alpha: 1)
+        context.fill(CGRect(x: width / 4, y: height / 4, width: width / 2, height: height / 2))
+        return context.makeImage()
+    }
+
+    // MARK: Atomy QuickTime
+
+    private static func be32(_ value: UInt32) -> Data { withUnsafeBytes(of: value.bigEndian) { Data($0) } }
+    private static func be16(_ value: UInt16) -> Data { withUnsafeBytes(of: value.bigEndian) { Data($0) } }
+
+    private static func box(_ type: String, _ parts: Data...) -> Data {
+        let payload = parts.reduce(into: Data()) { $0.append($1) }
+        return be32(UInt32(8 + payload.count)) + Data(type.utf8) + payload
+    }
+
+    private static let matrix = [0x0001_0000, 0, 0, 0, 0x0001_0000, 0, 0, 0, 0x4000_0000].reduce(into: Data()) { $0.append(be32(UInt32($1))) }
+
+    private static func movie(_ jpegs: [Data], width: Int, height: Int) -> Data {
+        let duration = UInt32(jpegs.count) * frameDuration
+        let ftyp = box("ftyp", Data("qt  ".utf8), be32(0x2005_0300), Data("qt  ".utf8))
+        let mdat = box("mdat", jpegs.reduce(into: Data()) { $0.append($1) })
+        let chunkOffset = UInt32(ftyp.count + 8)
+
+        let mvhd = box(
+            "mvhd", be32(0), be32(0), be32(0), be32(timescale), be32(duration), be32(0x0001_0000), be16(0x0100), Data(count: 10), matrix,
+            Data(count: 24), be32(2)
+        )
+        let tkhd = box(
+            "tkhd", be32(0x0000_0003), be32(0), be32(0), be32(1), be32(0), be32(duration), Data(count: 8), be16(0), be16(0), be16(0), be16(0),
+            matrix, be32(UInt32(width) << 16), be32(UInt32(height) << 16)
+        )
+        let mdhd = box("mdhd", be32(0), be32(0), be32(0), be32(timescale), be32(duration), be16(0), be16(0))
+        let mediaHandler = box("hdlr", be32(0), Data("mhlr".utf8), Data("vide".utf8), be32(0), be32(0), be32(0), Data([0]))
+        let vmhd = box("vmhd", be32(0x0000_0001), be16(0x0040), be16(0x8000), be16(0x8000), be16(0x8000))
+        let dataHandler = box("hdlr", be32(0), Data("dhlr".utf8), Data("alis".utf8), be32(0), be32(0), be32(0), Data([0]))
+        let dinf = box("dinf", box("dref", be32(0), be32(1), box("alis", be32(0x0000_0001))))
+        var compressor = Data([10]) + Data("Photo-JPEG".utf8)
+        compressor.append(Data(count: 32 - compressor.count))
+        let sampleEntry = box(
+            "jpeg", Data(count: 6), be16(1), be16(0), be16(0), be32(0), be32(0), be32(0x0000_0200), be16(UInt16(width)), be16(UInt16(height)),
+            be32(0x0048_0000), be32(0x0048_0000), be32(0), be16(1), compressor, be16(24), be16(0xFFFF)
+        )
+        let stsd = box("stsd", be32(0), be32(1), sampleEntry)
+        let stts = box("stts", be32(0), be32(1), be32(UInt32(jpegs.count)), be32(frameDuration))
+        let stsc = box("stsc", be32(0), be32(1), be32(1), be32(UInt32(jpegs.count)), be32(1))
+        let stsz = box("stsz", be32(0), be32(0), be32(UInt32(jpegs.count)), jpegs.reduce(into: Data()) { $0.append(be32(UInt32($1.count))) })
+        let stco = box("stco", be32(0), be32(1), be32(chunkOffset))
+        let stbl = box("stbl", stsd, stts, stsc, stsz, stco)
+        let minf = box("minf", vmhd, dataHandler, dinf, stbl)
+        let mdia = box("mdia", mdhd, mediaHandler, minf)
+        let moov = box("moov", mvhd, box("trak", tkhd, mdia))
+        return ftyp + mdat + moov
     }
 
     /// Obraz szumu (trudny do kompresji) do sprawdzania obniżania jakości JPEG.
