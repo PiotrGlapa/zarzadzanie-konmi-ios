@@ -17,9 +17,24 @@ public enum VideoThumbnail {
     public static func make(video: URL) async -> Data? {
         let generator = AVAssetImageGenerator(asset: AVURLAsset(url: video))
         generator.appliesPreferredTrackTransform = true
-        generator.maximumSize = CGSize(width: size, height: size)
-        guard let frame = try? await generator.image(at: .zero).image else { return nil }
-        return encode(frame)
+        guard let frame = try? await generator.image(at: .zero).image, let small = scaled(frame) else { return nil }
+        return encode(small)
+    }
+
+    /// Zmniejsza klatkę do dłuższego boku `size` (programowo, `CGContext`); mniejsza zostaje bez zmian.
+    static func scaled(_ frame: CGImage) -> CGImage? {
+        let longest = max(frame.width, frame.height)
+        guard longest > size else { return frame }
+        let factor = Double(size) / Double(longest)
+        let width = max(Int((Double(frame.width) * factor).rounded()), 1)
+        let height = max(Int((Double(frame.height) * factor).rounded()), 1)
+        guard let context = CGContext(
+            data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ) else { return nil }
+        context.interpolationQuality = .high
+        context.draw(frame, in: CGRect(x: 0, y: 0, width: width, height: height))
+        return context.makeImage()
     }
 
     /// Koduje `frame` do JPEG o rozmiarze ≤ `maxBytes`, obniżając jakość od 85 % co 10 punktów do 20 %; `nil`, gdy to niemożliwe.

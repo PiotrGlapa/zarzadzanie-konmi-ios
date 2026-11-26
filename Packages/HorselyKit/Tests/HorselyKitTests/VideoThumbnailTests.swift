@@ -11,25 +11,38 @@ import Testing
 /// Testy idą po kolei: AVFoundation na maszynie wirtualnej runnera (bez sprzętowego skalera i kodera) nie znosi równoległych sesji.
 @Suite(.serialized)
 struct VideoThumbnailTests {
-    @Test func thumbnailOfSampleIsJpegUnder1MB() async throws {
-        let sample = try await SampleVideo.make(width: 1280, height: 720)
+    @Test func aSmallSampleIsWrittenAndInspected() async throws {
+        let sample = try await SampleVideo.make(width: 64, height: 48)
         defer { try? FileManager.default.removeItem(at: sample.deletingLastPathComponent()) }
 
-        let jpeg = try #require(await VideoThumbnail.make(video: sample), "miniatura pierwszej klatki próbki")
-        #expect(jpeg.starts(with: [0xFF, 0xD8, 0xFF]), "JPEG")
-        #expect(Int64(jpeg.count) <= OutboxFile.maxThumbnailBytes)
-        let image = try #require(CGImageSourceCreateWithData(jpeg as CFData, nil).flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) })
-        #expect(max(image.width, image.height) == VideoThumbnail.size, "dłuższy bok 512")
-        #expect(image.height == 288, "proporcje 16:9 zachowane")
+        SampleVideo.trace("inspect 64x48")
+        #expect(await VideoInspector.inspect(sample) == VideoInfo(shortSidePx: 48, durationSeconds: 1))
+        SampleVideo.trace("inspect 64x48: gotowe")
     }
 
     @Test func aSmallFrameIsNotEnlarged() async throws {
         let sample = try await SampleVideo.make(width: 64, height: 48)
         defer { try? FileManager.default.removeItem(at: sample.deletingLastPathComponent()) }
 
+        SampleVideo.trace("miniatura 64x48")
         let jpeg = try #require(await VideoThumbnail.make(video: sample))
+        SampleVideo.trace("miniatura 64x48: gotowa")
         let image = try #require(CGImageSourceCreateWithData(jpeg as CFData, nil).flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) })
         #expect(image.width == 64 && image.height == 48)
+    }
+
+    @Test func thumbnailOfSampleIsJpegUnder1MB() async throws {
+        let sample = try await SampleVideo.make(width: 1280, height: 720)
+        defer { try? FileManager.default.removeItem(at: sample.deletingLastPathComponent()) }
+
+        SampleVideo.trace("miniatura 1280x720")
+        let jpeg = try #require(await VideoThumbnail.make(video: sample), "miniatura pierwszej klatki próbki")
+        SampleVideo.trace("miniatura 1280x720: gotowa")
+        #expect(jpeg.starts(with: [0xFF, 0xD8, 0xFF]), "JPEG")
+        #expect(Int64(jpeg.count) <= OutboxFile.maxThumbnailBytes)
+        let image = try #require(CGImageSourceCreateWithData(jpeg as CFData, nil).flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) })
+        #expect(max(image.width, image.height) == VideoThumbnail.size, "dłuższy bok 512")
+        #expect(image.height == 288, "proporcje 16:9 zachowane")
     }
 
     @Test func aFileThatIsNotAVideoHasNoThumbnailAndNoParameters() async throws {
@@ -66,6 +79,11 @@ enum SampleVideo {
         let reason: String
     }
 
+    /// Ślad na stderr (bez buforowania) — przy awarii procesu w AVFoundation dziennik CI pokazuje, na którym kroku.
+    static func trace(_ step: String) {
+        FileHandle.standardError.write(Data("[SampleVideo] \(step)\n".utf8))
+    }
+
     static func make(width: Int, height: Int) async throws -> URL {
         var failures: [String] = []
         for codec in [AVVideoCodecType.jpeg] {
@@ -82,6 +100,7 @@ enum SampleVideo {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-sample-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let url = folder.appendingPathComponent("sample-1s.mov")
+        trace("zapis \(width)x\(height) \(codec.rawValue): start")
         let writer = try AVAssetWriter(outputURL: url, fileType: .mov)
         let input = AVAssetWriterInput(mediaType: .video, outputSettings: [AVVideoCodecKey: codec, AVVideoWidthKey: width, AVVideoHeightKey: height])
         input.expectsMediaDataInRealTime = false
@@ -104,15 +123,18 @@ enum SampleVideo {
             var created: CVPixelBuffer?
             CVPixelBufferPoolCreatePixelBuffer(nil, pool, &created)
             guard let buffer = created else { throw WriteFailed(reason: "pixelBuffer") }
+            trace("klatka \(frame)")
             fill(buffer, shade: UInt8(60 + frame * 15))
             guard adaptor.append(buffer, withPresentationTime: CMTime(value: CMTimeValue(frame), timescale: 10)) else {
                 throw WriteFailed(reason: "append: \(String(describing: writer.error))")
             }
         }
+        trace("koniec zapisu")
         input.markAsFinished()
         writer.endSession(atSourceTime: CMTime(value: 10, timescale: 10))
         await writer.finishWriting()
         guard writer.status == .completed else { throw WriteFailed(reason: "finishWriting: \(String(describing: writer.error))") }
+        trace("zapis \(width)x\(height): gotowy")
         return url
     }
 
