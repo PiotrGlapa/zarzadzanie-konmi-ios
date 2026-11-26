@@ -79,6 +79,12 @@ public enum FilePolicy {
         return verdict
     }
 
+    /// Sprawdzenie przy dodawaniu pliku — wspólne dla aplikacji i rozszerzenia udostępniania (jedna ścieżka importu jak `OutboxFiles.import`
+    /// Androida): film > 100 MB jest przyjmowany, bo przed wysłaniem zostanie zmniejszony do 720p (decyzja A10).
+    public static func checkImport(fileName: String, mimeType: String?, sizeBytes: Int64) -> FileVerdict {
+        check(fileName: fileName, mimeType: mimeType, sizeBytes: sizeBytes, allowLargeVideo: true)
+    }
+
     /// Czy plik to obraz poddawany przygotowaniu (zmniejszenie, usunięcie lokalizacji).
     public static func isImage(_ contentType: String) -> Bool { contentType.hasPrefix("image/") }
 

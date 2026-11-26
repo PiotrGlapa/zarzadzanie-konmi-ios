@@ -11,19 +11,33 @@ struct VideoPreparationTests {
     private static let jpegBytes = Data([0xFF, 0xD8, 0xFF, 0xE0, 9, 9, 9, 9])
     private static let transcodedBytes = Data("film 720p".utf8)
 
+    /// Zachowanie kodeka zastępczego: zapis wyniku, błąd albo „sukces” bez pliku wynikowego (nieoczekiwany błąd dalej w przygotowaniu).
+    enum Behaviour: Sendable {
+        case writes
+        case failing(NSError)
+        case writesNothing
+    }
+
+    /// Błąd `AVAssetExportSession` po zawieszeniu aplikacji w trakcie eksportu (`AVError.operationInterrupted`).
+    static let interrupted = NSError(domain: "AVFoundationErrorDomain", code: -11847)
+
     /// Kodek zastępczy: zapisuje `transcodedBytes` w `target` (albo zgłasza błąd) i liczy wywołania.
     private final class FakeTranscoder: VideoTranscoding {
-        let fails: Bool
+        let behaviour: Mutex<Behaviour>
         let calls = Mutex(0)
 
-        init(fails: Bool) {
-            self.fails = fails
+        init(_ behaviour: Behaviour) {
+            self.behaviour = Mutex(behaviour)
         }
 
         func prepare(source: URL, target: URL, progress: @escaping @Sendable (Int) -> Void) async throws -> URL {
             calls.withLock { $0 += 1 }
             progress(45)
-            if fails { throw VideoPreparerError.unsupported }
+            switch behaviour.withLock({ $0 }) {
+            case let .failing(error): throw error
+            case .writesNothing: return target
+            case .writes: break
+            }
             try VideoPreparationTests.transcodedBytes.write(to: target)
             progress(100)
             return target
@@ -46,7 +60,7 @@ struct VideoPreparationTests {
         let make: @Sendable () -> AttachmentStore
     }
 
-    private func makeSetup(mode: WorkMode = .online, shortSide: Int = 2160, fails: Bool = false) throws -> Setup {
+    private func makeSetup(mode: WorkMode = .online, shortSide: Int = 2160, fails: Bool = false, behaviour: Behaviour? = nil) throws -> Setup {
         let store = RecordStore(database: try AppDatabase.inMemory())
         let root = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-video-\(UUID().uuidString)", isDirectory: true)
         let files = try LocalFileStore(root: root.appendingPathComponent("Files", isDirectory: true))
@@ -54,7 +68,7 @@ struct VideoPreparationTests {
         let capabilities = ProgramCapabilities(names: ["idempotencyKey"])
         let (client, _) = program.client(capabilities: capabilities)
         let processor = OutboxProcessor(store: store, client: client, capabilities: { capabilities }, now: { Date() })
-        let transcoder = FakeTranscoder(fails: fails)
+        let transcoder = FakeTranscoder(behaviour ?? (fails ? .failing(VideoPreparerError.unsupported as NSError) : .writes))
         let progress = Recorded()
         let videos = VideoPreparation(transcoder: transcoder, inspect: { _ in VideoInfo(shortSidePx: shortSide, durationSeconds: 60) }, thumbnail: { _ in Self.jpegBytes })
         let make: @Sendable () -> AttachmentStore = {
@@ -160,6 +174,64 @@ struct VideoPreparationTests {
         #expect(try await setup.store.queueSnapshot().preparing.isEmpty)
     }
 
+    @Test func anInterruptedExportKeepsTheVideoHeldAndResumesLater() async throws {
+        let setup = try makeSetup(behaviour: .failing(Self.interrupted))
+        try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [try video(setup)])
+        let (operation, held) = try await attachmentOperation(setup)
+
+        // Aplikacja zawieszona w trakcie eksportu: błąd przejściowy, nie odrzucenie.
+        #expect(await setup.attachments.resumePreparation() == 0)
+
+        let (after, file) = try await attachmentOperation(setup)
+        #expect(after.state == .held)
+        #expect(after.problem == nil)
+        #expect(file == held, "wpis kolejki nietknięty")
+        #expect(FileManager.default.fileExists(atPath: held.path), "plik źródłowy zostaje")
+        #expect(try await setup.store.queueSnapshot().preparing == [operation.id])
+        #expect(setup.progress.all.last == .some(nil))
+
+        // Następny start albo zadanie w tle kończy przygotowanie.
+        setup.transcoder.behaviour.withLock { $0 = .writes }
+        #expect(await setup.make().resumePreparation() == 1)
+        #expect(try await attachmentOperation(setup).0.state == .pending)
+    }
+
+    @Test func interruptionErrorsAreTransientAndOthersAreNot() {
+        #expect(VideoPreparation.isInterruption(Self.interrupted))
+        #expect(VideoPreparation.isInterruption(NSError(domain: "AVFoundationErrorDomain", code: -11818)))
+        #expect(VideoPreparation.isInterruption(NSError(domain: "AVFoundationErrorDomain", code: -11819)))
+        #expect(VideoPreparation.isInterruption(CancellationError()))
+        #expect(VideoPreparation.isInterruption(NSError(domain: "AVFoundationErrorDomain", code: -11800, userInfo: [NSUnderlyingErrorKey: Self.interrupted])))
+        #expect(!VideoPreparation.isInterruption(NSError(domain: "AVFoundationErrorDomain", code: -11800)))
+        #expect(!VideoPreparation.isInterruption(VideoPreparerError.unsupported))
+    }
+
+    @Test func standaloneKeepsTheOriginalWhenTheExportIsInterrupted() async throws {
+        let setup = try makeSetup(mode: .standalone, behaviour: .failing(Self.interrupted))
+        let id = try #require(try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [try video(setup)]).first)
+
+        let record = try #require(try await setup.store.get(.attachment, id: id)?.record(as: LocalAttachment.self))
+        #expect(record.fileName == "jazda.mov", "film zapisany w oryginale — nic nie ginie")
+    }
+
+    @Test func anUnexpectedErrorNeedsFixAndCleansUp() async throws {
+        // Kodek „kończy” bez pliku wynikowego — skrót SHA-256 wyniku się nie udaje: ścieżka `preparationFailed`.
+        let setup = try makeSetup(behaviour: .writesNothing)
+        try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [try video(setup)])
+        let (_, held) = try await attachmentOperation(setup)
+        let folder = URL(fileURLWithPath: held.path).deletingLastPathComponent()
+
+        #expect(await setup.attachments.resumePreparation() == 0)
+
+        let (operation, _) = try await attachmentOperation(setup)
+        #expect(operation.state == .needsFix)
+        #expect(operation.problem?.firstMessage == AttachmentStore.preparationFailed)
+        #expect(!FileManager.default.fileExists(atPath: held.path), "źródło usunięte")
+        let leftovers = (try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []
+        #expect(!leftovers.contains { $0.hasSuffix("-miniatura.jpg") || $0.hasSuffix("-720p.mp4") }, "wyniki przygotowania usunięte: \(leftovers)")
+        #expect(try await setup.store.queueSnapshot().preparing.isEmpty)
+    }
+
     @Test func aMissingSourceNeedsFix() async throws {
         let setup = try makeSetup()
         try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [try video(setup)])
@@ -208,7 +280,7 @@ struct VideoPreparationTests {
         #expect(record.fileName == "jazda.mov", "nic nie jest wysyłane, więc film zapisuje się w oryginale (lenient)")
     }
 
-    @Test func aLargeVideoIsAcceptedWhenAddedButOtherLargeFilesAreNot() throws {
+    @Test func aLargeVideoIsAcceptedWhenAddedButOtherLargeFilesAreNot() async throws {
         let setup = try makeSetup()
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-big-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
@@ -221,7 +293,11 @@ struct VideoPreparationTests {
 
         let imported = try setup.attachments.prepare(fileAt: big, mimeType: "video/quicktime")
         #expect(imported.sizeBytes == FilePolicy.maxBytes + 1)
-        setup.attachments.discard(imported)
+        // Tak jak z udostępniania (skrzynka → `prepare(fileAt:)` → `add`): film ≥ 100 MB czeka w kolejce na zmniejszenie.
+        try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [PendingAttachment(file: imported)])
+        let (operation, file) = try await attachmentOperation(setup)
+        #expect(operation.state == .held)
+        #expect(file.needsPreparation)
         let pdf = folder.appendingPathComponent("skan.pdf")
         try FileManager.default.copyItem(at: big, to: pdf)
         #expect(throws: AttachmentError.self) { try setup.attachments.prepare(fileAt: pdf, mimeType: "application/pdf") }

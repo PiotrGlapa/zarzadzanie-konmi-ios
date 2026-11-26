@@ -165,9 +165,12 @@ public struct VideoPreparation: Sendable {
                 transcoded = true
             } catch {
                 try? FileManager.default.removeItem(at: target)
-                // Przerwane (np. koniec czasu zadania w tle) — nie odrzucamy: przygotowanie wznowi się później.
-                if Task.isCancelled || error is CancellationError { throw CancellationError() }
-                if !lenient { return .rejected(Self.transcodeFailed) }
+                // Przerwane (koniec czasu zadania w tle, aplikacja zawieszona w trakcie kodowania) — nie odrzucamy: operacja zostaje `held`
+                // ze źródłem i przygotowanie wznowi się później (jak ponowienie pracy `VideoPrepareWorker` w Androidzie). W trybie
+                // samodzielnym (`lenient`) film zapisuje się wtedy w oryginale, jak przy każdym nieudanym kodowaniu — nic nie ginie.
+                if lenient { break }
+                if Task.isCancelled || Self.isInterruption(error) { throw CancellationError() }
+                return .rejected(Self.transcodeFailed)
             }
         case .keepOriginal:
             break
@@ -192,6 +195,19 @@ public struct VideoPreparation: Sendable {
             return VideoPolicy.canSendOriginal(sizeBytes: size) ? .keepOriginal : .reject(Self.unreadable)
         }
         return VideoPolicy.decide(shortSidePx: info.shortSidePx, sizeBytes: size, sendOriginal: sendOriginal)
+    }
+
+    /// Błędy przejściowe: przygotowanie przerwano z zewnątrz (anulowanie zadania, zawieszenie aplikacji w trakcie eksportu, przerwana sesja
+    /// albo restart usług multimediów) — do ponowienia, nie do odrzucenia filmu. Kody `AVError`: `operationInterrupted` (-11847),
+    /// `sessionWasInterrupted` (-11818), `mediaServicesWereReset` (-11819).
+    static let interruptionCodes: Set<Int> = [-11847, -11818, -11819]
+
+    public static func isInterruption(_ error: any Error) -> Bool {
+        if error is CancellationError { return true }
+        let ns = error as NSError
+        if ns.domain == AVFoundationErrorDomain, interruptionCodes.contains(ns.code) { return true }
+        if let underlying = ns.userInfo[NSUnderlyingErrorKey] as? NSError, underlying !== ns { return isInterruption(underlying) }
+        return false
     }
 
     static func size(of url: URL) -> Int64 {

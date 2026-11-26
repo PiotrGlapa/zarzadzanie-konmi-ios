@@ -120,10 +120,20 @@ struct AttachmentsSection: View {
             progress.set(attachmentId: key, percent: nil)
         }
         let store = environment.attachments
+        let owner = self.owner
+        let pending = ready.map { PendingAttachment(file: $0, description: description, sendOriginal: originals.contains($0.url)) }
         do {
-            try await store.add(owner, ready.map { PendingAttachment(file: $0, description: description, sendOriginal: originals.contains($0.url)) }) { percent in
-                Task { @MainActor in progress.set(attachmentId: key, percent: percent) }
+            // Zmniejszanie filmu przed zapisem trwa — dostaje czas na dokończenie także po zejściu aplikacji w tło.
+            let result: Result<[String], any Error> = await environment.withBackgroundTime(BackgroundWork.videoIdentifier) {
+                do {
+                    return .success(try await store.add(owner, pending) { percent in
+                        Task { @MainActor in progress.set(attachmentId: key, percent: percent) }
+                    })
+                } catch {
+                    return .failure(error)
+                }
             }
+            _ = try result.get()
             await load()
             if environment.workMode == .online {
                 Task {

@@ -313,7 +313,21 @@ final class AppEnvironment {
     func prepareVideos() async {
         guard workMode == .online, await attachments.hasPreparingVideos() else { return }
         scheduleVideoPreparation()
-        if await attachments.resumePreparation() > 0 { await sendQueue() }
+        let attachments = self.attachments
+        let released = await withBackgroundTime(BackgroundWork.videoIdentifier) { await attachments.resumePreparation() }
+        if released > 0 { await sendQueue() }
+    }
+
+    /// Praca, która może trwać minuty (przygotowanie filmu), dostaje od systemu czas na dokończenie po zejściu aplikacji w tło
+    /// (`beginBackgroundTask`). Gdy czas się kończy, praca jest anulowana — przygotowanie kończy się jako „przerwane” (operacja zostaje
+    /// `held` ze źródłem i wznowi ją zadanie w tle albo następny start), a nie „odrzucone”.
+    func withBackgroundTime<T: Sendable>(_ name: String, _ work: @escaping @Sendable () async -> T) async -> T {
+        let job = Task { await work() }
+        let assertion = BackgroundAssertion()
+        assertion.begin(name) { job.cancel() }
+        let result = await job.value
+        assertion.end()
+        return result
     }
 
     /// Wysyłka kolejki (po zapisie, odzyskaniu sieci, „Wyślij teraz”).
@@ -557,6 +571,28 @@ extension AppEnvironment {
         environment.queueCount = queueCount
         environment.conflictCount = conflictCount
         return environment
+    }
+}
+
+/// Zgoda systemu na pracę po zejściu w tło (`UIApplication.beginBackgroundTask`); `end()` kończy ją dokładnie raz — po pracy albo
+/// po upływie czasu (wtedy najpierw `onExpiration`).
+@MainActor
+final class BackgroundAssertion {
+    private var identifier: UIBackgroundTaskIdentifier = .invalid
+
+    func begin(_ name: String, onExpiration: @escaping @MainActor @Sendable () -> Void) {
+        identifier = UIApplication.shared.beginBackgroundTask(withName: name) { [weak self] in
+            MainActor.assumeIsolated {
+                onExpiration()
+                self?.end()
+            }
+        }
+    }
+
+    func end() {
+        guard identifier != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(identifier)
+        identifier = .invalid
     }
 }
 

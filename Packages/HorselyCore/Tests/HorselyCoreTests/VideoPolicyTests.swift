@@ -68,6 +68,9 @@ struct VideoPolicyTests {
         #expect(FilePolicy.check(fileName: "jazda.mov", mimeType: "video/quicktime", sizeBytes: 300 * mb, allowLargeVideo: true) == .allowed(fileName: "jazda.mov", contentType: "video/quicktime"))
         #expect(!FilePolicy.check(fileName: "jazda.mov", mimeType: "video/quicktime", sizeBytes: 300 * mb).isAllowed)
         #expect(!FilePolicy.check(fileName: "skan.pdf", mimeType: "application/pdf", sizeBytes: 300 * mb, allowLargeVideo: true).isAllowed)
+        // Import (aplikacja i rozszerzenie udostępniania) używa tej samej decyzji.
+        #expect(FilePolicy.checkImport(fileName: "jazda.mp4", mimeType: "video/mp4", sizeBytes: 300 * mb) == .allowed(fileName: "jazda.mp4", contentType: "video/mp4"))
+        #expect(!FilePolicy.checkImport(fileName: "skan.pdf", mimeType: "application/pdf", sizeBytes: 300 * mb).isAllowed)
         #expect(FilePolicy.isVideo("video/mp4"))
         #expect(!FilePolicy.isVideo("image/jpeg"))
     }

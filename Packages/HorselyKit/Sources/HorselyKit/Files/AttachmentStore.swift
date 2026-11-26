@@ -162,7 +162,7 @@ public final class AttachmentStore: Sendable {
 
     static func verdict(_ name: String, _ mime: String?, _ size: Int64) throws -> (String, String) {
         // Film > 100 MB jest przyjmowany: przed wysłaniem zostanie zmniejszony do 720p, a limit sprawdzi wynik (decyzja A10).
-        switch FilePolicy.check(fileName: name, mimeType: mime, sizeBytes: size, allowLargeVideo: true) {
+        switch FilePolicy.checkImport(fileName: name, mimeType: mime, sizeBytes: size) {
         case let .allowed(fileName, contentType): return (fileName, contentType)
         case let .rejected(reason): throw AttachmentError.rejected(reason)
         }
@@ -452,6 +452,9 @@ public final class AttachmentStore: Sendable {
             }
         } catch is CancellationError {
             // Przerwane: operacja zostaje `held` ze źródłem — wznowi ją następne `resumePreparation()`.
+            return false
+        } catch where VideoPreparation.isInterruption(error) || Task.isCancelled {
+            // Przerwanie zgłoszone inaczej niż `CancellationError` (np. `AVError.operationInterrupted`) — też zostaje `held`.
             return false
         } catch {
             // Nieoczekiwany błąd (zapis miniatury, brak miejsca): operacja nie może zostać w `held` z napisem „Przygotowuję film…”.
