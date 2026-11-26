@@ -223,9 +223,9 @@
 - Create: `HorselyCore/Ride/RideRecorder.swift`
 - Test: `HorselyCore/Tests/HorselyCoreTests/RideRecorderTests.swift`
 
-- [ ] **Step 1: Testy** — sześć testów [PLAN-A] Task 12 (pauza, słaby GPS po 30 s, bateria raz przy 15 %, koniec po 8 h, zapis co ≤ 10 s, odtworzenie dystansu i czasu).
-- [ ] **Step 2:** `final class RideRecorder` (bez współbieżności — używa jej aktor z Task 15), interfejs 1:1; push → PASS.
-- [ ] **Step 3: Commit** — `feat(core): maszyna stanow nagrywania jazdy z bezpiecznikami`
+- [x] **Step 1: Testy** — sześć testów [PLAN-A] Task 12 (pauza, słaby GPS po 30 s, bateria raz przy 15 %, koniec po 8 h, zapis co ≤ 10 s, odtworzenie dystansu i czasu).
+- [x] **Step 2:** `final class RideRecorder` (bez współbieżności — używa jej aktor z Task 15), interfejs 1:1; push → PASS.
+- [x] **Step 3: Commit** — `feat(core): maszyna stanow nagrywania jazdy z bezpiecznikami`
 
 ### Task 14: Zapis sesji na bieżąco i odzyskiwanie = [PLAN-A] Task 13
 
