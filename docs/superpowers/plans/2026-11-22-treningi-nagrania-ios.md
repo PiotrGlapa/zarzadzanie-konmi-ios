@@ -172,9 +172,9 @@
 **Interfaces:**
 - Produces: `enum VideoDecision: Equatable { case keepOriginal, transcode, reject(String) }`; `enum VideoPolicy { static func decide(shortSidePx:sizeBytes:sendOriginal:) -> VideoDecision; static func afterTranscode(sizeBytes:durationSeconds:) -> VideoDecision; static func canSendOriginal(sizeBytes:) -> Bool }` (reguły i komunikat odrzucenia jak [PLAN-A] Task 8); `VideoPreparer.prepare(source: URL, target: URL, progress: @Sendable (Int) -> Void) async throws -> URL` (`AVAssetExportSession` preset `AVAssetExportPreset1280x720`, `.mp4`, z zachowaniem orientacji; asynchroniczne `export(to:as:)` i `states(updateInterval:)`); `VideoThumbnail.make(video: URL) async -> Data?` (`AVAssetImageGenerator`, `appliesPreferredTrackTransform`, dłuższy bok 512, JPEG obniżany do ≤ 1 MB).
 
-- [ ] **Step 1: Testy** — lista z [PLAN-A] Task 8 (`video4KIsTranscoded`, `video720UnderLimitIsKept`, `originalToggleOnlyBelow100MB`, `transcodedOverLimitIsRejectedWithMaxLength`, `thumbnailOfSampleIsJpegUnder1MB`) oraz `interruptedPreparationResumesOnLaunch` (operacja `held` bez pliku wynikowego → przygotowanie ponownie w kolejce).
-- [ ] **Step 2:** Implementacja; push → PASS (test miniatury działa na runnerze macOS w `swift test`).
-- [ ] **Step 3: Commit** — `feat(attachments): przekodowanie filmow do 720p i miniatura pierwszej klatki`
+- [x] **Step 1: Testy** — lista z [PLAN-A] Task 8 (`video4KIsTranscoded`, `video720UnderLimitIsKept`, `originalToggleOnlyBelow100MB`, `transcodedOverLimitIsRejectedWithMaxLength`, `thumbnailOfSampleIsJpegUnder1MB`) oraz `interruptedPreparationResumesOnLaunch` (operacja `held` bez pliku wynikowego → przygotowanie ponownie w kolejce).
+- [x] **Step 2:** Implementacja; push → PASS (test miniatury działa na runnerze macOS w `swift test`).
+- [x] **Step 3: Commit** — `feat(attachments): przekodowanie filmow do 720p i miniatura pierwszej klatki`
 
 ### Task 10: Sekcja „Załączniki” treningu i metadane z galerii = [PLAN-A] Task 9
 
