@@ -11,6 +11,8 @@ import UIKit
 enum RideActivityStyle {
     /// Zieleń — kolor główny (przyciski, ikona konia).
     static let primary = dynamic(light: 0x2E7D32, dark: 0x81C784)
+    /// Tekst na zieleni (przycisk główny) — kontrast ≥ 4,5:1 w obu motywach.
+    static let onPrimary = dynamic(light: 0xFFFFFF, dark: 0x003910)
     /// Pomarańcz — ostrzeżenie (słaby GPS).
     static let warning = dynamic(light: 0x9A4A00, dark: 0xFFB77C)
     /// Tło ekranu blokady i tekst na nim.
@@ -20,6 +22,7 @@ enum RideActivityStyle {
     /// Dynamic Island ma zawsze czarne tło — kolory z wariantu ciemnego.
     static let islandPrimary = fixed(0x81C784)
     static let islandWarning = fixed(0xFFB77C)
+    static let islandOnPrimary = fixed(0x003910)
 
     private static func dynamic(light: UInt32, dark: UInt32) -> Color {
         Color(uiColor: UIColor { traits in rgb(traits.userInterfaceStyle == .dark ? dark : light) })
@@ -56,18 +59,19 @@ struct RideActivityHorseIcon: View {
 struct RideActivityButtons: View {
     let paused: Bool
     var tint: Color = RideActivityStyle.primary
+    var onTint: Color = RideActivityStyle.onPrimary
     var buttons: RideActivityButtonTexts = .app
 
     var body: some View {
         HStack(spacing: 8) {
             if paused {
                 Button(intent: ResumeRideIntent()) {
-                    Text(buttons.resume).frame(maxWidth: .infinity)
+                    Text(buttons.resume).foregroundStyle(onTint).frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
             } else {
                 Button(intent: PauseRideIntent()) {
-                    Text(buttons.pause).frame(maxWidth: .infinity)
+                    Text(buttons.pause).foregroundStyle(onTint).frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -162,7 +166,7 @@ struct RideActivityExpandedBottomView: View {
                 .font(.subheadline)
                 .foregroundStyle(state.weakGps && !state.paused ? RideActivityStyle.islandWarning : .white)
                 .lineLimit(1)
-            RideActivityButtons(paused: state.paused, tint: RideActivityStyle.islandPrimary)
+            RideActivityButtons(paused: state.paused, tint: RideActivityStyle.islandPrimary, onTint: RideActivityStyle.islandOnPrimary)
         }
     }
 }
