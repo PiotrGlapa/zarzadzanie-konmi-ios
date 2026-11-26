@@ -335,6 +335,7 @@ public final class AttachmentStore: Sendable {
             : nil
         let attachment = record(id, owner, pending, now: dates.now())
         let moment = Date()
+        let initialState: OutboxState = held ? .held : .pending
         let file = OutboxFile(
             operationId: operationId, path: target.path, fileName: pending.file.fileName, contentType: pending.file.contentType,
             sizeBytes: pending.file.sizeBytes, sha256: pending.file.sha256, description: attachment.description,
@@ -352,7 +353,7 @@ public final class AttachmentStore: Sendable {
                     id: operationId, kind: .createAttachment, localRef: id,
                     payload: .object(["ownerType": .string(owner.type.rawValue), "ownerId": .string(owner.id)]), dependsOn: dependsOn,
                     horseRefs: horse.map { [HorseRef($0)] } ?? [], summary: "\(OperationKind.createAttachment.label) · \(horse?.name ?? "stajnia")",
-                    state: held ? .held : .pending, createdAt: moment, updatedAt: moment, recordType: .attachment, recordId: id
+                    state: initialState, createdAt: moment, updatedAt: moment, recordType: .attachment, recordId: id
                 )
                 try access.upsert([try StoredRecord.of(attachment, syncState: .pending)])
                 try access.enqueue(operation, file: file)
@@ -377,7 +378,7 @@ public final class AttachmentStore: Sendable {
     @discardableResult
     public func resumePreparation() async -> Int {
         guard videos != nil else { return 0 }
-        let ids = (try? await store.read { access in
+        let ids = (try? await store.read { access -> [String] in
             let preparing = try access.preparingOperationIds()
             return try access.operations().map(\.id).filter { preparing.contains($0) }
         }) ?? []
@@ -614,7 +615,7 @@ public final class AttachmentStore: Sendable {
 
     /// Czy załącznik czeka jeszcze w kolejce (niewysłany, także film w przygotowaniu) — wtedy „Usuń” tylko wycofuje go z kolejki.
     public func isQueued(_ attachmentId: String) async -> Bool {
-        (try? await store.read { access in
+        (try? await store.read { access -> Bool in
             let preparing = try access.preparingOperationIds()
             return try access.operations().contains {
                 $0.kind == .createAttachment && $0.recordId == attachmentId && ($0.state == .pending || preparing.contains($0.id))
