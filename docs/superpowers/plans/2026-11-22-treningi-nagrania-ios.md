@@ -213,9 +213,9 @@
 - Create: `HorselyCore/Ride/CadenceAnalyzer.swift`
 - Test: `HorselyCore/Tests/HorselyCoreTests/CadenceAnalyzerTests.swift`
 
-- [ ] **Step 1: Testy** — cztery testy [PLAN-A] Task 11 (sinus 2,5 Hz → 150/min ±2, szum → `nil`, spoczynek → `nil` i intensywność ≈ 0, za mało próbek → `nil`). Algorytm dosłownie z [PLAN-A] Task 11 (przepróbkowanie do 50 Hz, autokorelacja 0,3–1,5 s, próg 0,4, ≥ 150 próbek); próbki iOS z `userAcceleration` w g mnożone przez 9,80665 (m/s²) przed analizą.
-- [ ] **Step 2:** Implementacja; push → PASS.
-- [ ] **Step 3: Commit** — `feat(core): rytm i intensywnosc ruchu z okien akcelerometru`
+- [x] **Step 1: Testy** — cztery testy [PLAN-A] Task 11 (sinus 2,5 Hz → 150/min ±2, szum → `nil`, spoczynek → `nil` i intensywność ≈ 0, za mało próbek → `nil`). Algorytm dosłownie z [PLAN-A] Task 11 (przepróbkowanie do 50 Hz, autokorelacja 0,3–1,5 s, próg 0,4, ≥ 150 próbek); próbki iOS z `userAcceleration` w g mnożone przez 9,80665 (m/s²) przed analizą.
+- [x] **Step 2:** Implementacja; push → PASS.
+- [x] **Step 3: Commit** — `feat(core): rytm i intensywnosc ruchu z okien akcelerometru`
 
 ### Task 13: Maszyna stanów nagrywania = [PLAN-A] Task 12
 
