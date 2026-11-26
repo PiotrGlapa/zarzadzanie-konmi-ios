@@ -775,7 +775,15 @@ extension RideRecordingController: RideActivityActionHandler {
         return await finish()
     }
 
-    private func awaitPendingRelaunch() async {
+}
+
+extension RideRecordingController {
+    /// Czeka na zadanie zaplanowane przy starcie aplikacji przez `prepareRelaunch` (wznowienie jazdy albo — przy uruchomieniu na pierwszym
+    /// planie — oznaczenie nieświeżej jazdy jako `.interrupted`, które dzieje się ASYNCHRONICZNIE). Odzyskiwanie przy starcie (Task 17,
+    /// `RideRecovery`) i przyciski Live Activity muszą na nie poczekać, zanim spojrzą na stan sesji — inaczej widziałyby stan sprzed decyzji
+    /// (np. `.recording` jazdy, która za chwilę dostanie `.interrupted`, albo brak działającego nagrywania tuż przed wznowieniem). Bez
+    /// zaplanowanego zadania wraca od razu.
+    public nonisolated func awaitPendingRelaunch() async {
         let pending = pendingRelaunch.withLock { $0 }
         await pending?.value
     }

@@ -41,6 +41,7 @@ public final class RideActivityActions: Sendable {
         var handler: (any RideActivityActionHandler)?
         var finishedSessionId: String?
         var log: (@Sendable (String) -> Void)?
+        var finishObserver: (@Sendable () -> Void)?
     }
 
     private let state = Mutex(State())
@@ -56,6 +57,12 @@ public final class RideActivityActions: Sendable {
     /// konia i współrzędnych — tylko rodzaj akcji i powód.
     public func setLog(_ log: (@Sendable (String) -> Void)?) {
         state.withLock { $0.log = log }
+    }
+
+    /// Wołane po „Zakończ” z Live Activity, które zakończyło jazdę (Task 17): aplikacja odbiera wtedy id przez `takeFinishedSessionId()`
+    /// i otwiera ekran zakończenia — także gdy jest już na pierwszym planie (wejście na pierwszy plan mogło nastąpić przed końcem akcji).
+    public func setFinishObserver(_ observer: (@Sendable () -> Void)?) {
+        state.withLock { $0.finishObserver = observer }
     }
 
     /// Wykonuje akcję u zarejestrowanego odbiorcy. Akcja, która nic nie zrobiła (brak odbiorcy albo brak jazdy), nie jest cichym sukcesem:
@@ -75,7 +82,13 @@ public final class RideActivityActions: Sendable {
             performed = await handler.resumeRide()
         case .finish:
             let id = await handler.finishRide()
-            if let id { state.withLock { $0.finishedSessionId = id } }
+            if let id {
+                let observer = state.withLock { current -> (@Sendable () -> Void)? in
+                    current.finishedSessionId = id
+                    return current.finishObserver
+                }
+                observer?()
+            }
             performed = id != nil
         }
         if performed { return .performed }

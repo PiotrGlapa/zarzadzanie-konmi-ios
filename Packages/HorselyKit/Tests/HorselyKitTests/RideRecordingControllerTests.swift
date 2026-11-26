@@ -1120,6 +1120,8 @@ struct RideRecordingControllerTests {
 }
 
 // MARK: - Środowisko testów
+//
+// Zaślepki i `ControllerHarness` są wewnętrzne (nie `private`) — korzystają z nich też `RideStartPolicyTests` (odzyskiwanie po starcie).
 
 private let START: Int64 = 1_790_000_000_000
 
@@ -1140,7 +1142,7 @@ extension RideNotificationTexts {
 }
 
 /// Zegar sterowany z testu (epoka, ms) — wspólny dla kontrolera i sklepu.
-private final class ControllerClock: Sendable {
+final class ControllerClock: Sendable {
     private let value: Mutex<Int64>
 
     init(_ start: Int64) {
@@ -1157,7 +1159,7 @@ private final class ControllerClock: Sendable {
 }
 
 /// Zaślepka źródła lokalizacji: test sam „nadaje” punkty przez `emit`.
-private final class FakeLocationSource: LocationSource {
+final class FakeLocationSource: LocationSource {
     private struct State {
         var authorization: LocationAuthorization
         var continuation: AsyncStream<LocationSample>.Continuation?
@@ -1232,7 +1234,7 @@ private final class FakeLocationSource: LocationSource {
 }
 
 /// Zaślepka akcelerometru.
-private final class FakeMotionSource: MotionSource {
+final class FakeMotionSource: MotionSource {
     private let continuation = Mutex<AsyncStream<AccelSample>.Continuation?>(nil)
 
     var active: Bool { continuation.withLock { $0 != nil } }
@@ -1256,7 +1258,7 @@ private final class FakeMotionSource: MotionSource {
 }
 
 /// Bateria sterowana z testu.
-private final class FakeBattery: BatteryMonitor {
+final class FakeBattery: BatteryMonitor {
     private struct State {
         var level: Int? = 80
         var monitoring = false
@@ -1277,7 +1279,7 @@ private final class FakeBattery: BatteryMonitor {
 }
 
 /// Zbiera ostrzeżenia zamiast wysyłać je do `UNUserNotificationCenter`.
-private final class AlertRecorder: RideAlertPoster {
+final class AlertRecorder: RideAlertPoster {
     private struct State {
         var posted: [RideAlert] = []
         var removed: [RideAlert.Kind] = []
@@ -1293,7 +1295,7 @@ private final class AlertRecorder: RideAlertPoster {
 }
 
 /// Zapisuje wywołania Live Activity zamiast ActivityKit.
-private final class FakeActivityPresenter: RideActivityPresenter {
+final class FakeActivityPresenter: RideActivityPresenter {
     enum Event: Equatable {
         case start(horseName: String, RideActivityState, resuming: Bool)
         case update(RideActivityState)
@@ -1334,7 +1336,7 @@ private final class FakeActivityPresenter: RideActivityPresenter {
 }
 
 /// Wpisy dziennika kontrolera (bez pliku).
-private final class LogLines: Sendable {
+final class LogLines: Sendable {
     private struct State {
         var lines: [String] = []
         /// Wpisy dziennika i znaczniki (np. koniec Live Activity) w kolejności zdarzeń.
@@ -1361,7 +1363,7 @@ private final class LogLines: Sendable {
 }
 
 /// Katalog bazy w katalogu tymczasowym, zaślepki i fabryka kontrolerów.
-private final class ControllerHarness: @unchecked Sendable {
+final class ControllerHarness: @unchecked Sendable {
     let clock = ControllerClock(START)
     let locations = FakeLocationSource()
     let motion = FakeMotionSource()

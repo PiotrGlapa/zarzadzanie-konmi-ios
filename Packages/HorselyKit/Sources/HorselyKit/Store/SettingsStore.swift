@@ -56,6 +56,7 @@ public struct SettingsStore: @unchecked Sendable {
         static let pushActive = "push.active"
         static let pushPermissionAsked = "push.permissionAsked"
         static let notificationsOffCardDismissed = "notifications.offCardDismissed"
+        static let rideWearHintHidden = "ride.wearHintHidden"
         /// Klucze `push.*` czyszczone razem z danymi połączenia — bez `push.permissionAsked` (decyzja użytkownika dotyczy telefonu).
         static let pushConnectionKeys = [
             pushRegistered, pushTokenPrefix, pushRegisteredAt, pushFailingSince, pushPermanentFailure, pushDeviceRemovedNotice, pushApnsRefused, pushActive,
@@ -148,6 +149,15 @@ public struct SettingsStore: @unchecked Sendable {
     /// Czyści stan połączenia push (wszystkie `push.*` poza `push.permissionAsked`) — „Rozłącz”, tryb samodzielny, usunięcie danych.
     public func clearPushConnectionState() {
         for key in Key.pushConnectionKeys { defaults.removeObject(forKey: key) }
+    }
+
+    // MARK: Nagrywanie jazdy
+
+    /// „Nie pokazuj więcej” na instrukcji noszenia telefonu przed startem nagrywania (NAG-03, Android `rideWearHintHidden`); domyślnie
+    /// instrukcja jest pokazywana. Ustawienie telefonu — nie jest czyszczone przy odparowaniu.
+    public var rideWearHintHidden: Bool {
+        get { bool(Key.rideWearHintHidden, default: false) }
+        nonmutating set { defaults.set(newValue, forKey: Key.rideWearHintHidden) }
     }
 
     // MARK: Dane

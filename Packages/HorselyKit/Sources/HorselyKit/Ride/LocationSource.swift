@@ -107,7 +107,7 @@ public final class SystemLocationSource: LocationSource, @unchecked Sendable {
 
     /// Zgoda z `CLAuthorizationStatus` i `CLAccuracyAuthorization`: „Zawsze” aplikacja nigdy nie prosi, ale gdyby ją miała — traktuje jak
     /// „Podczas używania”.
-    static func authorization(status: CLAuthorizationStatus, accuracy: CLAccuracyAuthorization) -> LocationAuthorization {
+    public static func authorization(status: CLAuthorizationStatus, accuracy: CLAccuracyAuthorization) -> LocationAuthorization {
         switch status {
         case .notDetermined:
             return .notDetermined
@@ -194,6 +194,50 @@ public final class SystemLocationSource: LocationSource, @unchecked Sendable {
         }
         task?.cancel()
         continuation?.finish()
+    }
+}
+
+/// Prośba o zgodę na lokalizację „Podczas używania” przed startem nagrywania (Task 17, NAG-04): pytanie systemu pada dopiero na kroku
+/// „Dokładna lokalizacja” ekranu startu, po dotknięciu „Zezwól” — nigdy poza nagrywaniem i nigdy o „Zawsze”. Wynik w tym samym kształcie
+/// co `SystemLocationSource.authorization` (przybliżona lokalizacja = `.reducedAccuracy`, start zablokowany z wyjaśnieniem).
+@MainActor
+public final class LocationPermissionRequester: NSObject, CLLocationManagerDelegate {
+    private let manager = CLLocationManager()
+    private var waiting: [CheckedContinuation<LocationAuthorization, Never>] = []
+
+    override public init() {
+        super.init()
+        manager.delegate = self
+    }
+
+    /// Bieżąca zgoda (bez pytania).
+    public var current: LocationAuthorization {
+        SystemLocationSource.authorization(status: manager.authorizationStatus, accuracy: manager.accuracyAuthorization)
+    }
+
+    /// Pyta system, gdy zgoda nie jest jeszcze ustalona, i czeka na odpowiedź; inaczej od razu zwraca bieżącą zgodę (ponownego pytania
+    /// system i tak nie pokazuje — po odmowie zostają ustawienia).
+    public func request() async -> LocationAuthorization {
+        guard manager.authorizationStatus == .notDetermined else { return current }
+        return await withCheckedContinuation { continuation in
+            waiting.append(continuation)
+            manager.requestWhenInUseAuthorization()
+        }
+    }
+
+    nonisolated public func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        let status = manager.authorizationStatus
+        let accuracy = manager.accuracyAuthorization
+        Task { @MainActor in self.answered(status: status, accuracy: accuracy) }
+    }
+
+    private func answered(status: CLAuthorizationStatus, accuracy: CLAccuracyAuthorization) {
+        // Pierwsze wywołanie delegata (zaraz po utworzeniu menedżera) zgłasza stan nieustalony — to jeszcze nie odpowiedź.
+        guard status != .notDetermined, !waiting.isEmpty else { return }
+        let result = SystemLocationSource.authorization(status: status, accuracy: accuracy)
+        let resumed = waiting
+        waiting = []
+        for continuation in resumed { continuation.resume(returning: result) }
     }
 }
 #endif
