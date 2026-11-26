@@ -72,6 +72,13 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     }
 }
 
+/// Czy telefon oferuje załączniki treningu (ZAT-06, `trainingAttachmentsAvailable` Androida): w trybie samodzielnym zawsze, w trybie z
+/// programem tylko gdy program ogłasza `trainingAttachments` (serwer 3.0.0). Na starszym programie sekcja „Załączniki” treningu jest
+/// ukryta — telefon nie obiecuje pliku, którego program nie przyjmie (kolejka i tak wstrzymałaby go, decyzja A6).
+public func trainingAttachmentsAvailable(mode: WorkMode, capabilities: ProgramCapabilities) -> Bool {
+    mode == .standalone || capabilities.trainingAttachments
+}
+
 /// Zmiana możliwości wykryta przy odczycie `system/info`.
 public struct CapabilitiesChange: Equatable, Sendable {
     public let before: ProgramCapabilities

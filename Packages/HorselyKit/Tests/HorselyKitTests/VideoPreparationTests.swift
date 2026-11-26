@@ -80,8 +80,8 @@ struct VideoPreparationTests {
         return Setup(store: store, files: files, processor: processor, attachments: make(), transcoder: transcoder, progress: progress, make: make)
     }
 
-    private func video(_ setup: Setup, sendOriginal: Bool = false) throws -> PendingAttachment {
-        let file = try setup.attachments.prepare(data: Data((0 ..< 4096).map { UInt8(truncatingIfNeeded: $0 % 251) }), fileName: "jazda.mov", mimeType: "video/quicktime")
+    private func video(_ setup: Setup, sendOriginal: Bool = false) async throws -> PendingAttachment {
+        let file = try await setup.attachments.prepare(data: Data((0 ..< 4096).map { UInt8(truncatingIfNeeded: $0 % 251) }), fileName: "jazda.mov", mimeType: "video/quicktime")
         return PendingAttachment(file: file, sendOriginal: sendOriginal)
     }
 
@@ -291,7 +291,7 @@ struct VideoPreparationTests {
         try handle.truncate(atOffset: UInt64(FilePolicy.maxBytes) + 1)
         try handle.close()
 
-        let imported = try setup.attachments.prepare(fileAt: big, mimeType: "video/quicktime")
+        let imported = try await setup.attachments.prepare(fileAt: big, mimeType: "video/quicktime")
         #expect(imported.sizeBytes == FilePolicy.maxBytes + 1)
         // Tak jak z udostępniania (skrzynka → `prepare(fileAt:)` → `add`): film ≥ 100 MB czeka w kolejce na zmniejszenie.
         try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [PendingAttachment(file: imported)])
@@ -300,6 +300,6 @@ struct VideoPreparationTests {
         #expect(file.needsPreparation)
         let pdf = folder.appendingPathComponent("skan.pdf")
         try FileManager.default.copyItem(at: big, to: pdf)
-        #expect(throws: AttachmentError.self) { try setup.attachments.prepare(fileAt: pdf, mimeType: "application/pdf") }
+        await #expect(throws: AttachmentError.self) { try await setup.attachments.prepare(fileAt: pdf, mimeType: "application/pdf") }
     }
 }

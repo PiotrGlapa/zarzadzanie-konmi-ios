@@ -25,18 +25,23 @@ public struct ImportedFile: Hashable, Sendable {
     public let contentType: String
     public let sizeBytes: Int64
     public let sha256: String
+    /// Chwila i miejsce wykonania odczytane z pliku z galerii PRZED jego przygotowaniem (zmniejszenie zdjęcia usuwa EXIF).
+    public let metadata: MediaMetadata
 
-    public init(url: URL, fileName: String, contentType: String, sizeBytes: Int64, sha256: String) {
+    public init(url: URL, fileName: String, contentType: String, sizeBytes: Int64, sha256: String, metadata: MediaMetadata = .none) {
         self.url = url
         self.fileName = fileName
         self.contentType = contentType
         self.sizeBytes = sizeBytes
         self.sha256 = sha256
+        self.metadata = metadata
     }
 }
 
 /// Plik wybrany przez użytkownika z opisem (≤ 500 znaków). Od 3.0 także chwila i miejsce wykonania (`capturedAt`, `latitude`,
 /// `longitude` — WGS84) oraz miniatura filmu JPEG ≤ 1 MB (`thumbnail`; plik przechodzi na własność operacji albo rekordu).
+/// Czas domyślnie pochodzi z metadanych pliku z galerii (`ImportedFile.metadata`); współrzędne NIE są domyślane — dostaje je tylko
+/// załącznik treningu (`forOwner`: konstytucja II, lokalizacja dotyczy wyłącznie jazdy), a nagranie jazdy podaje własne jawnie.
 public struct PendingAttachment: Hashable, Sendable {
     public let file: ImportedFile
     public let description: String?
@@ -54,10 +59,36 @@ public struct PendingAttachment: Hashable, Sendable {
         self.sendOriginal = sendOriginal
         self.file = file
         self.description = description
-        self.capturedAt = capturedAt
+        self.capturedAt = capturedAt ?? file.metadata.capturedAt
         self.latitude = latitude
         self.longitude = longitude
         self.thumbnail = thumbnail
+    }
+
+    /// Załącznik gotowy dla właściciela `type`: współrzędne (konstytucja 3.0.0, zasada II; ZAT-05 dotyczy tylko pinezki trasy treningu)
+    /// zostają wyłącznie przy załączniku treningu — jawne z nagrania jazdy albo, gdy ich brak, położenie z metadanych pliku z galerii
+    /// (zdjęcia: tylko gdy przy imporcie zostało zachowane zgodnie z „Zachowuj lokalizację”). Dla pozostałych właścicieli zawsze `nil`;
+    /// czas wykonania zostaje wszędzie.
+    func forOwner(_ type: AttachmentOwnerType) -> PendingAttachment {
+        let place: (latitude: Decimal?, longitude: Decimal?)
+        if type != .training {
+            place = (nil, nil)
+        } else if latitude != nil || longitude != nil {
+            place = (latitude, longitude)
+        } else {
+            place = (Self.decimal(file.metadata.latitude), Self.decimal(file.metadata.longitude))
+        }
+        guard place.latitude != latitude || place.longitude != longitude else { return self }
+        return PendingAttachment(
+            file: file, description: description, capturedAt: capturedAt, latitude: place.latitude, longitude: place.longitude, thumbnail: thumbnail,
+            sendOriginal: sendOriginal
+        )
+    }
+
+    /// Najkrótszy zapis dziesiętny (`52.2297`, nie `52.22970000000001`), żeby zaokrąglenie do 7 miejsc było dokładne.
+    private static func decimal(_ value: Double?) -> Decimal? {
+        guard let value, value.isFinite else { return nil }
+        return Decimal(string: String(value), locale: Locale(identifier: "en_US_POSIX")) ?? Decimal(value)
     }
 }
 
@@ -137,22 +168,23 @@ public final class AttachmentStore: Sendable {
 
     // MARK: Przygotowanie
 
-    /// Plik z urządzenia (aplikacja Pliki, udostępnianie): sprawdzenie typu i rozmiaru, kopia strumieniowa, obróbka zdjęć.
-    public func prepare(fileAt source: URL, fileName: String? = nil, mimeType: String? = nil) throws -> ImportedFile {
+    /// Plik z urządzenia (aplikacja Pliki, udostępnianie): sprawdzenie typu i rozmiaru, kopia strumieniowa, odczyt metadanych (czas,
+    /// miejsce) z kopii, obróbka zdjęć.
+    public func prepare(fileAt source: URL, fileName: String? = nil, mimeType: String? = nil) async throws -> ImportedFile {
         let name = fileName ?? source.lastPathComponent
         let size = Int64((try? source.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
         let (safeName, contentType) = try Self.verdict(name, mimeType, size)
         let target = try newImportURL(safeName)
         try FileManager.default.copyItem(at: source, to: target)
-        return try finish(target, fileName: safeName, contentType: contentType)
+        return try await finish(target, fileName: safeName, contentType: contentType)
     }
 
     /// Zdjęcie z aparatu albo galerii (dane w pamięci).
-    public func prepare(data: Data, fileName: String, mimeType: String?) throws -> ImportedFile {
+    public func prepare(data: Data, fileName: String, mimeType: String?) async throws -> ImportedFile {
         let (safeName, contentType) = try Self.verdict(fileName, mimeType, Int64(data.count))
         let target = try newImportURL(safeName)
         try data.write(to: target, options: .atomic)
-        return try finish(target, fileName: safeName, contentType: contentType)
+        return try await finish(target, fileName: safeName, contentType: contentType)
     }
 
     /// Usuwa przygotowany plik, którego użytkownik jednak nie dodał.
@@ -176,7 +208,10 @@ public final class AttachmentStore: Sendable {
 
     /// Zdjęcia: domyślnie zmniejszone do 2560 px (JPEG ~85 %) bez metadanych; „Wysyłaj oryginały” — bez zmian, ale bez GPS,
     /// chyba że włączono „Zachowuj lokalizację” (FR-M-ZAL-03).
-    private func finish(_ url: URL, fileName: String, contentType: String) throws -> ImportedFile {
+    private func finish(_ url: URL, fileName: String, contentType: String) async throws -> ImportedFile {
+        // Metadane z surowej kopii: zdjęcie po zmniejszeniu nie ma już EXIF, film po przekodowaniu — metadanych kontenera.
+        let read = await MediaMetadataReader.read(file: url, contentType: contentType)
+        let metadata = locationAllowed(read, contentType)
         var name = fileName
         var type = contentType
         if FilePolicy.isImage(contentType) {
@@ -190,20 +225,26 @@ public final class AttachmentStore: Sendable {
                         type = "image/jpeg"
                         let renamed = url.deletingLastPathComponent().appendingPathComponent(name)
                         try FileManager.default.moveItem(at: url, to: renamed)
-                        return try Self.describe(renamed, fileName: name, contentType: type)
+                        return try Self.describe(renamed, fileName: name, contentType: type, metadata: metadata)
                     }
                 }
             } else if !options.keepPhotoLocation, let cleaned = try? ImagePreparer.removingLocation(data), cleaned != data {
                 try cleaned.write(to: url, options: .atomic)
             }
         }
-        return try Self.describe(url, fileName: name, contentType: type)
+        return try Self.describe(url, fileName: name, contentType: type, metadata: metadata)
     }
 
-    static func describe(_ url: URL, fileName: String, contentType: String) throws -> ImportedFile {
+    /// Ustawienie „Zachowuj lokalizację” obejmuje też współrzędne zapisywane jako pola załącznika: bez niego zdjęcie nie niesie położenia
+    /// (zostaje czas). Film nie ma tego ustawienia — o współrzędnych decyduje właściciel załącznika (`PendingAttachment.forOwner`).
+    private func locationAllowed(_ metadata: MediaMetadata, _ contentType: String) -> MediaMetadata {
+        FilePolicy.isImage(contentType) && !settings().keepPhotoLocation ? metadata.withoutLocation : metadata
+    }
+
+    static func describe(_ url: URL, fileName: String, contentType: String, metadata: MediaMetadata = .none) throws -> ImportedFile {
         let (size, digest) = try FileDigest.sha256(of: url)
         guard size <= FilePolicy.maxBytes || FilePolicy.isVideo(contentType) else { throw AttachmentError.rejected("Plik jest za duży (najwyżej 100 MB).") }
-        return ImportedFile(url: url, fileName: fileName, contentType: contentType, sizeBytes: size, sha256: digest)
+        return ImportedFile(url: url, fileName: fileName, contentType: contentType, sizeBytes: size, sha256: digest, metadata: metadata)
     }
 
     // MARK: Dodawanie
@@ -217,7 +258,7 @@ public final class AttachmentStore: Sendable {
     @discardableResult
     public func add(_ owner: AttachmentOwner, _ attachments: [PendingAttachment], progress: @escaping @Sendable (Int) -> Void = { _ in }) async throws -> [String] {
         var ids: [String] = []
-        for pending in attachments {
+        for pending in attachments.map({ $0.forOwner(owner.type) }) {
             ids.append(mode() == .online ? try await addQueued(owner, pending) : try await addLocal(owner, pending, progress: progress))
         }
         return ids
@@ -274,7 +315,10 @@ public final class AttachmentStore: Sendable {
         guard case let .ready(ready) = result else { return pending }
         // Źródło zastąpione wersją 720p leży w tym samym katalogu importu i znika razem z nim po zapisie rekordu.
         return PendingAttachment(
-            file: ImportedFile(url: ready.file, fileName: ready.fileName, contentType: ready.contentType, sizeBytes: ready.sizeBytes, sha256: ready.sha256),
+            file: ImportedFile(
+                url: ready.file, fileName: ready.fileName, contentType: ready.contentType, sizeBytes: ready.sizeBytes, sha256: ready.sha256,
+                metadata: pending.file.metadata
+            ),
             description: pending.description, capturedAt: pending.capturedAt, latitude: pending.latitude, longitude: pending.longitude,
             thumbnail: ready.thumbnail, sendOriginal: pending.sendOriginal
         )

@@ -97,7 +97,7 @@ struct AttachmentsSection: View {
         working = true
         defer { working = false }
         let store = environment.attachments
-        let (ready, rejected) = await Task.detached(priority: .userInitiated) { PickedFile.prepare(picked, with: store) }.value
+        let (ready, rejected) = await Task.detached(priority: .userInitiated) { await PickedFile.prepare(picked, with: store) }.value
         if !rejected.isEmpty { message = tr("attachments_share_rejected", rejected.joined(separator: " ")) }
         // Film poniżej 100 MB: najpierw wybór „Wyślij oryginał” (bez zmniejszania do 720p, decyzja A10).
         if ready.contains(where: { FilePolicy.isVideo($0.contentType) && VideoPolicy.canSendOriginal(sizeBytes: $0.sizeBytes) }) {
@@ -206,19 +206,20 @@ enum PickedFile: Sendable {
     case data(Data, name: String, mimeType: String?)
     case file(URL, name: String?, mimeType: String?, securityScoped: Bool)
 
-    /// Sprawdza i kopiuje pliki do katalogu importu; zwraca gotowe pliki i opisy pominiętych („plik.exe — Ten typ…”).
-    static func prepare(_ picked: [PickedFile], with store: AttachmentStore) -> (ready: [ImportedFile], rejected: [String]) {
+    /// Sprawdza i kopiuje pliki do katalogu importu (z odczytem czasu i miejsca z kopii); zwraca gotowe pliki i opisy pominiętych
+    /// („plik.exe — Ten typ…”).
+    static func prepare(_ picked: [PickedFile], with store: AttachmentStore) async -> (ready: [ImportedFile], rejected: [String]) {
         var ready: [ImportedFile] = []
         var rejected: [String] = []
         for item in picked {
             do {
                 switch item {
                 case let .data(data, name, mimeType):
-                    ready.append(try store.prepare(data: data, fileName: name, mimeType: mimeType))
+                    ready.append(try await store.prepare(data: data, fileName: name, mimeType: mimeType))
                 case let .file(url, name, mimeType, scoped):
                     let accessing = scoped && url.startAccessingSecurityScopedResource()
                     defer { if accessing { url.stopAccessingSecurityScopedResource() } }
-                    ready.append(try store.prepare(fileAt: url, fileName: name, mimeType: mimeType))
+                    ready.append(try await store.prepare(fileAt: url, fileName: name, mimeType: mimeType))
                     if !scoped { try? FileManager.default.removeItem(at: url) }
                 }
             } catch let AttachmentError.rejected(reason) {

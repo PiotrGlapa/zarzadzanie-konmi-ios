@@ -27,7 +27,7 @@ extension AppEnvironment {
             let picked = entry.files.map { file in
                 PickedFile.file(folder.appendingPathComponent(file.name), name: file.name, mimeType: file.contentType, securityScoped: false)
             }
-            let (ready, rejected) = await Task.detached(priority: .utility) { PickedFile.prepare(picked, with: store) }.value
+            let (ready, rejected) = await Task.detached(priority: .utility) { await PickedFile.prepare(picked, with: store) }.value
             if !rejected.isEmpty { log.log("share", "pominięto \(rejected.count) plików") }
             guard !ready.isEmpty else { continue }
             do {

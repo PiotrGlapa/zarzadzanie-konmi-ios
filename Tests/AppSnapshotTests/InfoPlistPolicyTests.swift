@@ -96,7 +96,7 @@ final class InfoPlistPolicyTests: XCTestCase {
         _ = try await env.reports.costs(CostFilter())
         _ = try await env.reports.horseBalance(statuses: [], horseIds: [])
         let horse = try XCTUnwrap(env.horseDirectory.horses.first)
-        let file = try env.attachments.prepare(data: Data("notatka".utf8), fileName: "a.txt", mimeType: "text/plain")
+        let file = try await env.attachments.prepare(data: Data("notatka".utf8), fileName: "a.txt", mimeType: "text/plain")
         try await env.attachments.add(AttachmentOwner(type: .horse, id: horse.id, horseId: horse.id), [PendingAttachment(file: file)])
         try await env.backup.write(to: root.appendingPathComponent("kopia.zkkopia"), password: nil, attachmentsCacheMb: 200)
         await env.processSharedInbox()

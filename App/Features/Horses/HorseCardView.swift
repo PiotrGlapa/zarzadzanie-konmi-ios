@@ -114,7 +114,7 @@ struct HorseCardView: View {
             return
         }
         let store = environment.attachments
-        let file = try await Task.detached { try store.prepare(data: image.jpeg, fileName: "zdjecie.jpg", mimeType: "image/jpeg") }.value
+        let file = try await Task.detached { try await store.prepare(data: image.jpeg, fileName: "zdjecie.jpg", mimeType: "image/jpeg") }.value
         guard let id = try await store.add(AttachmentOwner(type: .horse, id: horseId, horseId: horseId), [PendingAttachment(file: file)]).first else { return }
         try await environment.horses.choosePhoto(horseId: horseId, attachmentId: id)
         Task { _ = await environment.sendQueue() }

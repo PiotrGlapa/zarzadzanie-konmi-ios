@@ -90,7 +90,8 @@ enum SampleVideo {
         FileHandle.standardError.write(Data("[SampleVideo] \(step)\n".utf8))
     }
 
-    static func make(width: Int, height: Int) async throws -> URL {
+    /// `location` — tekst ISO 6709 zapisany w atomie użytkownika `udta/©xyz` (QuickTime), który AVFoundation udostępnia jako położenie.
+    static func make(width: Int, height: Int, location: String? = nil) async throws -> URL {
         let folder = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-sample-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
         let url = folder.appendingPathComponent("sample-1s.mov")
@@ -99,7 +100,7 @@ enum SampleVideo {
             guard let image = frameImage(width: width, height: height, shade: UInt8(60 + frame * 15)) else { throw WriteFailed(reason: "klatka \(frame)") }
             jpegs.append(try ImagePreparer.encodeJPEG(image, quality: 0.8))
         }
-        try movie(jpegs, width: width, height: height).write(to: url)
+        try movie(jpegs, width: width, height: height, location: location).write(to: url)
         trace("próbka \(width)x\(height) zapisana")
         return url
     }
@@ -129,7 +130,13 @@ enum SampleVideo {
 
     private static let matrix = [0x0001_0000, 0, 0, 0, 0x0001_0000, 0, 0, 0, 0x4000_0000].reduce(into: Data()) { $0.append(be32(UInt32($1))) }
 
-    private static func movie(_ jpegs: [Data], width: Int, height: Int) -> Data {
+    /// Atom użytkownika `©xyz` (bajt 0xA9, nie UTF-8): długość tekstu, język (0x15C7 = „und”) i tekst.
+    private static func locationAtom(_ text: String) -> Data {
+        let payload = be16(UInt16(text.utf8.count)) + be16(0x15C7) + Data(text.utf8)
+        return box("udta", be32(UInt32(8 + payload.count)) + Data([0xA9, 0x78, 0x79, 0x7A]) + payload)
+    }
+
+    private static func movie(_ jpegs: [Data], width: Int, height: Int, location: String?) -> Data {
         let duration = UInt32(jpegs.count) * frameDuration
         let ftyp = box("ftyp", Data("qt  ".utf8), be32(0x2005_0300), Data("qt  ".utf8))
         let mdat = box("mdat", jpegs.reduce(into: Data()) { $0.append($1) })
@@ -162,7 +169,7 @@ enum SampleVideo {
         let stbl = box("stbl", stsd, stts, stsc, stsz, stco)
         let minf = box("minf", vmhd, dataHandler, dinf, stbl)
         let mdia = box("mdia", mdhd, mediaHandler, minf)
-        let moov = box("moov", mvhd, box("trak", tkhd, mdia))
+        let moov = box("moov", mvhd, box("trak", tkhd, mdia), location.map(locationAtom) ?? Data())
         return ftyp + mdat + moov
     }
 

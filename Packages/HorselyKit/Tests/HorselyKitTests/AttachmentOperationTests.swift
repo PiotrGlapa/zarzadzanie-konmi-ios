@@ -38,8 +38,8 @@ struct AttachmentOperationTests {
         try await setup.store.writeQuietly { try $0.enqueue(operation) }
     }
 
-    private func invoice(_ setup: Setup) throws -> PendingAttachment {
-        PendingAttachment(file: try setup.attachments.prepare(data: Data("faktura za siano".utf8), fileName: "faktura.txt", mimeType: "text/plain"), description: "  Siano  ")
+    private func invoice(_ setup: Setup) async throws -> PendingAttachment {
+        PendingAttachment(file: try await setup.attachments.prepare(data: Data("faktura za siano".utf8), fileName: "faktura.txt", mimeType: "text/plain"), description: "  Siano  ")
     }
 
     @Test func anAttachmentWaitsForItsQueuedEntryAndFollowsItsProgramId() async throws {
@@ -83,8 +83,8 @@ struct AttachmentOperationTests {
         return url
     }
 
-    private func video(_ setup: Setup, thumbnail: URL? = nil, latitude: String = "52.2297", longitude: String = "21.0122") throws -> PendingAttachment {
-        let file = try setup.attachments.prepare(data: Data((0 ..< 2048).map { UInt8(truncatingIfNeeded: $0 % 200) }), fileName: "jazda.mp4", mimeType: "video/mp4")
+    private func video(_ setup: Setup, thumbnail: URL? = nil, latitude: String = "52.2297", longitude: String = "21.0122") async throws -> PendingAttachment {
+        let file = try await setup.attachments.prepare(data: Data((0 ..< 2048).map { UInt8(truncatingIfNeeded: $0 % 200) }), fileName: "jazda.mp4", mimeType: "video/mp4")
         return PendingAttachment(
             file: file, capturedAt: InstantText.parse("2026-09-01T08:15:00Z"), latitude: DecimalText.parse(latitude), longitude: DecimalText.parse(longitude),
             thumbnail: thumbnail
@@ -125,7 +125,7 @@ struct AttachmentOperationTests {
 
     @Test func trainingAttachmentMultipartCarriesMetadataAndThumbnail() async throws {
         let setup = try makeSetup(capabilities: Self.withTrainingAttachments)
-        let pending = try video(setup, thumbnail: try thumbnailFile(setup, Self.jpegBytes))
+        let pending = try await video(setup, thumbnail: try thumbnailFile(setup, Self.jpegBytes))
         let sha = pending.file.sha256
         setup.program.on("POST", "attachments", .json(201, #"""
         [{"id":"srv-a1","ownerType":"Training","ownerId":"t1","horseId":"h1","fileName":"jazda.mp4","contentType":"video/mp4","sizeBytes":2048,
@@ -308,7 +308,7 @@ struct AttachmentOperationTests {
 
     @Test func aLostUploadIsSettledByCountingTheSha256BeforeAndAfter() async throws {
         let setup = try makeSetup()
-        let pending = try invoice(setup)
+        let pending = try await invoice(setup)
         let sha = pending.file.sha256
         setup.program.on("GET", "attachments", .json(200, "[]"), .json(200, #"[{"id":"srv-a1","sha256":"\#(sha)"}]"#))
         setup.program.on("POST", "attachments", .fail(.networkConnectionLost))
@@ -324,7 +324,7 @@ struct AttachmentOperationTests {
 
     @Test func standaloneKeepsTheFileInTheStoreAndPinned() async throws {
         let setup = try makeSetup(mode: .standalone)
-        let pending = try invoice(setup)
+        let pending = try await invoice(setup)
         let ids = try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [pending])
         let id = try #require(ids.first)
 
@@ -358,8 +358,8 @@ struct AttachmentOperationTests {
 
     @Test func rejectedFilesNeverReachTheQueue() async throws {
         let setup = try makeSetup()
-        #expect(throws: AttachmentError.self) {
-            _ = try setup.attachments.prepare(data: Data("MZ".utf8), fileName: "program.exe", mimeType: "application/x-msdownload")
+        await #expect(throws: AttachmentError.self) {
+            _ = try await setup.attachments.prepare(data: Data("MZ".utf8), fileName: "program.exe", mimeType: "application/x-msdownload")
         }
         #expect(try await setup.store.read { try $0.operations() }.isEmpty)
     }
@@ -403,5 +403,79 @@ struct AttachmentOperationTests {
         #expect(inbox.entries().isEmpty)
         inbox.removeAbandoned(now: Date().addingTimeInterval(2 * 24 * 60 * 60))
         #expect(!FileManager.default.fileExists(atPath: abandoned.path))
+    }
+
+    // MARK: Metadane z galerii (ZAT-05): czas wszędzie, współrzędne tylko przy załączniku treningu
+
+    private static let galleryMetadata = MediaMetadata(capturedAt: InstantText.parse("2026-10-05T07:30:00Z"), latitude: 52.2297, longitude: 21.0122)
+
+    /// Notatka tekstowa „z galerii”: plik z podanymi metadanymi (czytnik metadanych tekstu nie rusza).
+    private func gallery(
+        _ setup: Setup, _ name: String, metadata: MediaMetadata = Self.galleryMetadata, capturedAt: Date? = nil, latitude: Decimal? = nil, longitude: Decimal? = nil
+    ) async throws -> PendingAttachment {
+        let prepared = try await setup.attachments.prepare(data: Data(name.utf8), fileName: "\(name).txt", mimeType: "text/plain")
+        let file = ImportedFile(
+            url: prepared.url, fileName: prepared.fileName, contentType: prepared.contentType, sizeBytes: prepared.sizeBytes, sha256: prepared.sha256, metadata: metadata
+        )
+        return PendingAttachment(file: file, capturedAt: capturedAt, latitude: latitude, longitude: longitude)
+    }
+
+    private func queuedFiles(_ setup: Setup) async throws -> [OutboxFile] {
+        try await setup.store.read { access in try access.operations().compactMap { try access.outboxFile($0.id) } }
+    }
+
+    @Test func aNoteAttachmentFromTheGalleryKeepsTheTimeButNeverTheCoordinatesInTheQueue() async throws {
+        let setup = try makeSetup(capabilities: Self.withTrainingAttachments)
+
+        try await setup.attachments.add(
+            AttachmentOwner(type: .note, id: "n1", horseId: "h1"),
+            [try await gallery(setup, "z-galerii"), try await gallery(setup, "jawne", latitude: 1, longitude: 2)]
+        )
+
+        let queued = try await queuedFiles(setup)
+        #expect(queued.count == 2)
+        for file in queued {
+            #expect(file.capturedAt == Self.galleryMetadata.capturedAt, "czas wykonania może iść")
+            #expect(file.latitude == nil && file.longitude == nil, "współrzędne dotyczą wyłącznie jazdy (konstytucja II)")
+        }
+    }
+
+    @Test func explicitTimeAndPlaceOfARideRecordingOverrideTheMetadataOfTheFileForATraining() async throws {
+        let setup = try makeSetup(capabilities: Self.withTrainingAttachments)
+        let recorded = try #require(InstantText.parse("2026-10-05T08:15:00Z"))
+        let noPlace = Self.galleryMetadata.withoutLocation
+
+        try await setup.attachments.add(
+            AttachmentOwner(type: .training, id: "t1", horseId: "h1"),
+            [
+                try await gallery(setup, "z-jazdy", capturedAt: recorded, latitude: DecimalText.parse("50.0614"), longitude: DecimalText.parse("19.9366")),
+                try await gallery(setup, "z-galerii"),
+                try await gallery(setup, "bez", metadata: noPlace),
+            ]
+        )
+
+        let queued = try await queuedFiles(setup)
+        #expect(queued.count == 3)
+        #expect(queued[0].capturedAt == recorded)
+        #expect(queued[0].latitude.map(DecimalText.text) == "50.0614000" && queued[0].longitude.map(DecimalText.text) == "19.9366000")
+        #expect(queued[1].capturedAt == Self.galleryMetadata.capturedAt)
+        #expect(queued[1].latitude.map(DecimalText.text) == "52.2297000", "trening bierze położenie z pliku z galerii (jeśli import je zachował)")
+        #expect(queued[1].longitude.map(DecimalText.text) == "21.0122000")
+        #expect(queued[2].capturedAt == Self.galleryMetadata.capturedAt)
+        #expect(queued[2].latitude == nil && queued[2].longitude == nil, "zdjęcie bez położenia nie dostaje współrzędnych")
+    }
+
+    @Test func inStandaloneModeANoteAttachmentFromTheGalleryHasNoCoordinatesButATrainingOneKeepsThem() async throws {
+        let setup = try makeSetup(mode: .standalone)
+
+        let note = try #require(try await setup.attachments.add(AttachmentOwner(type: .note, id: "n1", horseId: "h1"), [try await gallery(setup, "notatka")]).first)
+        let training = try #require(try await setup.attachments.add(AttachmentOwner(type: .training, id: "t1", horseId: "h1"), [try await gallery(setup, "trening")]).first)
+
+        let noteRecord = try #require(try await setup.store.get(.attachment, id: note)?.record(as: LocalAttachment.self))
+        #expect(noteRecord.capturedAt == Self.galleryMetadata.capturedAt)
+        #expect(noteRecord.latitude == nil && noteRecord.longitude == nil)
+        let trainingRecord = try #require(try await setup.store.get(.attachment, id: training)?.record(as: LocalAttachment.self))
+        #expect(trainingRecord.latitude.map(DecimalText.text) == "52.2297000")
+        #expect(trainingRecord.longitude.map(DecimalText.text) == "21.0122000")
     }
 }
