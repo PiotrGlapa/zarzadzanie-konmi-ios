@@ -3,12 +3,16 @@
 
 import Foundation
 
-/// Próbka akcelerometru: `tNanos` — znacznik czasu zdarzenia (ns), `x`, `y`, `z` — przyspieszenie w **m/s²** (z grawitacją albo bez —
-/// analiza odejmuje średnią modułu, więc stała składowa grawitacji nie wpływa na wynik).
+/// Próbka akcelerometru: `tNanos` — znacznik czasu zdarzenia (ns), `x`, `y`, `z` — przyspieszenie w **m/s²** **włącznie z grawitacją**
+/// (jak na Androidzie, gdzie czujnik akcelerometru podaje przyspieszenie razem z grawitacją).
 ///
-/// Kontrakt jednostek: `CadenceAnalyzer` dostaje zawsze m/s², tak jak na Androidzie. Core Motion (`CMDeviceMotion.userAcceleration`)
-/// podaje przyspieszenie w jednostkach g — źródło próbek na iOS buduje `AccelSample` przez ``fromG(tNanos:x:y:z:)``, które mnoży
-/// przez 9,80665 przed analizą.
+/// Kontrakt wejścia `CadenceAnalyzer`: przyspieszenie z grawitacją, w m/s². Bez grawitacji wynik jest błędny: analiza liczy moduł
+/// wektora `|a| = sqrt(x² + y² + z²)` i dopiero z modułu odejmuje średnią, a moduł jest nieliniowy — drganie na jednej osi bez
+/// składowej stałej daje wyprostowany sinus `|sin|` (rytm dwukrotnie za wysoki, zawyżona intensywność). Stała grawitacja „podnosi”
+/// moduł ponad zero i dzięki temu moduł śledzi drganie liniowo.
+///
+/// Jednostki: Core Motion podaje wartości w g. Z `CMDeviceMotion` należy podać `userAcceleration + gravity` (sumowane po osiach, w g)
+/// przez ``fromG(tNanos:x:y:z:)``, które mnoży przez 9,80665 przed analizą; samego `userAcceleration` (bez grawitacji) podawać nie wolno.
 public struct AccelSample: Equatable, Sendable {
     /// Przyspieszenie normalne (m/s² na 1 g) — mnożnik zamiany g → m/s².
     public static let standardGravity: Double = 9.80665
@@ -25,8 +29,9 @@ public struct AccelSample: Equatable, Sendable {
         self.z = z
     }
 
-    /// Próbka z wartości w g (np. `userAcceleration` z Core Motion): `x`, `y`, `z` × 9,80665 → m/s². Mnożenie w `Double`,
-    /// potem zawężenie do `Float` (jak w próbkach Androida).
+    /// Próbka z wartości w g: `x`, `y`, `z` × 9,80665 → m/s². Wartości mają być przyspieszeniem **z grawitacją** — z Core Motion
+    /// `userAcceleration + gravity` sumowane po osiach (samo `userAcceleration` nie nadaje się, zob. kontrakt wejścia w `AccelSample`).
+    /// Mnożenie w `Double`, potem zawężenie do `Float` (jak w próbkach Androida).
     public static func fromG(tNanos: Int64, x: Double, y: Double, z: Double) -> AccelSample {
         AccelSample(
             tNanos: tNanos,
