@@ -65,7 +65,7 @@ final class RideFlowSnapshotTests: XCTestCase {
     func testBanners() {
         let banners = VStack(spacing: Spacing.between) {
             ForEach([RideState.recording, .paused, .interrupted], id: \.self) { state in
-                RideBanner(content: RideStartPolicy.banner(ride(state))!) {}
+                RideBanner(content: RideStartPolicy.banner(self.ride(state))!) {}
             }
             Spacer()
         }
