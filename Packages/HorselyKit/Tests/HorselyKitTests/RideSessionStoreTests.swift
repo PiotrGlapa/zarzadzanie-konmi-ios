@@ -70,7 +70,7 @@ struct RideSessionStoreTests {
 
     /// Android: `flushed points survive a new repository instance`.
     @Test func flushedPointsSurviveNewStore() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let first = try harness.openDatabase()
         let store = harness.store(first)
@@ -98,7 +98,7 @@ struct RideSessionStoreTests {
 
     /// Android: `unfinished ride reports horse time and distance`.
     @Test func unfinishedRideReportsHorseTimeAndDistance() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let first = try harness.openDatabase()
         let store = harness.store(first)
@@ -122,7 +122,7 @@ struct RideSessionStoreTests {
 
     /// Android: `discard removes points and media rows`.
     @Test func discardRemovesPointsAndMedia() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let database = try harness.openDatabase()
         let store = harness.store(database)
@@ -145,7 +145,7 @@ struct RideSessionStoreTests {
 
     /// Android: `only one active session`.
     @Test func onlyOneActiveSession() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let first = try await store.start(horse: grom, params: params)
@@ -163,7 +163,7 @@ struct RideSessionStoreTests {
 
     /// Android: `a finished but unsaved ride blocks a new start until it is discarded`.
     @Test func aFinishedButUnsavedRideBlocksANewStartUntilItIsDiscarded() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let first = try await store.start(horse: grom, params: params)
@@ -182,7 +182,7 @@ struct RideSessionStoreTests {
 
     /// Android: `finished but unsaved ride is reported after a new process`.
     @Test func finishedButUnsavedRideIsReportedAfterANewProcess() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let first = try harness.openDatabase()
         let store = harness.store(first)
@@ -204,28 +204,28 @@ struct RideSessionStoreTests {
         #expect(try await fresh.load(sessionId: id).track.points.count == 24)
         #expect(try await fresh.load(sessionId: id).session.endedAt == Date(timeIntervalSince1970: TimeInterval(START + 120_000) / 1000))
         // Nie jest już „w toku”: pasek NAG-01 go nie pokazuje.
-        #expect(await firstSnapshot(fresh.observeActive()) == nil)
+        #expect(await firstActiveSnapshot(fresh.observeActive()) == nil)
     }
 
     /// Android: `observeActive emits null after the ride is finished`.
     @Test func observeActiveEmitsNilAfterTheRideIsFinished() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
         let recorder = newRecorder()
         ride(recorder, from: 5, to: 20)
         try await flush(store, id, recorder)
-        #expect(await firstSnapshot(store.observeActive()) != nil)
+        #expect(await firstActiveSnapshot(store.observeActive()) != nil)
 
         try await store.setState(sessionId: id, state: .finished)
 
-        #expect(await firstSnapshot(store.observeActive()) == nil)
+        #expect(await firstActiveSnapshot(store.observeActive()) == nil)
     }
 
     /// Android: `the recorder start time given to start keeps flush and restore consistent`.
     @Test func theRecorderStartTimeGivenToStartKeepsFlushAndRestoreConsistent() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let first = try harness.openDatabase()
         let store = harness.store(first)
@@ -252,7 +252,7 @@ struct RideSessionStoreTests {
 
     /// Android: `a point from before the session start fails clearly and changes nothing`.
     @Test func aPointFromBeforeTheSessionStartFailsClearlyAndChangesNothing() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         // Sklep sam bierze czas startu z zegara (START), a maszyna powstała 7 ms wcześniej — rozjazd źródeł czasu.
@@ -274,7 +274,7 @@ struct RideSessionStoreTests {
 
     /// Android: `a process killed between flushes loses only what was not flushed and the ride can continue`.
     @Test func aProcessKilledBetweenFlushesLosesOnlyWhatWasNotFlushedAndTheRideCanContinue() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let first = try harness.openDatabase()
         let store = harness.store(first)
@@ -312,7 +312,7 @@ struct RideSessionStoreTests {
 
     /// Android: `a point completed with motion after the flush replaces its row`.
     @Test func aPointCompletedWithMotionAfterTheFlushReplacesItsRow() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
@@ -339,7 +339,7 @@ struct RideSessionStoreTests {
 
     /// Android: `flush keeps state pauses and flush time with the points in one transaction`.
     @Test func flushKeepsStatePausesAndFlushTimeWithThePointsInOneTransaction() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
@@ -371,7 +371,7 @@ struct RideSessionStoreTests {
 
     /// Android: `a paused ride keeps its pause and unfinished reports it`.
     @Test func aPausedRideKeepsItsPauseAndUnfinishedReportsIt() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let first = try harness.openDatabase()
         let store = harness.store(first)
@@ -395,29 +395,29 @@ struct RideSessionStoreTests {
 
     /// Android: `observeActive follows the persisted session and ends with it`.
     @Test func observeActiveFollowsThePersistedSessionAndEndsWithIt() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
-        #expect(await firstSnapshot(store.observeActive()) == nil)
+        #expect(await firstActiveSnapshot(store.observeActive()) == nil)
 
         let id = try await store.start(horse: grom, params: params)
         let recorder = newRecorder()
         ride(recorder, from: 5, to: 30)
         try await flush(store, id, recorder)
 
-        let snapshot = try #require(await firstSnapshot(store.observeActive()))
+        let snapshot = try #require(await firstActiveSnapshot(store.observeActive()))
         #expect(snapshot.state == .recording)
         // Migawka na żywo z `flush` jest bogatsza niż kolumny sesji (prędkość, chód).
         #expect(snapshot == recorder.snapshot())
         #expect(snapshot.speedKmh != nil)
 
         try await store.discard(sessionId: id)
-        #expect(await firstSnapshot(store.observeActive()) == nil)
+        #expect(await firstActiveSnapshot(store.observeActive()) == nil)
     }
 
     /// Android: `loading or flushing a missing session fails clearly`.
     @Test func loadingOrFlushingAMissingSessionFailsClearly() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
 
@@ -434,7 +434,7 @@ struct RideSessionStoreTests {
 
     /// Android `RideSessionDaoTest`: `the active session is the one that is not finished` (+ `pendingSession`: niezakończona przed zakończoną).
     @Test func theActiveSessionIsTheLatestOneThatIsNotFinished() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         #expect(try await store.activeSession() == nil)
@@ -454,7 +454,7 @@ struct RideSessionStoreTests {
 
     /// Android `RideSessionDaoTest`: `points and media are returned in order and appending is idempotent`.
     @Test func mediaAreReturnedInOrderAndTheSameUriReplacesTheEntry() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
@@ -478,7 +478,7 @@ struct RideSessionStoreTests {
 
     /// Android `RideSessionDaoTest`: `points ... appending is idempotent` — powtórzony zapis tego samego punktu nie dubluje wierszy.
     @Test func flushingTheSamePointsAgainDoesNotDuplicateRows() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
@@ -495,7 +495,7 @@ struct RideSessionStoreTests {
     // MARK: Zakończenie sesji
 
     @Test func theEndTimeIsKeptOnceSet() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
@@ -516,7 +516,7 @@ struct RideSessionStoreTests {
     }
 
     @Test func aFinishedSnapshotInFlushStoresTheEndTimeFromTheClock() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
@@ -534,7 +534,7 @@ struct RideSessionStoreTests {
     // MARK: Parametry jazdy
 
     @Test func customParametersSurviveTheRoundTripExactly() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let first = try harness.openDatabase()
         let store = harness.store(first)
@@ -561,7 +561,7 @@ struct RideSessionStoreTests {
     /// Pauzy odwrócone, sprzed startu i poza zakresem oraz punkty z absurdalnym czasem nie mogą przepełnić arytmetyki Int64 maszyny:
     /// są pomijane, czas ostatniego zapisu przycinany, a jazda wraca i da się ją odtworzyć.
     @Test func malformedPausesAndPointsAreSanitizedOnLoad() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let database = try harness.openDatabase()
         let store = harness.store(database)
@@ -598,7 +598,7 @@ struct RideSessionStoreTests {
     }
 
     @Test func aStartTimeOutsideTheSaneRangeMakesTheSessionCorruptButStillDiscardable() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let database = try harness.openDatabase()
         let store = harness.store(database)
@@ -617,7 +617,7 @@ struct RideSessionStoreTests {
     }
 
     @Test func unreadableThresholdsMakeTheRideDamagedButItCanBeDiscarded() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let database = try harness.openDatabase()
         let store = harness.store(database)
@@ -639,7 +639,7 @@ struct RideSessionStoreTests {
     }
 
     @Test func anUnknownStateLoadsAsInterruptedAndTheSessionIsNotDropped() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let database = try harness.openDatabase()
         let store = harness.store(database)
@@ -661,7 +661,7 @@ struct RideSessionStoreTests {
         #expect(unfinished.damaged)
         #expect(unfinished.distanceMeters == recorder.snapshot().distanceMeters)
         #expect(refused as? RideSessionError == .onlyOneActiveSession, "nieznany stan nadal jest niezakończoną sesją")
-        let snapshot = try #require(await firstSnapshot(store.observeActive()))
+        let snapshot = try #require(await firstActiveSnapshot(store.observeActive()))
         #expect(snapshot.state == .interrupted)
         #expect(snapshot.distanceMeters == recorder.snapshot().distanceMeters)
 
@@ -671,7 +671,7 @@ struct RideSessionStoreTests {
     }
 
     @Test func aPointWithAnExtremeTimeIsRejectedWithoutTrappingAndChangesNothing() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
         let id = try await store.start(horse: grom, params: params)
@@ -746,10 +746,10 @@ struct RideSessionStoreTests {
     // MARK: Pasek NAG-01 — strumień
 
     @Test func observeActiveEmitsAsTheSessionChanges() async throws {
-        let harness = Harness()
+        let harness = RideStoreHarness()
         defer { harness.cleanUp() }
         let store = harness.store(try harness.openDatabase())
-        let collector = Collector(store.observeActive())
+        let collector = StreamCollector(store.observeActive())
         defer { collector.stop() }
         #expect(await collector.waitUntil { $0.count == 1 })
         #expect(collector.values == [nil])
@@ -774,7 +774,7 @@ struct RideSessionStoreTests {
 private let START: Int64 = 1_790_000_000_000
 
 /// Zegar sklepu sterowany z testu (epoka, ms).
-private final class TestClock: Sendable {
+private final class RideStoreClock: Sendable {
     private let value: Mutex<Int64>
 
     init(_ start: Int64) {
@@ -792,8 +792,8 @@ private final class TestClock: Sendable {
 }
 
 /// Katalog bazy w katalogu tymczasowym i otwieranie jej od nowa („nowy proces”).
-private final class Harness {
-    let clock = TestClock(START)
+private final class RideStoreHarness {
+    let clock = RideStoreClock(START)
     private let directory = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-ride-\(UUID().uuidString)", isDirectory: true)
     private var opened: [AppDatabase] = []
 
@@ -824,7 +824,7 @@ private final class Harness {
 }
 
 /// Zbiera wartości strumienia w tle; test czeka na warunek z limitem czasu zamiast wisieć na pustym strumieniu.
-private final class Collector<T: Sendable>: Sendable {
+private final class StreamCollector<T: Sendable>: Sendable {
     private let state = Mutex<[T]>([])
     private let task = Mutex<Task<Void, Never>?>(nil)
 
@@ -852,8 +852,8 @@ private final class Collector<T: Sendable>: Sendable {
 }
 
 /// Pierwsza wartość strumienia paska NAG-01 (`nil` — brak niezakończonej sesji); brak emisji w 20 s to błąd testu.
-private func firstSnapshot(_ stream: AsyncStream<RideSnapshot?>) async -> RideSnapshot? {
-    let collector = Collector(stream)
+private func firstActiveSnapshot(_ stream: AsyncStream<RideSnapshot?>) async -> RideSnapshot? {
+    let collector = StreamCollector(stream)
     defer { collector.stop() }
     guard await collector.waitUntil({ !$0.isEmpty }) else {
         Issue.record("Strumień nic nie wyemitował w 20 s")
