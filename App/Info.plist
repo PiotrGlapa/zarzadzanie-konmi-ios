@@ -84,6 +84,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>location</string>
 		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
@@ -116,6 +117,12 @@
 	<string>Aplikacja łączy się z programem Horsely uruchomionym na komputerze w Twojej sieci domowej.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Odblokowanie aplikacji z danymi stajni</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Aplikacja zapisuje trasę z GPS tylko wtedy, gdy nagrywasz jazdę. Zezwól na dokładną lokalizację „podczas używania aplikacji”.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Dźwięk w filmach z aparatu podczas nagrywania</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Zapis zdjęć i filmów z jazdy do galerii</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

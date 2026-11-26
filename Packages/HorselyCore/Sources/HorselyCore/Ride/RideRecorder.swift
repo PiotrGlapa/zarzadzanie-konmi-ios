@@ -223,6 +223,9 @@ public final class RideRecorder {
         )
     }
 
+    /// Liczba punktów w śladzie (zachowanych, także odtworzonych z bazy) — do wpisów dziennika diagnostycznego (bez współrzędnych).
+    public var pointCount: Int { points.count }
+
     /// Punkty do zapisania: nowe od ostatniego wywołania oraz uzupełnione rytmem po zapisie (w kolejności czasu). Ustawia chwilę
     /// ostatniego zapisu na czas maszyny — kolejne `.flushDue` po 5 s.
     @discardableResult

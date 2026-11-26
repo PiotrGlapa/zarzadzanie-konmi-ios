@@ -62,6 +62,10 @@ final class AppEnvironment {
     @ObservationIgnored let entries: EntryRepository
     @ObservationIgnored let reminders: ReminderRepository
     @ObservationIgnored let trainings: TrainingRepository
+    /// JEDYNY sklep sesji nagrywania (kontroler nagrywania i pasek NAG-01 dzielą tę instancję — Task 15).
+    @ObservationIgnored let rideSessions: RideSessionStore
+    /// JEDYNY kontroler nagrywania jazdy (aktor z maszyną `RideRecorder`).
+    @ObservationIgnored let ride: RideRecordingController
     let router = DeepLinkRouter()
     /// Licznik zmian magazynu — widoki z danymi złożonymi z wielu rekordów (Pulpit, terminy, oś czasu) odświeżają się, gdy rośnie.
     private(set) var dataRevision: Int64 = 0
@@ -147,6 +151,12 @@ final class AppEnvironment {
         self.entries = EntryRepository(store: store, dates: dates, mode: currentMode)
         self.reminders = ReminderRepository(entries: entries)
         self.trainings = TrainingRepository(entries: entries)
+        let rideSessions = store.makeRideSessionStore()
+        self.rideSessions = rideSessions
+        self.ride = RideRecordingController(
+            store: rideSessions, locations: SystemLocationSource(), motion: CoreMotionSource(), battery: DeviceBatteryMonitor(),
+            notifier: LocalRideNotifier(texts: .app), log: { log.log(RideRecordingController.logCategory, $0) }
+        )
         self.workMode = settings.workMode
         self.theme = settings.theme
         self.sectionFilters = SectionFilters(today: dates.today())

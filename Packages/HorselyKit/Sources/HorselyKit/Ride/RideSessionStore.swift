@@ -687,6 +687,13 @@ public final class RideSessionStore: Sendable {
         }
     }
 
+    /// Stan aktywnej (niezakończonej) sesji odczytany SYNCHRONICZNIE — tylko przy starcie aplikacji, zanim skończy się uruchamianie
+    /// (`RideRecordingController.prepareRelaunch()`); `nil`, gdy nie ma sesji albo odczyt się nie udał. Nieznany stan to `.interrupted`.
+    public func activeSessionStateNow() -> RideState? {
+        guard let row = try? db.read({ db in try Self.fetchActive(db) }) else { return nil }
+        return RideState(rawValue: row.state) ?? .interrupted
+    }
+
     // MARK: - Obserwacja (pasek NAG-01)
 
     /// Stan niezakończonej sesji dla paska NAG-01: ostatnia migawka z `flush`, a gdy jej nie ma (nowy proces) lub stan sesji zdążył się
@@ -934,5 +941,15 @@ public final class RideSessionStore: Sendable {
 
     private static func encode(_ value: some Encodable) throws -> String {
         String(decoding: try JSONEncoder().encode(value), as: UTF8.self)
+    }
+}
+
+// MARK: - Sklep sesji z magazynu rekordów
+
+extension RecordStore {
+    /// Sklep sesji nagrywania na bazie tego magazynu. Aplikacja tworzy go RAZ (`AppEnvironment`) i dzieli między kontroler nagrywania
+    /// a pasek NAG-01 — zob. kontrakt jednej instancji w `RideRecordingController`.
+    public func makeRideSessionStore(now: @escaping @Sendable () -> Date = { Date() }) -> RideSessionStore {
+        RideSessionStore(database: database, now: now)
     }
 }

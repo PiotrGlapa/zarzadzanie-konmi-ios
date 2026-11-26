@@ -4,24 +4,42 @@ import HorselyKit
 import XCTest
 @testable import Horsely
 
-/// Prywatność (T136, konstytucja II): `Info.plist` prosi tylko o aparat, sieć lokalną i Face ID — bez lokalizacji, kontaktów,
-/// pełnej biblioteki zdjęć i `NSAllowsArbitraryLoads`; w trybie samodzielnym aplikacja nie łączy się z siecią (transport zapisuje
-/// każde żądanie).
+/// Prywatność (T136, konstytucja II 3.0.0): `Info.plist` prosi tylko o aparat, sieć lokalną, Face ID oraz — dla nagrywania jazdy —
+/// lokalizację „Podczas używania”, mikrofon (dźwięk filmu) i dodawanie do galerii; bez lokalizacji „Zawsze”, kontaktów, pełnej biblioteki
+/// zdjęć i `NSAllowsArbitraryLoads`; w trybie samodzielnym aplikacja nie łączy się z siecią (transport zapisuje każde żądanie).
 @MainActor
 final class InfoPlistPolicyTests: XCTestCase {
     private var info: [String: Any] { Bundle.main.infoDictionary ?? [:] }
 
     func testOnlyTheNeededPermissionsAreRequested() {
-        for key in ["NSCameraUsageDescription", "NSLocalNetworkUsageDescription", "NSFaceIDUsageDescription"] {
+        let needed = [
+            "NSCameraUsageDescription", "NSLocalNetworkUsageDescription", "NSFaceIDUsageDescription", "NSLocationWhenInUseUsageDescription",
+            "NSMicrophoneUsageDescription", "NSPhotoLibraryAddUsageDescription",
+        ]
+        for key in needed {
             XCTAssertFalse((info[key] as? String ?? "").isEmpty, "brak \(key)")
         }
         XCTAssertEqual(info["NSFaceIDUsageDescription"] as? String, "Odblokowanie aplikacji z danymi stajni")
         let forbidden = [
-            "NSLocationWhenInUseUsageDescription", "NSLocationAlwaysAndWhenInUseUsageDescription", "NSLocationAlwaysUsageDescription",
-            "NSLocationUsageDescription", "NSContactsUsageDescription", "NSPhotoLibraryUsageDescription", "NSPhotoLibraryAddUsageDescription",
-            "NSMicrophoneUsageDescription", "NSCalendarsUsageDescription", "NSBluetoothAlwaysUsageDescription",
+            "NSLocationAlwaysAndWhenInUseUsageDescription", "NSLocationAlwaysUsageDescription", "NSLocationUsageDescription",
+            "NSLocationTemporaryUsageDescriptionDictionary", "NSContactsUsageDescription", "NSPhotoLibraryUsageDescription",
+            "NSCalendarsUsageDescription", "NSBluetoothAlwaysUsageDescription", "NSMotionUsageDescription",
         ]
         for key in forbidden { XCTAssertNil(info[key], "niedozwolona zgoda \(key)") }
+    }
+
+    /// Nagrywanie jazdy (Task 15, FR-NAG-07, [ZAK] 6): lokalizacja wyłącznie „Podczas używania” — opis zgody z tekstu Androida
+    /// `ride_location_text` (ten sam, który widzi użytkownik przed pytaniem systemu), tryb tła `location`; nigdy klucza „Zawsze”.
+    func testLocationWhenInUseOnly() {
+        XCTAssertEqual(info["NSLocationWhenInUseUsageDescription"] as? String, tr("ride_location_text"))
+        XCTAssertEqual(
+            info["NSLocationWhenInUseUsageDescription"] as? String,
+            "Aplikacja zapisuje trasę z GPS tylko wtedy, gdy nagrywasz jazdę. Zezwól na dokładną lokalizację „podczas używania aplikacji”."
+        )
+        let modes = info["UIBackgroundModes"] as? [String] ?? []
+        XCTAssertTrue(modes.contains("location"), "brak trybu tła location")
+        XCTAssertNil(info["NSLocationAlwaysAndWhenInUseUsageDescription"], "lokalizacja „Zawsze” jest zabroniona")
+        XCTAssertNil(info["NSLocationAlwaysUsageDescription"], "lokalizacja „Zawsze” jest zabroniona")
     }
 
     /// Push z serwera (spec 003, FR-027, FR-030b, research R1/R3): Firebase bez swizzlingu i bez samoczynnego startu,

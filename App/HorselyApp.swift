@@ -63,6 +63,10 @@ struct HorselyApp: App {
         let tasks = background
         environment.scheduleVideoPreparation = { tasks.scheduleVideoPreparation() }
         PushBridge.shared.registrar = environment.pushRegistrar
+        // Nagrywanie jazdy (Task 15, A13): sesja `recording`/`paused` w bazie → sesja aktywności w tle odtworzona jeszcze w trakcie
+        // uruchamiania (iOS budzi aplikację w tle po zamknięciu jej przez system) i wznowienie nagrywania.
+        RideBridge.shared.controller = environment.ride
+        environment.ride.prepareRelaunch()
         notificationDelegate = NotificationDelegate(
             open: { url in environment.router.handle(url: url, mode: environment.workMode) },
             presentServerMessage: { message in environment.presentation(forServerMessage: message) },

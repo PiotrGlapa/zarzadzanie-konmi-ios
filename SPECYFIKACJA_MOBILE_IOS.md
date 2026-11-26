@@ -1907,7 +1907,8 @@ Kryteria wersji 2.0.1: **SC-001** pliki wzorcowe programu 2.0.0 (słowniki, koń
 - **`CLLocationUpdate.liveUpdates(.fitness)` + `CLBackgroundActivitySession`** — po zamknięciu przez system iOS uruchamia
   ponownie w tle (odpowiednik `START_STICKY`); po przesunięciu — koniec, przy ponownym starcie „Zapisz / Odrzuć”.
 - **`CLServiceSession(authorization: .whenInUse)`** — dokładna lokalizacja wymagana; przybliżona blokuje start.
-- **Akcelerometr**: `CMMotionManager.deviceMotionUpdateInterval = 1/50`, okna 5 s → analizator rytmu.
+- **Akcelerometr**: `CMMotionManager.deviceMotionUpdateInterval = 1/50`, okna 5 s → analizator rytmu; próbka to
+  `userAcceleration + gravity` (w g, potem × 9,80665) — analizator, jak na Androidzie, potrzebuje przyspieszenia z grawitacją.
 - **Brak optymalizacji baterii** — nie dotyczy na iOS.
 
 ### 9.4 Format trasy i statystyki

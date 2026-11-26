@@ -25,6 +25,18 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         return true
     }
 
+    /// Zamknięcie aplikacji przesunięciem w trakcie jazdy (aplikacja działa w tle dzięki lokalizacji, więc system to zgłasza): ostatni
+    /// zapis i stan „przerwane” — przy następnym starcie „Zapisz / Odrzuć” zamiast wznowienia ([ZAK] 6). Najwyżej 2 s (system daje kilka).
+    func applicationWillTerminate(_ application: UIApplication) {
+        guard let ride = RideBridge.shared.controller, ride.isRunning else { return }
+        let done = DispatchSemaphore(value: 0)
+        Task.detached {
+            await ride.interrupt()
+            done.signal()
+        }
+        _ = done.wait(timeout: .now() + 2)
+    }
+
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         MainActor.assumeIsolated { FirebasePushTokenSource.shared.setAPNSToken(deviceToken) }
         Task { await PushBridge.shared.registrar?.didRegisterAPNs() }
