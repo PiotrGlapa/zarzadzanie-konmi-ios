@@ -203,9 +203,9 @@
 **Interfaces:**
 - Produces: `struct TrackPoint`, `struct Pause`, `struct Track` (pola z [PLAN-A] Task 10, `tMillis: Int64`); `enum ZkTrack { static let format = "zk-track/1"; static func encode(_ track: Track) throws -> Data; static func decode(_ data: Data) throws -> Track }` — gzip (nagłówek gzip, nie surowy deflate) z JSON jak w README.
 
-- [ ] **Step 1: Testy** — `roundTripKeepsValuesWithinRounding`, `goldenBytesDecodeToFixture` (`krotka.b64` → `krotka.json`), `encodedDocumentEqualsAndroidAfterGunzip` (porównanie dokumentu JSON, nie bajtów), `oneHourAt1HzIsUnder60KB`.
-- [ ] **Step 2:** Push testów → CI FAIL. **Step 3:** Implementacja → PASS.
-- [ ] **Step 4: Commit** — `feat(core): format trasy zk-track/1 zgodny z Androidem`
+- [x] **Step 1: Testy** — `roundTripKeepsValuesWithinRounding`, `goldenBytesDecodeToFixture` (`krotka.b64` → `krotka.json`), `encodedDocumentEqualsAndroidAfterGunzip` (porównanie dokumentu JSON, nie bajtów), `oneHourAt1HzIsUnder60KB`.
+- [x] **Step 2:** Push testów → CI FAIL. **Step 3:** Implementacja → PASS.
+- [x] **Step 4: Commit** — `feat(core): format trasy zk-track/1 zgodny z Androidem`
 
 ### Task 12: Rytm i intensywność z akcelerometru = [PLAN-A] Task 11
 
