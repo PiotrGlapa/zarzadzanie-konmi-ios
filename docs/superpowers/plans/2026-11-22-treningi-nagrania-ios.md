@@ -186,9 +186,9 @@
 **Interfaces:**
 - Produces: `struct MediaMetadata: Equatable { capturedAt: Date?; latitude: Double?; longitude: Double? }`; `MediaMetadataReader.read(file: URL, contentType: String) async -> MediaMetadata` (zdjęcia: `CGImageSource` `{Exif}DateTimeOriginal`+`OffsetTimeOriginal`, `{GPS}`; filmy: `AVAsset` `commonKey.location` ISO 6709 i `creationDate`).
 
-- [ ] **Step 1: Testy** — `exifGpsAndTimeAreRead` (mały JPEG z GPS w zasobach), `quicktimeIso6709LocationIsParsed` (`+52.2297+021.0122/`), `missingLocationGivesNil`; migawki `trainingDetailShowsAttachmentsSection`, `sectionHiddenOnlineWithoutTrainingAttachments` (ZAT-06).
-- [ ] **Step 2:** Implementacja; push → PASS (w tym `AppSnapshotTests`).
-- [ ] **Step 3: Commit** — `feat(trainings): zalaczniki treningu w szczegolach i formularzu`
+- [x] **Step 1: Testy** — `exifGpsAndTimeAreRead` (mały JPEG z GPS w zasobach), `quicktimeIso6709LocationIsParsed` (`+52.2297+021.0122/`), `missingLocationGivesNil`; migawki `trainingDetailShowsAttachmentsSection`, `sectionHiddenOnlineWithoutTrainingAttachments` (ZAT-06).
+- [x] **Step 2:** Implementacja; push → PASS (w tym `AppSnapshotTests`).
+- [x] **Step 3: Commit** — `feat(trainings): zalaczniki treningu w szczegolach i formularzu`
 
 ---
 
