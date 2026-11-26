@@ -236,9 +236,9 @@
 **Interfaces:**
 - Produces: `RideSessionStore` z `start(horse:params:) throws -> String`, `flush(sessionId:points:snapshot:)` (jedna transakcja), `setState`, `addMedia`, `unfinished() -> UnfinishedRide?`, `load(sessionId:) -> LoadedSession`, `discard(sessionId:)`, `observeActive() -> AsyncStream<RideSnapshot?>` — typy jak [PLAN-A] Task 13.
 
-- [ ] **Step 1: Testy** — `flushedPointsSurviveNewStore` (nowa instancja na tym samym pliku bazy), `unfinishedRideReportsHorseTimeAndDistance`, `discardRemovesPointsAndMedia`, `onlyOneActiveSession`.
-- [ ] **Step 2:** Implementacja; push → PASS.
-- [ ] **Step 3: Commit** — `feat(ride): zapis sesji nagrywania na biezaco i odzyskiwanie`
+- [x] **Step 1: Testy** — `flushedPointsSurviveNewStore` (nowa instancja na tym samym pliku bazy), `unfinishedRideReportsHorseTimeAndDistance`, `discardRemovesPointsAndMedia`, `onlyOneActiveSession`.
+- [x] **Step 2:** Implementacja; push → PASS.
+- [x] **Step 3: Commit** — `feat(ride): zapis sesji nagrywania na biezaco i odzyskiwanie`
 
 ### Task 15: Lokalizacja i ruch w tle, kontroler nagrywania
 
