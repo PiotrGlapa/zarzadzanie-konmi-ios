@@ -15,25 +15,28 @@ struct TrainingsSectionView: View {
         @Bindable var filters = environment.sectionFilters
         let today = environment.dates.today()
         NavigationStack {
-            ScrollView {
-                if let list {
-                    if list.items.isEmpty {
-                        SectionEmpty(title: "trainings_section_empty_title", hint: "trainings_section_empty_hint")
-                    } else {
-                        DividedList(list.items) { training in
-                            NavigationLink(value: EntryRoute(recordType: .training, id: training.id)) { row(training) }
-                                .buttonStyle(.plain)
+            // Pasek NAG-01 nad listą w stałym kontenerze (bez jazdy — zerowa wysokość, bez zmiany drzewa widoków).
+            VStack(spacing: 0) {
+                ActiveRideBanner()
+                ScrollView {
+                    if let list {
+                        if list.items.isEmpty {
+                            SectionEmpty(title: "trainings_section_empty_title", hint: "trainings_section_empty_hint")
+                        } else {
+                            DividedList(list.items) { training in
+                                NavigationLink(value: EntryRoute(recordType: .training, id: training.id)) { row(training) }
+                                    .buttonStyle(.plain)
+                            }
                         }
+                    } else {
+                        ProgressView().frame(maxWidth: .infinity).padding(.vertical, 32)
                     }
-                } else {
-                    ProgressView().frame(maxWidth: .infinity).padding(.vertical, 32)
+                    Color.clear.frame(height: Spacing.addButtonClearance)
                 }
-                Color.clear.frame(height: Spacing.addButtonClearance)
+                .safeAreaInset(edge: .bottom) {
+                    if let list { SectionFooter(text: tr("trainings_summary", list.count, Formats.money(list.total)), identifier: "trainings-section-summary") }
+                }
             }
-            .safeAreaInset(edge: .bottom) {
-                if let list { SectionFooter(text: tr("trainings_summary", list.count, Formats.money(list.total)), identifier: "trainings-section-summary") }
-            }
-            .activeRideBanner(environment)
             .background(HorselyColor.background)
             .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle("nav_trainings")

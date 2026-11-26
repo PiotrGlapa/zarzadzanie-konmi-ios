@@ -1,4 +1,5 @@
 import Foundation
+import GRDB
 import HorselyCore
 import Testing
 @testable import HorselyKit
@@ -238,6 +239,89 @@ struct RideStartPolicyTests {
         #expect(await recovery.check() == .none)
     }
 
+    // MARK: Błędy „Zapisz / Odrzuć / Zakończ” (poprawka I2)
+
+    /// Nieudane „Zapisz” nie jest połykane: wpis w dzienniku (nazwa typu, bez konia), komunikat „ride_save_failed” i stan sprawdzony
+    /// ponownie — jazda nadal czeka na pytanie.
+    @Test func failedSaveIsReportedAndTheRideIsAskedAgain() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let id = try await recordAndKill(h, seconds: 8)
+        let store = try h.openStore()
+        let controller = h.controller(store, locations: FakeLocationSource(), motion: FakeMotionSource())
+        controller.prepareRelaunch(launch: .foreground)
+        let recovery = RideRecovery(store: store, controller: controller, log: h.logs.append)
+        let ride = try #require(await recovery.pending())
+        try await failing(h, "BEFORE UPDATE ON ride_session")
+
+        let outcome = await recovery.saveReporting(ride)
+        guard case let .failed(key, pending) = outcome else {
+            Issue.record("oczekiwano błędu, jest \(outcome)")
+            return
+        }
+        #expect(key == "ride_save_failed")
+        #expect(pending?.sessionId == id)
+        #expect(pending?.state == .interrupted, "jazda zostaje w bazie i czeka na ponowne pytanie")
+        let line = try #require(h.logs.lines.first { $0.hasPrefix("Zapis odzyskiwanej jazdy nie powiódł się (") })
+        #expect(!line.contains("Grom"))
+    }
+
+    /// Nieudane „Odrzuć nagranie”: wpis w dzienniku, komunikat i sesja nadal do odzyskania.
+    @Test func failedDiscardIsReportedAndTheRideIsAskedAgain() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let id = try await recordAndKill(h, seconds: 8)
+        let store = try h.openStore()
+        let controller = h.controller(store, locations: FakeLocationSource(), motion: FakeMotionSource())
+        controller.prepareRelaunch(launch: .foreground)
+        let recovery = RideRecovery(store: store, controller: controller, log: h.logs.append)
+        _ = try #require(await recovery.pending())
+        try await failing(h, "BEFORE DELETE ON ride_session")
+
+        let outcome = await recovery.discardReporting(sessionId: id)
+        guard case let .failed(key, pending) = outcome else {
+            Issue.record("oczekiwano błędu, jest \(outcome)")
+            return
+        }
+        #expect(key == "ride_stats_failed")
+        #expect(pending?.sessionId == id)
+        #expect(h.logs.lines.contains { $0.hasPrefix("Odrzucenie jazdy nie powiodło się (") })
+    }
+
+    /// „Zakończ” na ekranie: jazda nagrywana w tym procesie — kontroler kończy ją i ekran przechodzi do zakończenia; przerwana jazda przy
+    /// nieudanym zapisie — komunikat i wpis w dzienniku zamiast braku reakcji.
+    @Test func finishFromTheRecordingScreenReportsFailures() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let controller = h.controller(store)
+        let recovery = RideRecovery(store: store, controller: controller, log: h.logs.append)
+        let id = try await controller.start(horse: grom, params: params)
+        for s in 1...6 {
+            h.clock.millis = Self.start + Int64(s) * 1_000
+            await h.emit(fix(s), to: controller)
+            await controller.tick()
+        }
+        let recording = try #require(await awaitRide(store) { $0?.snapshot.state == .recording } ?? nil)
+        #expect(await recovery.finish(recording) == .finished(sessionId: id))
+        #expect(try await store.load(sessionId: id).session.state == .finished)
+        try await store.discard(sessionId: id)
+
+        // Jazda przerwana (kontroler jej nie nagrywa), zapis zamknięcia się nie udaje.
+        let second = try await recordAndKill(h, seconds: 8)
+        try await store.setState(sessionId: second, state: .interrupted)
+        let interrupted = try #require(await awaitRide(store) { $0?.snapshot.state == .interrupted } ?? nil)
+        try await failing(h, "BEFORE UPDATE ON ride_session")
+        let outcome = await recovery.finish(interrupted)
+        guard case let .failed(key, pending) = outcome else {
+            Issue.record("oczekiwano błędu, jest \(outcome)")
+            return
+        }
+        #expect(key == "ride_save_failed")
+        #expect(pending?.sessionId == second)
+        #expect(h.logs.lines.contains { $0.hasPrefix("Zapis odzyskiwanej jazdy nie powiódł się (") })
+    }
+
     // MARK: Ekran nagrywania (czysta logika)
 
     /// Android: `the clock ticks between flushes and stops while paused` + `an hour long ride shows hours in the clock`.
@@ -284,6 +368,14 @@ struct RideStartPolicyTests {
             await first.tick()
         }
         return id
+    }
+
+    /// Wyzwalacz w bazie, który odrzuca podaną operację na `ride_session` (np. „BEFORE UPDATE ON ride_session”).
+    private func failing(_ h: ControllerHarness, _ when: String) async throws {
+        let database = try #require(h.opened.last)
+        try await database.writer.write { db in
+            try db.execute(sql: "CREATE TRIGGER test_fail_\(UUID().uuidString.prefix(8)) \(when) BEGIN SELECT RAISE(ABORT, 'test'); END")
+        }
     }
 
     /// Pierwsza wartość strumienia paska spełniająca warunek (`.some(nil)` — brak jazdy) albo `nil` po 20 s.

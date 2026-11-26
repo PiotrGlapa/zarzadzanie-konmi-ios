@@ -15,6 +15,17 @@ public enum RideRecoveryCheck: Sendable, Hashable {
     case pending(UnfinishedRide)
 }
 
+/// Wynik akcji użytkownika na niezakończonej jeździe („Zapisz”, „Odrzuć”, „Zakończ”) — błąd nie jest połykany: interfejs pokazuje
+/// komunikat z katalogu, a dziennik dostaje nazwę typu błędu (bez konia i współrzędnych).
+public enum RideActionOutcome: Sendable, Hashable {
+    /// Jazda zamknięta do zapisu — ekran zakończenia tej sesji.
+    case finished(sessionId: String)
+    /// Jazda odrzucona.
+    case discarded
+    /// Nie wyszło: `messageKey` — komunikat z katalogu, `pending` — stan sprawdzony ponownie po błędzie (jazda do ponownego pytania albo `nil`).
+    case failed(messageKey: String, pending: UnfinishedRide?)
+}
+
 extension Track {
     /// Ostatnia chwila trasy (epoka, ms): ostatni punkt albo koniec ostatniej pauzy, nie wcześniej niż start (Android
     /// `Track.lastActivityMillis`). Koniec jazdy odzyskanej po zabiciu procesu — nie chwila zapisu, bo czas od przerwania do „Zapisz”
@@ -106,6 +117,55 @@ public struct RideRecovery: Sendable {
             end = nil
         }
         try await store.setState(sessionId: sessionId, state: .finished, endedAtMillis: end)
+    }
+
+    // MARK: Akcje z komunikatem (Task 17, poprawka I2)
+
+    /// Komunikat po nieudanym zapisie albo zakończeniu: „Nie udało się zapisać jazdy. Spróbuj jeszcze raz — …”.
+    public static let saveFailedKey = "ride_save_failed"
+    /// Komunikat po nieudanym odrzuceniu: „Nie udało się zapisać zmian w nagraniu. Spróbuj jeszcze raz.”.
+    public static let discardFailedKey = "ride_stats_failed"
+
+    /// „Zapisz” z pytania o odzyskanie: błąd → wpis w dzienniku, komunikat i ponowne sprawdzenie stanu (jazda zostaje w bazie).
+    public func saveReporting(_ ride: UnfinishedRide) async -> RideActionOutcome {
+        do {
+            return .finished(sessionId: try await save(ride))
+        } catch {
+            log("Zapis odzyskiwanej jazdy nie powiódł się (\(String(describing: type(of: error))))")
+            return .failed(messageKey: Self.saveFailedKey, pending: await pending())
+        }
+    }
+
+    /// „Odrzuć nagranie”: błąd → wpis w dzienniku, komunikat i ponowne sprawdzenie stanu.
+    public func discardReporting(sessionId: String) async -> RideActionOutcome {
+        do {
+            try await discard(sessionId: sessionId)
+            return .discarded
+        } catch {
+            log("Odrzucenie jazdy nie powiodło się (\(String(describing: type(of: error))))")
+            return .failed(messageKey: Self.discardFailedKey, pending: await pending())
+        }
+    }
+
+    /// „Zakończ” na ekranie nagrywania. Jazdę nagrywaną w tym procesie kończy kontroler (a `closeAfterFinish` domyka ją po nieudanym
+    /// zapisie końcowym); przerwaną albo nienagrywaną tu — zapisuje jak „Zapisz”. Gdy kontroler nie zakończył jazdy (np. skończyła się
+    /// w międzyczasie) albo zapis się nie udał — wpis w dzienniku, komunikat i ponowne sprawdzenie stanu; ekran nie zostaje bez reakcji.
+    public func finish(_ ride: ActiveRide) async -> RideActionOutcome {
+        if ride.snapshot.state == .interrupted || controller.activeSessionId != ride.sessionId {
+            let unfinished = UnfinishedRide(
+                sessionId: ride.sessionId, horseName: ride.horseName, startedAt: ride.startedAt, distanceMeters: ride.snapshot.distanceMeters,
+                state: ride.snapshot.state
+            )
+            return await saveReporting(unfinished)
+        }
+        guard let id = await controller.finish() else {
+            log("Zakończenie jazdy: kontroler nie zakończył jazdy (nagrywanie już się skończyło)")
+            let pending = await pending()
+            if let pending, pending.sessionId == ride.sessionId, pending.state == .finished { return .finished(sessionId: pending.sessionId) }
+            return .failed(messageKey: Self.saveFailedKey, pending: pending)
+        }
+        await closeAfterFinish(sessionId: id)
+        return .finished(sessionId: id)
     }
 
     /// „Odrzuć” (po drugim pytaniu): usuwa sesję, jej punkty i pliki zrobione w trakcie jazdy. Kolejność: najpierw adresy plików (wiersz

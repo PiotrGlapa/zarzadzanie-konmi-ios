@@ -41,12 +41,8 @@ struct RootView: View {
                 // Odzyskiwanie jazdy przy starcie (NAG-09): nie nad otwartym ekranem nagrywania (ten pyta sam).
                 .rideRecoveryAlert(
                     Binding(get: { environment.router.ride == nil ? rideRecovery : nil }, set: { rideRecovery = $0 }),
-                    onSave: { ride in
-                        Task {
-                            if let id = try? await environment.rideRecovery.save(ride) { environment.router.openRideFinish(sessionId: id) }
-                        }
-                    },
-                    onDiscard: { ride in Task { try? await environment.rideRecovery.discard(sessionId: ride.sessionId) } }
+                    onSave: { ride in Task { handleRecovery(await environment.rideRecovery.saveReporting(ride)) } },
+                    onDiscard: { ride in Task { handleRecovery(await environment.rideRecovery.discardReporting(sessionId: ride.sessionId)) } }
                 )
             }
         }
@@ -147,6 +143,20 @@ struct RootView: View {
             guard let type else { return }
             QuickActions.shared.pending = nil
             environment.router.handle(shortcut: type, mode: environment.workMode)
+        }
+    }
+
+    /// Wynik „Zapisz / Odrzuć” z pytania przy starcie: zakończenie → ekran zakończenia; błąd → komunikat u dołu ekranu i ponowne pytanie
+    /// o stan sprawdzony po błędzie (wpis w dzienniku robi `RideRecovery`).
+    private func handleRecovery(_ outcome: RideActionOutcome) {
+        switch outcome {
+        case let .finished(id):
+            environment.router.openRideFinish(sessionId: id)
+        case .discarded:
+            break
+        case let .failed(key, pending):
+            environment.router.banner = BannerMessage(text: tr(key))
+            rideRecovery = pending
         }
     }
 

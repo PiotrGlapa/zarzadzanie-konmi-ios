@@ -84,26 +84,23 @@ final class RideRecordingModel {
         Task { await environment.ride.resume() }
     }
 
-    /// „Zakończ” po potwierdzeniu. Jazdę nagrywaną w tym procesie kończy kontroler; przerwaną (bez nagrywania) zamyka odzyskiwanie jak
-    /// „Zapisz”. `finish()` zwraca id także po nieudanym zapisie końcowym (sesja `.interrupted` bez ostatnich punktów) — wtedy
-    /// `closeAfterFinish` zamyka ją z tym, co już jest w bazie, a ekran i tak przechodzi do zakończenia; gdy i to się nie uda, sesja zostaje
-    /// przerwana i przy następnym starcie aplikacji wraca pytanie „Zapisz / Odrzuć”.
+    /// „Zakończ” po potwierdzeniu (`RideRecovery.finish`): jazdę nagrywaną w tym procesie kończy kontroler, przerwaną zamyka odzyskiwanie
+    /// jak „Zapisz”. `finish()` zwraca id także po nieudanym zapisie końcowym — wtedy `closeAfterFinish` zamyka sesję z tym, co już jest
+    /// w bazie, a ekran przechodzi do zakończenia; gdy i to się nie uda, sesja zostaje przerwana i przy następnym starcie aplikacji wraca
+    /// „Zapisz / Odrzuć”. Niepowodzenie (zapis, kontroler bez tej jazdy) daje komunikat „Nie udało się zapisać jazdy…”.
     func finish() async {
         guard let ride, !finishing else { return }
         finishing = true
         defer { finishing = false }
-        let controller = environment.ride
-        if ride.snapshot.state == .interrupted || controller.activeSessionId != ride.sessionId {
-            let unfinished = UnfinishedRide(
-                sessionId: ride.sessionId, horseName: ride.horseName, startedAt: ride.startedAt, distanceMeters: ride.snapshot.distanceMeters,
-                state: ride.snapshot.state
-            )
-            if let id = try? await environment.rideRecovery.save(unfinished) { finishSessionId = id }
-            return
+        switch await environment.rideRecovery.finish(ride) {
+        case let .finished(id):
+            if finishSessionId == nil { finishSessionId = id }
+        case let .failed(key, _):
+            // Jazda zostaje w bazie (pasek i odzyskiwanie); wpis w dzienniku robi `RideRecovery`.
+            message = tr(key)
+        case .discarded:
+            break
         }
-        guard let id = await controller.finish() else { return }
-        await environment.rideRecovery.closeAfterFinish(sessionId: id)
-        if finishSessionId == nil { finishSessionId = id }
     }
 
     /// Aparat zwrócił plik dla sesji `sessionId` (zapamiętanej przy otwarciu aparatu): zapis z chwilą i ostatnim punktem GPS (ZAT-05).

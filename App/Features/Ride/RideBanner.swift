@@ -69,18 +69,6 @@ struct ActiveRideBanner: View {
     }
 }
 
-extension View {
-    /// Pasek NAG-01 nad listą ekranu (Pulpit, dział Treningi), tylko gdy jest niezakończona jazda — pusty `safeAreaInset` też przesuwa
-    /// treść pod dużym tytułem, więc bez jazdy widok zostaje bez zmian.
-    @ViewBuilder func activeRideBanner(_ environment: AppEnvironment) -> some View {
-        if RideStartPolicy.banner(environment.activeRide) != nil {
-            safeAreaInset(edge: .top, spacing: 0) { ActiveRideBanner() }
-        } else {
-            self
-        }
-    }
-}
-
 /// „Nagraj jazdę” (obok „+” w dziale Treningi, na karcie konia z wybranym koniem). Gdy jazda już trwa, start otwiera ekran nagrywania
 /// (jedno nagrywanie naraz — decyduje ekran startu).
 struct RideRecordButton: View {
