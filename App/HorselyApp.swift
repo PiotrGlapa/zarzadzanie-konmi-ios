@@ -27,6 +27,7 @@ struct HorselyApp: App {
         let sync = environment.sync
         let outbox = environment.outbox
         let network = environment.network
+        let attachments = environment.attachments
         background = BackgroundTasks(
             refresh: { _ in
                 await environment.processSharedInbox()
@@ -49,9 +50,18 @@ struct HorselyApp: App {
                 await AutoBackupRunner.runIfDue(environment)
                 return true
             },
+            video: { _ in
+                // Przygotowanie filmów z kolejki (A10); przerwane przez koniec czasu zadania wznowi start aplikacji.
+                guard settings.workMode == .online else { return true }
+                if await attachments.resumePreparation() > 0 { _ = await outbox.processAll() }
+                let waiting = await attachments.hasPreparingVideos()
+                return !waiting
+            },
             interval: { BackgroundWork.refreshInterval(for: await sync.capabilities()) }
         )
         background.register()
+        let tasks = background
+        environment.scheduleVideoPreparation = { tasks.scheduleVideoPreparation() }
         PushBridge.shared.registrar = environment.pushRegistrar
         notificationDelegate = NotificationDelegate(
             open: { url in environment.router.handle(url: url, mode: environment.workMode) },

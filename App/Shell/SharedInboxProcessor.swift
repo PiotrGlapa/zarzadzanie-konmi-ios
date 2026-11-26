@@ -40,7 +40,13 @@ extension AppEnvironment {
         }
         if added > 0 {
             router.banner = BannerMessage(text: workMode == .online ? tr("common_saved_queued") : tr("common_saved"))
-            if workMode == .online { Task { _ = await sendQueue() } }
+            if workMode == .online {
+                Task {
+                    _ = await sendQueue()
+                    // Udostępniony film do zmniejszenia czeka w kolejce (decyzja A10).
+                    await prepareVideos()
+                }
+            }
         }
         return added
     }

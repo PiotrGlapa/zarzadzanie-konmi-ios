@@ -109,6 +109,10 @@ final class AppEnvironment {
     @ObservationIgnored private var notificationTask: Task<Void, Never>?
     /// Postęp wysyłki plików do programu (Kolejka wysyłki).
     let uploadProgress: UploadProgress
+    /// Postęp przygotowania filmów z kolejki (kafel „Przygotowuję film… 45%”, decyzja A10).
+    let videoProgress: VideoProgress
+    /// Planuje zadanie w tle `pl.glapa.horsely.video` (ustawia `HorselyApp` po rejestracji zadań).
+    @ObservationIgnored var scheduleVideoPreparation: @MainActor () -> Void = {}
     /// Blokada aplikacji (zablokowana od startu, gdy włączona).
     let appLock: AppLockState
     /// Jeden stan połączenia dla całej aplikacji (pasek, ikonka, podtytuł „Dane z …”).
@@ -192,7 +196,12 @@ final class AppEnvironment {
             store: store, files: files, workDirectory: FileManager.default.temporaryDirectory.appendingPathComponent("horsely-backup", isDirectory: true),
             appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.1.0", dates: dates
         )
-        self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
+        let videoProgress = VideoProgress()
+        self.videoProgress = videoProgress
+        self.attachments = AttachmentStore(
+            store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates, videos: VideoPreparation(),
+            videoProgress: { id, percent in Task { @MainActor in videoProgress.set(attachmentId: id, percent: percent) } }
+        )
         horseDirectory.useThumbnailSource(attachments)
         // Zarejestrowany telefon nie planuje powiadomień lokalnych już od pierwszego przeliczenia po starcie (bez chwilowego dubla);
         // pierwsza publikacja rejestratora poprawi stan, gdyby coś się zmieniło (zgoda, możliwości serwera).
@@ -297,6 +306,14 @@ final class AppEnvironment {
         capabilities = info.capabilities
         programVersion = info.programVersion
         connection.dataFrom = info.lastSyncAt
+    }
+
+    /// Przygotowanie filmów czekających w kolejce (po dodaniu, przy starcie — wznowienie przerwanego), potem wysyłka; dopóki coś czeka,
+    /// zaplanowane jest też zadanie w tle, które dokończy przygotowanie po zamknięciu aplikacji (decyzja A10).
+    func prepareVideos() async {
+        guard workMode == .online, await attachments.hasPreparingVideos() else { return }
+        scheduleVideoPreparation()
+        if await attachments.resumePreparation() > 0 { await sendQueue() }
     }
 
     /// Wysyłka kolejki (po zapisie, odzyskaniu sieci, „Wyślij teraz”).
@@ -540,6 +557,17 @@ extension AppEnvironment {
         environment.queueCount = queueCount
         environment.conflictCount = conflictCount
         return environment
+    }
+}
+
+/// Postęp przygotowania filmów (0–100 %) według `id` załącznika — „Przygotowuję film… 45%” na kaflu (decyzja A10).
+@MainActor
+@Observable
+final class VideoProgress {
+    private(set) var percent: [String: Int] = [:]
+
+    func set(attachmentId: String, percent value: Int?) {
+        percent[attachmentId] = value.map { min(max($0, 0), 100) }
     }
 }
 

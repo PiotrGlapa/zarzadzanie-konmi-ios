@@ -98,6 +98,7 @@
 		<string>pl.glapa.horsely.refresh</string>
 		<string>pl.glapa.horsely.sync</string>
 		<string>pl.glapa.horsely.backup</string>
+		<string>pl.glapa.horsely.video</string>
 	</array>
 	<key>UILaunchScreen</key>
 	<dict/>

@@ -53,6 +53,8 @@ struct RootView: View {
             await environment.cleanUpStalePush()
             await environment.startOnline()
             await environment.processSharedInbox()
+            // Filmy, których przygotowanie przerwało zamknięcie aplikacji (decyzja A10).
+            await environment.prepareVideos()
         }
         .task { await environment.observeQueue() }
         .task { await environment.observePushState() }

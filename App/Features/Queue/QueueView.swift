@@ -72,7 +72,10 @@ struct QueueView: View {
                     .disabled(sending)
                     .accessibilityIdentifier("queue-send-now")
                     DividedList(operations) { operation in
-                        QueueRow(operation: operation, waitsForUpdate: operation.state == .pending && operation.waitsForProgramUpdate(environment.capabilities)) {
+                        QueueRow(
+                            operation: operation, waitsForUpdate: operation.state == .pending && operation.waitsForProgramUpdate(environment.capabilities),
+                            preparing: environment.queue.preparing.contains(operation.id)
+                        ) {
                             deleting = operation
                         }
                     }
@@ -163,15 +166,20 @@ struct QueueRow: View {
     let operation: OutboxOperation
     /// Załącznik treningu czeka na aktualizację programu (brak `trainingAttachments`, decyzja A6) — zamiast „Czeka na wysłanie”.
     var waitsForUpdate = false
+    /// Film zmniejszany do 720p (`held` do końca przygotowania, decyzja A10) — „Przygotowuję film…” zamiast „Wstrzymane”.
+    var preparing = false
     let onDelete: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.between) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(operation.summary).font(.body).foregroundStyle(HorselyColor.onBackground)
-                Text(LocalizedStringKey(Self.stateKey(operation.state, waitsForUpdate: waitsForUpdate)))
+                Text(LocalizedStringKey(preparing ? "video_preparing" : Self.stateKey(operation.state, waitsForUpdate: waitsForUpdate)))
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(operation.state == .needsFix || operation.state == .conflict || operation.state == .held ? HorselyColor.warning : HorselyColor.onSurfaceVariant)
+                    .foregroundStyle(
+                        operation.state == .needsFix || operation.state == .conflict || (operation.state == .held && !preparing)
+                            ? HorselyColor.warning : HorselyColor.onSurfaceVariant
+                    )
                 if operation.state == .needsFix, let message = operation.problem?.firstMessage {
                     Text(message).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant)
                 }
