@@ -144,14 +144,13 @@ public struct RecordAccess {
         try db.execute(sql: "DELETE FROM local_record WHERE syncState = ?", arguments: [syncState.rawValue])
     }
 
-    /// Czyści cały magazyn rekordów (zmiana trybu; odtworzenie kopii zastępuje całość w jednej transakcji): rekordy, trasy nagrań
-    /// oraz sesje nagrywania z punktami i plikami z jazdy.
+    /// Czyści cały magazyn rekordów (zmiana trybu; odtworzenie kopii zastępuje całość w jednej transakcji): rekordy i trasy nagrań.
+    /// Sesji nagrywania (`ride_session`, `ride_point`, `ride_media`) NIE rusza — jak `RoomLocalStore.clear()` w Androidzie: sesja nie jest
+    /// częścią magazynu lokalnego (kopia jej nie zawiera), a niezapisana jazda ma przetrwać rutynowe czyszczenie. Operacje zastępujące
+    /// dane telefonu przy niezapisanej jeździe wstrzymuje blokada trybów (Task 31, `RideSessionGuard` z Androida), a nie kasowanie sesji.
     public func clear() throws {
         state.dirty = true
         try db.execute(sql: "DELETE FROM local_track")
-        try db.execute(sql: "DELETE FROM ride_point")
-        try db.execute(sql: "DELETE FROM ride_media")
-        try db.execute(sql: "DELETE FROM ride_session")
         try db.execute(sql: "DELETE FROM record_horse")
         try db.execute(sql: "DELETE FROM local_record")
     }

@@ -151,7 +151,8 @@ struct MigrationV3Tests {
         try await store.deleteTrack(recordingId: "r1")
     }
 
-    /// Plan Task 6 `clearRemovesTracks`: czyszczenie magazynu usuwa trasy, sesje nagrywania, punkty i pliki z jazdy.
+    /// Plan Task 6 `clearRemovesTracks`: czyszczenie magazynu usuwa trasy, ale — jak `RoomLocalStore.clear()` w Androidzie — zostawia
+    /// sesję nagrywania z punktami i plikami z jazdy (niezapisana jazda przeżywa rutynowe czyszczenie; Task 14).
     @Test func clearRemovesTracks() async throws {
         let database = try AppDatabase.inMemory()
         let store = RecordStore(database: database)
@@ -167,12 +168,10 @@ struct MigrationV3Tests {
 
         #expect(try await store.track(recordingId: "r1") == nil)
         #expect(try await store.track(recordingId: "r2") == nil)
-        #expect(try await sessions.session(id: "s1") == nil)
-        #expect(try await sessions.points(sessionId: "s1").isEmpty)
-        #expect(try await sessions.media(sessionId: "s1").isEmpty)
-        for table in rideTables {
-            #expect(try count(table, in: database) == 0, "\(table)")
-        }
+        #expect(try count("local_track", in: database) == 0)
+        #expect(try await sessions.session(id: "s1") != nil, "sesja nagrywania przeżywa czyszczenie magazynu")
+        #expect(try await sessions.points(sessionId: "s1").map(\.seq) == [0, 1])
+        #expect(try await sessions.media(sessionId: "s1").count == 1)
     }
 
     /// Android: `clear removes tracks and hard delete of a recording removes its track`.
