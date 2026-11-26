@@ -131,18 +131,8 @@ final class RideFlowSnapshotTests: XCTestCase {
 
     // MARK: Odzyskiwanie
 
-    /// Android: `recovery dialog shows horse time distance and offers save and discard` — systemowy alert nad aplikacją (zrzut okna, bo
-    /// alert iOS jest prezentowany poza widokiem).
-    func testRecoveryAlert() async {
-        let pending = UnfinishedRide(sessionId: "s1", horseName: "Grom", startedAt: startedAt, distanceMeters: 6_100, state: .interrupted)
-        for variant in [SnapshotVariant.light, .dark] {
-            await assertWindow(
-                HorselyColor.background.ignoresSafeArea()
-                    .rideRecoveryAlert(.constant(pending), timeZone: warsaw, onSave: { _ in }, onDiscard: { _ in }),
-                name: "ride-recovery-alert", variant: variant
-            )
-        }
-    }
+    // Pytanie „Zapisz / Odrzuć” to systemowy alert (`UIAlertController`) prezentowany poza widokiem — SnapshotTesting go nie rysuje (próba
+    // zrzutu całego okna dała pusty obraz). Treść sprawdza `testRecoveryAndBannerTextsFromTheCatalog`, logikę — `RideStartPolicyTests`.
 
     /// Teksty pytania i paska z katalogu, podstawione jak na ekranie (godzina w strefie telefonu, dystans jak w Live Activity).
     func testRecoveryAndBannerTextsFromTheCatalog() {
@@ -190,27 +180,5 @@ final class RideFlowSnapshotTests: XCTestCase {
         let id = try await env.rideSessions.start(horse: HorseRef(id: grom.id, name: grom.name, passportNumber: nil), params: params, startedAtMillis: start)
         try await env.rideSessions.flush(sessionId: id, points: [], snapshot: ride(.recording).snapshot, pauses: [])
         return env
-    }
-
-    /// Zrzut całego okna po pokazaniu widoku (z alertem prezentowanym przez system).
-    private func assertWindow(
-        _ view: some View, name: String, variant: SnapshotVariant, file: StaticString = #filePath, testName: String = #function, line: UInt = #line
-    ) async {
-        let controller = UIHostingController(rootView: view.tint(HorselyColor.primary))
-        let window = UIWindow(frame: CGRect(origin: .zero, size: Self.snapshotSize))
-        window.overrideUserInterfaceStyle = variant == .dark ? .dark : .light
-        window.rootViewController = controller
-        window.makeKeyAndVisible()
-        try? await Task.sleep(for: .seconds(2))
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 2
-        let image = UIGraphicsImageRenderer(bounds: window.bounds, format: format).image { _ in
-            _ = window.drawHierarchy(in: window.bounds, afterScreenUpdates: true)
-        }
-        window.rootViewController = nil
-        window.isHidden = true
-        assertSnapshot(
-            of: image, as: .image(precision: 0.98, perceptualPrecision: 0.98), named: "\(name)-\(variant.rawValue)", file: file, testName: testName, line: line
-        )
     }
 }

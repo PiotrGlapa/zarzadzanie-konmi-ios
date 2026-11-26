@@ -33,7 +33,7 @@ struct TrainingsSectionView: View {
             .safeAreaInset(edge: .bottom) {
                 if let list { SectionFooter(text: tr("trainings_summary", list.count, Formats.money(list.total)), identifier: "trainings-section-summary") }
             }
-            .safeAreaInset(edge: .top, spacing: 0) { ActiveRideBanner() }
+            .activeRideBanner(environment)
             .background(HorselyColor.background)
             .toolbarBackground(HorselyColor.background, for: .tabBar)
             .navigationTitle("nav_trainings")
