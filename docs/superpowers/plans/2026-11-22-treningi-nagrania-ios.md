@@ -251,9 +251,9 @@
 - Consumes: Task 12–14.
 - Produces: `protocol LocationSource: Sendable { func updates() -> AsyncStream<LocationSample>; var authorization: LocationAuthorization { get } }` z implementacją systemową (`CLLocationUpdate.liveUpdates(.fitness)`, `CLBackgroundActivitySession()` trzymana przez cały czas nagrywania, `CLServiceSession(authorization: .whenInUse, fullAccuracyPurposeKey:)`; `LocationSample` → `TrackPoint`); `enum LocationAuthorization { notDetermined, denied, reducedAccuracy, whenInUse }`; `protocol MotionSource` (`CMMotionManager.deviceMotionUpdateInterval = 1/50`, okna 5 s → `CadenceAnalyzer`); `actor RideRecordingController { func start(horse:params:) async throws; func pause(); func resume(); func finish() async -> String /* sessionId */; func resumeAfterRelaunch() async; var snapshots: AsyncStream<RideSnapshot> }` — zdarzenia `RideEvent` → powiadomienia lokalne (teksty z [PLAN-A] Task 14) i aktualizacja Live Activity (Task 16 podłącza); `UIDevice.isBatteryMonitoringEnabled` tylko w trakcie. Utrata zgody w trakcie → stan `interrupted`, zapis bieżących punktów. Dziennik diagnostyczny (`HorselyKit/Log`) dostaje wpisy stanu (start, pauza, wznowienie, ponowne uruchomienie, słaby GPS, przerwanie, koniec — z czasem, liczbą punktów i dokładnością) **bez współrzędnych i nazwy konia**.
 
-- [ ] **Step 1: Testy** (z udawanymi źródłami) — `pointsFlowToStoreEvery10s`, `reducedAccuracyBlocksStart`, `deniedBlocksStart`, `authorizationRevokedMarksInterrupted`, `relaunchWithActiveSessionResumesUpdates`, `finishStopsSourcesAndSetsFinished`, `diagnosticLogHasNoCoordinatesOrHorseName`; w `InfoPlistPolicyTests`: `locationWhenInUseOnly` (jest `NSLocationWhenInUseUsageDescription` i `location` w trybach tła; brak klucza „Always”).
-- [ ] **Step 2:** Implementacja; push → PASS.
-- [ ] **Step 3: Commit** — `feat(ride): nagrywanie lokalizacji i ruchu w tle z wznowieniem po ponownym uruchomieniu`
+- [x] **Step 1: Testy** (z udawanymi źródłami) — `pointsFlowToStoreEvery10s`, `reducedAccuracyBlocksStart`, `deniedBlocksStart`, `authorizationRevokedMarksInterrupted`, `relaunchWithActiveSessionResumesUpdates`, `finishStopsSourcesAndSetsFinished`, `diagnosticLogHasNoCoordinatesOrHorseName`; w `InfoPlistPolicyTests`: `locationWhenInUseOnly` (jest `NSLocationWhenInUseUsageDescription` i `location` w trybach tła; brak klucza „Always”).
+- [x] **Step 2:** Implementacja; push → PASS.
+- [x] **Step 3: Commit** — `feat(ride): nagrywanie lokalizacji i ruchu w tle z wznowieniem po ponownym uruchomieniu`
 
 ### Task 16: Live Activity
 
