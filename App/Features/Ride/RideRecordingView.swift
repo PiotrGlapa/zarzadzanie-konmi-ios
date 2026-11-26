@@ -31,18 +31,16 @@ final class RideRecordingModel {
         self.environment = environment
     }
 
-    /// Obserwacja jazdy i zegar; działa, dopóki ekran jest widoczny (`.task`).
-    func run() async {
-        await withTaskGroup(of: Void.self) { group in
-            group.addTask { @MainActor in
-                for await ride in self.environment.rideSessions.observeActiveRide() { await self.onRide(ride) }
-            }
-            group.addTask { @MainActor in
-                while !Task.isCancelled {
-                    try? await Task.sleep(for: .seconds(1))
-                    self.onTick()
-                }
-            }
+    /// Obserwacja jazdy ze sklepu sesji; działa, dopóki ekran jest widoczny (`.task`).
+    func observe() async {
+        for await ride in environment.rideSessions.observeActiveRide() { await onRide(ride) }
+    }
+
+    /// Zegar sekundowy między zapisami; działa, dopóki ekran jest widoczny (`.task`).
+    func tick() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .seconds(1))
+            onTick()
         }
     }
 
@@ -169,7 +167,8 @@ struct RideRecordingView: View {
             }
             .ignoresSafeArea()
         }
-        .task { await model.run() }
+        .task { await model.observe() }
+        .task { await model.tick() }
         .onChange(of: model.finishSessionId) { _, id in if let id { onFinish(id) } }
         .onChange(of: model.gone) { _, gone in if gone { onClose() } }
     }
