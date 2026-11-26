@@ -27,32 +27,31 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            // NAG-01: pasek trwającego nagrywania stoi nad listą (nie w niej), bo na górze przewiniętej listy znikałby z ekranu (jak Android).
-            // Stały kontener — bez jazdy pasek nie ma wysokości, a drzewo widoków (i przewinięcie listy) nie zmienia się przy starcie i końcu jazdy.
-            VStack(spacing: 0) {
-                ActiveRideBanner()
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
-                        OnlineDashboardCards()
-                        NotificationsDashboardCards()
-                        BackupReminderCard()
-                        if directory.isLoaded, directory.horses.isEmpty, environment.workMode == .standalone {
-                            addFirstHorseCard.padding(.top, Spacing.between)
-                        }
-                        if environment.workMode != .unset, !directory.horses.isEmpty { quickAdd }
-                        if let dashboard, !directory.horses.isEmpty {
-                            reminderAreas(dashboard)
-                            costs(dashboard)
-                            recent(dashboard)
-                        }
-                        if !stableHorses.isEmpty {
-                            SectionHeader("dashboard_horses")
-                            tiles
-                        }
-                        Color.clear.frame(height: Spacing.addButtonClearance)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    // NAG-01: pasek trwającego nagrywania na górze Pulpitu. Jest częścią treści przewijanej, bo każdy kontener albo
+                    // `safeAreaInset` wokół listy przesuwa duży tytuł także bez jazdy (porównanie wzorców migawek, poprawka I1 Task 17);
+                    // bez jazdy nie ma wysokości i drzewo widoków się nie zmienia.
+                    ActiveRideBanner(horizontalPadding: 0)
+                    OnlineDashboardCards()
+                    NotificationsDashboardCards()
+                    BackupReminderCard()
+                    if directory.isLoaded, directory.horses.isEmpty, environment.workMode == .standalone {
+                        addFirstHorseCard.padding(.top, Spacing.between)
                     }
-                    .padding(.horizontal, Spacing.screenEdge)
+                    if environment.workMode != .unset, !directory.horses.isEmpty { quickAdd }
+                    if let dashboard, !directory.horses.isEmpty {
+                        reminderAreas(dashboard)
+                        costs(dashboard)
+                        recent(dashboard)
+                    }
+                    if !stableHorses.isEmpty {
+                        SectionHeader("dashboard_horses")
+                        tiles
+                    }
+                    Color.clear.frame(height: Spacing.addButtonClearance)
                 }
+                .padding(.horizontal, Spacing.screenEdge)
             }
             .background(HorselyColor.background)
             .toolbarBackground(HorselyColor.background, for: .tabBar)

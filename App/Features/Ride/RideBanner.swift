@@ -58,13 +58,14 @@ struct RideBanner: View {
 /// Pasek dla bieżącej jazdy ze środowiska (nic, gdy nie ma niezakończonej jazdy); dotknięcie — ekran nagrywania.
 struct ActiveRideBanner: View {
     @Environment(AppEnvironment.self) private var environment
+    /// Odstęp od krawędzi ekranu (0, gdy kontener ma już własny).
+    var horizontalPadding: CGFloat = Spacing.screenEdge
 
     var body: some View {
         if let content = RideStartPolicy.banner(environment.activeRide) {
             RideBanner(content: content) { environment.router.ride = .recording }
-                .padding(.horizontal, Spacing.screenEdge)
+                .padding(.horizontal, horizontalPadding)
                 .padding(.vertical, Spacing.between)
-                .background(HorselyColor.background)
         }
     }
 }
