@@ -183,10 +183,10 @@ func windowLengthsAllGive150PerMinute(count: Int) throws {
 }
 
 @Test func samplesFromGGiveIntensityInMetresPerSecondSquared() throws {
-    // Sinus o amplitudzie 0,2 g po przeliczeniu to 0,2 · 9,80665 m/s², RMS = amplituda / sqrt(2); rytm bez zmian.
+    // Grawitacja 1 g na osi z i drganie 0,2 g (moduł bez grawitacji na jednej osi byłby wyprostowanym sinusem). Po przeliczeniu to 0,2 · 9,80665 m/s², RMS = amplituda / sqrt(2); rytm bez zmian.
     let samples = (0..<400).map { i -> AccelSample in
         let t = Double(i) / 50.0
-        return AccelSample.fromG(tNanos: ns(t), x: 0, y: 0, z: 0.2 * sin(2.0 * Double.pi * 2.5 * t))
+        return AccelSample.fromG(tNanos: ns(t), x: 0, y: 0, z: 1.0 + 0.2 * sin(2.0 * Double.pi * 2.5 * t))
     }
     let motion = CadenceAnalyzer.analyze(samples)
     try expectCadence(motion, near: 150.0)
