@@ -65,6 +65,7 @@ public struct ZkTrackError: Error, Sendable, Equatable {
 
     static let notGzip = ZkTrackError("Trasa nie jest poprawnym gzipem.")
     static let invalidJSON = ZkTrackError("Dokument trasy nie jest poprawnym JSON.")
+    static let tooLarge = ZkTrackError("Trasa po rozpakowaniu jest zbyt duża.")
 }
 
 /// Kodek `zk-track/1`: gzip z dokumentu JSON z kolumnami (kolejność pól i reguły zaokrągleń — `golden/zk-track/README.md`).

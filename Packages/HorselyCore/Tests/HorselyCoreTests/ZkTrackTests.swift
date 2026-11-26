@@ -275,7 +275,11 @@ private func zkNear(_ expected: Double?, _ actual: Double?, _ delta: Double, _ f
     // Same spacje kompresują się prawie do zera: ~65 MiB po rozpakowaniu to kilkadziesiąt KB gzip.
     let bomb = try Gzip.compress(Data(repeating: 0x20, count: 65 * 1024 * 1024))
     #expect(bomb.count < 1024 * 1024, "bomba jest mała po kompresji: \(bomb.count) B")
-    #expect(throws: ZkTrackError.self) { try ZkTrack.decode(bomb) }
+    // Konkretny błąd limitu: bez limitu 65 MiB spacji rozpakowałoby się poprawnie (CRC i ISIZE się zgadzają) i dopiero parser JSON
+    // rzuciłby `invalidJSON` — inny komunikat, więc usunięcie limitu w `Gzip.process` oblewa ten test.
+    #expect { try ZkTrack.decode(bomb) } throws: { error in
+        (error as? ZkTrackError) == ZkTrackError.tooLarge
+    }
 }
 
 @Test func readsDocumentsWrittenByAnotherPlatformWithDifferentFieldOrder() throws {

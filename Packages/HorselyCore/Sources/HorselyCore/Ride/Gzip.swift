@@ -116,7 +116,7 @@ enum Gzip {
                 let produced = chunkSize - stream.dst_size
                 if produced > 0 {
                     output.append(contentsOf: UnsafeBufferPointer(start: destination, count: produced))
-                    if output.count > limit { throw ZkTrackError("Trasa po rozpakowaniu jest zbyt duża.") }
+                    if output.count > limit { throw ZkTrackError.tooLarge }
                 }
                 switch status {
                 case COMPRESSION_STATUS_END:
