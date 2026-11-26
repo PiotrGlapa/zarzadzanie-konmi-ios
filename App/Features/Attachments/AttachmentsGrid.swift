@@ -291,15 +291,20 @@ struct AttachmentTile: View {
         }
         .frame(width: Self.side, height: Self.side)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .task(id: attachment.id) {
-            guard FilePolicy.isImage(attachment.contentType), let data = await environment.attachments.thumbnail(attachment) else { return }
+        // Film w kolejce dostaje miniaturę po przygotowaniu — zadanie rusza ponownie, gdy przygotowanie się kończy.
+        .task(id: "\(attachment.id)-\(isPreparing)") {
+            guard let data = await environment.attachments.thumbnail(attachment) else { return }
             thumbnail = UIImage(data: data)
         }
     }
 
     /// Napis na dole kafla: film jeszcze zmniejszany do 720p — postęp zamiast „czeka na wysłanie” (decyzja A10); inaczej oznaczenie kolejki.
+    private var isPreparing: Bool {
+        environment.workMode == .online && environment.queue.preparingOperation(attachmentId: attachment.id) != nil
+    }
+
     private var caption: String? {
-        if environment.workMode == .online, environment.queue.preparingOperation(attachmentId: attachment.id) != nil {
+        if isPreparing {
             return environment.videoProgress.percent[attachment.id].map { tr("video_prepare_progress", $0) } ?? tr("video_preparing")
         }
         return environment.marker(.attachment, id: attachment.id).map { tr(RecordMarkerLabel.key($0)) }

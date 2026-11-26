@@ -556,12 +556,38 @@ public final class AttachmentStore: Sendable {
 
     // MARK: Pliki
 
-    /// Miniatura z pamięci albo z programu (tylko obrazy); `nil`, gdy jej nie ma.
+    /// Miniatura kafla: z pamięci telefonu, dla filmu w kolejce — z pliku operacji (pierwsza klatka zrobiona przy przygotowaniu),
+    /// inaczej z programu, ale tylko tam, gdzie może ona być (`mayHaveRemoteThumbnail`); `nil`, gdy jej nie ma.
     public func thumbnail(_ attachment: LocalAttachment) async -> Data? {
         if let data = await localThumbnail(attachment.id) { return data }
+        if FilePolicy.isVideo(attachment.contentType) {
+            if let data = await queuedThumbnail(attachment.id) { return data }
+            guard Self.mayHaveRemoteThumbnail(contentType: attachment.contentType, online: mode() == .online) else { return nil }
+            // Film z programu: miniatura nie jest przypięta (jak `download(pinned = false)` Androida), 404 — zostaje ikona.
+            if case let .image(data) = await programThumbnail(attachment.id, pinned: false) { return data }
+            return nil
+        }
         guard FilePolicy.isImage(attachment.contentType) else { return nil }
         if case let .image(data) = await thumbnail(attachmentId: attachment.id) { return data }
         return nil
+    }
+
+    /// Czy telefon ma szukać miniatury załącznika w programie (`AttachmentRepository.savedOf` Androida; eksport programu nie niesie
+    /// `hasThumbnail`): zdjęcie zawsze, film tylko w trybie z programem (w samodzielnym miniatura leży wyłącznie w telefonie), inne
+    /// pliki — nigdy (żądanie nie jest wysyłane).
+    static func mayHaveRemoteThumbnail(contentType: String, online: Bool) -> Bool {
+        FilePolicy.isImage(contentType) || (FilePolicy.isVideo(contentType) && online)
+    }
+
+    /// Miniatura filmu czekającego w kolejce: plik w katalogu jego operacji `CreateAttachment` (`OutboxFile.thumbnailPath`).
+    private func queuedThumbnail(_ attachmentId: String) async -> Data? {
+        let path = try? await store.read { access -> String? in
+            guard let operation = try access.operations().first(where: { $0.kind == .createAttachment && ($0.recordId ?? $0.localRef) == attachmentId }) else { return nil }
+            return try access.outboxFile(operation.id)?.thumbnailPath
+        }
+        guard let path else { return nil }
+        let data = FileManager.default.contents(atPath: path)
+        return data?.isEmpty == false ? data : nil
     }
 
     /// Miniatura załącznika-obrazu po identyfikatorze (zdjęcie konia, FR-006…FR-011), w kolejności: plik miniatury →
@@ -576,11 +602,16 @@ public final class AttachmentStore: Sendable {
             }
             return .image(small)
         }
+        return await programThumbnail(id, pinned: true)
+    }
+
+    /// `GET attachments/{id}/thumbnail` (tylko online) z zapisem w pamięci telefonu.
+    private func programThumbnail(_ id: String, pinned: Bool) async -> ThumbnailResult {
         guard mode() == .online, let client else { return .failed }
         switch await client.execute(ApiRequest(.get, "attachments/\(id)/thumbnail", forFile: true)) {
         case let .success(response):
             guard !response.body.isEmpty else { return .failed }
-            if let saved = try? files.write(response.body, attachmentId: id, kind: .thumbnail, pinned: true) {
+            if let saved = try? files.write(response.body, attachmentId: id, kind: .thumbnail, pinned: pinned) {
                 try? await store.write { try $0.upsertFile(saved) }
             }
             return .image(response.body)
