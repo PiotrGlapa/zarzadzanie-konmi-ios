@@ -225,6 +225,8 @@ public struct OutboxOperation: Hashable, Sendable, Identifiable {
 /// - `capturedAt`: chwila wykonania pliku (3.0: zdjęcie lub film z jazdy); `nil`, gdy nieznana
 /// - `latitude`, `longitude`: miejsce wykonania (WGS84); wysyłane z 7 miejscami po przecinku (HALF_UP)
 /// - `thumbnailPath`: miniatura filmu (JPEG ≤ `maxThumbnailBytes`) — druga kopia w katalogu operacji; znika razem z plikiem
+/// - `needsPreparation`: film czeka na zmniejszenie do 720p (decyzja A10): `path` to jeszcze plik źródłowy (może przekraczać 100 MB),
+///   a operacja stoi w stanie `held`, dopóki przygotowanie się nie skończy — wtedy plik jest podmieniany, a operacja wraca jako `pending`
 public struct OutboxFile: Hashable, Sendable {
     public static let maxSizeBytes: Int64 = 100 * 1024 * 1024
     public static let maxThumbnailBytes: Int64 = 1024 * 1024
@@ -240,11 +242,13 @@ public struct OutboxFile: Hashable, Sendable {
     public let latitude: Decimal?
     public let longitude: Decimal?
     public let thumbnailPath: String?
+    public let needsPreparation: Bool
 
     public init(
         operationId: String, path: String, fileName: String, contentType: String, sizeBytes: Int64, sha256: String, description: String? = nil,
-        capturedAt: Date? = nil, latitude: Decimal? = nil, longitude: Decimal? = nil, thumbnailPath: String? = nil
+        capturedAt: Date? = nil, latitude: Decimal? = nil, longitude: Decimal? = nil, thumbnailPath: String? = nil, needsPreparation: Bool = false
     ) {
+        self.needsPreparation = needsPreparation
         self.operationId = operationId
         self.path = path
         self.fileName = fileName

@@ -178,10 +178,11 @@ public struct PairingService: Sendable {
         }
     }
 
-    /// „Wyślij mimo to”: wstrzymane operacje wracają do kolejki.
+    /// „Wyślij mimo to”: wstrzymane operacje wracają do kolejki; film jeszcze zmniejszany do 720p czeka na koniec przygotowania (decyzja A10).
     public func release(now: Date = Date()) async throws {
         try await store.writeQuietly { access in
-            for op in try access.operations() where op.state == .held {
+            let preparing = try access.preparingOperationIds()
+            for op in try access.operations() where op.state == .held && !preparing.contains(op.id) {
                 try access.updateOperation(op.id, expected: [.held]) { current in
                     var next = current
                     next.state = .pending

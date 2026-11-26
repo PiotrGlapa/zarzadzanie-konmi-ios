@@ -2,6 +2,7 @@ import CryptoKit
 import Foundation
 import GRDB
 import HorselyCore
+import Synchronization
 
 /// Wpis albo koń, do którego należą załączniki; `horseId` — koń wpisu (opis operacji w kolejce, zakładka „Załączniki” konia).
 public struct AttachmentOwner: Hashable, Sendable {
@@ -43,10 +44,14 @@ public struct PendingAttachment: Hashable, Sendable {
     public let latitude: Decimal?
     public let longitude: Decimal?
     public let thumbnail: URL?
+    /// „Wyślij oryginał” (tylko film poniżej 100 MB): bez zmniejszania do 720p (decyzja A10, `VideoPolicy.canSendOriginal`).
+    public let sendOriginal: Bool
 
     public init(
-        file: ImportedFile, description: String? = nil, capturedAt: Date? = nil, latitude: Decimal? = nil, longitude: Decimal? = nil, thumbnail: URL? = nil
+        file: ImportedFile, description: String? = nil, capturedAt: Date? = nil, latitude: Decimal? = nil, longitude: Decimal? = nil, thumbnail: URL? = nil,
+        sendOriginal: Bool = false
     ) {
+        self.sendOriginal = sendOriginal
         self.file = file
         self.description = description
         self.capturedAt = capturedAt
@@ -101,6 +106,12 @@ public final class AttachmentStore: Sendable {
     private let mode: @Sendable () -> WorkMode
     private let settings: @Sendable () -> AttachmentSettings
     private let dates: any DateProvider
+    /// Przygotowanie filmów (zmniejszenie do 720p, miniatura — decyzja A10); `nil` — film idzie jak każdy plik.
+    private let videos: VideoPreparation?
+    /// Postęp przygotowania filmu z kolejki według `id` załącznika (0–100; `nil` — koniec), do napisu „Przygotowuję film… 45%”.
+    private let videoProgress: @Sendable (String, Int?) -> Void
+    /// Operacje, których film właśnie jest przygotowywany — drugie wywołanie (start, zadanie w tle, dodanie) go nie zdubluje.
+    private let preparingNow = Mutex<Set<String>>([])
     /// Katalog plików przygotowanych do dodania (kopie z galerii, aparatu, udostępniania).
     public let importDirectory: URL
     /// Katalog plików operacji `CreateAttachment` — nigdy nie czyszczony przez LRU, plik znika po wysłaniu.
@@ -108,8 +119,11 @@ public final class AttachmentStore: Sendable {
 
     public init(
         store: RecordStore, files: LocalFileStore, client: ApiClient?, mode: @escaping @Sendable () -> WorkMode,
-        settings: @escaping @Sendable () -> AttachmentSettings, dates: any DateProvider = SystemDateProvider()
+        settings: @escaping @Sendable () -> AttachmentSettings, dates: any DateProvider = SystemDateProvider(), videos: VideoPreparation? = nil,
+        videoProgress: @escaping @Sendable (String, Int?) -> Void = { _, _ in }
     ) {
+        self.videos = videos
+        self.videoProgress = videoProgress
         self.store = store
         self.files = files
         self.client = client
@@ -147,7 +161,8 @@ public final class AttachmentStore: Sendable {
     }
 
     static func verdict(_ name: String, _ mime: String?, _ size: Int64) throws -> (String, String) {
-        switch FilePolicy.check(fileName: name, mimeType: mime, sizeBytes: size) {
+        // Film > 100 MB jest przyjmowany: przed wysłaniem zostanie zmniejszony do 720p, a limit sprawdzi wynik (decyzja A10).
+        switch FilePolicy.check(fileName: name, mimeType: mime, sizeBytes: size, allowLargeVideo: true) {
         case let .allowed(fileName, contentType): return (fileName, contentType)
         case let .rejected(reason): throw AttachmentError.rejected(reason)
         }
@@ -187,7 +202,7 @@ public final class AttachmentStore: Sendable {
 
     static func describe(_ url: URL, fileName: String, contentType: String) throws -> ImportedFile {
         let (size, digest) = try FileDigest.sha256(of: url)
-        guard size <= FilePolicy.maxBytes else { throw AttachmentError.rejected("Plik jest za duży (najwyżej 100 MB).") }
+        guard size <= FilePolicy.maxBytes || FilePolicy.isVideo(contentType) else { throw AttachmentError.rejected("Plik jest za duży (najwyżej 100 MB).") }
         return ImportedFile(url: url, fileName: fileName, contentType: contentType, sizeBytes: size, sha256: digest)
     }
 
@@ -195,13 +210,22 @@ public final class AttachmentStore: Sendable {
 
     /// Dodaje załączniki wpisu `owner`. Online: operacja `CreateAttachment` (zależna od niewysłanego wpisu) i rekord `Pending`;
     /// samodzielny: rekord `Local`, plik i miniatura przypięte w magazynie. Zwraca identyfikatory załączników.
+    ///
+    /// Film (decyzja A10): online, gdy trzeba go zmniejszyć do 720p, operacja czeka w stanie `held` z plikiem źródłowym
+    /// (`needsPreparation`) — przygotowanie robi `resumePreparation()`; samodzielnie film jest zmniejszany przed zapisem pliku,
+    /// a `progress` dostaje postęp (0–100).
     @discardableResult
-    public func add(_ owner: AttachmentOwner, _ attachments: [PendingAttachment]) async throws -> [String] {
+    public func add(_ owner: AttachmentOwner, _ attachments: [PendingAttachment], progress: @escaping @Sendable (Int) -> Void = { _ in }) async throws -> [String] {
         var ids: [String] = []
         for pending in attachments {
-            ids.append(mode() == .online ? try await addQueued(owner, pending) : try await addLocal(owner, pending))
+            ids.append(mode() == .online ? try await addQueued(owner, pending) : try await addLocal(owner, pending, progress: progress))
         }
         return ids
+    }
+
+    /// Czy dodanie zostawiło filmy do przygotowania w kolejce (wtedy aplikacja planuje zadanie w tle „przygotowanie filmów”).
+    public func hasPreparingVideos() async -> Bool {
+        ((try? await store.read { try $0.preparingOperationIds() }) ?? []).isEmpty == false
     }
 
     private func record(_ id: String, _ owner: AttachmentOwner, _ pending: PendingAttachment, now: LocalDateTime) -> LocalAttachment {
@@ -239,7 +263,25 @@ public final class AttachmentStore: Sendable {
         return try? files.write(data, attachmentId: attachmentId, kind: .thumbnail, pinned: true)
     }
 
-    private func addLocal(_ owner: AttachmentOwner, _ pending: PendingAttachment) async throws -> String {
+    /// Tryb samodzielny: film przechodzi to samo przygotowanie co w kolejce, ale przed zapisem pliku. Nic nie jest tu wysyłane, więc limit
+    /// 100 MB nie obowiązuje — film, którego nie udało się zmniejszyć, zapisuje się w oryginale (`lenient`).
+    private func preparedLocally(_ pending: PendingAttachment, progress: @escaping @Sendable (Int) -> Void) async throws -> PendingAttachment {
+        guard let videos, FilePolicy.isVideo(pending.file.contentType) else { return pending }
+        let result = try await videos.prepare(
+            source: pending.file.url, fileName: pending.file.fileName, contentType: pending.file.contentType, sendOriginal: pending.sendOriginal,
+            existingThumbnail: pending.thumbnail, lenient: true, progress: progress
+        )
+        guard case let .ready(ready) = result else { return pending }
+        // Źródło zastąpione wersją 720p leży w tym samym katalogu importu i znika razem z nim po zapisie rekordu.
+        return PendingAttachment(
+            file: ImportedFile(url: ready.file, fileName: ready.fileName, contentType: ready.contentType, sizeBytes: ready.sizeBytes, sha256: ready.sha256),
+            description: pending.description, capturedAt: pending.capturedAt, latitude: pending.latitude, longitude: pending.longitude,
+            thumbnail: ready.thumbnail, sendOriginal: pending.sendOriginal
+        )
+    }
+
+    private func addLocal(_ owner: AttachmentOwner, _ picked: PendingAttachment, progress: @escaping @Sendable (Int) -> Void) async throws -> String {
+        let pending = try await preparedLocally(picked, progress: progress)
         let id = UUID().uuidString.lowercased()
         // Najpierw plik, potem rekord: przerwanie zostawia najwyżej osierocony plik, a nie rekord bez pliku.
         let original = try files.move(pending.file.url, attachmentId: id, kind: .original, pinned: true)
@@ -260,6 +302,7 @@ public final class AttachmentStore: Sendable {
         }
         try? FileManager.default.removeItem(at: pending.file.url.deletingLastPathComponent())
         if let source = pending.thumbnail { try? FileManager.default.removeItem(at: source) }
+        if let source = picked.thumbnail { try? FileManager.default.removeItem(at: source) }
         return id
     }
 
@@ -273,10 +316,19 @@ public final class AttachmentStore: Sendable {
         try? FileManager.default.removeItem(at: pending.file.url.deletingLastPathComponent())
         // Miniatura filmu to druga kopia w katalogu operacji — znika razem z plikiem.
         var thumbnailPath: String?
+        let thumbnailCopy = folder.appendingPathComponent("thumbnail.jpg")
         if let source = pending.thumbnail {
-            let copy = folder.appendingPathComponent("thumbnail.jpg")
-            try? FileManager.default.removeItem(at: copy)
-            if (try? FileManager.default.moveItem(at: source, to: copy)) != nil { thumbnailPath = copy.path }
+            try? FileManager.default.removeItem(at: thumbnailCopy)
+            if (try? FileManager.default.moveItem(at: source, to: thumbnailCopy)) != nil { thumbnailPath = thumbnailCopy.path }
+        }
+        // Film (A10): do zmniejszenia — operacja `held` z plikiem źródłowym do końca przygotowania; bez zmniejszania — tylko miniatura.
+        var held = false
+        if let videos, FilePolicy.isVideo(pending.file.contentType) {
+            if await videos.needsTranscoding(target, sendOriginal: pending.sendOriginal) {
+                held = true
+            } else if thumbnailPath == nil, let jpeg = await videos.thumbnail(of: target), (try? jpeg.write(to: thumbnailCopy, options: .atomic)) != nil {
+                thumbnailPath = thumbnailCopy.path
+            }
         }
         let thumbnail = FilePolicy.isImage(pending.file.contentType)
             ? (try? ImagePreparer.thumbnail(try Data(contentsOf: target))).flatMap { try? files.write($0, attachmentId: id, kind: .thumbnail, pinned: true) }
@@ -286,7 +338,8 @@ public final class AttachmentStore: Sendable {
         let file = OutboxFile(
             operationId: operationId, path: target.path, fileName: pending.file.fileName, contentType: pending.file.contentType,
             sizeBytes: pending.file.sizeBytes, sha256: pending.file.sha256, description: attachment.description,
-            capturedAt: attachment.capturedAt, latitude: attachment.latitude, longitude: attachment.longitude, thumbnailPath: thumbnailPath
+            capturedAt: attachment.capturedAt, latitude: attachment.latitude, longitude: attachment.longitude, thumbnailPath: thumbnailPath,
+            needsPreparation: held
         )
         do {
             try await store.write { access in
@@ -299,7 +352,7 @@ public final class AttachmentStore: Sendable {
                     id: operationId, kind: .createAttachment, localRef: id,
                     payload: .object(["ownerType": .string(owner.type.rawValue), "ownerId": .string(owner.id)]), dependsOn: dependsOn,
                     horseRefs: horse.map { [HorseRef($0)] } ?? [], summary: "\(OperationKind.createAttachment.label) · \(horse?.name ?? "stajnia")",
-                    createdAt: moment, updatedAt: moment, recordType: .attachment, recordId: id
+                    state: held ? .held : .pending, createdAt: moment, updatedAt: moment, recordType: .attachment, recordId: id
                 )
                 try access.upsert([try StoredRecord.of(attachment, syncState: .pending)])
                 try access.enqueue(operation, file: file)
@@ -311,6 +364,123 @@ public final class AttachmentStore: Sendable {
             throw error
         }
         return id
+    }
+
+    // MARK: Przygotowanie filmów (decyzja A10)
+
+    static let missingVideo = "Brak pliku filmu na telefonie."
+    static let preparationFailed = "Nie udało się przygotować filmu. Spróbuj ponownie albo wybierz inny film."
+
+    /// Przygotowuje każdy film, który stoi w kolejce w stanie `held` z `needsPreparation` (w kolejności kolejki) — po dodaniu, przy starcie
+    /// aplikacji i w zadaniu w tle `pl.glapa.horsely.video`. Przerwane przygotowanie (zabity proces, koniec czasu zadania) zostawia operację
+    /// `held` z plikiem źródłowym, więc następne wywołanie zaczyna je od nowa. Zwraca liczbę operacji zwolnionych do wysyłki (`pending`).
+    @discardableResult
+    public func resumePreparation() async -> Int {
+        guard videos != nil else { return 0 }
+        let ids = (try? await store.read { access in
+            let preparing = try access.preparingOperationIds()
+            return try access.operations().map(\.id).filter { preparing.contains($0) }
+        }) ?? []
+        var released = 0
+        for id in ids {
+            if Task.isCancelled { break }
+            if await prepareHeldVideo(id) { released += 1 }
+        }
+        return released
+    }
+
+    /// Przygotowanie filmu jednej operacji (`VideoPrepareJob` Androida): po zmniejszeniu do 720p i miniaturze plik jest podmieniany,
+    /// a operacja wraca do kolejki jako `pending` (jedna transakcja). Film, którego nie da się przygotować, kończy jako `needsFix`
+    /// z komunikatem, a jego pliki są usuwane, więc „Wyślij ponownie” nie wypuści nieprzygotowanego filmu. `true` — operacja zwolniona.
+    func prepareHeldVideo(_ operationId: String) async -> Bool {
+        guard let videos else { return false }
+        guard preparingNow.withLock({ $0.insert(operationId).inserted }) else { return false }
+        defer { _ = preparingNow.withLock { $0.remove(operationId) } }
+        let found = try? await store.read { access -> HeldVideo? in
+            guard let operation = try access.operation(operationId), operation.state == .held,
+                  let file = try access.outboxFile(operationId), file.needsPreparation else { return nil }
+            return HeldVideo(file: file, attachmentId: operation.recordId ?? operation.localRef)
+        }
+        guard let held = found else { return false }
+        let file = held.file
+        let attachmentId = held.attachmentId
+        let source = URL(fileURLWithPath: file.path)
+        guard FileManager.default.fileExists(atPath: source.path) else {
+            await rejectPreparation(operationId, file, Self.missingVideo)
+            return false
+        }
+        let progress = videoProgress
+        progress(attachmentId, 0)
+        defer { progress(attachmentId, nil) }
+        do {
+            let result = try await videos.prepare(
+                source: source, fileName: file.fileName, contentType: file.contentType, sendOriginal: false,
+                existingThumbnail: file.thumbnailPath.map { URL(fileURLWithPath: $0) }
+            ) { progress(attachmentId, $0) }
+            switch result {
+            case let .rejected(message):
+                try? FileManager.default.removeItem(at: source)
+                await rejectPreparation(operationId, file, message)
+                return false
+            case let .ready(ready):
+                let prepared = OutboxFile(
+                    operationId: operationId, path: ready.file.path, fileName: ready.fileName, contentType: ready.contentType, sizeBytes: ready.sizeBytes,
+                    sha256: ready.sha256, description: file.description, capturedAt: file.capturedAt, latitude: file.latitude, longitude: file.longitude,
+                    thumbnailPath: ready.thumbnail?.path, needsPreparation: false
+                )
+                let now = Date()
+                let stored = (try? await store.write { access -> Bool in
+                    guard try access.replaceFile(operationId, expected: [.held], with: prepared) else { return false }
+                    try access.updateOperation(operationId, expected: [.held]) { current in
+                        var next = current
+                        next.state = .pending
+                        next.updatedAt = now
+                        return next
+                    }
+                    return true
+                }) ?? false
+                if !stored {
+                    // Operację usunięto (albo zmieniono) w trakcie kodowania — wyniku nikt już nie potrzebuje.
+                    prepared.deleteFiles()
+                    if let replaced = ready.replacedSource { try? FileManager.default.removeItem(at: replaced) }
+                    return false
+                }
+                // Źródło znika dopiero po utrwaleniu wyniku: przerwanie wcześniej zostawia operację ze źródłem, które istnieje.
+                if let replaced = ready.replacedSource { try? FileManager.default.removeItem(at: replaced) }
+                return true
+            }
+        } catch is CancellationError {
+            // Przerwane: operacja zostaje `held` ze źródłem — wznowi ją następne `resumePreparation()`.
+            return false
+        } catch {
+            // Nieoczekiwany błąd (zapis miniatury, brak miejsca): operacja nie może zostać w `held` z napisem „Przygotowuję film…”.
+            let stem = source.deletingPathExtension().lastPathComponent
+            for name in ["\(stem)-720p.mp4", "\(stem)-720p-miniatura.jpg", "\(stem)-miniatura.jpg"] {
+                try? FileManager.default.removeItem(at: source.deletingLastPathComponent().appendingPathComponent(name))
+            }
+            try? FileManager.default.removeItem(at: source)
+            await rejectPreparation(operationId, file, Self.preparationFailed)
+            return false
+        }
+    }
+
+    private struct HeldVideo: Sendable {
+        let file: OutboxFile
+        let attachmentId: String
+    }
+
+    private func rejectPreparation(_ operationId: String, _ file: OutboxFile, _ message: String) async {
+        if let path = file.thumbnailPath { try? FileManager.default.removeItem(atPath: path) }
+        let now = Date()
+        _ = try? await store.write { access in
+            try access.updateOperation(operationId, expected: [.held]) { current in
+                var next = current
+                next.state = .needsFix
+                next.problem = ApiProblem(title: message)
+                next.updatedAt = now
+                return next
+            }
+        }
     }
 
     // MARK: Lista
@@ -442,10 +612,13 @@ public final class AttachmentStore: Sendable {
 
     // MARK: Usuwanie
 
-    /// Czy załącznik czeka jeszcze w kolejce (niewysłany) — wtedy „Usuń” tylko wycofuje go z kolejki.
+    /// Czy załącznik czeka jeszcze w kolejce (niewysłany, także film w przygotowaniu) — wtedy „Usuń” tylko wycofuje go z kolejki.
     public func isQueued(_ attachmentId: String) async -> Bool {
         (try? await store.read { access in
-            try access.operations().contains { $0.kind == .createAttachment && $0.recordId == attachmentId && $0.state == .pending }
+            let preparing = try access.preparingOperationIds()
+            return try access.operations().contains {
+                $0.kind == .createAttachment && $0.recordId == attachmentId && ($0.state == .pending || preparing.contains($0.id))
+            }
         }) ?? false
     }
 
@@ -456,8 +629,10 @@ public final class AttachmentStore: Sendable {
             guard let operation = try access.operations().first(where: { $0.kind == .createAttachment && $0.recordId == attachmentId && $0.state.isUnsent }) else {
                 return []
             }
-            guard operation.state == .pending else { return nil }
-            let files = try access.deleteOperation(operation.id, allowed: [.pending]).files
+            // Film w przygotowaniu (`held`, A10) też można wycofać — przygotowanie zauważy brak operacji i usunie swój wynik.
+            let preparing = try access.preparingOperationIds().contains(operation.id)
+            guard operation.state == .pending || preparing else { return nil }
+            let files = try access.deleteOperation(operation.id, allowed: [.pending, .held]).files
             try access.deleteHard(.attachment, id: attachmentId)
             try access.deleteFiles(attachmentId: attachmentId)
             return files

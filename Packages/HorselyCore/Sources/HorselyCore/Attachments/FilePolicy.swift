@@ -52,29 +52,38 @@ public enum FilePolicy {
 
     static let typesMessage = "Dozwolone pliki: JPG, PNG, HEIC, WEBP, PDF, DOCX, XLSX, TXT, MP4, MOV."
 
-    public static func check(fileName: String, mimeType: String?, sizeBytes: Int64) -> FileVerdict {
+    /// - Parameter allowLargeVideo: film (mp4/mov) większy niż 100 MB nie jest odrzucany: aplikacja zmniejsza go do 720p przed wysłaniem
+    ///   (decyzja A10), a limit sprawdza dopiero wynik przekodowania (`VideoPolicy.afterTranscode`). Inne typy zawsze podlegają limitowi.
+    public static func check(fileName: String, mimeType: String?, sizeBytes: Int64, allowLargeVideo: Bool = false) -> FileVerdict {
         if sizeBytes <= 0 { return .rejected(reason: "Plik jest pusty.") }
-        if sizeBytes > maxBytes { return .rejected(reason: "Plik jest za duży (najwyżej 100 MB).") }
+        let tooBig = FileVerdict.rejected(reason: "Plik jest za duży (najwyżej 100 MB).")
+        if sizeBytes > maxBytes && !allowLargeVideo { return tooBig }
 
         let safeName = sanitize(fileName)
         let fileExtension = Self.fileExtension(safeName)
         let mime = canonicalMime(mimeType)
 
+        let verdict: FileVerdict
         if let canonical = byExtension[fileExtension] {
             if let mime, !generic.contains(mime), mime != canonical {
                 return .rejected(reason: "Typ pliku nie zgadza się z jego rozszerzeniem. \(typesMessage)")
             }
-            return .allowed(fileName: safeName, contentType: canonical)
+            verdict = .allowed(fileName: safeName, contentType: canonical)
+        } else if fileExtension.isEmpty, let mime, let suffix = extensionForMime[mime] {
+            // Plik z innej aplikacji bywa bez rozszerzenia, ale z dobrym typem MIME.
+            verdict = .allowed(fileName: "\(safeName).\(suffix)", contentType: mime)
+        } else {
+            return .rejected(reason: "Ten typ pliku nie jest dozwolony. \(typesMessage)")
         }
-        // Plik z innej aplikacji bywa bez rozszerzenia, ale z dobrym typem MIME.
-        if fileExtension.isEmpty, let mime, let suffix = extensionForMime[mime] {
-            return .allowed(fileName: "\(safeName).\(suffix)", contentType: mime)
-        }
-        return .rejected(reason: "Ten typ pliku nie jest dozwolony. \(typesMessage)")
+        if sizeBytes > maxBytes, case let .allowed(_, contentType) = verdict, !isVideo(contentType) { return tooBig }
+        return verdict
     }
 
     /// Czy plik to obraz poddawany przygotowaniu (zmniejszenie, usunięcie lokalizacji).
     public static func isImage(_ contentType: String) -> Bool { contentType.hasPrefix("image/") }
+
+    /// Czy plik to film (mp4, mov) — przygotowywany przed wysłaniem: zmniejszenie do 720p i miniatura (decyzja A10).
+    public static func isVideo(_ contentType: String) -> Bool { contentType.hasPrefix("video/") }
 
     /// Rozszerzenie nazwy małymi literami (bez kropki); pusty napis — brak.
     public static func fileExtension(_ name: String) -> String {
