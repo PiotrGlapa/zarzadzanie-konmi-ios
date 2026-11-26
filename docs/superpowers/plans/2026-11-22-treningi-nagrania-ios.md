@@ -265,10 +265,10 @@
 **Interfaces:**
 - Produces: `struct RideActivityAttributes: ActivityAttributes { horseName: String; struct ContentState: Codable, Hashable { activeSeconds: Int; distanceMeters: Int; gait: String?; weakGps: Bool; paused: Bool } }`; `PauseRideIntent`, `ResumeRideIntent`, `FinishRideIntent: LiveActivityIntent` (Zakończ → `openAppWhenRun`, ekran zakończenia); `protocol RideActivityPresenter: Sendable { func start(...); func update(...); func end() }`. Treść: „Grom · 24 min · 3,2 km · kłus”, „Słaby sygnał GPS”.
 
-- [ ] **Step 1: Testy** — `activityStartsUpdatesAndEndsWithRide` (udawany prezenter), `pauseIntentPausesController`; migawki ekranu blokady i Dynamic Island (kompaktowy, rozwinięty).
-- [ ] **Step 2:** Implementacja; push → PASS (kompilacja z nowym celem).
+- [x] **Step 1: Testy** — `activityStartsUpdatesAndEndsWithRide` (udawany prezenter), `pauseIntentPausesController`; migawki ekranu blokady i Dynamic Island (kompaktowy, rozwinięty).
+- [x] **Step 2:** Implementacja; push → PASS (kompilacja z nowym celem).
 - [ ] **Step 3:** `gh workflow run release.yml -f group=Deweloper` → przebieg zielony, oba rozszerzenia podpisane (podsumowanie przebiegu).
-- [ ] **Step 4: Commit** — `feat(ride): Live Activity z pauza i zakonczeniem jazdy`
+- [x] **Step 4: Commit** — `feat(ride): Live Activity z pauza i zakonczeniem jazdy`
 
 ### Task 17: Start, ekran nagrywania, pasek, odzyskiwanie, aparat = [PLAN-A] Task 15
 
