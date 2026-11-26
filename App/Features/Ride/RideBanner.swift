@@ -55,21 +55,6 @@ struct RideBanner: View {
     }
 }
 
-/// Pasek dla bieżącej jazdy ze środowiska (nic, gdy nie ma niezakończonej jazdy); dotknięcie — ekran nagrywania.
-struct ActiveRideBanner: View {
-    @Environment(AppEnvironment.self) private var environment
-    /// Odstęp od krawędzi ekranu (0, gdy kontener ma już własny).
-    var horizontalPadding: CGFloat = Spacing.screenEdge
-
-    var body: some View {
-        if let content = RideStartPolicy.banner(environment.activeRide) {
-            RideBanner(content: content) { environment.router.ride = .recording }
-                .padding(.horizontal, horizontalPadding)
-                .padding(.vertical, Spacing.between)
-        }
-    }
-}
-
 /// „Nagraj jazdę” (obok „+” w dziale Treningi, na karcie konia z wybranym koniem). Gdy jazda już trwa, start otwiera ekran nagrywania
 /// (jedno nagrywanie naraz — decyduje ekran startu).
 struct RideRecordButton: View {

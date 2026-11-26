@@ -17,7 +17,11 @@ struct TrainingsSectionView: View {
         NavigationStack {
             ScrollView {
                 // Pasek NAG-01 na górze listy (w treści przewijanej — kontener wokół listy przesuwał duży tytuł także bez jazdy).
-                ActiveRideBanner()
+                if let banner = RideStartPolicy.banner(environment.activeRide) {
+                    RideBanner(content: banner) { environment.router.ride = .recording }
+                        .padding(.horizontal, Spacing.screenEdge)
+                        .padding(.vertical, Spacing.between)
+                }
                 if let list {
                     if list.items.isEmpty {
                         SectionEmpty(title: "trainings_section_empty_title", hint: "trainings_section_empty_hint")

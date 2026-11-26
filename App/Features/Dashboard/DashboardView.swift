@@ -32,7 +32,9 @@ struct DashboardView: View {
                     // NAG-01: pasek trwającego nagrywania na górze Pulpitu. Jest częścią treści przewijanej, bo każdy kontener albo
                     // `safeAreaInset` wokół listy przesuwa duży tytuł także bez jazdy (porównanie wzorców migawek, poprawka I1 Task 17);
                     // bez jazdy nie ma wysokości i drzewo widoków się nie zmienia.
-                    ActiveRideBanner(horizontalPadding: 0)
+                    if let banner = RideStartPolicy.banner(environment.activeRide) {
+                        RideBanner(content: banner) { environment.router.ride = .recording }.padding(.vertical, Spacing.between)
+                    }
                     OnlineDashboardCards()
                     NotificationsDashboardCards()
                     BackupReminderCard()
