@@ -66,6 +66,8 @@ struct HorselyApp: App {
         // Nagrywanie jazdy (Task 15, A13): decyzję o wznowieniu niezakończonej jazdy podejmuje `AppDelegate.didFinishLaunching` (zna
         // przyczynę uruchomienia i stan aplikacji); `App.init` wykonuje się wcześniej, więc kontroler jest już wtedy dostępny.
         RideBridge.shared.controller = environment.ride
+        // Przyciski Live Activity (Task 16): `LiveActivityIntent` wykonuje się w tym procesie i trafia do tego samego kontrolera.
+        RideActivityActions.shared.register(environment.ride)
         notificationDelegate = NotificationDelegate(
             open: { url in environment.router.handle(url: url, mode: environment.workMode) },
             presentServerMessage: { message in environment.presentation(forServerMessage: message) },

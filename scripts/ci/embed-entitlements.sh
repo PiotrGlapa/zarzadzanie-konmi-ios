@@ -3,13 +3,19 @@
 # Powód: zespół nie ma zarejestrowanych urządzeń, więc archiwum nie może dostać podpisu deweloperskiego, a SDK urządzenia
 # zabrania podpisu doraźnego w xcodebuild. Eksport z `-allowProvisioningUpdates` zastępuje ten podpis podpisem
 # dystrybucyjnym z chmury Apple i zachowuje uprawnienia.
+# Rozszerzenie Live Activity (HorselyRideActivity, Task 16) nie ma uprawnień — dostaje sam podpis doraźny, bo codesign nie podpisze
+# aplikacji z niepodpisanym kodem zagnieżdżonym w PlugIns/. Podpis od środka: najpierw rozszerzenia, na końcu aplikacja.
 # Użycie: embed-entitlements.sh <ścieżka.xcarchive>
 set -euo pipefail
 
 archive="$1"
 app="$archive/Products/Applications/Horsely.app"
 appex="$app/PlugIns/HorselyShare.appex"
+ride_appex="$app/PlugIns/HorselyRideActivity.appex"
 : "${APPLE_TEAM_ID:?Brak APPLE_TEAM_ID}"
+
+[ -d "$appex" ] || { echo "::error title=Archiwum::Brak $appex"; exit 1; }
+[ -d "$ride_appex" ] || { echo "::error title=Archiwum::Brak $ride_appex"; exit 1; }
 
 tmp="$(mktemp -d)"
 sign() {
@@ -22,8 +28,11 @@ sign() {
 }
 
 sign "$appex" ShareExtension/HorselyShare.entitlements
+codesign --force --sign - "$ride_appex"
 sign "$app" App/Horsely.entitlements
 rm -rf "$tmp"
 
 echo "Uprawnienia wstawione do archiwum."
 codesign -d --entitlements :- "$app" 2>/dev/null | grep -E "group\.|keychain|aps-environment" || true
+codesign --verify --strict "$ride_appex"
+echo "HorselyRideActivity.appex: podpis doraźny bez uprawnień."

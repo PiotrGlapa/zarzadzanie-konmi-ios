@@ -1924,7 +1924,9 @@ Kryteria wersji 2.0.1: **SC-001** pliki wzorcowe programu 2.0.0 (słowniki, koń
 
 - **Nowy cel rozszerzenia** `HorselyRideActivity` — widżet ekranu blokady i Dynamic Island.
 - **Teksty**: „Grom · 24 min · 3,2 km · kłus”, „Słaby sygnał GPS”.
-- **Intents**: `PauseRideIntent`, `ResumeRideIntent`, `FinishRideIntent` (`openAppWhenRun`).
+- **Intents**: `PauseRideIntent`, `ResumeRideIntent`, `FinishRideIntent` (`openAppWhenRun`); napisy przycisków z `ride_notification_pause`,
+  `ride_notification_resume`, `ride_notification_finish`. Intencje wykonują się w procesie aplikacji i trafiają do jedynego kontrolera nagrywania
+  przez rejestr `RideActivityActions` (HorselyCore); stan aktywności bez współrzędnych, aktualizacja tylko przy zmianie widocznej treści.
 
 ### 9.6 Przekodowanie filmów
 

@@ -122,10 +122,18 @@ public actor RideRecordingController {
     private let motion: any MotionSource
     private let battery: any BatteryMonitor
     private let notifier: any RideNotifier
+    private let activity: any RideActivityPresenter
     private let clock: @Sendable () -> Int64
     private let log: @Sendable (String) -> Void
     private let tickInterval: Duration?
     private let status = Mutex(Status())
+
+    /// Zadanie zaplanowane przez `prepareRelaunch` — akcje z Live Activity (proces uruchomiony w tle przez przycisk) czekają na nie, żeby
+    /// „Pauza” nie trafiła w kontroler przed wznowieniem jazdy.
+    private let pendingRelaunch = Mutex<Task<Void, Never>?>(nil)
+
+    /// Ostatni stan wysłany do Live Activity (`nil` — aktywności nie ma); aktualizacja tylko przy zmianie widocznej treści.
+    private var activityState: RideActivityState?
 
     /// Migawki stanu na żywo (Live Activity — Task 16): po każdym tiku, punkcie zmieniającym słaby GPS, pauzie, wznowieniu i zakończeniu;
     /// najnowsza wygrywa. Jeden odbiorca. Przy przerwaniu ostatnia migawka ma stan `.interrupted`.
@@ -166,11 +174,13 @@ public actor RideRecordingController {
 
     /// - Parameters:
     ///   - store: JEDYNY sklep sesji aplikacji (ten sam, który obserwuje pasek NAG-01)
+    ///   - activity: Live Activity jazdy (Task 16) — start, aktualizacje i koniec prowadzi kontroler
     ///   - clock: „teraz” w ms epoki — ten sam zegar co `RideSessionStore` (testy podają sterowany)
     ///   - log: wpis w dzienniku diagnostycznym (kategoria `logCategory`) — tekst bez współrzędnych i nazwy konia
     ///   - tickInterval: odstęp tików; `nil` — bez samoczynnych tików (testy wołają `tick()` same)
     public init(
         store: RideSessionStore, locations: any LocationSource, motion: any MotionSource, battery: any BatteryMonitor, notifier: any RideNotifier,
+        activity: any RideActivityPresenter = NoRideActivityPresenter(),
         clock: @escaping @Sendable () -> Int64 = { Int64((Date().timeIntervalSince1970 * 1000).rounded()) },
         log: @escaping @Sendable (String) -> Void = { _ in }, tickInterval: Duration? = RideRecordingController.defaultTickInterval
     ) {
@@ -179,6 +189,7 @@ public actor RideRecordingController {
         self.motion = motion
         self.battery = battery
         self.notifier = notifier
+        self.activity = activity
         self.clock = clock
         self.log = log
         self.tickInterval = tickInterval
@@ -233,7 +244,7 @@ public actor RideRecordingController {
         stopSensors(keepBackgroundActivity: true)
         log(entry("Pauza", machine))
         await flush()
-        publish()
+        await publish()
     }
 
     /// Wznawia po pauzie: zeruje bufor okna akcelerometru (okno nie może obejmować przerwy) i włącza czujniki.
@@ -247,7 +258,7 @@ public actor RideRecordingController {
             log(entry("Wznowienie: nie udało się uruchomić GPS (\(Self.describe(locations.authorization)))", machine))
         }
         await flush()
-        publish()
+        await publish()
     }
 
     /// Kończy jazdę na prośbę użytkownika: zatrzymuje źródła, ostatni zapis punktów, stan `.finished`. Zwraca id sesji (ekran zakończenia)
@@ -262,7 +273,7 @@ public actor RideRecordingController {
         await closeRide(machine, id)
         if events.contains(.autoFinished) { await notifier.autoFinished() }
         log(entry("Koniec nagrywania", machine))
-        end(machine)
+        await end(machine)
         return id
     }
 
@@ -293,7 +304,7 @@ public actor RideRecordingController {
             guard recorder === machine, !finishing else { return }
         }
         await handle(machine.tick(tMillis: clock(), batteryPercent: level), machine)
-        if !finishing { publish() }
+        if !finishing { await publish() }
     }
 
     // MARK: - Ponowne uruchomienie (A13)
@@ -315,17 +326,22 @@ public actor RideRecordingController {
         case .background: resume = active.state == .paused || ageMillis <= Self.relaunchFreshnessMillis
         case .foreground: resume = false
         }
-        guard resume else {
-            return Task { await self.interruptStaleSession(active.id, launch: launch, ageMillis: ageMillis) }
+        let task: Task<Void, Never>
+        if resume {
+            if locations.authorization == .whenInUse { locations.beginBackgroundActivity() }
+            task = Task { await self.resumeAfterRelaunch() }
+        } else {
+            task = Task { await self.interruptStaleSession(active.id, launch: launch, ageMillis: ageMillis) }
         }
-        if locations.authorization == .whenInUse { locations.beginBackgroundActivity() }
-        return Task { await self.resumeAfterRelaunch() }
+        pendingRelaunch.withLock { $0 = task }
+        return task
     }
 
     /// Jazda, której system nie wznowił (przesunięcie albo nieudane wznowienie): `.interrupted` bez powiadomienia (użytkownik jest w aplikacji,
-    /// odzyskanie pokaże „Zapisz / Odrzuć”), bez włączania lokalizacji.
+    /// odzyskanie pokaże „Zapisz / Odrzuć”), bez włączania lokalizacji. Live Activity z poprzedniego procesu znika z ekranu blokady.
     private func interruptStaleSession(_ id: String, launch: RideLaunchKind, ageMillis: Int64) async {
         guard recorder == nil, !relaunching else { return }
+        await endActivity()
         let how = launch == .foreground ? "na pierwszym planie" : "w tle"
         do {
             try await store.setState(sessionId: id, state: .interrupted)
@@ -352,10 +368,12 @@ public actor RideRecordingController {
         } catch {
             log("Ponowne uruchomienie: odczyt niezakończonej jazdy nie powiódł się (\(Self.typeName(error)))")
             locations.stop()
+            await endActivity()
             return
         }
         guard let pending, pending.state == .recording || pending.state == .paused else {
             locations.stop()
+            await endActivity()
             return
         }
         let authorization = locations.authorization
@@ -408,13 +426,16 @@ public actor RideRecordingController {
         }
         battery.start()
         status.withLock { $0 = Status(sessionId: id, running: true) }
+        let initial = RideActivityState(machine.snapshot())
+        activityState = initial
+        await activity.start(horseName: loaded.session.horse.name, state: initial)
         if afterRestart {
             log(entry("Ponowne uruchomienie: wznowiono jazdę w stanie \(machine.snapshot().state.rawValue)", machine))
             await flush()
         } else {
             log(entry("Start nagrywania", machine))
         }
-        publish()
+        await publish()
         startTicker()
         return true
     }
@@ -444,11 +465,11 @@ public actor RideRecordingController {
                 await scheduleFlush()
             case .weakGpsStarted:
                 log(entry("Słaby GPS", machine))
-                publish()
+                await publish()
                 await notifier.weakGps(started: true)
             case .weakGpsEnded:
                 log(entry("Koniec słabego GPS", machine))
-                publish()
+                await publish()
                 await notifier.weakGps(started: false)
             case .batteryLow:
                 let percent = lastBattery ?? 15
@@ -468,7 +489,7 @@ public actor RideRecordingController {
         await closeRide(machine, id)
         await notifier.autoFinished()
         log(entry("Koniec nagrywania po 8 godzinach", machine))
-        end(machine)
+        await end(machine)
     }
 
     /// Przerwanie bez zakończenia jazdy: zatrzymanie źródeł, zapis bieżących punktów, stan `.interrupted`; sesja czeka na „Zapisz / Odrzuć”.
@@ -493,6 +514,7 @@ public actor RideRecordingController {
         last.state = .interrupted
         snapshotContinuation.yield(last)
         release()
+        await endActivity()
         if notify { await notifier.interrupted() }
     }
 
@@ -562,8 +584,10 @@ public actor RideRecordingController {
         }
     }
 
-    /// Nie udało się zacząć/wznowić albo brak zgody po ponownym uruchomieniu: jazda zostaje do odzyskania, użytkownik dostaje powiadomienie.
+    /// Nie udało się zacząć/wznowić albo brak zgody po ponownym uruchomieniu: jazda zostaje do odzyskania, użytkownik dostaje powiadomienie;
+    /// Live Activity (także z poprzedniego procesu) znika.
     private func markInterrupted(_ id: String) async {
+        await endActivity()
         do {
             let state = try await store.load(sessionId: id).session.state
             if state == .finished { return }
@@ -575,11 +599,18 @@ public actor RideRecordingController {
         }
     }
 
-    private func end(_ machine: RideRecorder) {
+    private func end(_ machine: RideRecorder) async {
         var last = machine.snapshot()
         last.state = .finished
         snapshotContinuation.yield(last)
         release()
+        await endActivity()
+    }
+
+    /// Zdejmuje Live Activity jazdy.
+    private func endActivity() async {
+        activityState = nil
+        await activity.end()
     }
 
     private func release() {
@@ -657,9 +688,15 @@ public actor RideRecordingController {
         sensorsRunning = false
     }
 
-    private func publish() {
+    /// Migawka do strumienia i — gdy zmieniła się widoczna treść — aktualizacja Live Activity.
+    private func publish() async {
         guard let machine = recorder else { return }
-        snapshotContinuation.yield(machine.snapshot())
+        let snapshot = machine.snapshot()
+        snapshotContinuation.yield(snapshot)
+        let state = RideActivityState(snapshot)
+        guard let last = activityState, !last.sameDisplay(as: state) else { return }
+        activityState = state
+        await activity.update(state)
     }
 
     /// Wpis dziennika: zdarzenie, czas jazdy, liczba punktów i ostatnia dokładność — bez współrzędnych i nazwy konia.
@@ -691,5 +728,31 @@ public actor RideRecordingController {
         case .reducedAccuracy: "przybliżona"
         case .whenInUse: "podczas używania"
         }
+    }
+}
+
+// MARK: - Przyciski Live Activity
+
+/// „Pauza”, „Wznów” i „Zakończ” z Live Activity (`RideActivityActions`, Task 16). Gdy przycisk uruchomił aplikację w tle, akcja czeka na
+/// zaplanowane wznowienie jazdy (`prepareRelaunch`).
+extension RideRecordingController: RideActivityActionHandler {
+    public func pauseRide() async {
+        await awaitPendingRelaunch()
+        await pause()
+    }
+
+    public func resumeRide() async {
+        await awaitPendingRelaunch()
+        await resume()
+    }
+
+    public func finishRide() async -> String? {
+        await awaitPendingRelaunch()
+        return await finish()
+    }
+
+    private func awaitPendingRelaunch() async {
+        let pending = pendingRelaunch.withLock { $0 }
+        await pending?.value
     }
 }

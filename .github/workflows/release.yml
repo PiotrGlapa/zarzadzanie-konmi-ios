@@ -113,14 +113,26 @@ jobs:
             -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
             | tee build/export.log | tail -n 40
           mkdir -p "$RUNNER_TEMP/ipa" && unzip -q -o "$RUNNER_TEMP"/export/*.ipa -d "$RUNNER_TEMP/ipa"
-          for app in "$RUNNER_TEMP"/ipa/Payload/Horsely.app "$RUNNER_TEMP"/ipa/Payload/Horsely.app/PlugIns/HorselyShare.appex; do
+          payload="$RUNNER_TEMP/ipa/Payload/Horsely.app"
+          # Każdy pakiet (aplikacja i oba rozszerzenia) musi mieć ważny podpis dystrybucyjny zespołu, nie doraźny z embed-entitlements.sh.
+          for bundle in "$payload" "$payload/PlugIns/HorselyShare.appex" "$payload/PlugIns/HorselyRideActivity.appex"; do
+            [ -d "$bundle" ] || { echo "::error title=Podpis::Brak $bundle w pliku .ipa"; exit 1; }
+            codesign --verify --strict "$bundle" \
+              || { echo "::error title=Podpis::Nieważny podpis $bundle"; exit 1; }
+            signature="$(codesign -d --verbose=2 "$bundle" 2>&1)"
+            grep -q "^TeamIdentifier=${APPLE_TEAM_ID}$" <<< "$signature" \
+              || { echo "::error title=Podpis::$bundle nie ma podpisu zespołu ${APPLE_TEAM_ID}"; exit 1; }
+          done
+          echo "Podpis dystrybucyjny zespołu w aplikacji, HorselyShare.appex i HorselyRideActivity.appex."
+          # App Group i pęk kluczy: aplikacja i rozszerzenie udostępniania (Live Activity ich nie potrzebuje).
+          for app in "$payload" "$payload/PlugIns/HorselyShare.appex"; do
             entitlements="$(codesign -d --entitlements :- "$app" 2>/dev/null)"
             echo "$entitlements" | grep -q "group.pl.glapa.horsely" \
               || { echo "::error title=Uprawnienia::Brak App Group w $app"; exit 1; }
             echo "$entitlements" | grep -q "keychain-access-groups" \
               || { echo "::error title=Uprawnienia::Brak grupy pęku kluczy w $app"; exit 1; }
           done
-          echo "Uprawnienia App Group i pęku kluczy obecne w aplikacji i rozszerzeniu."
+          echo "Uprawnienia App Group i pęku kluczy obecne w aplikacji i rozszerzeniu udostępniania."
 
       # Powiadomienia push (spec 003): aps-environment=production tylko w aplikacji, plist Firebase tylko w aplikacji, manifest
       # prywatności. Błąd zatrzymuje przebieg przed wysyłką do TestFlight (nigdy ciche pominięcie).

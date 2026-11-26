@@ -61,6 +61,22 @@ final class InfoPlistPolicyTests: XCTestCase {
         XCTAssertFalse((share["UIBackgroundModes"] as? [String] ?? []).contains("remote-notification"))
     }
 
+    /// Live Activity nagrywania jazdy (Task 16, FR-NAG-05, SPECYFIKACJA 9.5): `NSSupportsLiveActivities` w aplikacji, rozszerzenie
+    /// `HorselyRideActivity` to rozszerzenie WidgetKit bez Firebase i bez trybów tła.
+    func testLiveActivitiesAreSupported() throws {
+        XCTAssertEqual(info["NSSupportsLiveActivities"] as? Bool, true)
+        var root = URL(fileURLWithPath: #filePath)
+        while root.pathComponents.count > 1, !FileManager.default.fileExists(atPath: root.appendingPathComponent("RideActivity/Info.plist").path) {
+            root.deleteLastPathComponent()
+        }
+        let data = try Data(contentsOf: root.appendingPathComponent("RideActivity/Info.plist"))
+        let widget = try XCTUnwrap(PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any])
+        let extensionInfo = try XCTUnwrap(widget["NSExtension"] as? [String: Any])
+        XCTAssertEqual(extensionInfo["NSExtensionPointIdentifier"] as? String, "com.apple.widgetkit-extension")
+        XCTAssertFalse(widget.keys.contains { $0.localizedCaseInsensitiveContains("firebase") })
+        XCTAssertNil(widget["UIBackgroundModes"])
+    }
+
     func testArbitraryLoadsAreNotAllowed() {
         let transport = info["NSAppTransportSecurity"] as? [String: Any] ?? [:]
         XCTAssertNotEqual(transport["NSAllowsArbitraryLoads"] as? Bool, true)

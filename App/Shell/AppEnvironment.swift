@@ -155,7 +155,8 @@ final class AppEnvironment {
         self.rideSessions = rideSessions
         self.ride = RideRecordingController(
             store: rideSessions, locations: SystemLocationSource(), motion: CoreMotionSource(), battery: DeviceBatteryMonitor(),
-            notifier: LocalRideNotifier(texts: .app), log: { log.log(RideRecordingController.logCategory, $0) }
+            notifier: LocalRideNotifier(texts: .app), activity: LiveRideActivityPresenter(log: { log.log(RideRecordingController.logCategory, $0) }),
+            log: { log.log(RideRecordingController.logCategory, $0) }
         )
         self.workMode = settings.workMode
         self.theme = settings.theme

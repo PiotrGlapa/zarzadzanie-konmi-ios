@@ -87,13 +87,19 @@ jobs:
             $SIMULATOR_SIGNING | tee build/build.log | tail -n 40 || { grep -E "error:" build/build.log | sort -u | head -n 60; exit 65; }
         shell: bash
 
-      - name: Pakiet aplikacji zawiera manifest prywatności i plist Firebase (tylko aplikacja)
+      - name: Pakiet aplikacji zawiera manifest prywatności, plist Firebase (tylko aplikacja) i rozszerzenie Live Activity
         run: |
           app="$(find build/DerivedData/Build/Products -maxdepth 2 -name Horsely.app -type d | head -n 1)"
           echo "Aplikacja: $app"
           [ -e "$app/PrivacyInfo.xcprivacy" ] || { echo "::error title=Manifest prywatności::Brak PrivacyInfo.xcprivacy w Horsely.app"; exit 1; }
           [ -e "$app/GoogleService-Info.plist" ] || { echo "::error title=Firebase::Brak GoogleService-Info.plist w Horsely.app"; exit 1; }
           [ ! -e "$app/PlugIns/HorselyShare.appex/GoogleService-Info.plist" ] || { echo "::error title=Firebase::GoogleService-Info.plist w rozszerzeniu"; exit 1; }
+          # Live Activity (Task 16): rozszerzenie widżetów osadzone w aplikacji, z tekstami i bez Firebase.
+          ride="$app/PlugIns/HorselyRideActivity.appex"
+          [ -d "$ride" ] || { echo "::error title=Live Activity::Brak HorselyRideActivity.appex w Horsely.app"; exit 1; }
+          [ ! -e "$ride/GoogleService-Info.plist" ] || { echo "::error title=Firebase::GoogleService-Info.plist w rozszerzeniu Live Activity"; exit 1; }
+          [ "$(plutil -extract NSSupportsLiveActivities raw -o - "$app/Info.plist")" = "true" ] || { echo "::error title=Live Activity::Brak NSSupportsLiveActivities w Info.plist aplikacji"; exit 1; }
+          ls "$ride"
 
       - name: Błędy kompilacji (z pełnego dziennika)
         if: failure()

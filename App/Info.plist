@@ -123,6 +123,8 @@
 	<string>Dźwięk w filmach z aparatu podczas nagrywania</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Zapis zdjęć i filmów z jazdy do galerii</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsLocalNetworking</key>

@@ -856,6 +856,111 @@ struct RideRecordingControllerTests {
         #expect(!h.logs.lines.contains("Jazda oznaczona jako przerwana"))
     }
 
+    // MARK: Task 16: Live Activity
+
+    /// Live Activity idzie za jazdą: start przy starcie nagrywania (koń i stan zerowy), aktualizacje tylko przy zmianie widocznej treści
+    /// (pełne minuty, dziesiąte części km, chód, słaby GPS, pauza), koniec przy zakończeniu — a w drugiej jeździe przy przerwaniu
+    /// (zamknięcie przesunięciem) i przy uruchomieniu na pierwszym planie z porzuconą jazdą (aktywność z poprzedniego procesu).
+    @Test func activityStartsUpdatesAndEndsWithRide() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let controller = h.controller(store)
+        let id = try await controller.start(horse: grom, params: params)
+        let zero = RideActivityState(activeSeconds: 0, distanceMeters: 0, gait: nil, weakGps: false, paused: false)
+        #expect(h.activity.events == [.start(horseName: "Grom", zero)])
+
+        for s in 1...20 { await second(h, controller, s) }
+        let moving = h.activity.updates
+        #expect(!moving.isEmpty, "dystans rośnie — aktywność dostaje nową treść")
+        #expect(moving.count < 20, "tik co sekundę bez zmiany napisu nie aktualizuje aktywności")
+        var previous = zero
+        for update in moving {
+            #expect(!update.sameDisplay(as: previous), "aktualizacja bez zmiany widocznej treści")
+            previous = update
+        }
+        #expect(moving.allSatisfy { !$0.paused && !$0.weakGps })
+
+        h.clock.millis = START + 20_500
+        await controller.pause()
+        let pausedState = try #require(h.activity.updates.last)
+        #expect(pausedState.paused, "pauza zmienia treść („pauza”, przycisk „Wznów”)")
+        h.clock.millis = START + 30_000
+        await controller.resume()
+        #expect(h.activity.updates.last?.paused == false)
+
+        for s in 31...64 { await second(h, controller, s, accuracy: 40.0) }
+        #expect(h.activity.updates.last?.weakGps == true, "„Słaby sygnał GPS” w aktywności")
+        await second(h, controller, 65)
+        #expect(h.activity.updates.last?.weakGps == false)
+        #expect(h.activity.ends == 0)
+
+        h.clock.millis = START + 66_000
+        #expect(await controller.finish() == id)
+        #expect(h.activity.events.last == .end)
+        #expect(h.activity.ends == 1)
+        let starts = h.activity.events.filter { event in
+            if case .start = event { return true }
+            return false
+        }
+        #expect(starts.count == 1)
+
+        // Druga jazda: przerwanie (zamknięcie aplikacji przesunięciem) też zdejmuje aktywność.
+        try await store.discard(sessionId: id)
+        let secondRide = h.controller(store, locations: FakeLocationSource())
+        let next = try await secondRide.start(horse: grom, params: params)
+        #expect(h.activity.events.last == .start(horseName: "Grom", zero))
+        await secondRide.interrupt()
+        #expect(h.activity.events.last == .end)
+        #expect(h.activity.ends == 2)
+
+        // Otwarcie aplikacji z porzuconą jazdą: aktywność poprzedniego procesu znika razem z przerwaniem jazdy.
+        try await store.setState(sessionId: next, state: .recording)
+        let reopened = h.controller(try h.openStore(), locations: FakeLocationSource())
+        await reopened.prepareRelaunch(launch: .foreground)?.value
+        #expect(h.activity.events.last == .end)
+        #expect(h.activity.ends == 3)
+        #expect(try await store.load(sessionId: next).session.state == .interrupted)
+    }
+
+    /// „Pauza”, „Wznów” i „Zakończ” z Live Activity docierają do kontrolera przez rejestr `RideActivityActions` (intencje wołają
+    /// `RideActivityActions.shared`); bez zarejestrowanego kontrolera (proces rozszerzenia widżetów) akcja nic nie robi. „Zakończ” zostawia
+    /// id sesji dla ekranu zakończenia (Task 21).
+    @Test func pauseIntentPausesController() async throws {
+        let h = ControllerHarness()
+        defer { h.cleanUp() }
+        let store = try h.openStore()
+        let controller = h.controller(store)
+        let actions = RideActivityActions()
+        #expect(await actions.perform(.pause) == false)
+
+        actions.register(controller)
+        let id = try await controller.start(horse: grom, params: params)
+        for s in 1...3 { await second(h, controller, s) }
+        h.clock.millis = START + 3_500
+        #expect(await actions.perform(.pause))
+        #expect(try await store.load(sessionId: id).session.state == .paused)
+        #expect(!h.locations.active)
+        #expect(h.locations.backgroundActive, "sesja w tle zostaje, żeby „Wznów” z ekranu blokady mógł włączyć GPS")
+        #expect(h.activity.updates.last?.paused == true)
+
+        h.clock.millis = START + 10_000
+        #expect(await actions.perform(.resume))
+        #expect(try await store.load(sessionId: id).session.state == .recording)
+        #expect(h.locations.active)
+
+        #expect(actions.takeFinishedSessionId() == nil)
+        h.clock.millis = START + 11_000
+        #expect(await actions.perform(.finish))
+        #expect(try await store.load(sessionId: id).session.state == .finished)
+        #expect(actions.takeFinishedSessionId() == id)
+        #expect(actions.takeFinishedSessionId() == nil, "ekran zakończenia odbiera id raz")
+        #expect(h.activity.events.last == .end)
+
+        actions.register(nil)
+        #expect(await actions.perform(.finish) == false)
+    }
+
     // MARK: AccelWindowBuffer (Android: AccelWindowBufferTest)
 
     private func accel(_ ms: Int64) -> AccelSample { AccelSample(tNanos: ms * 1_000_000, x: 0, y: 0, z: 9.81) }
@@ -1095,6 +1200,33 @@ private final class AlertRecorder: RideAlertPoster {
     func remove(_ kind: RideAlert.Kind) async { state.withLock { $0.removed.append(kind) } }
 }
 
+/// Zapisuje wywołania Live Activity zamiast ActivityKit.
+private final class FakeActivityPresenter: RideActivityPresenter {
+    enum Event: Equatable {
+        case start(horseName: String, RideActivityState)
+        case update(RideActivityState)
+        case end
+    }
+
+    private let state = Mutex<[Event]>([])
+
+    var events: [Event] { state.withLock { $0 } }
+
+    var updates: [RideActivityState] {
+        var result: [RideActivityState] = []
+        for event in events {
+            if case let .update(value) = event { result.append(value) }
+        }
+        return result
+    }
+
+    var ends: Int { events.filter { $0 == .end }.count }
+
+    func start(horseName: String, state value: RideActivityState) async { state.withLock { $0.append(.start(horseName: horseName, value)) } }
+    func update(_ value: RideActivityState) async { state.withLock { $0.append(.update(value)) } }
+    func end() async { state.withLock { $0.append(.end) } }
+}
+
 /// Wpisy dziennika kontrolera (bez pliku).
 private final class LogLines: Sendable {
     private let state = Mutex<[String]>([])
@@ -1112,6 +1244,7 @@ private final class ControllerHarness: @unchecked Sendable {
     let battery = FakeBattery()
     let alerts = AlertRecorder()
     let logs = LogLines()
+    let activity = FakeActivityPresenter()
     let directory = FileManager.default.temporaryDirectory.appendingPathComponent("horsely-ride-controller-\(UUID().uuidString)", isDirectory: true)
     private(set) var opened: [AppDatabase] = []
 
@@ -1127,7 +1260,7 @@ private final class ControllerHarness: @unchecked Sendable {
     ) -> RideRecordingController {
         RideRecordingController(
             store: store, locations: locations ?? self.locations, motion: motion ?? self.motion, battery: battery,
-            notifier: LocalRideNotifier(texts: .stringsXml, poster: alerts), clock: clock.millisProvider, log: log ?? logs.append,
+            notifier: LocalRideNotifier(texts: .stringsXml, poster: alerts), activity: activity, clock: clock.millisProvider, log: log ?? logs.append,
             tickInterval: nil
         )
     }
