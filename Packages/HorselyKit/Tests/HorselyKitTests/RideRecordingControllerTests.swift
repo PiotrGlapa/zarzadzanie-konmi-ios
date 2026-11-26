@@ -379,8 +379,11 @@ struct RideRecordingControllerTests {
         for s in 6...10 { await second(h, controller, s) }
 
         let points = try await store.load(sessionId: id).track.points
-        #expect(points.map(\.tMillis) == (1...10).map { START + Int64($0) * 1_000 }, "partia z nieudanego zapisu dotarła razem z nowymi punktami")
-        #expect(points.map(\.lat) == (1...10).map { 52.0 + Double($0) * 0.0001 })
+        let expectedTimes: [Int64] = (1...10).map { step in START + Int64(step) * 1_000 }
+        #expect(points.map(\.tMillis) == expectedTimes, "partia z nieudanego zapisu dotarła razem z nowymi punktami")
+        let expectedLatitudes: [Double] = (1...10).map { step in 52.0 + Double(step) * 0.0001 }
+        let latitudes: [Double] = points.map(\.lat)
+        #expect(latitudes == expectedLatitudes)
         #expect(try await store.load(sessionId: id).session.lastFlushMillis == START + 10_000)
     }
 
@@ -667,8 +670,12 @@ struct RideRecordingControllerTests {
     /// Android: `window is returned when the samples span 5 seconds`.
     @Test func windowIsReturnedWhenTheSamplesSpan5Seconds() throws {
         var buffer = AccelWindowBuffer()
-        for ms in stride(from: Int64(0), to: 5_000, by: 20) { #expect(buffer.add(accel(ms)) == nil) }
-        let window = try #require(buffer.add(accel(5_000)))
+        for ms in stride(from: Int64(0), to: 5_000, by: 20) {
+            let window = buffer.add(accel(ms))
+            #expect(window == nil)
+        }
+        let closed = buffer.add(accel(5_000))
+        let window = try #require(closed)
         #expect(window.count == 251)
         #expect(window.first?.tNanos == 0)
         #expect(window.last?.tNanos == 5_000_000_000)
@@ -678,8 +685,12 @@ struct RideRecordingControllerTests {
     @Test func nextWindowStartsEmpty() {
         var buffer = AccelWindowBuffer()
         for ms in stride(from: Int64(0), through: 5_000, by: 20) { _ = buffer.add(accel(ms)) }
-        for ms in stride(from: Int64(5_020), through: 9_980, by: 20) { #expect(buffer.add(accel(ms)) == nil) }
-        #expect(buffer.add(accel(10_020)) != nil)
+        for ms in stride(from: Int64(5_020), through: 9_980, by: 20) {
+            let window = buffer.add(accel(ms))
+            #expect(window == nil)
+        }
+        let next = buffer.add(accel(10_020))
+        #expect(next != nil)
     }
 
     /// Android: `clear drops the collected samples`.
@@ -687,7 +698,10 @@ struct RideRecordingControllerTests {
         var buffer = AccelWindowBuffer()
         for ms in stride(from: Int64(0), to: 4_000, by: 20) { _ = buffer.add(accel(ms)) }
         buffer.clear()
-        for ms in stride(from: Int64(10_000), to: 13_000, by: 20) { #expect(buffer.add(accel(ms)) == nil) }
+        for ms in stride(from: Int64(10_000), to: 13_000, by: 20) {
+            let window = buffer.add(accel(ms))
+            #expect(window == nil)
+        }
     }
 
     // MARK: LocationSample z CLLocation
