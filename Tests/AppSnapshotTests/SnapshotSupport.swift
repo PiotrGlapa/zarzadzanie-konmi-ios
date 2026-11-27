@@ -93,7 +93,7 @@ extension XCTestCase {
 @MainActor
 enum SnapshotDiag {
     static func log(_ label: String, controller: UIViewController?, file: StaticString) {
-        var lines = ["== \(label) idle=\(UIApplication.shared.isIdleTimerDisabled) battery=\(UIDevice.current.isBatteryMonitoringEnabled) scenes=\(UIApplication.shared.connectedScenes.count)"]
+        var lines = ["== \(label) t=\(Int(ProcessInfo.processInfo.systemUptime)) idle=\(UIApplication.shared.isIdleTimerDisabled) battery=\(UIDevice.current.isBatteryMonitoringEnabled) scenes=\(UIApplication.shared.connectedScenes.count)"]
         for scene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
             lines.append("  scene state=\(scene.activationState.rawValue) statusBar=\(scene.statusBarManager?.statusBarFrame ?? .zero) hidden=\(scene.statusBarManager?.isStatusBarHidden ?? false)")
             for window in scene.windows {
