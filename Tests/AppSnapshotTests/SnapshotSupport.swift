@@ -119,11 +119,26 @@ enum SnapshotDiag {
                 let name = "\(type(of: view))"
                 if name.contains("LargeTitle") || view is UINavigationBar {
                     lines.append("  \(name) frame=\(view.frame) inWindow=\(view.convert(view.bounds, to: nil))")
+                    if name.contains("LargeTitle") {
+                        func labels(_ v: UIView, _ d: Int) {
+                            if let label = v as? UILabel {
+                                let attrs = label.attributedText.flatMap { $0.length > 0 ? $0.attributes(at: 0, effectiveRange: nil) : nil } ?? [:]
+                                lines.append("    label \(type(of: label)) frame=\(label.frame) font=\(label.font.fontName) \(label.font.pointSize) lh=\(label.font.lineHeight) asc=\(label.font.ascender) desc=\(label.font.descender) lines=\(label.numberOfLines) attrs=\(attrs.map { "\($0.key.rawValue)=\($0.value)" }.sorted().joined(separator: "; "))")
+                            }
+                            if d < 6 { v.subviews.forEach { labels($0, d + 1) } }
+                        }
+                        labels(view, 0)
+                    }
                 }
                 if depth < 40 { view.subviews.forEach { visit($0, depth + 1) } }
             }
             visit(controller.view, 0)
         }
+        let probe = UILabel()
+        probe.font = UIFont.preferredFont(forTextStyle: .largeTitle)
+        probe.text = "Pulpit"
+        let appearance = UINavigationBar.appearance()
+        lines.append("  global largeFont lh=\(probe.font.lineHeight) fit=\(probe.sizeThatFits(CGSize(width: 393, height: 500))) appLarge=\(String(describing: appearance.largeTitleTextAttributes)) appScroll=\(appearance.scrollEdgeAppearance != nil)")
         let url = URL(fileURLWithPath: "\(file)").deletingLastPathComponent().appendingPathComponent("__Snapshots__/diag.txt")
         let text = lines.joined(separator: "\n") + "\n"
         if let handle = try? FileHandle(forWritingTo: url) {
