@@ -10,15 +10,33 @@ import XCTest
 /// migawki na stałych danych (koń „Grom”, 24:10, 3,24 km, kłus; bez żywego zegara), jasny / ciemny / tekst 200 % według konwencji
 /// `SnapshotSupport`, oraz teksty z katalogu podstawione tak jak na ekranie.
 ///
-/// KOLEJNOŚĆ (poprawka I1 Task 17): klasa nazywa się `TrainingsRideFlowSnapshotTests`, żeby XCTest (kolejność alfabetyczna klas)
-/// uruchamiał ją PO pozostałych migawkach. Pomiar w CI (45916321752, 45918277126, 45919450844): po migawkach ekranu startu/nagrywania
-/// z tej klasy duży tytuł ekranów renderowanych później w tym samym procesie symulatora (Pulpit, dział Treningi) wypadał o ok. 17 px
-/// przy 3x (≈ 6 pt) niżej — także dla Pulpitu z kodem identycznym jak przed Task 17; bez tej klasy wzorce sprzed Task 17 przechodzą bez
-/// zmian. Przyczyny (stanu systemu zostawianego przez te widoki) nie ustalono; wzorce plików zostają w `__Snapshots__/RideFlowSnapshotTests/`
-/// (katalog wynika z nazwy pliku). Migawki z paskiem na Pulpicie i w dziale Treningi biegną w tej klasie jako pierwsze (`testBanner…`).
+/// STAN GLOBALNY UIKIT (poprawka I1 Task 17, pomiary CI 45923274989…45927554186): pierwszy pasek nawigacji, który w procesie ułoży tytuł
+/// z polską literą z ogonkiem/kreską („Więcej”, „Nagraj jazdę”), na stałe podnosi wysokość widoku dużego tytułu UIKit z 52 do 57,67 pt
+/// (etykieta „Pulpit” tej samej czcionki: 40,67 → 46,33 pt; przy 200 %: 73 → 82,67 pt) — dla WSZYSTKICH późniejszych ekranów z dużym tytułem
+/// w tym procesie (tytuł niżej o 17 px przy 3x). Robią to ekrany startu i nagrywania z tej klasy oraz `RootView` z kartami (`ShellSnapshotTests`
+/// `testMore…`/`testTabBar…`, tak było przed Task 17). Kod paska NAG-01 i obserwacja jazdy NIE zmieniają układu (sonda: pasek, sesja w sklepie,
+/// `observeActiveRide`, dział Treningi z paskiem — 52 pt). Stanu nie da się wyzerować, więc:
+/// - klasa nazywa się `TrainingsRideFlowSnapshotTests`, żeby XCTest (kolejność alfabetyczna klas) uruchamiał ją PO klasach z wzorcami dużego
+///   tytułu nagranymi przed tym stanem (Pulpit, działy) — inaczej ekrany startu z tej klasy przesunęłyby ich tytuły;
+/// - migawki z dużym tytułem tej klasy (Pulpit i dział Treningi z paskiem) najpierw same wprowadzają proces w ten stan
+///   (`primeNavigationTitleMetrics`), więc są takie same niezależnie od tego, co biegło wcześniej — i odpowiadają działającej aplikacji, w której pasek kart z „Więcej”
+///   jest widoczny od startu (jak `shell-dashboard`).
+/// Wzorce plików zostają w `__Snapshots__/RideFlowSnapshotTests/` (katalog wynika z nazwy pliku).
 @MainActor
 final class TrainingsRideFlowSnapshotTests: XCTestCase {
     private let warsaw = TimeZone(identifier: "Europe/Warsaw")!
+
+    /// Ułożenie (bez porównania) paska nawigacji z tytułem „Więcej” tą samą drogą co migawka — patrz opis klasy.
+    private func primeNavigationTitleMetrics() async {
+        let controller = UIHostingController(
+            rootView: NavigationStack { Color.clear.navigationTitle("Więcej").navigationBarTitleDisplayMode(.large) }
+        )
+        let strategy = Snapshotting<UIViewController, UIImage>.image(drawHierarchyInKeyWindow: true, size: Self.snapshotSize, traits: SnapshotVariant.light.traits)
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            strategy.snapshot(controller).run { _ in continuation.resume() }
+        }
+    }
+
     /// 2026-10-05 12:05 UTC = 14:05 w Warszawie.
     private let startedAt = Date(timeIntervalSince1970: 1_791_201_900)
 
@@ -86,6 +104,7 @@ final class TrainingsRideFlowSnapshotTests: XCTestCase {
 
     /// Android: `the dashboard shows the banner above everything and opens the recording` — pasek obserwuje sesję w sklepie sesji.
     func testBannerOnTheDashboard() async throws {
+        await primeNavigationTitleMetrics()
         for variant in [SnapshotVariant.light, .dark] {
             let env = try await environmentWithRide(variant)
             let observer = Task { await env.observeActiveRide() }
@@ -96,6 +115,7 @@ final class TrainingsRideFlowSnapshotTests: XCTestCase {
 
     /// Android: `the trainings section shows the banner and the record button next to the plus`.
     func testBannerInTheTrainingsSectionWithTheRecordButton() async throws {
+        await primeNavigationTitleMetrics()
         let env = try await environmentWithRide(.light)
         let observer = Task { await env.observeActiveRide() }
         defer { observer.cancel() }

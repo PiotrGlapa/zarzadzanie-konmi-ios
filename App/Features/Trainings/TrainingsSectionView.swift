@@ -16,7 +16,7 @@ struct TrainingsSectionView: View {
         let today = environment.dates.today()
         NavigationStack {
             ScrollView {
-                // Pasek NAG-01 na górze listy (w treści przewijanej — kontener wokół listy przesuwał duży tytuł także bez jazdy).
+                // Pasek NAG-01 na górze listy, w treści przewijanej (bez jazdy nie ma wysokości — poprawka I1 Task 17).
                 if let banner = RideStartPolicy.banner(environment.activeRide) {
                     RideBanner(content: banner) { environment.router.ride = .recording }
                         .padding(.horizontal, Spacing.screenEdge)

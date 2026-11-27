@@ -48,7 +48,6 @@ extension XCTestCase {
         _ view: some View, name: String, variant: SnapshotVariant, file: StaticString = #filePath, testName: String = #function, line: UInt = #line
     ) {
         let controller = UIHostingController(rootView: view.tint(HorselyColor.primary))
-        SnapshotDiag.log("before \(name)-\(variant.rawValue)", controller: nil, file: file)
         assertSnapshot(
             of: controller,
             as: .image(drawHierarchyInKeyWindow: true, precision: 0.98, perceptualPrecision: 0.98, size: Self.snapshotSize, traits: variant.traits),
@@ -57,7 +56,6 @@ extension XCTestCase {
             testName: testName,
             line: line
         )
-        SnapshotDiag.log("after \(name)-\(variant.rawValue)", controller: controller, file: file)
     }
 }
 
@@ -72,10 +70,8 @@ extension XCTestCase {
         window.rootViewController = controller
         window.makeKeyAndVisible()
         try? await Task.sleep(for: .seconds(1))
-        SnapshotDiag.log("settled \(name)-\(variant.rawValue)", controller: controller, file: file)
         window.rootViewController = nil
         window.isHidden = true
-        SnapshotDiag.log("before \(name)-\(variant.rawValue)", controller: nil, file: file)
         assertSnapshot(
             of: controller,
             as: .image(drawHierarchyInKeyWindow: true, precision: 0.98, perceptualPrecision: 0.98, size: Self.snapshotSize, traits: variant.traits),
@@ -84,70 +80,6 @@ extension XCTestCase {
             testName: testName,
             line: line
         )
-        SnapshotDiag.log("after \(name)-\(variant.rawValue)", controller: controller, file: file)
-    }
-}
-
-/// TYMCZASOWA DIAGNOSTYKA (przeciek stanu między migawkami, Task 17 I1): okna, obszar bezpieczny, przewijanie i pasek nawigacji
-/// zapisywane do `__Snapshots__/diag.txt` (artefakt CI).
-@MainActor
-enum SnapshotDiag {
-    static func log(_ label: String, controller: UIViewController?, file: StaticString) {
-        var lines = ["== \(label) t=\(Int(ProcessInfo.processInfo.systemUptime)) idle=\(UIApplication.shared.isIdleTimerDisabled) battery=\(UIDevice.current.isBatteryMonitoringEnabled) scenes=\(UIApplication.shared.connectedScenes.count)"]
-        for scene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
-            lines.append("  scene state=\(scene.activationState.rawValue) statusBar=\(scene.statusBarManager?.statusBarFrame ?? .zero) hidden=\(scene.statusBarManager?.isStatusBarHidden ?? false)")
-            for window in scene.windows {
-                lines.append("  win \(type(of: window)) \(Unmanaged.passUnretained(window).toOpaque()) key=\(window.isKeyWindow) hidden=\(window.isHidden) frame=\(window.frame) safe=\(window.safeAreaInsets) root=\(window.rootViewController.map { "\(type(of: $0))" } ?? "nil") level=\(window.windowLevel.rawValue)")
-            }
-        }
-        if let controller {
-            lines.append("  vc safe=\(controller.view.safeAreaInsets) frame=\(controller.view.frame) window=\(controller.view.window != nil)")
-            func visitControllers(_ vc: UIViewController, _ depth: Int) {
-                if let nav = vc as? UINavigationController {
-                    lines.append("  nav bar=\(nav.navigationBar.frame) large=\(nav.navigationBar.prefersLargeTitles) safe=\(nav.view.safeAreaInsets) add=\(nav.additionalSafeAreaInsets) top=\(nav.topViewController.map { "\(type(of: $0))" } ?? "nil")")
-                    if let top = nav.topViewController {
-                        lines.append("    topvc safe=\(top.view.safeAreaInsets) mode=\(top.navigationItem.largeTitleDisplayMode.rawValue)")
-                    }
-                }
-                if depth < 8 { vc.children.forEach { visitControllers($0, depth + 1) } }
-            }
-            visitControllers(controller, 0)
-            func visit(_ view: UIView, _ depth: Int) {
-                if let scroll = view as? UIScrollView, scroll.bounds.height > 300 {
-                    lines.append("  scroll \(type(of: scroll)) offset=\(scroll.contentOffset.y) adjusted=\(scroll.adjustedContentInset) inset=\(scroll.contentInset) frame=\(scroll.frame) size=\(scroll.contentSize) behavior=\(scroll.contentInsetAdjustmentBehavior.rawValue)")
-                }
-                let name = "\(type(of: view))"
-                if name.contains("LargeTitle") || view is UINavigationBar {
-                    lines.append("  \(name) frame=\(view.frame) inWindow=\(view.convert(view.bounds, to: nil))")
-                    if name.contains("LargeTitle") {
-                        func labels(_ v: UIView, _ d: Int) {
-                            if let label = v as? UILabel {
-                                let attrs = label.attributedText.flatMap { $0.length > 0 ? $0.attributes(at: 0, effectiveRange: nil) : nil } ?? [:]
-                                lines.append("    label \(type(of: label)) frame=\(label.frame) font=\(label.font.fontName) \(label.font.pointSize) lh=\(label.font.lineHeight) asc=\(label.font.ascender) desc=\(label.font.descender) lines=\(label.numberOfLines) attrs=\(attrs.map { "\($0.key.rawValue)=\($0.value)" }.sorted().joined(separator: "; "))")
-                            }
-                            if d < 6 { v.subviews.forEach { labels($0, d + 1) } }
-                        }
-                        labels(view, 0)
-                    }
-                }
-                if depth < 40 { view.subviews.forEach { visit($0, depth + 1) } }
-            }
-            visit(controller.view, 0)
-        }
-        let probe = UILabel()
-        probe.font = UIFont.preferredFont(forTextStyle: .largeTitle)
-        probe.text = "Pulpit"
-        let appearance = UINavigationBar.appearance()
-        lines.append("  global largeFont lh=\(probe.font.lineHeight) fit=\(probe.sizeThatFits(CGSize(width: 393, height: 500))) appLarge=\(String(describing: appearance.largeTitleTextAttributes)) appScroll=\(appearance.scrollEdgeAppearance != nil)")
-        let url = URL(fileURLWithPath: "\(file)").deletingLastPathComponent().appendingPathComponent("__Snapshots__/diag.txt")
-        let text = lines.joined(separator: "\n") + "\n"
-        if let handle = try? FileHandle(forWritingTo: url) {
-            _ = try? handle.seekToEnd()
-            try? handle.write(contentsOf: Data(text.utf8))
-            try? handle.close()
-        } else {
-            try? Data(text.utf8).write(to: url)
-        }
     }
 }
 
