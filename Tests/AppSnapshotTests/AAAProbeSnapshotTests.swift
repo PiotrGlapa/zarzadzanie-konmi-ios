@@ -24,34 +24,28 @@ final class AAAProbeSnapshotTests: XCTestCase {
         NavigationStack { RideStartView(model: model, onClose: {}, onRecording: {}, onFinish: { _ in }) }
     }
 
+    private func titled(_ title: String, large: Bool) -> some View {
+        NavigationStack {
+            ScrollView { Text("Treść").frame(maxWidth: .infinity) }
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(large ? .large : .inline)
+        }
+    }
+
     func testLeakSteps() async throws {
         measure("0-start")
+        assertScreen(Text("Więcej jazdę ŁÓŻ żółć").font(.title2.weight(.semibold)), name: "step-1-body-diacritics", variant: .light)
+        measure("1-body-diacritics")
+        assertScreen(titled("Konie", large: false), name: "step-2-inline-ascii", variant: .light)
+        measure("2-inline-ascii")
+        assertScreen(titled("Więcej", large: true), name: "step-3-large-e-ogonek", variant: .light)
+        measure("3-large-e-ogonek")
+        assertScreen(titled("Nagraj jazdę", large: false), name: "step-4-inline-e-ogonek", variant: .light)
+        measure("4-inline-e-ogonek")
+        assertScreen(titled("Żółw", large: false), name: "step-5-inline-z-dot", variant: .light)
+        measure("5-inline-z-dot")
         let env = makeEnvironment(mode: .standalone, variant: .light)
-        let horses = try await SnapshotHorses.seed(env)
-        assertScreen(start(RideStartModel(preview: .wearHint, environment: env, horses: [])), name: "step-1-wear", variant: .light)
-        measure("1-wear")
-        assertScreen(start(RideStartModel(preview: .locationDenied, environment: env, horses: [])), name: "step-2-denied", variant: .light)
-        measure("2-denied")
-        assertScreen(start(RideStartModel(preview: .location, environment: env, horses: horses)), name: "step-3-location", variant: .light)
-        measure("3-location")
-        assertScreen(start(RideStartModel(preview: .horse, environment: env, horses: horses, horseId: horses.first?.id, fromCard: true)), name: "step-4-horse", variant: .light)
-        measure("4-horse")
-
-        let startedAt = Date(timeIntervalSince1970: 1_791_201_900)
-        let snapshot = RideSnapshot(state: .recording, activeSeconds: 24 * 60 + 10, distanceMeters: 3_240, speedKmh: 9.4, gait: .trot, weakGps: false)
-        let ride = ActiveRide(sessionId: "s1", horseName: "Grom", startedAt: startedAt, snapshot: snapshot)
-        assertScreen(NavigationStack { RideRecordingScreen(ride: ride, loading: false, seconds: 1_450, track: nil) }, name: "step-5-recording", variant: .light)
-        measure("5-recording")
-
-        assertScreen(TabView { Text("A").tabItem { Label("A", systemImage: "star") } }, name: "step-6-tabview", variant: .light)
-        measure("6-tabview")
-
-        let more = makeEnvironment(mode: .standalone, variant: .light)
-        assertScreen(MoreView().environment(more), name: "step-7-more", variant: .light)
-        measure("7-more")
-
-        more.router.selectedTab = .more
-        assertScreen(RootView().environment(more), name: "step-8-root-more", variant: .light)
-        measure("8-root-more")
+        assertScreen(start(RideStartModel(preview: .wearHint, environment: env, horses: [])), name: "step-6-wear", variant: .light)
+        measure("6-wear")
     }
 }
