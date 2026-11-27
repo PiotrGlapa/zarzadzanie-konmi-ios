@@ -23,6 +23,22 @@ struct RecordStoreTests {
         LocalTraining(id: id, createdAt: stamp, updatedAt: stamp, version: 1, horseId: horse, trainingDate: date(day), trainingTypeId: "type-1", durationMinutes: 45)
     }
 
+    /// Nagranie jazdy treningu (chwile UTC jak w kontrakcie, bez `trackData`).
+    private func recording(_ id: String, training: String, horse: String, day: Int) -> LocalTrainingRecording {
+        let started = InstantText.parse("2026-10-\(String(format: "%02d", day))T08:00:00Z")!
+        return Recording(
+            id: id, trainingId: training, version: 1, createdAt: started, updatedAt: started,
+            startedAt: started, endedAt: started.addingTimeInterval(3600), timeZone: "Europe/Warsaw",
+            totalSeconds: 3600, movingSeconds: 3000, stoppedSeconds: 600, pausedSeconds: 0, distanceMeters: 5000,
+            avgMovingSpeedKmh: Decimal(string: "15")!, maxSpeedKmh: Decimal(string: "25")!, elevationGainM: 100, elevationLossM: 80, minAltitudeM: 100, maxAltitudeM: 200,
+            walkSeconds: 1200, walkMeters: 1500, trotSeconds: 1500, trotMeters: 2500, canterSeconds: 300, canterMeters: 800,
+            canterCount: 1, longestCanterSeconds: 300, longestCanterMeters: 800, loadPoints: Decimal(string: "75.5")!,
+            gaitThresholdsUsed: RideDefaults.builtIn.thresholds, loadParamsUsed: RideDefaults.builtIn.load,
+            accelerometerUsed: false, weatherStatus: .none, trimmedStartSeconds: 0, trimmedEndSeconds: 0, algorithmVersion: 1,
+            source: ["platform": .string("ios")], trackFormat: "zk-track/1", pointCount: 3600, segments: []
+        ).toRecord(horseId: horse, trainingDate: date(day))
+    }
+
     private func purchase(_ id: String, horses: [String], day: Int) -> LocalPurchase {
         LocalPurchase(
             id: id, createdAt: stamp, updatedAt: stamp, version: 1, purchaseDate: date(day), productName: "Siano", categoryId: "cat-1",
@@ -49,6 +65,9 @@ struct RecordStoreTests {
             training("t1", horse: "h1", day: 9),
             LocalReminder(id: "r1", createdAt: stamp, updatedAt: stamp, horseId: "h1", kind: .farrier, dueDate: date(20), title: "Kowal", sourceId: "f1"),
             LocalAttachment(id: "a1", createdAt: stamp, updatedAt: stamp, ownerType: .note, ownerId: "n1", horseId: "h1", fileName: "a.jpg", contentType: "image/jpeg", sizeBytes: 10, sha256: "abc"),
+            recording("tr1", training: "t1", horse: "h1", day: 9),
+            LocalHorseRideProfile(horseId: "h1", profile: RideProfile(gaitStopMaxKmh: Decimal(string: "0.5")!, gaitWalkMaxKmh: Decimal(string: "4.5")!, gaitTrotMaxKmh: Decimal(string: "8.0")!, loadWeightWalk: Decimal(string: "0.1")!, loadWeightTrot: Decimal(string: "0.3")!, loadWeightCanter: Decimal(string: "0.6")!, loadClimbPer10m: Decimal(string: "1.0")!, loadWarnPercent: 5, heavyRidePoints: 1), createdAt: stamp, updatedAt: stamp, version: 1),
+            LocalRideDefaults(defaults: RideDefaults(gaitStopMaxKmh: Decimal(string: "0.5")!, gaitWalkMaxKmh: Decimal(string: "4.5")!, gaitTrotMaxKmh: Decimal(string: "8.0")!, loadWeightWalk: Decimal(string: "0.1")!, loadWeightTrot: Decimal(string: "0.3")!, loadWeightCanter: Decimal(string: "0.6")!, loadClimbPer10m: Decimal(string: "1.0")!, loadWarnPercent: 5, heavyRidePoints: 1, recordedRideTrainingTypeId: "trening-nagranie", version: 1), createdAt: stamp, updatedAt: stamp),
         ]
         #expect(Set(records.map(\.recordType)) == Set(RecordType.allCases))
 
@@ -241,6 +260,6 @@ struct RecordStoreTests {
         let tables = try database.writer.read { db in
             try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'grdb_%'")
         }
-        #expect(Set(tables) == ["local_record", "record_horse", "local_file", "queue_operation", "queue_history", "conflict", "local_meta", "address"])
+        #expect(Set(tables) == ["local_record", "record_horse", "local_file", "queue_operation", "queue_history", "conflict", "local_meta", "address", "local_track", "ride_session", "ride_point", "ride_media"])
     }
 }

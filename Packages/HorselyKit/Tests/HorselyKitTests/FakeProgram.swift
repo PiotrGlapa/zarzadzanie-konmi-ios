@@ -19,6 +19,7 @@ final class FakeProgram: @unchecked Sendable {
     struct Recorded: Sendable {
         let method: String
         let path: String
+        let url: String
         let headers: [String: String]
         let body: Data?
 
@@ -66,7 +67,8 @@ final class FakeProgram: @unchecked Sendable {
             stream.open()
             var data = Data()
             var buffer = [UInt8](repeating: 0, count: 4096)
-            while stream.hasBytesAvailable {
+            // Czytamy do końca strumienia (0 bajtów) — wysyłka pliku (`multipart`) ma treść większą niż jedna porcja.
+            while true {
                 let read = stream.read(&buffer, maxLength: buffer.count)
                 if read <= 0 { break }
                 data.append(buffer, count: read)
@@ -77,7 +79,8 @@ final class FakeProgram: @unchecked Sendable {
         let method = request.httpMethod ?? "GET"
         lock.lock()
         defer { lock.unlock() }
-        recorded.append(Recorded(method: method, path: path, headers: request.allHTTPHeaderFields ?? [:], body: body))
+        let allHeaders = request.allHTTPHeaderFields ?? [:]
+        recorded.append(Recorded(method: method, path: path, url: url.absoluteString, headers: allHeaders, body: body))
         guard let index = routes.lastIndex(where: { $0.method == method && ($0.path == path || ($0.path.hasSuffix("*") && path.hasPrefix(String($0.path.dropLast())))) }) else {
             if pushEnabled, let pushed = pushReply(method: method, path: path, body: body) { return pushed }
             return .json(404, #"{"title":"Nie znaleziono"}"#)

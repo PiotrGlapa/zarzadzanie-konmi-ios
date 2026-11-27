@@ -53,6 +53,8 @@ targets:
           - Info.plist
           - Horsely.entitlements
           - Resources/android/**
+      # Live Activity (Task 16): atrybuty, intencje, widoki i ikona wspólne z rozszerzeniem `HorselyRideActivity`.
+      - path: Shared
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely
@@ -70,6 +72,8 @@ targets:
       - package: Firebase
         product: FirebaseMessaging
       - target: HorselyShare
+        embed: true
+      - target: HorselyRideActivity
         embed: true
 
   HorselyShare:
@@ -94,6 +98,31 @@ targets:
     dependencies:
       - package: HorselyCore
       - package: HorselyKit
+
+  # Live Activity nagrywanej jazdy (Task 16, SPECYFIKACJA_MOBILE_IOS.md 9.5): ekran blokady i Dynamic Island. Bez uprawnień (App Group,
+  # pęk kluczy) i bez Firebase; tylko HorselyCore (formater treści i rejestr akcji przycisków).
+  HorselyRideActivity:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: RideActivity
+        excludes:
+          - Info.plist
+      - path: Shared
+      # Teksty ze `strings.xml` (ten sam katalog co aplikacja).
+      - path: App/Resources/Localizable.xcstrings
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: pl.glapa.horsely.RideActivity
+        PRODUCT_NAME: HorselyRideActivity
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_FILE: RideActivity/Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        SKIP_INSTALL: YES
+        SWIFT_EMIT_LOC_STRINGS: NO
+        ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: NO
+    dependencies:
+      - package: HorselyCore
 
   AppSnapshotTests:
     type: bundle.unit-test
@@ -128,6 +157,7 @@ schemes:
       targets:
         Horsely: all
         HorselyShare: all
+        HorselyRideActivity: all
     run:
       config: Debug
     test:

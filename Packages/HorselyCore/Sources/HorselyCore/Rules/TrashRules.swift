@@ -6,6 +6,7 @@ enum TrashRules {
     private static let ownerTypes: [AttachmentOwnerType: RecordType] = [
         .horse: .horse, .vetVisit: .vetVisit, .farrierVisit: .farrierVisit, .physioVisit: .physioVisit, .specialistVisit: .specialistVisit,
         .competition: .competition, .competitionStart: .competitionStart, .purchase: .purchase, .note: .note, .contact: .contact,
+        .training: .training,
     ]
 
     private static let horseOwned: [RecordType] = [.vetVisit, .farrierVisit, .physioVisit, .specialistVisit, .note, .training, .competitionStart, .reminder]

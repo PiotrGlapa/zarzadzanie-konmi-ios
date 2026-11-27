@@ -72,7 +72,12 @@ struct QueueView: View {
                     .disabled(sending)
                     .accessibilityIdentifier("queue-send-now")
                     DividedList(operations) { operation in
-                        QueueRow(operation: operation) { deleting = operation }
+                        QueueRow(
+                            operation: operation, waitsForUpdate: operation.state == .pending && operation.waitsForProgramUpdate(environment.capabilities),
+                            preparing: environment.queue.preparing.contains(operation.id)
+                        ) {
+                            deleting = operation
+                        }
                     }
                 }
                 .padding(.vertical, Spacing.screenEdge)
@@ -131,7 +136,7 @@ struct QueueView: View {
             let removed = try? await environment.store.writeQuietly { access in
                 try access.deleteOperation(operation.id, allowed: OutboxState.editable)
             }
-            removed?.files.forEach { try? FileManager.default.removeItem(atPath: $0.path) }
+            removed?.files.forEach { $0.deleteFiles() }
             if removed?.removed.isEmpty ?? true { resultText = tr("queue_delete_blocked") }
         }
     }
@@ -159,15 +164,22 @@ struct QueueView: View {
 /// Wiersz operacji: opis, stan (z komunikatem programu przy „Wymaga poprawy”), kolejna próba i usunięcie dla edytowalnych.
 struct QueueRow: View {
     let operation: OutboxOperation
+    /// Załącznik treningu czeka na aktualizację programu (brak `trainingAttachments`, decyzja A6) — zamiast „Czeka na wysłanie”.
+    var waitsForUpdate = false
+    /// Film zmniejszany do 720p (`held` do końca przygotowania, decyzja A10) — „Przygotowuję film…” zamiast „Wstrzymane”.
+    var preparing = false
     let onDelete: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: Spacing.between) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(operation.summary).font(.body).foregroundStyle(HorselyColor.onBackground)
-                Text(LocalizedStringKey(Self.stateKey(operation.state)))
+                Text(LocalizedStringKey(preparing ? "video_preparing" : Self.stateKey(operation.state, waitsForUpdate: waitsForUpdate)))
                     .font(.footnote.weight(.semibold))
-                    .foregroundStyle(operation.state == .needsFix || operation.state == .conflict || operation.state == .held ? HorselyColor.warning : HorselyColor.onSurfaceVariant)
+                    .foregroundStyle(
+                        operation.state == .needsFix || operation.state == .conflict || (operation.state == .held && !preparing)
+                            ? HorselyColor.warning : HorselyColor.onSurfaceVariant
+                    )
                 if operation.state == .needsFix, let message = operation.problem?.firstMessage {
                     Text(message).font(.footnote).foregroundStyle(HorselyColor.onSurfaceVariant)
                 }
@@ -193,9 +205,9 @@ struct QueueRow: View {
         .accessibilityIdentifier("queue-row")
     }
 
-    static func stateKey(_ state: OutboxState) -> String {
+    static func stateKey(_ state: OutboxState, waitsForUpdate: Bool = false) -> String {
         switch state {
-        case .pending: "queue_state_pending"
+        case .pending: waitsForUpdate ? "queue_state_waits_for_update" : "queue_state_pending"
         case .sending: "queue_state_sending"
         case .unknown: "queue_state_unknown"
         case .needsFix: "queue_state_needs_fix"

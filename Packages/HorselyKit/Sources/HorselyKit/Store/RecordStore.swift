@@ -120,16 +120,23 @@ public struct RecordAccess {
         }
     }
 
-    /// Usuwa wiersz bezpowrotnie (trwałe usunięcie, uzgodnienie, zastąpienie `id`).
+    /// Usuwa wiersz bezpowrotnie (trwałe usunięcie, uzgodnienie, zastąpienie `id`). Nagranie jazdy zabiera ze sobą swoją trasę.
     public func deleteHard(_ type: RecordType, id: String) throws {
         state.dirty = true
+        if type == .trainingRecording {
+            try db.execute(sql: "DELETE FROM local_track WHERE recordingId = ?", arguments: [id])
+        }
         try db.execute(sql: "DELETE FROM record_horse WHERE type = ? AND id = ?", arguments: [type.rawValue, id])
         try db.execute(sql: "DELETE FROM local_record WHERE type = ? AND id = ?", arguments: [type.rawValue, id])
     }
 
-    /// Usuwa wszystkie wiersze danego stanu (np. `Projected` przed uzgadnianiem).
+    /// Usuwa wszystkie wiersze danego stanu (np. `Projected` przed uzgadnianiem) razem z trasami usuwanych nagrań.
     public func deleteState(_ syncState: SyncState) throws {
         state.dirty = true
+        try db.execute(
+            sql: "DELETE FROM local_track WHERE recordingId IN (SELECT id FROM local_record WHERE type = ? AND syncState = ?)",
+            arguments: [RecordType.trainingRecording.rawValue, syncState.rawValue]
+        )
         try db.execute(
             sql: "DELETE FROM record_horse WHERE (type || ':' || id) IN (SELECT type || ':' || id FROM local_record WHERE syncState = ?)",
             arguments: [syncState.rawValue]
@@ -137,11 +144,32 @@ public struct RecordAccess {
         try db.execute(sql: "DELETE FROM local_record WHERE syncState = ?", arguments: [syncState.rawValue])
     }
 
-    /// Czyści cały magazyn rekordów (zmiana trybu; odtworzenie kopii zastępuje całość w jednej transakcji).
+    /// Czyści cały magazyn rekordów (zmiana trybu; odtworzenie kopii zastępuje całość w jednej transakcji): rekordy i trasy nagrań.
+    /// Sesji nagrywania (`ride_session`, `ride_point`, `ride_media`) NIE rusza — jak `RoomLocalStore.clear()` w Androidzie: sesja nie jest
+    /// częścią magazynu lokalnego (kopia jej nie zawiera), a niezapisana jazda ma przetrwać rutynowe czyszczenie. Operacje zastępujące
+    /// dane telefonu przy niezapisanej jeździe wstrzymuje blokada trybów (Task 31, `RideSessionGuard` z Androida), a nie kasowanie sesji.
     public func clear() throws {
         state.dirty = true
+        try db.execute(sql: "DELETE FROM local_track")
         try db.execute(sql: "DELETE FROM record_horse")
         try db.execute(sql: "DELETE FROM local_record")
+    }
+
+    // MARK: Trasy nagrań
+
+    /// Zapisuje lub zastępuje trasę nagrania — w transakcji magazynu, więc wycofuje się razem z nią.
+    public func putTrack(_ track: StoredTrack) throws {
+        state.dirty = true
+        try db.execute(
+            sql: "INSERT OR REPLACE INTO local_track (recordingId, version, format, data) VALUES (?, ?, ?, ?)",
+            arguments: [track.recordingId, track.version, track.format, track.data]
+        )
+    }
+
+    /// Usuwa trasę nagrania; brak trasy nie jest błędem.
+    public func deleteTrack(recordingId: String) throws {
+        state.dirty = true
+        try db.execute(sql: "DELETE FROM local_track WHERE recordingId = ?", arguments: [recordingId])
     }
 
     public func setMeta(_ key: String, _ value: String?) throws {
@@ -233,6 +261,14 @@ public struct RecordAccess {
 
     public func meta(_ key: String) throws -> String? {
         try String.fetchOne(db, sql: "SELECT value FROM local_meta WHERE key = ?", arguments: [key])
+    }
+
+    /// Trasa nagrania; `nil`, gdy jej nie pobrano.
+    public func track(recordingId: String) throws -> StoredTrack? {
+        guard let row = try Row.fetchOne(db, sql: "SELECT recordingId, version, format, data FROM local_track WHERE recordingId = ?", arguments: [recordingId]) else {
+            return nil
+        }
+        return StoredTrack(recordingId: row["recordingId"], version: row["version"], format: row["format"], data: row["data"])
     }
 
     public func changeCounter() throws -> Int64 {
@@ -331,6 +367,18 @@ public final class RecordStore: Sendable {
 
     public func setMeta(_ key: String, _ value: String?) async throws {
         try await write { try $0.setMeta(key, value) }
+    }
+
+    public func track(recordingId: String) async throws -> StoredTrack? {
+        try await read { try $0.track(recordingId: recordingId) }
+    }
+
+    public func putTrack(_ track: StoredTrack) async throws {
+        try await write { try $0.putTrack(track) }
+    }
+
+    public func deleteTrack(recordingId: String) async throws {
+        try await write { try $0.deleteTrack(recordingId: recordingId) }
     }
 
     // MARK: Obserwacja

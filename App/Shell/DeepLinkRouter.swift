@@ -7,6 +7,15 @@ enum AppTab: Hashable, Sendable, CaseIterable {
     case dashboard, horses, reminders, trainings, more
 }
 
+/// Ekran nagrywania jazdy pokazywany na pełnym ekranie nad kartami.
+enum RideFlowRoute: Hashable, Sendable {
+    /// „Nagraj jazdę” — z karty konia z wybranym koniem.
+    case start(horseId: String?)
+    case recording
+    /// Zakończona jazda czekająca na zapis (formularz treningu z jazdy — Task 21).
+    case finish(sessionId: String)
+}
+
 /// Cel wejścia z powiadomienia, szybkiej akcji ikony albo adresu `horsely://` (contracts/app-entry-points-ios.md).
 enum AppDestination: Equatable, Sendable {
     case dashboard
@@ -41,8 +50,16 @@ final class DeepLinkRouter {
     var banner: BannerMessage?
     /// Ponowne parowanie („Połącz ponownie” w komunikacie o odrzuconym kluczu albo zmienionym certyfikacie).
     var showPairing = false
+    /// Nagrywanie jazdy na pełnym ekranie (Task 17): start, ekran nagrywania albo zakończenie; `nil` — zamknięte. Otwierają je „Nagraj jazdę”,
+    /// pasek NAG-01, „Zapisz” z odzyskiwania i „Zakończ” z Live Activity (`RideActivityActions` → `openRideFinish`).
+    var ride: RideFlowRoute?
     /// Cel odłożony do czasu wyboru trybu pracy.
     private(set) var deferredDestination: AppDestination?
+
+    /// „Zakończ” z Live Activity (otwiera aplikację) albo zakończenie jazdy w trakcie: ekran zakończenia tej sesji.
+    func openRideFinish(sessionId: String) {
+        ride = .finish(sessionId: sessionId)
+    }
 
     func handle(url: URL, mode: WorkMode) {
         route(Self.destination(for: url), mode: mode)

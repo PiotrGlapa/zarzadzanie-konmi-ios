@@ -15,6 +15,8 @@ struct AttachmentsSection: View {
     @State private var opened: LocalAttachment?
     @State private var working = false
     @State private var message: String?
+    /// Filmy czekające na wybór „Wyślij oryginał” przed dodaniem (decyzja A10).
+    @State private var videoChoice: VideoChoice?
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.between) {
@@ -49,6 +51,15 @@ struct AttachmentsSection: View {
         .sheet(item: $opened) { attachment in
             AttachmentViewer(attachment: attachment)
         }
+        .sheet(item: $videoChoice) { choice in
+            VideoOptionsSheet(choice: choice) { originals in
+                videoChoice = nil
+                Task { await save(choice.files, description: choice.description, originals: originals) }
+            } onCancel: {
+                videoChoice = nil
+                choice.files.forEach(environment.attachments.discard)
+            }
+        }
         .alert(message ?? "", isPresented: Binding(get: { message != nil }, set: { if !$0 { message = nil } })) {
             Button(tr("common_ok")) { message = nil }
         }
@@ -58,6 +69,9 @@ struct AttachmentsSection: View {
         HStack(spacing: Spacing.between) {
             Text("attachments_title").font(.headline).fixedSize().accessibilityAddTraits(.isHeader)
             if working { ProgressView() }
+            if working, let percent = environment.videoProgress.percent[owner.id] {
+                Text(tr("video_prepare_progress", percent)).font(.footnote).foregroundStyle(HorselyColor.primary)
+            }
         }
     }
 
@@ -83,19 +97,107 @@ struct AttachmentsSection: View {
         working = true
         defer { working = false }
         let store = environment.attachments
-        let (ready, rejected) = await Task.detached(priority: .userInitiated) { PickedFile.prepare(picked, with: store) }.value
-        if !ready.isEmpty {
-            do {
-                try await store.add(owner, ready.map { PendingAttachment(file: $0, description: description) })
-                await load()
-                if environment.workMode == .online { Task { _ = await environment.sendQueue() } }
-            } catch {
-                ready.forEach(store.discard)
-                message = tr("attachments_share_rejected", error.localizedDescription)
-                return
+        let (ready, rejected) = await Task.detached(priority: .userInitiated) { await PickedFile.prepare(picked, with: store) }.value
+        if !rejected.isEmpty { message = tr("attachments_share_rejected", rejected.joined(separator: " ")) }
+        // Film poniżej 100 MB: najpierw wybór „Wyślij oryginał” (bez zmniejszania do 720p, decyzja A10).
+        if ready.contains(where: { FilePolicy.isVideo($0.contentType) && VideoPolicy.canSendOriginal(sizeBytes: $0.sizeBytes) }) {
+            videoChoice = VideoChoice(files: ready, description: description)
+            return
+        }
+        await save(ready, description: description, originals: [])
+    }
+
+    /// Zapis przygotowanych plików; `originals` — filmy z włączonym „Wyślij oryginał”. Online film do zmniejszenia czeka w kolejce
+    /// („Przygotowuję film…”) i jest przygotowywany w tle; samodzielnie — zmniejszany przed zapisem z postępem w nagłówku.
+    private func save(_ ready: [ImportedFile], description: String?, originals: Set<URL>) async {
+        guard !ready.isEmpty else { return }
+        working = true
+        // Postęp zmniejszania w trybie samodzielnym pod kluczem właściciela (nagłówek sekcji).
+        let progress = environment.videoProgress
+        let key = owner.id
+        defer {
+            working = false
+            progress.set(attachmentId: key, percent: nil)
+        }
+        let store = environment.attachments
+        let owner = self.owner
+        let pending = ready.map { PendingAttachment(file: $0, description: description, sendOriginal: originals.contains($0.url)) }
+        do {
+            // Zmniejszanie filmu przed zapisem trwa — dostaje czas na dokończenie także po zejściu aplikacji w tło.
+            let result: Result<[String], any Error> = await environment.withBackgroundTime(BackgroundWork.videoIdentifier) {
+                do {
+                    return .success(try await store.add(owner, pending) { percent in
+                        Task { @MainActor in progress.set(attachmentId: key, percent: percent) }
+                    })
+                } catch {
+                    return .failure(error)
+                }
+            }
+            _ = try result.get()
+            await load()
+            if environment.workMode == .online {
+                Task {
+                    _ = await environment.sendQueue()
+                    await environment.prepareVideos()
+                }
+            }
+        } catch {
+            ready.forEach(store.discard)
+            message = tr("attachments_share_rejected", error.localizedDescription)
+        }
+    }
+}
+
+/// Pliki gotowe do dodania, wśród nich film, dla którego można wybrać „Wyślij oryginał”.
+struct VideoChoice: Identifiable {
+    let id = UUID()
+    let files: [ImportedFile]
+    let description: String?
+}
+
+/// Wybór dla filmów przed dodaniem (`VideoOptions` z `PendingAttachmentsSection` Androida): przełącznik „Wyślij oryginał” (tylko poniżej
+/// 100 MB — większego pliku program nie przyjmie) albo informacja, że film zostanie zmniejszony do 720p.
+struct VideoOptionsSheet: View {
+    let choice: VideoChoice
+    let onConfirm: (Set<URL>) -> Void
+    let onCancel: () -> Void
+    @State private var originals: Set<URL> = []
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                ForEach(choice.files.filter { FilePolicy.isVideo($0.contentType) }, id: \.url) { file in
+                    Section {
+                        if VideoPolicy.canSendOriginal(sizeBytes: file.sizeBytes) {
+                            Toggle(isOn: original(file.url)) { Text("video_send_original") }
+                                .accessibilityIdentifier("video-send-original")
+                            Text(LocalizedStringKey(originals.contains(file.url) ? "video_send_original_hint" : "video_will_shrink"))
+                                .font(.footnote)
+                                .foregroundStyle(HorselyColor.onSurfaceVariant)
+                        } else {
+                            Text("video_too_big_to_send_original").font(.footnote)
+                        }
+                    } header: {
+                        Text(file.fileName)
+                    }
+                }
+            }
+            .navigationTitle("attachments_add_title")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button(tr("common_cancel")) { onCancel() } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(tr("attachments_add")) { onConfirm(originals) }.accessibilityIdentifier("video-options-add")
+                }
             }
         }
-        if !rejected.isEmpty { message = tr("attachments_share_rejected", rejected.joined(separator: " ")) }
+        .interactiveDismissDisabled()
+    }
+
+    private func original(_ url: URL) -> Binding<Bool> {
+        Binding(get: { originals.contains(url) }, set: { on in
+            if on { originals.insert(url) } else { originals.remove(url) }
+        })
     }
 }
 
@@ -104,19 +206,20 @@ enum PickedFile: Sendable {
     case data(Data, name: String, mimeType: String?)
     case file(URL, name: String?, mimeType: String?, securityScoped: Bool)
 
-    /// Sprawdza i kopiuje pliki do katalogu importu; zwraca gotowe pliki i opisy pominiętych („plik.exe — Ten typ…”).
-    static func prepare(_ picked: [PickedFile], with store: AttachmentStore) -> (ready: [ImportedFile], rejected: [String]) {
+    /// Sprawdza i kopiuje pliki do katalogu importu (z odczytem czasu i miejsca z kopii); zwraca gotowe pliki i opisy pominiętych
+    /// („plik.exe — Ten typ…”).
+    static func prepare(_ picked: [PickedFile], with store: AttachmentStore) async -> (ready: [ImportedFile], rejected: [String]) {
         var ready: [ImportedFile] = []
         var rejected: [String] = []
         for item in picked {
             do {
                 switch item {
                 case let .data(data, name, mimeType):
-                    ready.append(try store.prepare(data: data, fileName: name, mimeType: mimeType))
+                    ready.append(try await store.prepare(data: data, fileName: name, mimeType: mimeType))
                 case let .file(url, name, mimeType, scoped):
                     let accessing = scoped && url.startAccessingSecurityScopedResource()
                     defer { if accessing { url.stopAccessingSecurityScopedResource() } }
-                    ready.append(try store.prepare(fileAt: url, fileName: name, mimeType: mimeType))
+                    ready.append(try await store.prepare(fileAt: url, fileName: name, mimeType: mimeType))
                     if !scoped { try? FileManager.default.removeItem(at: url) }
                 }
             } catch let AttachmentError.rejected(reason) {
@@ -175,8 +278,8 @@ struct AttachmentTile: View {
                 .padding(6)
                 .frame(width: Self.side, height: Self.side)
             }
-            if let marker = environment.marker(.attachment, id: attachment.id) {
-                Text(LocalizedStringKey(RecordMarkerLabel.key(marker)))
+            if let caption {
+                Text(caption)
                     .font(.caption2.weight(.semibold))
                     .lineLimit(1)
                     .foregroundStyle(HorselyColor.onPrimary)
@@ -188,10 +291,23 @@ struct AttachmentTile: View {
         }
         .frame(width: Self.side, height: Self.side)
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .task(id: attachment.id) {
-            guard FilePolicy.isImage(attachment.contentType), let data = await environment.attachments.thumbnail(attachment) else { return }
+        // Film w kolejce dostaje miniaturę po przygotowaniu — zadanie rusza ponownie, gdy przygotowanie się kończy.
+        .task(id: "\(attachment.id)-\(isPreparing)") {
+            guard let data = await environment.attachments.thumbnail(attachment) else { return }
             thumbnail = UIImage(data: data)
         }
+    }
+
+    /// Napis na dole kafla: film jeszcze zmniejszany do 720p — postęp zamiast „czeka na wysłanie” (decyzja A10); inaczej oznaczenie kolejki.
+    private var isPreparing: Bool {
+        environment.workMode == .online && environment.queue.preparingOperation(attachmentId: attachment.id) != nil
+    }
+
+    private var caption: String? {
+        if isPreparing {
+            return environment.videoProgress.percent[attachment.id].map { tr("video_prepare_progress", $0) } ?? tr("video_preparing")
+        }
+        return environment.marker(.attachment, id: attachment.id).map { tr(RecordMarkerLabel.key($0)) }
     }
 
     static func icon(_ contentType: String) -> String {

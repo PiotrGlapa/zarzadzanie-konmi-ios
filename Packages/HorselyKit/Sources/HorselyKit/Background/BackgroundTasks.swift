@@ -12,6 +12,8 @@ public enum BackgroundWork {
     public static let refreshIdentifier = "pl.glapa.horsely.refresh"
     public static let syncIdentifier = "pl.glapa.horsely.sync"
     public static let backupIdentifier = "pl.glapa.horsely.backup"
+    /// Przygotowanie filmów (zmniejszenie do 720p, decyzja A10) — wznawia przerwane, gdy aplikacja nie jest na pierwszym planie.
+    public static let videoIdentifier = "pl.glapa.horsely.video"
     public static let refreshInterval: TimeInterval = 60 * 60
     public static let stampRefreshInterval: TimeInterval = 15 * 60
 
@@ -40,6 +42,7 @@ public final class BackgroundTasks: @unchecked Sendable {
     private let refresh: Work
     private let sync: Work
     private let backup: Work?
+    private let video: Work?
     private let interval: @Sendable () async -> TimeInterval
 
     /// - Parameters:
@@ -47,10 +50,14 @@ public final class BackgroundTasks: @unchecked Sendable {
     ///   - sync: sama wysyłka kolejki
     ///   - interval: odstęp następnego odświeżenia (zależny od możliwości programu)
     ///   - backup: kopia automatyczna co tydzień (`pl.glapa.horsely.backup`)
-    public init(refresh: @escaping Work, sync: @escaping Work, backup: Work? = nil, interval: @escaping @Sendable () async -> TimeInterval) {
+    ///   - video: przygotowanie filmów czekających w kolejce (`pl.glapa.horsely.video`); `true` — nic nie zostało do przygotowania
+    public init(
+        refresh: @escaping Work, sync: @escaping Work, backup: Work? = nil, video: Work? = nil, interval: @escaping @Sendable () async -> TimeInterval
+    ) {
         self.refresh = refresh
         self.sync = sync
         self.backup = backup
+        self.video = video
         self.interval = interval
     }
 
@@ -65,6 +72,11 @@ public final class BackgroundTasks: @unchecked Sendable {
             BGTaskScheduler.shared.register(forTaskWithIdentifier: BackgroundWork.backupIdentifier, using: nil) { [self] task in
                 handle(task, work: backup, reschedule: false)
                 scheduleBackup()
+            }
+        }
+        if let video {
+            BGTaskScheduler.shared.register(forTaskWithIdentifier: BackgroundWork.videoIdentifier, using: nil) { [self] task in
+                handle(task, work: video, reschedule: false)
             }
         }
     }
@@ -108,6 +120,14 @@ public final class BackgroundTasks: @unchecked Sendable {
         request.requiresNetworkConnectivity = false
         request.requiresExternalPower = false
         request.earliestBeginDate = Date().addingTimeInterval(delay)
+        try? BGTaskScheduler.shared.submit(request)
+    }
+
+    /// Przygotowanie filmów w tle (bez sieci): system uruchamia je, gdy telefon nie jest używany; przerwane — wznowi start aplikacji.
+    public func scheduleVideoPreparation() {
+        let request = BGProcessingTaskRequest(identifier: BackgroundWork.videoIdentifier)
+        request.requiresNetworkConnectivity = false
+        request.requiresExternalPower = false
         try? BGTaskScheduler.shared.submit(request)
     }
 

@@ -2,6 +2,15 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/pl/1.1.0/). Wersje zgodne z aplikacją na Androida o tym samym zakresie.
 
+## [Nieopublikowane]
+
+### Poprawiono
+
+- Ustawienia → Powiadomienia: gdy serwer wysyła powiadomienia, a telefon nie ma jeszcze zgody, ekran mówi „telefon nie ma
+  jeszcze na nie zgody” z przyciskiem „Zezwól na powiadomienia” zamiast mylącego „Rejestruję telefon na serwerze…”
+  (rejestracja w tym stanie czeka i nic nie wysyła).
+- Dziennik diagnostyczny (kategoria `push`) zapisuje każdą zmianę stanu push, np. „stan: czekam na zgodę na powiadomienia”.
+
 ## [2.1.0] — 2026-11-05
 
 Powiadomienia push z serwera w trybie z serwerem ([specs/003-push-z-serwera](specs/003-push-z-serwera/spec.md)).

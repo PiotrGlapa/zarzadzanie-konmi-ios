@@ -3,7 +3,7 @@ import HorselyKit
 import SwiftUI
 
 /// Treningi konia (FR-M-TRN-04): filtry (rodzaj, zakres dat), „Treningów: N · Razem: kwota”, wiersze z paskiem koloru treningu
-/// (rodzaj, czas „X h Y min”, intensywność, wysokość przeszkód, ocena, trener), „Dodaj trening”.
+/// (rodzaj, czas „X h Y min”, intensywność, wysokość przeszkód, ocena, trener), „Dodaj trening”, „Nagraj jazdę”.
 struct TrainingsTab: View {
     @Environment(AppEnvironment.self) private var environment
     let horseId: String
@@ -33,6 +33,8 @@ struct TrainingsTab: View {
                 .accessibilityIdentifier("trainings-filters")
             }
             TabAddButton(title: "trainings_section_add", request: EntryRequest(kind: .training, horseId: horseId), identifier: "trainings-add")
+            // „Nagraj jazdę” z tym koniem (Task 17): ekran startu ma go wybranego, z „Zmień” zamiast listy.
+            RideRecordButton(horseId: horseId)
             if let list {
                 if list.trainings.isEmpty {
                     TabEmptyText(key: "trainings_section_empty_title", hint: "trainings_section_empty_hint")

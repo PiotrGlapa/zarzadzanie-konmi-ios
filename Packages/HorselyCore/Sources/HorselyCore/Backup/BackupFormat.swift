@@ -25,13 +25,18 @@ public struct BackupCounts: Codable, Equatable, Sendable {
     }
 }
 
-/// `manifest.json` (contracts/android/backup-format.md §3; `BackupModels.kt` Androida 2.0.1) — pierwszy wpis archiwum; `entries` to
+/// `manifest.json` (contracts/android/backup-format.md §3; `BackupModels.kt` Androida 3.0.2) — pierwszy wpis archiwum; `entries` to
 /// sumy `sha256` pozostałych wpisów (`export.json`, `phone.json`, `attachments/<id>`).
 public struct BackupManifest: Codable, Equatable, Sendable {
     public static let format = "zk-kopia"
     /// Najwyższy `formatVersion`, który ta aplikacja odtworzy (zgodność wstecz, FR-KOP-04).
-    public static let formatVersion = 2
-    public static let exportSchemaVersion = "1.5"
+    public static let formatVersion = 3
+    /// Schemat pliku `export.json` kopii (serwer 3.0: nagrania jazd, profile koni, ustawienia jazd, metadane załączników).
+    public static let exportSchemaVersion = "1.6"
+    /// Logiczna wersja danych aplikacji 3.0 — osobna od schematu eksportu (decyzja serwera D2).
+    public static let dataSchemaVersion = "3.0"
+    /// Wersja danych kopii bez pola `dataSchemaVersion` (format 2, aplikacja 2.x).
+    public static let legacyDataSchemaVersion = "2.0"
     public static let manifestName = "manifest.json"
     public static let exportName = "export.json"
     public static let phoneName = "phone.json"
@@ -43,6 +48,7 @@ public struct BackupManifest: Codable, Equatable, Sendable {
     public var createdAt: String
     public var appVersion: String
     public var exportSchemaVersion: String
+    public var dataSchemaVersion: String
     public var counts: BackupCounts
     public var entries: [String: String]
 
@@ -52,6 +58,7 @@ public struct BackupManifest: Codable, Equatable, Sendable {
         self.createdAt = createdAt
         self.appVersion = appVersion
         exportSchemaVersion = Self.exportSchemaVersion
+        dataSchemaVersion = Self.dataSchemaVersion
         self.counts = counts
         self.entries = entries
     }
@@ -63,6 +70,8 @@ public struct BackupManifest: Codable, Equatable, Sendable {
         createdAt = try c.decode(String.self, forKey: .createdAt)
         appVersion = try c.decode(String.self, forKey: .appVersion)
         exportSchemaVersion = try c.decodeIfPresent(String.self, forKey: .exportSchemaVersion) ?? Self.exportSchemaVersion
+        // Manifest formatu 2 (aplikacja 2.x) nie zna `dataSchemaVersion` — „3.0” byłoby nieprawdą o takiej kopii (jak `BackupReader.kt`).
+        dataSchemaVersion = try c.decodeIfPresent(String.self, forKey: .dataSchemaVersion) ?? Self.legacyDataSchemaVersion
         counts = try c.decodeIfPresent(BackupCounts.self, forKey: .counts) ?? BackupCounts()
         entries = try c.decodeIfPresent([String: String].self, forKey: .entries) ?? [:]
     }

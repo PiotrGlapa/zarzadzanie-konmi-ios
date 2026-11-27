@@ -131,7 +131,10 @@ extension RuleEngine {
             guard let old = try s.find(.training, id, as: LocalTraining.self) else { throw s.notFound("Training", id) }
             let updated = try training(s, input, id: id, old: old)
             try Self.requireVersion(s, current: old.version, expected: expectedVersion)
-            return (try s.replace(old: old, with: updated, primary: true), nil)
+            let saved = try s.replace(old: old, with: updated, primary: true)
+            // Załączniki treningu idą za koniem treningu (jak przy notatce i wizytach).
+            try Self.syncAttachmentsHorse(s, ownerType: .training, ownerId: id, horseId: saved.horseId)
+            return (saved, nil)
         }
     }
 

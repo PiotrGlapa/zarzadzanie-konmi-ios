@@ -106,7 +106,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Program %1$@ — aplikacja testowana z 2.0.0; sprawdź, czy jest nowa wersja aplikacji."
+            "value" : "Program %1$@ — aplikacja testowana z 3.0.0; sprawdź, czy jest nowa wersja aplikacji."
           }
         }
       }
@@ -155,35 +155,35 @@
         }
       }
     },
-    "about_whats_new_fixes" : {
+    "about_whats_new_analysis" : {
       "extractionState" : "manual",
       "localizations" : {
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Horsely: nowa nazwa aplikacji i zgodność z programem 2.0.0 — nowe rodzaje treningów, status konia „Kontuzjowany” z ikoną plastra oraz szybsze pobieranie samych zmian."
+            "value" : "Progi chodów i obciążenie konia w ustawieniach jazd oraz nowy raport „Analiza jazd”."
           }
         }
       }
     },
-    "about_whats_new_look" : {
+    "about_whats_new_attachments" : {
       "extractionState" : "manual",
       "localizations" : {
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dziennik diagnostyczny w „O aplikacji”: podgląd, wysyłanie i czyszczenie oraz opcjonalny szczegółowy dziennik połączeń (adres, IP, wynik) włączany w Ustawieniach na 7 dni."
+            "value" : "Załączniki treningów: do treningu można dołączać zdjęcia i filmy, a w trybie z programem trafiają one do komputera."
           }
         }
       }
     },
-    "about_whats_new_rating" : {
+    "about_whats_new_ride" : {
       "extractionState" : "manual",
       "localizations" : {
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Poprawiony układ raportów: etykiety i wartości w „Więcej szczegółów” nie łamią się już po literze."
+            "value" : "Nagrywanie jazdy: trasa z GPS, zdjęcia i filmy w trakcie jazdy, mapa trasy w szczegółach treningu, udostępnianie trasy w pliku GPX oraz opcjonalna pogoda z chwili jazdy (po włączeniu telefon pyta serwis Open-Meteo o pogodę dla zaokrąglonego położenia)."
           }
         }
       }
@@ -194,7 +194,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Co nowego w wersji 2.0.1"
+            "value" : "Co nowego w wersji %1$@"
           }
         }
       }
@@ -1002,6 +1002,28 @@
         }
       }
     },
+    "backup_blocked_recording" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ nagrywanie jazdy, zanim przywrócisz kopię."
+          }
+        }
+      }
+    },
+    "backup_blocked_unsaved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz lub odrzuć nagraną jazdę, zanim przywrócisz kopię."
+          }
+        }
+      }
+    },
     "backup_choose_location" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1195,7 +1217,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bez hasła plik nie jest zaszyfrowany, a zawiera dane finansowe — przechowuj go w bezpiecznym miejscu. Zapomnianego hasła nie da się odzyskać: kopii z hasłem nie odtworzysz bez niego."
+            "value" : "Bez hasła plik nie jest zaszyfrowany, a zawiera dane finansowe i trasy jazd (położenie GPS) — przechowuj go w bezpiecznym miejscu. Zapomnianego hasła nie da się odzyskać: kopii z hasłem nie odtworzysz bez niego."
           }
         }
       }
@@ -1338,7 +1360,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Obecne dane zostaną zastąpione."
+            "value" : "Obecne dane zostaną zastąpione — także jazdy z trasą zapisane w telefonie."
           }
         }
       }
@@ -1570,6 +1592,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminy — w dniu terminu"
+          }
+        }
+      }
+    },
+    "channel_ride_alerts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostrzeżenia z nagrywania jazdy"
+          }
+        }
+      }
+    },
+    "channel_ride_recording" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie jazdy"
           }
         }
       }
@@ -2716,6 +2760,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresy"
+          }
+        }
+      }
+    },
+    "connection_blocked_recording" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ nagrywanie jazdy, zanim rozłączysz program."
+          }
+        }
+      }
+    },
+    "connection_blocked_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie można teraz rozłączyć"
+          }
+        }
+      }
+    },
+    "connection_blocked_unsaved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz lub odrzuć nagraną jazdę, zanim rozłączysz program."
           }
         }
       }
@@ -5232,6 +5309,17 @@
         }
       }
     },
+    "entry_recording_locked_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń nagranie, aby zmienić konia lub datę"
+          }
+        }
+      }
+    },
     "entry_suggested_date" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -5415,6 +5503,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Połączenie jest wstrzymane. Sprawdź je w Ustawieniach."
+          }
+        }
+      }
+    },
+    "error_training_has_recording" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trening ma nagranie jazdy — usuń nagranie, aby zmienić konia lub datę."
           }
         }
       }
@@ -7240,6 +7339,72 @@
         }
       }
     },
+    "horse_ride_profile_blocked" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmiana wartości jest teraz niedostępna — program wymaga aktualizacji."
+          }
+        }
+      }
+    },
+    "horse_ride_profile_edit_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zostaw pole puste, żeby koń używał wartości domyślnej."
+          }
+        }
+      }
+    },
+    "horse_ride_profile_intro" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Własne wartości tego konia. Pole bez wartości używa wartości domyślnych z Ustawień → „Jazdy: chody i obciążenie”."
+          }
+        }
+      }
+    },
+    "horse_ride_profile_restore" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przywróć domyślne"
+          }
+        }
+      }
+    },
+    "horse_ride_profile_restore_field" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przywróć domyślne: %1$@"
+          }
+        }
+      }
+    },
+    "horse_ride_profile_set_own" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ustaw własne"
+          }
+        }
+      }
+    },
     "horse_sex_gelding" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -7478,6 +7643,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminy"
+          }
+        }
+      }
+    },
+    "horse_tab_ride_settings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazdy"
           }
         }
       }
@@ -8329,6 +8505,17 @@
         }
       }
     },
+    "owner_type_training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trening"
+          }
+        }
+      }
+    },
     "owner_type_vet_visit" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -8733,7 +8920,7 @@
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Program %1$@ — aplikacja testowana z 2.0.0; sprawdź, czy jest nowa wersja aplikacji."
+            "value" : "Program %1$@ — aplikacja testowana z 3.0.0; sprawdź, czy jest nowa wersja aplikacji."
           }
         }
       }
@@ -9288,6 +9475,17 @@
         }
       }
     },
+    "push_allow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zezwól na powiadomienia"
+          }
+        }
+      }
+    },
     "push_device_removed" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -9548,6 +9746,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Włączone — powiadomienia o terminach wysyła serwer Horsely."
+          }
+        }
+      }
+    },
+    "push_state_waiting_permission" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Serwer Horsely może wysyłać powiadomienia na ten telefon, ale telefon nie ma jeszcze na nie zgody. Do tego czasu powiadomienia planuje telefon."
           }
         }
       }
@@ -9882,6 +10091,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sprawdzam, czy dotarło do programu…"
+          }
+        }
+      }
+    },
+    "queue_state_waits_for_update" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czeka na aktualizację programu"
           }
         }
       }
@@ -11252,6 +11472,39 @@
         }
       }
     },
+    "reports_recorded_of" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Z nagraniem: %1$lld z %2$lld treningów · %3$@ km"
+          }
+        }
+      }
+    },
+    "reports_recorded_of_one" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Z nagraniem: %1$lld z %2$lld treningu · %3$@ km"
+          }
+        }
+      }
+    },
+    "reports_recorded_open" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz analizę jazd"
+          }
+        }
+      }
+    },
     "reports_reload" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -11259,6 +11512,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Odśwież raport"
+          }
+        }
+      }
+    },
+    "reports_ride_analysis" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analiza jazd"
+          }
+        }
+      }
+    },
+    "reports_ride_analysis_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazdy z nagraniem: miesiące, obciążenie koni, kondycja, odpoczynek, rekordy, mapa tras i pogoda"
           }
         }
       }
@@ -11468,6 +11743,2945 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wycofany"
+          }
+        }
+      }
+    },
+    "ride_allow" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zezwól"
+          }
+        }
+      }
+    },
+    "ride_analysis_cadence" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "rytm"
+          }
+        }
+      }
+    },
+    "ride_analysis_canter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Galop"
+          }
+        }
+      }
+    },
+    "ride_analysis_condition" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postęp kondycji"
+          }
+        }
+      }
+    },
+    "ride_analysis_condition_empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak danych o prędkości i rytmie w tym okresie."
+          }
+        }
+      }
+    },
+    "ride_analysis_days_since_heavy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dni od ostatniej ciężkiej jazdy"
+          }
+        }
+      }
+    },
+    "ride_analysis_days_without" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dni bez jazdy"
+          }
+        }
+      }
+    },
+    "ride_analysis_distance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dystans"
+          }
+        }
+      }
+    },
+    "ride_analysis_elevation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przewyższenie"
+          }
+        }
+      }
+    },
+    "ride_analysis_elevation_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld m"
+          }
+        }
+      }
+    },
+    "ride_analysis_last_heavy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ostatnia ciężka jazda"
+          }
+        }
+      }
+    },
+    "ride_analysis_load" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obciążenie"
+          }
+        }
+      }
+    },
+    "ride_analysis_months" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Miesiące"
+          }
+        }
+      }
+    },
+    "ride_analysis_no_heavy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "brak w okresie"
+          }
+        }
+      }
+    },
+    "ride_analysis_open_training" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz trening"
+          }
+        }
+      }
+    },
+    "ride_analysis_open_training_for" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz trening: %1$@"
+          }
+        }
+      }
+    },
+    "ride_analysis_points_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ pkt"
+          }
+        }
+      }
+    },
+    "ride_analysis_record_canter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Najdłuższy galop"
+          }
+        }
+      }
+    },
+    "ride_analysis_record_distance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Najdłuższa jazda (dystans)"
+          }
+        }
+      }
+    },
+    "ride_analysis_record_duration" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Najdłuższa jazda (czas)"
+          }
+        }
+      }
+    },
+    "ride_analysis_record_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Największa prędkość"
+          }
+        }
+      }
+    },
+    "ride_analysis_records" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rekordy"
+          }
+        }
+      }
+    },
+    "ride_analysis_records_empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak rekordów w tym okresie."
+          }
+        }
+      }
+    },
+    "ride_analysis_rest" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odpoczynek"
+          }
+        }
+      }
+    },
+    "ride_analysis_riders" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeźdźcy"
+          }
+        }
+      }
+    },
+    "ride_analysis_rides" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazdy"
+          }
+        }
+      }
+    },
+    "ride_analysis_routes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa tras"
+          }
+        }
+      }
+    },
+    "ride_analysis_routes_description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa tras: %1$lld"
+          }
+        }
+      }
+    },
+    "ride_analysis_routes_download_rest" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pobierz pozostałe trasy (%1$lld)"
+          }
+        }
+      }
+    },
+    "ride_analysis_routes_loading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wczytuję trasy: %1$lld z %2$lld"
+          }
+        }
+      }
+    },
+    "ride_analysis_routes_none" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trasy niedostępne — bez połączenia z programem nie da się pobrać tras, których nie ma w telefonie."
+          }
+        }
+      }
+    },
+    "ride_analysis_routes_partial" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokazano %1$lld z %2$lld tras; pozostałych nie ma w telefonie."
+          }
+        }
+      }
+    },
+    "ride_analysis_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "prędkość"
+          }
+        }
+      }
+    },
+    "ride_analysis_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czas"
+          }
+        }
+      }
+    },
+    "ride_analysis_total_distance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dystans"
+          }
+        }
+      }
+    },
+    "ride_analysis_total_rides" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazdy"
+          }
+        }
+      }
+    },
+    "ride_analysis_total_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czas jazdy"
+          }
+        }
+      }
+    },
+    "ride_analysis_training_type" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rodzaj treningu"
+          }
+        }
+      }
+    },
+    "ride_analysis_trot" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kłus"
+          }
+        }
+      }
+    },
+    "ride_analysis_walk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stęp"
+          }
+        }
+      }
+    },
+    "ride_analysis_weather" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pogoda"
+          }
+        }
+      }
+    },
+    "ride_analysis_weather_empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Brak jazd z pobraną pogodą w tym okresie."
+          }
+        }
+      }
+    },
+    "ride_analysis_weather_load" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Średnie obciążenie"
+          }
+        }
+      }
+    },
+    "ride_analysis_weather_rides" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazdy"
+          }
+        }
+      }
+    },
+    "ride_analysis_weather_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Średnia prędkość"
+          }
+        }
+      }
+    },
+    "ride_analysis_week_of" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tydzień od %1$@"
+          }
+        }
+      }
+    },
+    "ride_analysis_weeks_with_rides" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tygodnie z jazdą"
+          }
+        }
+      }
+    },
+    "ride_auto_finished" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie zakończone po 8 godzinach."
+          }
+        }
+      }
+    },
+    "ride_banner" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trwa nagrywanie — %1$@ · %2$@ · %3$@"
+          }
+        }
+      }
+    },
+    "ride_banner_interrupted" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie przerwane — %1$@ · %2$@ · %3$@"
+          }
+        }
+      }
+    },
+    "ride_banner_open" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ekran nagrywania"
+          }
+        }
+      }
+    },
+    "ride_banner_paused" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie wstrzymane — %1$@ · %2$@ · %3$@"
+          }
+        }
+      }
+    },
+    "ride_battery_disable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyłącz optymalizację"
+          }
+        }
+      }
+    },
+    "ride_battery_later" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie teraz"
+          }
+        }
+      }
+    },
+    "ride_battery_low" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bateria %1$lld%% — nagrywanie trwa, podłącz telefon albo zakończ jazdę."
+          }
+        }
+      }
+    },
+    "ride_battery_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aby telefon nie przerywał nagrywania po wygaszeniu ekranu, wyłącz dla aplikacji optymalizację baterii."
+          }
+        }
+      }
+    },
+    "ride_battery_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Praca w tle"
+          }
+        }
+      }
+    },
+    "ride_camera_denied" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez zgody na użycie aparatu nie zrobisz zdjęcia ani filmu."
+          }
+        }
+      }
+    },
+    "ride_camera_unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie znaleziono aplikacji aparatu."
+          }
+        }
+      }
+    },
+    "ride_cancel_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trasy nie da się odzyskać. Zdjęcia i filmy zrobione w czasie jazdy zostaną usunięte z aplikacji i nie dołączą się do treningu."
+          }
+        }
+      }
+    },
+    "ride_cancel_text_gallery" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trasy nie da się odzyskać. Zdjęcia i filmy zrobione w czasie jazdy zostaną zachowane w galerii telefonu (folder „Zarzadzanie konmi”), ale nie dołączą się do treningu."
+          }
+        }
+      }
+    },
+    "ride_cancel_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzucić nagranie?"
+          }
+        }
+      }
+    },
+    "ride_card_media" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Załączniki z jazdy (%1$lld)"
+          }
+        }
+      }
+    },
+    "ride_card_media_close" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zamknij"
+          }
+        }
+      }
+    },
+    "ride_card_media_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dołączą się do treningu po zapisaniu."
+          }
+        }
+      }
+    },
+    "ride_card_media_located" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ · z miejscem na trasie"
+          }
+        }
+      }
+    },
+    "ride_card_media_photo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdjęcie, %1$@"
+          }
+        }
+      }
+    },
+    "ride_card_media_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Załączniki z jazdy"
+          }
+        }
+      }
+    },
+    "ride_card_media_video" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Film, %1$@"
+          }
+        }
+      }
+    },
+    "ride_card_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagranie"
+          }
+        }
+      }
+    },
+    "ride_card_trim" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przytnij"
+          }
+        }
+      }
+    },
+    "ride_card_trimmed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przycięto z początku: %1$@, z końca: %2$@"
+          }
+        }
+      }
+    },
+    "ride_default_marker" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "domyślne"
+          }
+        }
+      }
+    },
+    "ride_desc_climb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ile punktów doliczyć za każde 10 m podjazdu. W górach albo dla starszego konia zwiększ."
+          }
+        }
+      }
+    },
+    "ride_desc_heavy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazda z co najmniej taką liczbą punktów liczy się jako ciężka (raport: odpoczynek)."
+          }
+        }
+      }
+    },
+    "ride_desc_thresholds" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Do jakiej prędkości koń idzie stępem / kłusem. Koń z długim krokiem kłusuje szybciej — podnieś próg; kuc — obniż. Sprawdź na nagranej jeździe, czy podział chodów zgadza się z tym, co pamiętasz."
+          }
+        }
+      }
+    },
+    "ride_desc_warn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O ile obciążenie ostatnich 7 dni może przekroczyć średnią tygodniową z ostatnich 4 tygodni, zanim pojawi się ostrzeżenie. Koń po kontuzji lub przerwie: 15–20%."
+          }
+        }
+      }
+    },
+    "ride_desc_weight_canter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jak wyżej dla galopu. Koń zimnokrwisty lub z nadwagą: 4–5; koń pełnej krwi w formie: 2–2,5."
+          }
+        }
+      }
+    },
+    "ride_desc_weight_trot" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ile razy minuta kłusa męczy konia bardziej niż minuta stępa. Młody lub słabo przygotowany koń: 2,5–3; koń wytrzymałościowy w formie: 1,5."
+          }
+        }
+      }
+    },
+    "ride_desc_weight_walk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ile „punktów pracy” daje minuta stępa. Zostaw 1 — to punkt odniesienia."
+          }
+        }
+      }
+    },
+    "ride_discard_kept_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nie udało się zachować %lld zdjęć lub filmów w galerii — pliki zostały w aplikacji."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nie udało się zachować %lld zdjęć lub filmów w galerii — pliki zostały w aplikacji."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nie udało się zachować %lld zdjęcia lub filmu w galerii — plik został w aplikacji."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nie udało się zachować %lld zdjęcia lub filmu w galerii — pliki zostały w aplikacji."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ride_distance" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dystans"
+          }
+        }
+      }
+    },
+    "ride_distance_km" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ km"
+          }
+        }
+      }
+    },
+    "ride_duration_hours_minutes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld h %2$02lld min"
+          }
+        }
+      }
+    },
+    "ride_duration_minutes" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld min"
+          }
+        }
+      }
+    },
+    "ride_duration_seconds" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld s"
+          }
+        }
+      }
+    },
+    "ride_error_integer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wpisz liczbę całkowitą."
+          }
+        }
+      }
+    },
+    "ride_error_number" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wpisz liczbę, np. 7 albo 7,5."
+          }
+        }
+      }
+    },
+    "ride_error_required" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wpisz wartość."
+          }
+        }
+      }
+    },
+    "ride_example_rest" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postój daje 0 pkt."
+          }
+        }
+      }
+    },
+    "ride_finish" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ"
+          }
+        }
+      }
+    },
+    "ride_finish_back" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wróć do jazdy"
+          }
+        }
+      }
+    },
+    "ride_finish_confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ"
+          }
+        }
+      }
+    },
+    "ride_finish_form_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trening z jazdy"
+          }
+        }
+      }
+    },
+    "ride_finish_load_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się wczytać jazdy. Możesz ją odrzucić."
+          }
+        }
+      }
+    },
+    "ride_finish_loading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przygotowywanie jazdy…"
+          }
+        }
+      }
+    },
+    "ride_finish_resumed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokończono zapis poprzedniej jazdy."
+          }
+        }
+      }
+    },
+    "ride_finish_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazda zostanie zamknięta i będzie można ją zapisać jako trening."
+          }
+        }
+      }
+    },
+    "ride_finish_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończyć nagrywanie?"
+          }
+        }
+      }
+    },
+    "ride_gait" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chód"
+          }
+        }
+      }
+    },
+    "ride_gait_canter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "galop"
+          }
+        }
+      }
+    },
+    "ride_gait_share" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
+    "ride_gait_stop" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "postój"
+          }
+        }
+      }
+    },
+    "ride_gait_trot" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "kłus"
+          }
+        }
+      }
+    },
+    "ride_gait_walk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "stęp"
+          }
+        }
+      }
+    },
+    "ride_interrupted" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie przerwane — otwórz aplikację, aby zapisać jazdę"
+          }
+        }
+      }
+    },
+    "ride_interrupted_notice" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie zostało przerwane. To, co zapisano do tej pory, można zapisać jako jazdę."
+          }
+        }
+      }
+    },
+    "ride_list_icon_description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trening z nagraniem trasy"
+          }
+        }
+      }
+    },
+    "ride_location_denied" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez dostępu do dokładnej lokalizacji nie da się nagrać jazdy."
+          }
+        }
+      }
+    },
+    "ride_location_denied_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W ustawieniach aplikacji otwórz Uprawnienia → Lokalizacja, wybierz „Tylko podczas używania aplikacji” i włącz „Używaj dokładnej lokalizacji”. Potem wróć tutaj."
+          }
+        }
+      }
+    },
+    "ride_location_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aplikacja zapisuje trasę z GPS tylko wtedy, gdy nagrywasz jazdę. Zezwól na dokładną lokalizację „podczas używania aplikacji”."
+          }
+        }
+      }
+    },
+    "ride_location_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dokładna lokalizacja"
+          }
+        }
+      }
+    },
+    "ride_map_description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ślad jazdy"
+          }
+        }
+      }
+    },
+    "ride_map_finish" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meta"
+          }
+        }
+      }
+    },
+    "ride_map_plain" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa"
+          }
+        }
+      }
+    },
+    "ride_map_satellite" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Satelita"
+          }
+        }
+      }
+    },
+    "ride_map_start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        }
+      }
+    },
+    "ride_map_terrain" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teren"
+          }
+        }
+      }
+    },
+    "ride_map_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa jazdy"
+          }
+        }
+      }
+    },
+    "ride_map_unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa niedostępna w tej wersji — pokazuję sam ślad."
+          }
+        }
+      }
+    },
+    "ride_media" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdjęcie / film"
+          }
+        }
+      }
+    },
+    "ride_media_added" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodano do jazdy"
+          }
+        }
+      }
+    },
+    "ride_media_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się dodać pliku do jazdy."
+          }
+        }
+      }
+    },
+    "ride_media_photo" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zdjęcie"
+          }
+        }
+      }
+    },
+    "ride_media_video" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Film"
+          }
+        }
+      }
+    },
+    "ride_none" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie ma trwającego nagrywania."
+          }
+        }
+      }
+    },
+    "ride_notification_finish" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ"
+          }
+        }
+      }
+    },
+    "ride_notification_pause" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pauza"
+          }
+        }
+      }
+    },
+    "ride_notification_paused" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pauza"
+          }
+        }
+      }
+    },
+    "ride_notification_resume" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wznów"
+          }
+        }
+      }
+    },
+    "ride_notification_resuming" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wznawianie nagrywania…"
+          }
+        }
+      }
+    },
+    "ride_notification_starting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start nagrywania…"
+          }
+        }
+      }
+    },
+    "ride_notification_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie jazdy"
+          }
+        }
+      }
+    },
+    "ride_notification_weak_gps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Słaby sygnał GPS"
+          }
+        }
+      }
+    },
+    "ride_notifications_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie działa przy wygaszonym ekranie i pokazuje stałe powiadomienie z czasem i dystansem oraz przyciskami „Pauza” i „Zakończ”. Zezwól na powiadomienia, aby je widzieć."
+          }
+        }
+      }
+    },
+    "ride_notifications_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Powiadomienia"
+          }
+        }
+      }
+    },
+    "ride_open_settings" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Otwórz ustawienia"
+          }
+        }
+      }
+    },
+    "ride_param_climb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dodatek za podjazd"
+          }
+        }
+      }
+    },
+    "ride_param_heavy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ciężka jazda od"
+          }
+        }
+      }
+    },
+    "ride_param_input_label" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (%2$@)"
+          }
+        }
+      }
+    },
+    "ride_param_stop" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postój do"
+          }
+        }
+      }
+    },
+    "ride_param_trot" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kłus do"
+          }
+        }
+      }
+    },
+    "ride_param_walk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stęp do"
+          }
+        }
+      }
+    },
+    "ride_param_warn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Próg ostrzeżenia"
+          }
+        }
+      }
+    },
+    "ride_param_weight_canter" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waga galopu"
+          }
+        }
+      }
+    },
+    "ride_param_weight_trot" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waga kłusa"
+          }
+        }
+      }
+    },
+    "ride_param_weight_walk" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Waga stępa"
+          }
+        }
+      }
+    },
+    "ride_pause" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pauza"
+          }
+        }
+      }
+    },
+    "ride_paused_notice" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie wstrzymane — czas pauzy nie liczy się do jazdy."
+          }
+        }
+      }
+    },
+    "ride_record" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagraj jazdę"
+          }
+        }
+      }
+    },
+    "ride_recovery_discard" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzuć"
+          }
+        }
+      }
+    },
+    "ride_recovery_discard_back" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wróć"
+          }
+        }
+      }
+    },
+    "ride_recovery_discard_confirm" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzuć nagranie"
+          }
+        }
+      }
+    },
+    "ride_recovery_discard_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trasa i zdjęcia z tej jazdy zostaną usunięte z aplikacji. Tej operacji nie można cofnąć."
+          }
+        }
+      }
+    },
+    "ride_recovery_discard_text_gallery" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trasa z tej jazdy zostanie usunięta z aplikacji — tej operacji nie można cofnąć. Zdjęcia i filmy zrobione w czasie jazdy zostaną zachowane w galerii telefonu."
+          }
+        }
+      }
+    },
+    "ride_recovery_discard_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzucić nagranie?"
+          }
+        }
+      }
+    },
+    "ride_recovery_save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz"
+          }
+        }
+      }
+    },
+    "ride_recovery_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Masz niezakończone nagranie (%1$@, %2$@, %3$@)."
+          }
+        }
+      }
+    },
+    "ride_recovery_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niezakończone nagranie"
+          }
+        }
+      }
+    },
+    "ride_resume" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wznów"
+          }
+        }
+      }
+    },
+    "ride_save_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się zapisać jazdy. Spróbuj jeszcze raz — to, co już zapisano, nie zostanie zdublowane."
+          }
+        }
+      }
+    },
+    "ride_save_too_few_points" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagranie ma za mało punktów trasy, żeby je zapisać. Odrzuć je."
+          }
+        }
+      }
+    },
+    "ride_screen_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagrywanie jazdy"
+          }
+        }
+      }
+    },
+    "ride_settings_example_header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przykład"
+          }
+        }
+      }
+    },
+    "ride_settings_load_header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Obciążenie"
+          }
+        }
+      }
+    },
+    "ride_settings_other_header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pozostałe"
+          }
+        }
+      }
+    },
+    "ride_settings_scope_online" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartości domyślne są zapisane w programie i wspólne dla wszystkich telefonów. Każdy koń może mieć własne wartości — ustawisz je na karcie konia."
+          }
+        }
+      }
+    },
+    "ride_settings_scope_standalone" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartości domyślne są zapisane w tym telefonie. Każdy koń może mieć własne wartości — ustawisz je na karcie konia."
+          }
+        }
+      }
+    },
+    "ride_settings_thresholds_header" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progi chodów"
+          }
+        }
+      }
+    },
+    "ride_settings_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jazdy: chody i obciążenie"
+          }
+        }
+      }
+    },
+    "ride_settings_training_type" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rodzaj treningu dla nagranych jazd"
+          }
+        }
+      }
+    },
+    "ride_settings_training_type_empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W słowniku nie ma aktywnych rodzajów treningu."
+          }
+        }
+      }
+    },
+    "ride_settings_training_type_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ten rodzaj treningu będzie wybrany od razu po zakończeniu nagranej jazdy."
+          }
+        }
+      }
+    },
+    "ride_settings_training_type_inactive" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (nieaktywny)"
+          }
+        }
+      }
+    },
+    "ride_settings_training_type_missing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rodzaj niedostępny"
+          }
+        }
+      }
+    },
+    "ride_settings_training_type_unavailable_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybrany rodzaj jest nieaktywny — nagrane jazdy będą miały pusty rodzaj. Wybierz inny."
+          }
+        }
+      }
+    },
+    "ride_settings_wear_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pokazuj instrukcję noszenia telefonu"
+          }
+        }
+      }
+    },
+    "ride_settings_wear_hint_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przed startem nagrywania pokazuję, jak nosić telefon, żeby chody były liczone poprawnie. Te dwa przełączniki działają od razu, bez przycisku „Zapisz”."
+          }
+        }
+      }
+    },
+    "ride_settings_weather" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pobieraj pogodę do jazd"
+          }
+        }
+      }
+    },
+    "ride_settings_weather_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po zakończeniu jazdy pobieram pogodę z Open-Meteo. Usługa dostaje tylko położenie zaokrąglone do 0,01° (ok. 1 km) i godzinę jazdy. Wyłączenie zatrzymuje też pobieranie dla jazd, które na pogodę czekają; jazd zapisanych bez pogody nie uzupełniam po ponownym włączeniu."
+          }
+        }
+      }
+    },
+    "ride_short_discard" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odrzuć — za krótkie nagranie"
+          }
+        }
+      }
+    },
+    "ride_short_keep" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz mimo to"
+          }
+        }
+      }
+    },
+    "ride_short_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagranie trwa krócej niż minutę albo ma mniej niż 100 m. Możesz je odrzucić albo mimo to zapisać."
+          }
+        }
+      }
+    },
+    "ride_short_text_one_point" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagranie ma za mało punktów trasy (potrzeba co najmniej dwóch), więc nie da się go zapisać. Możesz je tylko odrzucić."
+          }
+        }
+      }
+    },
+    "ride_short_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Za krótkie nagranie"
+          }
+        }
+      }
+    },
+    "ride_skip" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pomiń"
+          }
+        }
+      }
+    },
+    "ride_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prędkość"
+          }
+        }
+      }
+    },
+    "ride_speed_kmh" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ km/h"
+          }
+        }
+      }
+    },
+    "ride_start_checking" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sprawdzanie nagrań…"
+          }
+        }
+      }
+    },
+    "ride_start_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się rozpocząć nagrywania. Spróbuj jeszcze raz."
+          }
+        }
+      }
+    },
+    "ride_start_horse_change" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zmień"
+          }
+        }
+      }
+    },
+    "ride_start_no_horses" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W stajni nie ma jeszcze konia — dodaj konia, aby nagrać jazdę."
+          }
+        }
+      }
+    },
+    "ride_start_pick_horse" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wybierz konia, na którym jedziesz — jego progi chodów obowiązują już w trakcie jazdy."
+          }
+        }
+      }
+    },
+    "ride_start_starting" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uruchamianie nagrywania…"
+          }
+        }
+      }
+    },
+    "ride_stats_avg_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Śr. prędkość"
+          }
+        }
+      }
+    },
+    "ride_stats_cadence_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld/min"
+          }
+        }
+      }
+    },
+    "ride_stats_chart_altitude" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wysokość: %1$lld–%2$lld m"
+          }
+        }
+      }
+    },
+    "ride_stats_chart_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prędkość: do %1$@ km/h"
+          }
+        }
+      }
+    },
+    "ride_stats_chart_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wysokość i prędkość w czasie"
+          }
+        }
+      }
+    },
+    "ride_stats_col_cadence" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rytm"
+          }
+        }
+      }
+    },
+    "ride_stats_col_gait" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chód"
+          }
+        }
+      }
+    },
+    "ride_stats_col_km" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Km"
+          }
+        }
+      }
+    },
+    "ride_stats_col_percent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%"
+          }
+        }
+      }
+    },
+    "ride_stats_col_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Śr. km/h"
+          }
+        }
+      }
+    },
+    "ride_stats_col_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czas"
+          }
+        }
+      }
+    },
+    "ride_stats_delete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń nagranie"
+          }
+        }
+      }
+    },
+    "ride_stats_delete_cancel" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anuluj"
+          }
+        }
+      }
+    },
+    "ride_stats_delete_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trasa i statystyki jazdy trafią do kosza razem z nagraniem. Trening zostanie, a jego konia i datę będzie można znów zmienić."
+          }
+        }
+      }
+    },
+    "ride_stats_delete_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usunąć nagranie?"
+          }
+        }
+      }
+    },
+    "ride_stats_deleted" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagranie przeniesiono do kosza."
+          }
+        }
+      }
+    },
+    "ride_stats_elevation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przewyższenie"
+          }
+        }
+      }
+    },
+    "ride_stats_elevation_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld m"
+          }
+        }
+      }
+    },
+    "ride_stats_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się zapisać zmian w nagraniu. Spróbuj jeszcze raz."
+          }
+        }
+      }
+    },
+    "ride_stats_map" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mapa"
+          }
+        }
+      }
+    },
+    "ride_stats_max_speed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maks. prędkość"
+          }
+        }
+      }
+    },
+    "ride_stats_moving_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czas w ruchu"
+          }
+        }
+      }
+    },
+    "ride_stats_pending_upload" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nagranie czeka na wysłanie do programu."
+          }
+        }
+      }
+    },
+    "ride_stats_percent_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld%%"
+          }
+        }
+      }
+    },
+    "ride_stats_points" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Punkty obciążenia"
+          }
+        }
+      }
+    },
+    "ride_stats_points_value" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ pkt"
+          }
+        }
+      }
+    },
+    "ride_stats_recalculate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przelicz z obecnymi ustawieniami konia"
+          }
+        }
+      }
+    },
+    "ride_stats_recalculate_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progi chodów konia zmieniły się od czasu tego nagrania — chody i statystyki można przeliczyć na nowo."
+          }
+        }
+      }
+    },
+    "ride_stats_recalculated" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przeliczono nagranie."
+          }
+        }
+      }
+    },
+    "ride_stats_share_gpx" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Udostępnij trasę (GPX)"
+          }
+        }
+      }
+    },
+    "ride_stats_share_gpx_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie udało się przygotować pliku GPX. Spróbuj jeszcze raz."
+          }
+        }
+      }
+    },
+    "ride_stats_share_gpx_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Udostępnij trasę"
+          }
+        }
+      }
+    },
+    "ride_stats_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statystyki jazdy"
+          }
+        }
+      }
+    },
+    "ride_stats_track_loading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wczytywanie trasy…"
+          }
+        }
+      }
+    },
+    "ride_stats_track_unavailable" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trasa niedostępna"
+          }
+        }
+      }
+    },
+    "ride_stats_trim" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przytnij"
+          }
+        }
+      }
+    },
+    "ride_stats_trimmed_both" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przycięto %1$@ z początku i %2$@ z końca"
+          }
+        }
+      }
+    },
+    "ride_stats_trimmed_end" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przycięto %1$@ z końca"
+          }
+        }
+      }
+    },
+    "ride_stats_trimmed_start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przycięto %1$@ z początku"
+          }
+        }
+      }
+    },
+    "ride_time" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Czas"
+          }
+        }
+      }
+    },
+    "ride_trim_apply" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zastosuj"
+          }
+        }
+      }
+    },
+    "ride_trim_end" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń z końca: %1$@"
+          }
+        }
+      }
+    },
+    "ride_trim_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Odetnij początek albo koniec jazdy — na przykład dojazd lub powrót samochodem. Przycięcie usuwa punkty trasy na stałe."
+          }
+        }
+      }
+    },
+    "ride_trim_kept" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zostaje"
+          }
+        }
+      }
+    },
+    "ride_trim_slider" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakres jazdy do zachowania"
+          }
+        }
+      }
+    },
+    "ride_trim_start" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usuń z początku: %1$@"
+          }
+        }
+      }
+    },
+    "ride_trim_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przytnij nagranie"
+          }
+        }
+      }
+    },
+    "ride_trim_too_much" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Po przycięciu zostałoby za mało trasy — zmniejsz zakres."
+          }
+        }
+      }
+    },
+    "ride_unit_climb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pkt / 10 m w górę"
+          }
+        }
+      }
+    },
+    "ride_unit_kmh" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "km/h"
+          }
+        }
+      }
+    },
+    "ride_unit_percent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%"
+          }
+        }
+      }
+    },
+    "ride_unit_points" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pkt"
+          }
+        }
+      }
+    },
+    "ride_value_climb" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ pkt / 10 m w górę"
+          }
+        }
+      }
+    },
+    "ride_value_default" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (domyślne)"
+          }
+        }
+      }
+    },
+    "ride_value_default_is" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Domyślnie: %1$@"
+          }
+        }
+      }
+    },
+    "ride_value_kmh" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ km/h"
+          }
+        }
+      }
+    },
+    "ride_value_none" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "—"
+          }
+        }
+      }
+    },
+    "ride_value_points" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ pkt"
+          }
+        }
+      }
+    },
+    "ride_value_warn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "+%1$@%%"
+          }
+        }
+      }
+    },
+    "ride_wear_dont_show" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie pokazuj więcej"
+          }
+        }
+      }
+    },
+    "ride_wear_text" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Włóż telefon do kieszeni kurtki albo uchwytu na ramieniu, ekranem do ciała. Nie wkładaj go do torby przy siodle ani nie trzymaj w ręce — wtedy chody będą liczone błędnie."
+          }
+        }
+      }
+    },
+    "ride_wear_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jak nosić telefon"
+          }
+        }
+      }
+    },
+    "ride_weather" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pogoda: %1$@"
+          }
+        }
+      }
+    },
+    "ride_weather_empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pogoda: brak danych"
+          }
+        }
+      }
+    },
+    "ride_weather_failed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pogoda: niedostępna"
+          }
+        }
+      }
+    },
+    "ride_weather_feels_like" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (odcz. %2$lld°C)"
+          }
+        }
+      }
+    },
+    "ride_weather_humidity" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wilgotność %1$lld%%"
+          }
+        }
+      }
+    },
+    "ride_weather_pending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pogoda: czekam na połączenie"
+          }
+        }
+      }
+    },
+    "ride_weather_precipitation" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "opad %1$@ mm"
+          }
+        }
+      }
+    },
+    "ride_weather_temperature" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld°C"
+          }
+        }
+      }
+    },
+    "ride_weather_wind" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "wiatr %1$lld km/h"
           }
         }
       }
@@ -12123,6 +15337,116 @@
         }
       }
     },
+    "video_prepare_progress" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przygotowuję film… %1$lld%%"
+          }
+        }
+      }
+    },
+    "video_prepare_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przygotowanie filmu do wysłania"
+          }
+        }
+      }
+    },
+    "video_preparing" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Przygotowuję film…"
+          }
+        }
+      }
+    },
+    "video_send_original" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wyślij oryginał"
+          }
+        }
+      }
+    },
+    "video_send_original_hint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bez zmniejszania do 720p — plik zostanie wysłany w pełnej jakości."
+          }
+        }
+      }
+    },
+    "video_too_big_to_send_original" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ten film ma co najmniej 100 MB, więc zostanie zmniejszony do 720p."
+          }
+        }
+      }
+    },
+    "video_will_shrink" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Film większy niż 720p zostanie zmniejszony przed wysłaniem."
+          }
+        }
+      }
+    },
+    "work_mode_blocked_recording" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zakończ nagrywanie jazdy, zanim zmienisz tryb pracy."
+          }
+        }
+      }
+    },
+    "work_mode_blocked_title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nie można teraz zmienić trybu"
+          }
+        }
+      }
+    },
+    "work_mode_blocked_unsaved" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zapisz lub odrzuć nagraną jazdę, zanim zmienisz tryb pracy."
+          }
+        }
+      }
+    },
     "work_mode_changed_standalone" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -12262,6 +15586,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dane są wspólne z programem: zmiany z telefonu trafiają do programu, a telefon pobiera jego dane."
+          }
+        }
+      }
+    },
+    "work_mode_online_rides" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "pl" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Znikną też %lld jazdy z trasą — to jedyne kopie tras."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Zniknie też %lld jazd z trasą — to jedyne kopie tras."
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Zniknie też %lld jazda z trasą — to jedyna kopia trasy."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Zniknie też %lld jazdy z trasą — to jedyne kopie tras."
+                }
+              }
+            }
           }
         }
       }

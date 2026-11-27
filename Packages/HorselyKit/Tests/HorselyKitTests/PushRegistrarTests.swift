@@ -234,6 +234,26 @@ struct PushRegistrarTests {
         #expect(appeared.box.states == [.fallback(.serverHasNoPush), .pending, .registered])
     }
 
+    /// `push` pojawia się przy synchronizacji, a zgoda jest nieustalona: rejestrator czeka bez żądań, ale dziennik mówi na co;
+    /// po zgodzie rejestracja rusza i dziennik pokazuje kolejne stany.
+    @Test func waitingForPermissionIsVisibleInTheLogAndRegistrationStartsAfterConsent() async {
+        let h = PushHarness(push: false, authorization: .notDetermined)
+        await h.registrar.reconcile(.launch)
+        h.box.capabilities = PushHarness.pushCapabilities
+        await h.registrar.reconcile(.capabilities(CapabilitiesChange(before: .none, after: PushHarness.pushCapabilities)))
+        #expect(h.putCount == 0)
+        #expect(h.tokens.calls.isEmpty, "bez zgody żadnego wywołania Firebase")
+        #expect(h.logs.all == [PushDiagnostics.state(.fallback(.serverHasNoPush)), PushDiagnostics.state(.noPermission(asked: false))])
+        #expect(PushDiagnostics.state(.noPermission(asked: false)) == "stan: czekam na zgodę na powiadomienia")
+
+        h.box.authorization = .allowed
+        await h.registrar.reconcile(.permissionChanged)
+        #expect(h.putCount == 1)
+        #expect(h.logs.all.suffix(3) == [
+            PushDiagnostics.state(.pending), PushDiagnostics.registered(prefix: String(token.prefix(8))), PushDiagnostics.state(.registered),
+        ])
+    }
+
     @Test func aFreshRegistrationIsNotRepeatedButANewTokenIs() async {
         let h = PushHarness()
         await h.registrar.reconcile(.launch)

@@ -158,7 +158,8 @@ public final class SyncService: Sendable {
         }
         let document: ExportDocument
         do {
-            document = try ExportDocument.parse(data)
+            // Pobranie z programu: nieczytelna trasa nagrania nie psuje odświeżania — nagranie wchodzi bez niej (jak `ExportCursor` Androida).
+            document = try ExportDocument.parse(data, lenientTracks: true)
         } catch {
             return .failed(.badResponse)
         }

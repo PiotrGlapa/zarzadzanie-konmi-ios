@@ -7,7 +7,8 @@ import GRDB
 public final class AppDatabase: Sendable {
     public let writer: any DatabaseWriter
 
-    private init(writer: any DatabaseWriter) throws {
+    /// Dokańcza migracje na podanej bazie (wewnętrzne — test migracji `v2 → v3` buduje bazę do `v2` produkcyjnym migratorem).
+    init(writer: any DatabaseWriter) throws {
         self.writer = writer
         try AppDatabase.migrator().migrate(writer)
     }
@@ -172,6 +173,59 @@ public final class AppDatabase: Sendable {
                 t.add(column: "horseRefs", .text)
                 t.add(column: "summary", .text).notNull().defaults(to: "")
                 t.add(column: "resultId", .text)
+            }
+        }
+        // Treningi i nagrania (T061): tabele `local_track`, `ride_session`, `ride_point`, `ride_media` — kolumny, `NOT NULL`
+        // i klucze obce 1:1 z Androidem 3.0.2 (`Migration3To4.kt`). Punkty i pliki z jazdy znikają razem z sesją (`ON DELETE CASCADE`).
+        migrator.registerMigration("v3") { db in
+            try db.create(table: "local_track") { t in
+                t.column("recordingId", .text).notNull().primaryKey()
+                t.column("version", .integer).notNull()
+                t.column("format", .text).notNull()
+                t.column("data", .blob).notNull()
+            }
+
+            try db.create(table: "ride_session") { t in
+                t.column("id", .text).notNull().primaryKey()
+                t.column("horseId", .text).notNull()
+                t.column("horseName", .text).notNull()
+                t.column("state", .text).notNull()
+                t.column("startedAtMillis", .integer).notNull()
+                t.column("endedAtMillis", .integer)
+                t.column("timeZone", .text).notNull()
+                t.column("pausesJson", .text).notNull()
+                t.column("thresholdsJson", .text).notNull()
+                t.column("loadJson", .text).notNull()
+                t.column("accelerometerUsed", .integer).notNull()
+                t.column("lastFlushMillis", .integer).notNull()
+                t.column("distanceMeters", .integer).notNull()
+                t.column("activeSeconds", .integer).notNull()
+            }
+
+            // Klucz główny (`sessionId`, `seq`) jest zarazem indeksem punktów sesji — bez osobnego indeksu.
+            try db.create(table: "ride_point") { t in
+                t.column("sessionId", .text).notNull().references("ride_session", onDelete: .cascade)
+                t.column("seq", .integer).notNull()
+                t.column("tMillis", .integer).notNull()
+                t.column("lat", .real).notNull()
+                t.column("lon", .real).notNull()
+                t.column("altM", .real)
+                t.column("speedMs", .real)
+                t.column("hAccM", .real)
+                t.column("vAccM", .real)
+                t.column("cadence", .real)
+                t.column("intensity", .real)
+                t.primaryKey(["sessionId", "seq"])
+            }
+
+            try db.create(table: "ride_media") { t in
+                t.column("sessionId", .text).notNull().references("ride_session", onDelete: .cascade)
+                t.column("uri", .text).notNull()
+                t.column("contentType", .text).notNull()
+                t.column("capturedAtMillis", .integer).notNull()
+                t.column("lat", .real)
+                t.column("lon", .real)
+                t.primaryKey(["sessionId", "uri"])
             }
         }
         return migrator

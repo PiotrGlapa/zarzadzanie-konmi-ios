@@ -109,6 +109,7 @@ public actor PushRegistrar {
         ))
         if state != published {
             published = state
+            log(PushDiagnostics.state(state))
             onState(state)
         }
         return state

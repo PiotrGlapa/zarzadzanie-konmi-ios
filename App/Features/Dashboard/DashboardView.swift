@@ -29,6 +29,11 @@ struct DashboardView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
+                    // NAG-01: pasek trwającego nagrywania na górze Pulpitu, jako pierwszy element treści przewijanej — bez jazdy nie ma
+                    // wysokości, a lista i jej przewijanie zostają te same (poprawka I1 Task 17).
+                    if let banner = RideStartPolicy.banner(environment.activeRide) {
+                        RideBanner(content: banner) { environment.router.ride = .recording }.padding(.vertical, Spacing.between)
+                    }
                     OnlineDashboardCards()
                     NotificationsDashboardCards()
                     BackupReminderCard()

@@ -130,6 +130,8 @@ extension RecordAccess {
 
     // MARK: Zapis wiersza
 
+    /// Zapis pliku w `fileRef` (JSON). Pola 3.0 są opcjonalne, więc wiersze zapisane wcześniej czytają się bez zmian; chwila i
+    /// współrzędne — jako tekst (`Instant.toString()`, liczba ze skalą zapisu), bez pośrednictwa `Double`.
     private struct StoredFile: Codable {
         let path: String
         let fileName: String
@@ -137,19 +139,56 @@ extension RecordAccess {
         let sizeBytes: Int64
         let sha256: String
         let description: String?
+        let capturedAt: String?
+        let latitude: String?
+        let longitude: String?
+        let thumbnailPath: String?
+        /// Tylko `true` trafia do zapisu — wiersze bez filmu w przygotowaniu wyglądają jak przed 3.0.
+        let needsPreparation: Bool?
 
         init(_ file: OutboxFile) {
+            needsPreparation = file.needsPreparation ? true : nil
             path = file.path
             fileName = file.fileName
             contentType = file.contentType
             sizeBytes = file.sizeBytes
             sha256 = file.sha256
             description = file.description
+            capturedAt = file.capturedAt.map(InstantText.format)
+            latitude = file.latitude.map(DecimalText.text)
+            longitude = file.longitude.map(DecimalText.text)
+            thumbnailPath = file.thumbnailPath
         }
 
         func file(_ operationId: String) -> OutboxFile {
-            OutboxFile(operationId: operationId, path: path, fileName: fileName, contentType: contentType, sizeBytes: sizeBytes, sha256: sha256, description: description)
+            OutboxFile(
+                operationId: operationId, path: path, fileName: fileName, contentType: contentType, sizeBytes: sizeBytes, sha256: sha256,
+                description: description, capturedAt: capturedAt.flatMap(InstantText.parse), latitude: latitude.flatMap(DecimalText.parse),
+                longitude: longitude.flatMap(DecimalText.parse), thumbnailPath: thumbnailPath, needsPreparation: needsPreparation ?? false
+            )
         }
+    }
+
+    /// Podmienia plik operacji (film po przygotowaniu) tylko wtedy, gdy jej stan należy do `expected`; `false` — operacji nie ma albo
+    /// zmieniła stan (np. usunięto ją w trakcie kodowania).
+    @discardableResult
+    public func replaceFile(_ operationId: String, expected: Set<OutboxState>, with file: OutboxFile) throws -> Bool {
+        guard let current = try operation(operationId), expected.contains(current.state) else { return false }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys]
+        let text = String(decoding: try encoder.encode(StoredFile(file)), as: UTF8.self)
+        try db.execute(sql: "UPDATE queue_operation SET fileRef = ? WHERE id = ?", arguments: [text, operationId])
+        return true
+    }
+
+    /// Operacje `CreateAttachment` w stanie `held`, których film czeka na zmniejszenie do 720p (decyzja A10) — w odróżnieniu od
+    /// operacji wstrzymanych po ponownym parowaniu (też `held`), które zwalnia dopiero „Wyślij mimo to”.
+    public func preparingOperationIds() throws -> Set<String> {
+        var ids = Set<String>()
+        for op in try operations() where op.state == .held && op.kind == .createAttachment {
+            if try outboxFile(op.id)?.needsPreparation == true { ids.insert(op.id) }
+        }
+        return ids
     }
 
     private func saveOperation(_ op: OutboxOperation, file: OutboxFile?, insert: Bool) throws {
@@ -267,10 +306,18 @@ extension RecordAccess {
 public struct QueueSnapshot: Equatable, Sendable {
     public let operations: [OutboxOperation]
     public let openConflicts: [Conflict]
+    /// Operacje z filmem w przygotowaniu (`held` do zmniejszenia do 720p): na listach „Przygotowuję film…”, nie „wymaga poprawy”.
+    public let preparing: Set<String>
 
-    public init(operations: [OutboxOperation] = [], openConflicts: [Conflict] = []) {
+    public init(operations: [OutboxOperation] = [], openConflicts: [Conflict] = [], preparing: Set<String> = []) {
         self.operations = operations
         self.openConflicts = openConflicts
+        self.preparing = preparing
+    }
+
+    /// Operacja przygotowująca film załącznika `attachmentId` (kafel „Przygotowuję film… 45%”); `nil` — film nie jest przygotowywany.
+    public func preparingOperation(attachmentId: String) -> OutboxOperation? {
+        operations.first { preparing.contains($0.id) && $0.recordType == .attachment && $0.recordId == attachmentId }
     }
 
     /// Niewysłane (licznik na „Więcej”).
@@ -281,7 +328,7 @@ public struct QueueSnapshot: Equatable, Sendable {
         let related = operations.filter { $0.recordType == type && $0.recordId == id && $0.state.isUnsent }
         if related.isEmpty { return nil }
         if related.contains(where: { $0.state == .conflict }) { return .conflict }
-        if related.contains(where: { $0.state == .needsFix || $0.state == .held }) { return .needsFix }
+        if related.contains(where: { $0.state == .needsFix || ($0.state == .held && !preparing.contains($0.id)) }) { return .needsFix }
         return .pending
     }
 }
@@ -299,7 +346,7 @@ extension RecordStore {
         ValueObservation
             .tracking { db in
                 let access = RecordAccess(db: db, state: RecordAccess.WriteState())
-                return QueueSnapshot(operations: try access.operations(), openConflicts: try access.openConflicts())
+                return QueueSnapshot(operations: try access.operations(), openConflicts: try access.openConflicts(), preparing: try access.preparingOperationIds())
             }
             .removeDuplicates()
             .values(in: database.writer)
@@ -322,6 +369,6 @@ extension RecordStore {
     }
 
     public func queueSnapshot() async throws -> QueueSnapshot {
-        try await read { QueueSnapshot(operations: try $0.operations(), openConflicts: try $0.openConflicts()) }
+        try await read { QueueSnapshot(operations: try $0.operations(), openConflicts: try $0.openConflicts(), preparing: try $0.preparingOperationIds()) }
     }
 }

@@ -1,4 +1,5 @@
 import HorselyCore
+import HorselyKit
 import SwiftUI
 import UIKit
 
@@ -8,6 +9,8 @@ import UIKit
 struct RootView: View {
     @Environment(AppEnvironment.self) private var environment
     @Environment(\.scenePhase) private var scenePhase
+    /// Niezakończona jazda do pytania „Zapisz / Odrzuć” przy starcie aplikacji (NAG-09, Task 17).
+    @State private var rideRecovery: UnfinishedRide?
 
     var body: some View {
         @Bindable var router = environment.router
@@ -35,6 +38,12 @@ struct RootView: View {
                         .tag(AppTab.more)
                 }
                 .tint(HorselyColor.primary)
+                // Odzyskiwanie jazdy przy starcie (NAG-09): nie nad otwartym ekranem nagrywania (ten pyta sam).
+                .rideRecoveryAlert(
+                    Binding(get: { environment.router.ride == nil ? rideRecovery : nil }, set: { rideRecovery = $0 }),
+                    onSave: { ride in Task { handleRecovery(await environment.rideRecovery.saveReporting(ride)) } },
+                    onDiscard: { ride in Task { handleRecovery(await environment.rideRecovery.discardReporting(sessionId: ride.sessionId)) } }
+                )
             }
         }
         .tint(HorselyColor.primary)
@@ -53,12 +62,29 @@ struct RootView: View {
             await environment.cleanUpStalePush()
             await environment.startOnline()
             await environment.processSharedInbox()
+            // Filmy, których przygotowanie przerwało zamknięcie aplikacji (decyzja A10).
+            await environment.prepareVideos()
         }
         .task { await environment.observeQueue() }
+        .task { await environment.observeActiveRide() }
+        .task(id: environment.workMode) {
+            // Po decyzji startowej kontrolera nagrywania (`RideRecovery` czeka na `prepareRelaunch`): przerwana albo zakończona
+            // i niezapisana jazda — pytanie; jazda wznowiona w tle — bez pytania (pasek NAG-01).
+            guard environment.workMode != .unset else { return }
+            rideRecovery = await environment.rideRecovery.pending()
+            openFinishedRide()
+        }
         .task { await environment.observePushState() }
         .task { await openPushForTests() }
         .onChange(of: environment.connection.problem) { old, new in
             withAnimation { environment.indicator.problemChanged(from: old, to: new) }
+        }
+        .fullScreenCover(isPresented: Binding(get: { router.ride != nil }, set: { if !$0 { router.ride = nil } })) {
+            if let route = router.ride { RideFlowView(environment: environment, route: route) }
+        }
+        .onChange(of: router.ride) { _, route in
+            // Ekran nagrywania sam pyta o niezakończoną jazdę — pytanie z startu aplikacji nie wraca po jego zamknięciu.
+            if route != nil { rideRecovery = nil }
         }
         .fullScreenCover(isPresented: $router.showPairing) {
             PairingFlowView(purpose: .repair) { environment.router.showPairing = false }
@@ -67,6 +93,7 @@ struct RootView: View {
         .onChange(of: scenePhase) { _, phase in
             environment.appLock.sceneChanged(phase, settings: environment.settings)
             if phase == .active {
+                openFinishedRide()
                 Task { await environment.processSharedInbox() }
                 // Powrót na pierwszy plan ponawia miniatury zdjęć koni także wtedy, gdy odświeżenie nie jest jeszcze należne (FR-008).
                 Task { await environment.horseDirectory.retryMissingThumbnails() }
@@ -117,6 +144,27 @@ struct RootView: View {
             QuickActions.shared.pending = nil
             environment.router.handle(shortcut: type, mode: environment.workMode)
         }
+    }
+
+    /// Wynik „Zapisz / Odrzuć” z pytania przy starcie: zakończenie → ekran zakończenia; błąd → komunikat u dołu ekranu i ponowne pytanie
+    /// o stan sprawdzony po błędzie (wpis w dzienniku robi `RideRecovery`).
+    private func handleRecovery(_ outcome: RideActionOutcome) {
+        switch outcome {
+        case let .finished(id):
+            environment.router.openRideFinish(sessionId: id)
+        case .discarded:
+            break
+        case let .failed(key, pending):
+            environment.router.banner = BannerMessage(text: tr(key))
+            rideRecovery = pending
+        }
+    }
+
+    /// „Zakończ” z Live Activity zakończyło jazdę i otworzyło aplikację (`openAppWhenRun`): ekran zakończenia tej jazdy (hak Task 21).
+    /// Id odbiera się raz — z wejścia na pierwszy plan albo z obserwatora akcji (`HorselyApp`), zależnie od tego, co przyjdzie pierwsze.
+    private func openFinishedRide() {
+        guard environment.workMode != .unset, let id = RideActivityActions.shared.takeFinishedSessionId() else { return }
+        environment.router.openRideFinish(sessionId: id)
     }
 
     /// Testy UI (`-UITestOpenPush <reminder|summary|backup|test>`, tylko Debug): symuluje dotknięcie wiadomości z serwera.

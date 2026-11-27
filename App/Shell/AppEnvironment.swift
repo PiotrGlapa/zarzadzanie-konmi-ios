@@ -62,6 +62,20 @@ final class AppEnvironment {
     @ObservationIgnored let entries: EntryRepository
     @ObservationIgnored let reminders: ReminderRepository
     @ObservationIgnored let trainings: TrainingRepository
+    /// JEDYNY sklep sesji nagrywania (kontroler nagrywania i pasek NAG-01 dzielą tę instancję — Task 15).
+    @ObservationIgnored let rideSessions: RideSessionStore
+    /// JEDYNY kontroler nagrywania jazdy (aktor z maszyną `RideRecorder`).
+    @ObservationIgnored let ride: RideRecordingController
+    /// Odzyskiwanie niezakończonej jazdy (pytanie przy starcie, ekran startu) — na tym samym sklepie i kontrolerze (Task 17).
+    @ObservationIgnored let rideRecovery: RideRecovery
+    /// Zdjęcia i filmy zrobione w trakcie jazdy (`ride-media/` w kontenerze aplikacji, ZAT-05).
+    @ObservationIgnored let rideMedia: RideMediaFiles
+    /// Parametry jazdy konia przy starcie nagrywania. Do Task 26 (ustawienia jazd i profil konia) — wartości wbudowane (`RideDefaults.builtIn`).
+    @ObservationIgnored var rideParameters: @Sendable (_ horseId: String) async -> EffectiveRideParameters = { _ in
+        RideParameters.resolve(RideDefaults.builtIn, nil)
+    }
+    /// Niezakończona jazda dla paska NAG-01 i ekranu nagrywania — migawka z JEDYNEGO sklepu sesji (`observeActiveRide`), uruchamia `RootView`.
+    private(set) var activeRide: ActiveRide?
     let router = DeepLinkRouter()
     /// Licznik zmian magazynu — widoki z danymi złożonymi z wielu rekordów (Pulpit, terminy, oś czasu) odświeżają się, gdy rośnie.
     private(set) var dataRevision: Int64 = 0
@@ -109,6 +123,10 @@ final class AppEnvironment {
     @ObservationIgnored private var notificationTask: Task<Void, Never>?
     /// Postęp wysyłki plików do programu (Kolejka wysyłki).
     let uploadProgress: UploadProgress
+    /// Postęp przygotowania filmów z kolejki (kafel „Przygotowuję film… 45%”, decyzja A10).
+    let videoProgress: VideoProgress
+    /// Planuje zadanie w tle `pl.glapa.horsely.video` (ustawia `HorselyApp` po rejestracji zadań).
+    @ObservationIgnored var scheduleVideoPreparation: @MainActor () -> Void = {}
     /// Blokada aplikacji (zablokowana od startu, gdy włączona).
     let appLock: AppLockState
     /// Jeden stan połączenia dla całej aplikacji (pasek, ikonka, podtytuł „Dane z …”).
@@ -129,7 +147,7 @@ final class AppEnvironment {
     init(
         settings: SettingsStore, dates: any DateProvider, log: DiagnosticLog, store: RecordStore, files: LocalFileStore,
         launchOptions: LaunchOptions = LaunchOptions(arguments: []), secrets: SecretStore? = nil, transport: ProgramTransport? = nil,
-        probe: ConnectProbe? = nil, uploader: BackgroundUploader? = nil, pushTokens: (any PushTokenSource)? = nil
+        probe: ConnectProbe? = nil, uploader: BackgroundUploader? = nil, pushTokens: (any PushTokenSource)? = nil, rideMediaDirectory: URL? = nil
     ) {
         self.settings = settings
         self.dates = dates
@@ -143,6 +161,23 @@ final class AppEnvironment {
         self.entries = EntryRepository(store: store, dates: dates, mode: currentMode)
         self.reminders = ReminderRepository(entries: entries)
         self.trainings = TrainingRepository(entries: entries)
+        let rideSessions = store.makeRideSessionStore()
+        self.rideSessions = rideSessions
+        let rideNotifier = LocalRideNotifier(texts: .app)
+        let ride = RideRecordingController(
+            store: rideSessions, locations: SystemLocationSource(), motion: CoreMotionSource(), battery: DeviceBatteryMonitor(),
+            notifier: rideNotifier, activity: LiveRideActivityPresenter(log: { log.log(RideRecordingController.logCategory, $0) }),
+            log: { log.log(RideRecordingController.logCategory, $0) }
+        )
+        self.ride = ride
+        let rideMedia = RideMediaFiles(
+            root: rideMediaDirectory ?? FileManager.default.temporaryDirectory.appendingPathComponent("horsely-ride-media-\(UUID().uuidString)", isDirectory: true)
+        )
+        self.rideMedia = rideMedia
+        self.rideRecovery = RideRecovery(
+            store: rideSessions, controller: ride, notifier: rideNotifier, deleteMedia: { rideMedia.delete($0) },
+            log: { log.log(RideRecordingController.logCategory, $0) }
+        )
         self.workMode = settings.workMode
         self.theme = settings.theme
         self.sectionFilters = SectionFilters(today: dates.today())
@@ -192,7 +227,12 @@ final class AppEnvironment {
             store: store, files: files, workDirectory: FileManager.default.temporaryDirectory.appendingPathComponent("horsely-backup", isDirectory: true),
             appVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "2.1.0", dates: dates
         )
-        self.attachments = AttachmentStore(store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates)
+        let videoProgress = VideoProgress()
+        self.videoProgress = videoProgress
+        self.attachments = AttachmentStore(
+            store: store, files: files, client: client, mode: currentMode, settings: { AttachmentSettings(settings) }, dates: dates, videos: VideoPreparation(),
+            videoProgress: { id, percent in Task { @MainActor in videoProgress.set(attachmentId: id, percent: percent) } }
+        )
         horseDirectory.useThumbnailSource(attachments)
         // Zarejestrowany telefon nie planuje powiadomień lokalnych już od pierwszego przeliczenia po starcie (bez chwilowego dubla);
         // pierwsza publikacja rejestratora poprawi stan, gdyby coś się zmieniło (zgoda, możliwości serwera).
@@ -297,6 +337,28 @@ final class AppEnvironment {
         capabilities = info.capabilities
         programVersion = info.programVersion
         connection.dataFrom = info.lastSyncAt
+    }
+
+    /// Przygotowanie filmów czekających w kolejce (po dodaniu, przy starcie — wznowienie przerwanego), potem wysyłka; dopóki coś czeka,
+    /// zaplanowane jest też zadanie w tle, które dokończy przygotowanie po zamknięciu aplikacji (decyzja A10).
+    func prepareVideos() async {
+        guard workMode == .online, await attachments.hasPreparingVideos() else { return }
+        scheduleVideoPreparation()
+        let attachments = self.attachments
+        let released = await withBackgroundTime(BackgroundWork.videoIdentifier) { await attachments.resumePreparation() }
+        if released > 0 { await sendQueue() }
+    }
+
+    /// Praca, która może trwać minuty (przygotowanie filmu), dostaje od systemu czas na dokończenie po zejściu aplikacji w tło
+    /// (`beginBackgroundTask`). Gdy czas się kończy, praca jest anulowana — przygotowanie kończy się jako „przerwane” (operacja zostaje
+    /// `held` ze źródłem i wznowi ją zadanie w tle albo następny start), a nie „odrzucone”.
+    func withBackgroundTime<T: Sendable>(_ name: String, _ work: @escaping @Sendable () async -> T) async -> T {
+        let job = Task { await work() }
+        let assertion = BackgroundAssertion()
+        assertion.begin(name) { job.cancel() }
+        let result = await job.value
+        assertion.end()
+        return result
     }
 
     /// Wysyłka kolejki (po zapisie, odzyskaniu sieci, „Wyślij teraz”).
@@ -429,6 +491,11 @@ final class AppEnvironment {
         workMode == .online ? queue.marker(type, id: id) : nil
     }
 
+    /// Niezakończona jazda z sklepu sesji (pasek NAG-01); uruchamia ją `RootView`.
+    func observeActiveRide() async {
+        for await ride in rideSessions.observeActiveRide() { activeRide = ride }
+    }
+
     /// Pętla odświeżania widoków po zmianach w magazynie; uruchamia ją `RootView`.
     func observeChanges() async {
         do {
@@ -481,7 +548,8 @@ final class AppEnvironment {
         return AppEnvironment(
             settings: settings, dates: dates, log: log, store: RecordStore(database: database), files: files, launchOptions: options,
             uploader: options.isTestRun ? nil : BackgroundUploader.shared,
-            pushTokens: options.isTestRun ? nil : FirebasePushTokenSource.shared
+            pushTokens: options.isTestRun ? nil : FirebasePushTokenSource.shared,
+            rideMediaDirectory: options.isTestRun ? nil : directory.appendingPathComponent(RideMediaFiles.directoryName, isDirectory: true)
         )
     }
 }
@@ -540,6 +608,39 @@ extension AppEnvironment {
         environment.queueCount = queueCount
         environment.conflictCount = conflictCount
         return environment
+    }
+}
+
+/// Zgoda systemu na pracę po zejściu w tło (`UIApplication.beginBackgroundTask`); `end()` kończy ją dokładnie raz — po pracy albo
+/// po upływie czasu (wtedy najpierw `onExpiration`).
+@MainActor
+final class BackgroundAssertion {
+    private var identifier: UIBackgroundTaskIdentifier = .invalid
+
+    func begin(_ name: String, onExpiration: @escaping @MainActor @Sendable () -> Void) {
+        identifier = UIApplication.shared.beginBackgroundTask(withName: name) { [weak self] in
+            MainActor.assumeIsolated {
+                onExpiration()
+                self?.end()
+            }
+        }
+    }
+
+    func end() {
+        guard identifier != .invalid else { return }
+        UIApplication.shared.endBackgroundTask(identifier)
+        identifier = .invalid
+    }
+}
+
+/// Postęp przygotowania filmów (0–100 %) według `id` załącznika — „Przygotowuję film… 45%” na kaflu (decyzja A10).
+@MainActor
+@Observable
+final class VideoProgress {
+    private(set) var percent: [String: Int] = [:]
+
+    func set(attachmentId: String, percent value: Int?) {
+        percent[attachmentId] = value.map { min(max($0, 0), 100) }
     }
 }
 

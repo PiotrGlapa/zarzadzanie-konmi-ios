@@ -27,6 +27,7 @@ struct HorselyApp: App {
         let sync = environment.sync
         let outbox = environment.outbox
         let network = environment.network
+        let attachments = environment.attachments
         background = BackgroundTasks(
             refresh: { _ in
                 await environment.processSharedInbox()
@@ -49,10 +50,33 @@ struct HorselyApp: App {
                 await AutoBackupRunner.runIfDue(environment)
                 return true
             },
+            video: { _ in
+                // Przygotowanie filmów z kolejki (A10); przerwane przez koniec czasu zadania wznowi start aplikacji.
+                guard settings.workMode == .online else { return true }
+                if await attachments.resumePreparation() > 0 { _ = await outbox.processAll() }
+                let waiting = await attachments.hasPreparingVideos()
+                return !waiting
+            },
             interval: { BackgroundWork.refreshInterval(for: await sync.capabilities()) }
         )
         background.register()
+        let tasks = background
+        environment.scheduleVideoPreparation = { tasks.scheduleVideoPreparation() }
         PushBridge.shared.registrar = environment.pushRegistrar
+        // Nagrywanie jazdy (Task 15, A13): decyzję o wznowieniu niezakończonej jazdy podejmuje `AppDelegate.didFinishLaunching` (zna
+        // przyczynę uruchomienia i stan aplikacji); `App.init` wykonuje się wcześniej, więc kontroler jest już wtedy dostępny.
+        RideBridge.shared.controller = environment.ride
+        // Przyciski Live Activity (Task 16): `LiveActivityIntent` wykonuje się w tym procesie i trafia do tego samego kontrolera.
+        RideActivityActions.shared.setLog { [log = environment.log] in log.log(RideRecordingController.logCategory, $0) }
+        RideActivityActions.shared.register(environment.ride)
+        // „Zakończ” z Live Activity (Task 17, hak ekranu zakończenia — Task 21): po zakończeniu jazdy ekran zakończenia tej sesji, także
+        // gdy aplikacja jest już na pierwszym planie. Id odbiera się raz (`RootView` próbuje też przy wejściu na pierwszy plan).
+        RideActivityActions.shared.setFinishObserver {
+            Task { @MainActor in
+                guard environment.workMode != .unset, let id = RideActivityActions.shared.takeFinishedSessionId() else { return }
+                environment.router.openRideFinish(sessionId: id)
+            }
+        }
         notificationDelegate = NotificationDelegate(
             open: { url in environment.router.handle(url: url, mode: environment.workMode) },
             presentServerMessage: { message in environment.presentation(forServerMessage: message) },

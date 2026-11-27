@@ -85,13 +85,30 @@ final class StringsParityTests: XCTestCase {
         return catalog
     }
 
+    /// Teksty tylko dla iOS (`App/Resources/ios/strings.xml`) — `sync-strings.ps1` dołącza je po Androidzie i odrzuca konflikt nazw.
+    private func loadIOSOnly() throws -> [String: String] {
+        let url = repositoryRoot.appendingPathComponent("App/Resources/ios/strings.xml")
+        guard FileManager.default.fileExists(atPath: url.path) else { return [:] }
+        let parser = AndroidResourceParser()
+        let xml = try XCTUnwrap(XMLParser(contentsOf: url), "Brak pliku \(url.path)")
+        xml.delegate = parser
+        XCTAssertTrue(xml.parse(), "Błąd odczytu ios/strings.xml: \(String(describing: xml.parserError))")
+        XCTAssertTrue(parser.plurals.isEmpty, "Liczby mnogie w ios/strings.xml nie są obsługiwane")
+        return parser.strings
+    }
+
     func testEveryAndroidStringExistsWithTheSameText() throws {
         let android = try loadAndroid()
+        let iosOnly = try loadIOSOnly()
         let catalog = try loadCatalog()
         XCTAssertGreaterThan(android.strings.count, 1000)
-        XCTAssertEqual(Set(android.strings.keys), Set(catalog.strings.keys), "Różne zbiory kluczy tekstów")
+        XCTAssertTrue(Set(iosOnly.keys).isDisjoint(with: android.strings.keys), "Tekst tylko-iOS o nazwie klucza z Androida")
+        XCTAssertEqual(Set(android.strings.keys).union(iosOnly.keys), Set(catalog.strings.keys), "Różne zbiory kluczy tekstów")
         for (key, text) in android.strings {
             XCTAssertEqual(catalog.strings[key], convert(text), "Tekst „\(key)”")
+        }
+        for (key, text) in iosOnly {
+            XCTAssertEqual(catalog.strings[key], convert(text), "Tekst tylko-iOS „\(key)”")
         }
     }
 

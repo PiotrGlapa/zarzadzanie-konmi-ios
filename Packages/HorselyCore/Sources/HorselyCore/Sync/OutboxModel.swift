@@ -95,6 +95,9 @@ public enum OperationKind: String, Codable, Sendable, CaseIterable {
         case .reminder: .createReminder
         case .attachment: .createAttachment
         case .dictionary: nil
+        case .trainingRecording: nil
+        case .horseRideProfile: nil
+        case .rideDefaults: nil
         }
     }
 
@@ -201,6 +204,13 @@ public struct OutboxOperation: Hashable, Sendable, Identifiable {
         self.baseVersion = baseVersion
     }
 
+    /// Decyzja A6: załącznik treningu (`ownerType=Training`) czeka na aktualizację programu, dopóki ten nie ogłosi `trainingAttachments` —
+    /// starszy program odrzuciłby go jako nieznany typ, więc operacja zostaje `Pending` i nie jest wysyłana (kolejka pokazuje
+    /// „Czeka na aktualizację programu”).
+    public func waitsForProgramUpdate(_ program: ProgramCapabilities) -> Bool {
+        kind == .createAttachment && !program.trainingAttachments && text("ownerType") == AttachmentOwnerType.training.rawValue
+    }
+
     /// Pole tekstowe treści (np. `id` terminu, `competitionId` startu).
     public func text(_ key: String) -> String? { payload[key]?.stringValue }
 
@@ -211,8 +221,15 @@ public struct OutboxOperation: Hashable, Sendable, Identifiable {
 }
 
 /// Plik operacji `CreateAttachment` — kopia w kontenerze App Group (nigdy nie czyszczona przez LRU).
+///
+/// - `capturedAt`: chwila wykonania pliku (3.0: zdjęcie lub film z jazdy); `nil`, gdy nieznana
+/// - `latitude`, `longitude`: miejsce wykonania (WGS84); wysyłane z 7 miejscami po przecinku (HALF_UP)
+/// - `thumbnailPath`: miniatura filmu (JPEG ≤ `maxThumbnailBytes`) — druga kopia w katalogu operacji; znika razem z plikiem
+/// - `needsPreparation`: film czeka na zmniejszenie do 720p (decyzja A10): `path` to jeszcze plik źródłowy (może przekraczać 100 MB),
+///   a operacja stoi w stanie `held`, dopóki przygotowanie się nie skończy — wtedy plik jest podmieniany, a operacja wraca jako `pending`
 public struct OutboxFile: Hashable, Sendable {
     public static let maxSizeBytes: Int64 = 100 * 1024 * 1024
+    public static let maxThumbnailBytes: Int64 = 1024 * 1024
 
     public let operationId: String
     public let path: String
@@ -221,8 +238,17 @@ public struct OutboxFile: Hashable, Sendable {
     public let sizeBytes: Int64
     public let sha256: String
     public let description: String?
+    public let capturedAt: Date?
+    public let latitude: Decimal?
+    public let longitude: Decimal?
+    public let thumbnailPath: String?
+    public let needsPreparation: Bool
 
-    public init(operationId: String, path: String, fileName: String, contentType: String, sizeBytes: Int64, sha256: String, description: String? = nil) {
+    public init(
+        operationId: String, path: String, fileName: String, contentType: String, sizeBytes: Int64, sha256: String, description: String? = nil,
+        capturedAt: Date? = nil, latitude: Decimal? = nil, longitude: Decimal? = nil, thumbnailPath: String? = nil, needsPreparation: Bool = false
+    ) {
+        self.needsPreparation = needsPreparation
         self.operationId = operationId
         self.path = path
         self.fileName = fileName
@@ -230,6 +256,16 @@ public struct OutboxFile: Hashable, Sendable {
         self.sizeBytes = sizeBytes
         self.sha256 = sha256
         self.description = description
+        self.capturedAt = capturedAt
+        self.latitude = latitude
+        self.longitude = longitude
+        self.thumbnailPath = thumbnailPath
+    }
+
+    /// Usuwa z dysku plik i miniaturę — wołane, gdy operacja przestaje ich potrzebować (po wysłaniu, usunięciu, scaleniu).
+    public func deleteFiles() {
+        try? FileManager.default.removeItem(atPath: path)
+        if let thumbnailPath { try? FileManager.default.removeItem(atPath: thumbnailPath) }
     }
 }
 

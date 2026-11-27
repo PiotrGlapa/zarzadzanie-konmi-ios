@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Sprawdza w rozpakowanym pliku .ipa konfigurację powiadomień push (spec 003, contracts/ci-push.md; FR-030a, FR-030b, FR-032b):
 #   1. aplikacja ma uprawnienie `aps-environment` = `production`;
-#   2. rozszerzenie udostępniania NIE ma `aps-environment`;
-#   3. `GoogleService-Info.plist` (BUNDLE_ID = pl.glapa.horsely) jest w aplikacji i NIE ma go w rozszerzeniu;
+#   2. rozszerzenia (udostępnianie, Live Activity) NIE mają `aps-environment`;
+#   3. `GoogleService-Info.plist` (BUNDLE_ID = pl.glapa.horsely) jest w aplikacji i NIE ma go w rozszerzeniach;
 #   4. manifest prywatności `PrivacyInfo.xcprivacy` jest w aplikacji.
 # Błąd kończy przebieg PRZED wysyłką do TestFlight — wysyłka nigdy nie jest po cichu pomijana.
 # Użycie: verify-push-entitlements.sh <katalog z Payload/Horsely.app>
@@ -11,10 +11,12 @@ set -uo pipefail
 root="${1:?Podaj katalog z Payload/Horsely.app}"
 app="$root/Payload/Horsely.app"
 appex="$app/PlugIns/HorselyShare.appex"
+ride_appex="$app/PlugIns/HorselyRideActivity.appex"
 errors=()
 
 [ -d "$app" ] || { echo "::error title=Uprawnienia push::Brak $app"; exit 1; }
 [ -d "$appex" ] || errors+=("brak rozszerzenia HorselyShare.appex w aplikacji")
+[ -d "$ride_appex" ] || errors+=("brak rozszerzenia HorselyRideActivity.appex (Live Activity) w aplikacji")
 
 entitlements_of() { codesign -d --entitlements :- "$1" 2>/dev/null || true; }
 
@@ -30,6 +32,13 @@ if [ -d "$appex" ]; then
     errors+=("rozszerzenie HorselyShare ma aps-environment — nie może (push tylko w aplikacji)")
   fi
   [ -e "$appex/GoogleService-Info.plist" ] && errors+=("rozszerzenie HorselyShare zawiera GoogleService-Info.plist — Firebase tylko w aplikacji")
+fi
+
+if [ -d "$ride_appex" ]; then
+  if entitlements_of "$ride_appex" | grep -q "aps-environment"; then
+    errors+=("rozszerzenie HorselyRideActivity ma aps-environment — nie może (push tylko w aplikacji)")
+  fi
+  [ -e "$ride_appex/GoogleService-Info.plist" ] && errors+=("rozszerzenie HorselyRideActivity zawiera GoogleService-Info.plist — Firebase tylko w aplikacji")
 fi
 
 plist="$app/GoogleService-Info.plist"

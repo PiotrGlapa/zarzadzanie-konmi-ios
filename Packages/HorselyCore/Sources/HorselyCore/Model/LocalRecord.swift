@@ -53,7 +53,11 @@ public enum RecordCodec {
         case .note: try JSONDecoder().decode(LocalNote.self, from: data)
         case .training: try JSONDecoder().decode(LocalTraining.self, from: data)
         case .reminder: try JSONDecoder().decode(LocalReminder.self, from: data)
-        case .attachment: try JSONDecoder().decode(LocalAttachment.self, from: data)
+        // Rekordy z liczbami, które muszą zachować skalę zapisu (`ScaledRecords.swift`).
+        case .attachment: try LocalAttachment(scaledJSON: JSONValue.parseKeepingScale(data))
+        case .trainingRecording: try LocalTrainingRecording(scaledJSON: JSONValue.parseKeepingScale(data))
+        case .horseRideProfile: try LocalHorseRideProfile(scaledJSON: JSONValue.parseKeepingScale(data))
+        case .rideDefaults: try LocalRideDefaults(scaledJSON: JSONValue.parseKeepingScale(data))
         }
     }
 
@@ -61,8 +65,10 @@ public enum RecordCodec {
         try decode(type, from: Data(json.utf8))
     }
 
+    /// Treść rekordu; nagrania, profile i ustawienia jazd oraz załączniki — z zachowaną skalą liczb (`textKeepingScale()`).
     public static func encode(_ record: some LocalRecord) throws -> Data {
-        try makeEncoder().encode(record)
+        if let scaled = record as? any ScaledJSONRecord { return Data(scaled.scaledJSON().textKeepingScale().utf8) }
+        return try makeEncoder().encode(record)
     }
 
     public static func encodeString(_ record: some LocalRecord) throws -> String {

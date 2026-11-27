@@ -12,9 +12,16 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     public static let horseStatusInjuredName = "horseStatusInjured"
     /// Powiadomienia push z serwera (spec 003). `pushAdmin` (UI webowe) nie dotyczy telefonu i jest pomijane jak każda nieznana nazwa.
     public static let pushName = "push"
+    /// Nowe możliwości 3.0 — załączniki treningów.
+    public static let trainingAttachmentsName = "trainingAttachments"
+    /// Nowe możliwości 3.0 — nagrania jazdy.
+    public static let trainingRecordingsName = "trainingRecordings"
+    /// Pseudo-możliwość obliczana z `apiVersions` — serwer obsługuje `/api/v3`.
+    public static let apiV3Name = "apiV3"
 
     private static let known: Set<String> = [
         updatedSinceName, dataStampName, ifMatchDeleteName, idempotencyKeyName, horsePhotoFieldName, horseStatusInjuredName, pushName,
+        trainingAttachmentsName, trainingRecordingsName, apiV3Name,
     ]
 
     /// Program bez listy możliwości (1.5.0–1.6.x) i tryb samodzielny.
@@ -47,11 +54,29 @@ public struct ProgramCapabilities: Hashable, Sendable, CustomStringConvertible {
     public var horseStatusInjured: Bool { names.contains(Self.horseStatusInjuredName) }
     /// Serwer wysyła powiadomienia push (`PUT/DELETE/GET push/device`, `GET push/rules`).
     public var push: Bool { names.contains(Self.pushName) }
+    /// Serwer ogłasza załączniki treningów.
+    public var trainingAttachments: Bool { names.contains(Self.trainingAttachmentsName) }
+    /// Serwer ogłasza nagrania jazdy.
+    public var trainingRecordings: Bool { names.contains(Self.trainingRecordingsName) }
+    /// Serwer obsługuje `/api/v3` (obliczana z `apiVersions`).
+    public var apiV3: Bool { names.contains(Self.apiV3Name) }
 
     /// Zapis do `local_meta`: nazwy rozdzielone przecinkami, w stałej kolejności.
     public var serialized: String { names.sorted().joined(separator: ",") }
 
     public var description: String { "ProgramCapabilities(\(serialized))" }
+
+    /// Oblicza możliwości z `ProgramInfo` — dodaje `apiV3`, gdy `apiVersions` zawiera `"3"`.
+    public static func of(_ info: ProgramInfo) -> ProgramCapabilities {
+        ProgramCapabilities(names: info.capabilities + (info.apiVersions.contains("3") ? [Self.apiV3Name] : []))
+    }
+}
+
+/// Czy telefon oferuje załączniki treningu (ZAT-06, `trainingAttachmentsAvailable` Androida): w trybie samodzielnym zawsze, w trybie z
+/// programem tylko gdy program ogłasza `trainingAttachments` (serwer 3.0.0). Na starszym programie sekcja „Załączniki” treningu jest
+/// ukryta — telefon nie obiecuje pliku, którego program nie przyjmie (kolejka i tak wstrzymałaby go, decyzja A6).
+public func trainingAttachmentsAvailable(mode: WorkMode, capabilities: ProgramCapabilities) -> Bool {
+    mode == .standalone || capabilities.trainingAttachments
 }
 
 /// Zmiana możliwości wykryta przy odczycie `system/info`.
@@ -66,9 +91,9 @@ public struct CapabilitiesChange: Equatable, Sendable {
 
     public var changed: Bool { before != after }
 
-    /// Następne pobranie musi być pełne: inna treść pobrania (`updatedSince`) albo inny status koni.
+    /// Następne pobranie musi być pełne: inna treść pobrania (`updatedSince`) albo inny status koni albo zmiana `apiV3`.
     public var forcesFullSync: Bool {
-        before.updatedSince != after.updatedSince || before.horseStatusInjured != after.horseStatusInjured
+        before.updatedSince != after.updatedSince || before.horseStatusInjured != after.horseStatusInjured || before.apiV3 != after.apiV3
     }
 
     /// Zmienił się odstęp pracy w tle (15 min ze stemplem danych, inaczej 60 min).
@@ -101,17 +126,23 @@ public struct ProgramInfo: Decodable, Equatable, Sendable {
     /// Od 2.0; brak u programu 1.5.0–1.6.x.
     public let capabilities: [String]
     public let dataStamp: String?
+    /// Wersje API ogłaszane przez serwer (np. `["1", "3"]`). Od 3.0; brak u programu 1.5.0–1.6.x.
+    public let apiVersions: [String]
+    /// Wersja schematu danych (np. `"3.0"`). Od 3.0; brak u programu 1.5.0–1.6.x.
+    public let dataSchemaVersion: String?
 
-    public init(appVersion: String, apiVersion: String? = "v1", schemaVersion: String? = nil, serverTime: String? = nil, capabilities: [String] = [], dataStamp: String? = nil) {
+    public init(appVersion: String, apiVersion: String? = "v1", schemaVersion: String? = nil, serverTime: String? = nil, capabilities: [String] = [], dataStamp: String? = nil, apiVersions: [String] = [], dataSchemaVersion: String? = nil) {
         self.appVersion = appVersion
         self.apiVersion = apiVersion
         self.schemaVersion = schemaVersion
         self.serverTime = serverTime
         self.capabilities = capabilities
         self.dataStamp = dataStamp
+        self.apiVersions = apiVersions
+        self.dataSchemaVersion = dataSchemaVersion
     }
 
-    private enum CodingKeys: String, CodingKey { case appVersion, apiVersion, schemaVersion, serverTime, capabilities, dataStamp }
+    private enum CodingKeys: String, CodingKey { case appVersion, apiVersion, schemaVersion, serverTime, capabilities, dataStamp, apiVersions, dataSchemaVersion }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -121,7 +152,10 @@ public struct ProgramInfo: Decodable, Equatable, Sendable {
         serverTime = try c.decodeIfPresent(String.self, forKey: .serverTime)
         capabilities = (try? c.decodeIfPresent([String].self, forKey: .capabilities)) ?? []
         dataStamp = try c.decodeIfPresent(String.self, forKey: .dataStamp)
+        apiVersions = (try? c.decodeIfPresent([String].self, forKey: .apiVersions)) ?? []
+        dataSchemaVersion = try c.decodeIfPresent(String.self, forKey: .dataSchemaVersion)
     }
 
-    public var programCapabilities: ProgramCapabilities { ProgramCapabilities(names: capabilities) }
+    /// Możliwości zapisywane po `system/info`: lista z programu plus `apiV3`, gdy `apiVersions` zawiera `"3"`.
+    public var programCapabilities: ProgramCapabilities { ProgramCapabilities.of(self) }
 }

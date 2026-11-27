@@ -151,7 +151,7 @@ final class ShareFlowModel {
         case rejected(String)
     }
 
-    /// Kopia strumieniowa pliku z dostawcy do folderu skrzynki; plik niedozwolony albo > 100 MB — opis przyczyny.
+    /// Kopia strumieniowa pliku z dostawcy do folderu skrzynki; plik niedozwolony albo > 100 MB (poza filmem) — opis przyczyny.
     static func copy(_ provider: NSItemProvider, into folder: URL, index: Int) async -> CopyResult {
         guard let type = Self.fileType(of: provider) else {
             return .rejected(shareText("attachments_share_rejected", provider.suggestedName ?? "plik"))
@@ -165,7 +165,8 @@ final class ShareFlowModel {
                 }
                 let baseName = suggested.contains(".") ? suggested : (type.preferredFilenameExtension.map { "\(suggested).\($0)" } ?? url.lastPathComponent)
                 let size = Int64((try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize) ?? 0)
-                switch FilePolicy.check(fileName: baseName, mimeType: type.preferredMIMEType, sizeBytes: size) {
+                // Ta sama decyzja co w aplikacji: długi film (> 100 MB) trafia do skrzynki i zostanie zmniejszony do 720p (A10).
+                switch FilePolicy.checkImport(fileName: baseName, mimeType: type.preferredMIMEType, sizeBytes: size) {
                 case let .rejected(reason):
                     continuation.resume(returning: .rejected("\(baseName) — \(reason)"))
                 case let .allowed(fileName, contentType):

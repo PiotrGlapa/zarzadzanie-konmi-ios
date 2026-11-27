@@ -4,7 +4,7 @@ import SwiftUI
 
 /// Dział Treningi (T099, US11/2): treningi wszystkich koni od najnowszych — data, koń, rodzaj, czas, wysokość przeszkód przy skokach,
 /// trener, koszt, ocena gwiazdkami; filtry w arkuszu (okres, koń, rodzaj, trener, jeździec); stopka „Treningów: N · Razem: kwota”;
-/// „+” otwiera formularz treningu z wyborem konia.
+/// „+” otwiera formularz treningu z wyborem konia, „Nagraj jazdę” obok — start nagrywania; nad listą pasek trwającego nagrywania (NAG-01).
 struct TrainingsSectionView: View {
     @Environment(AppEnvironment.self) private var environment
     @State private var list: SectionList<LocalTraining>?
@@ -16,6 +16,12 @@ struct TrainingsSectionView: View {
         let today = environment.dates.today()
         NavigationStack {
             ScrollView {
+                // Pasek NAG-01 na górze listy, w treści przewijanej (bez jazdy nie ma wysokości — poprawka I1 Task 17).
+                if let banner = RideStartPolicy.banner(environment.activeRide) {
+                    RideBanner(content: banner) { environment.router.ride = .recording }
+                        .padding(.horizontal, Spacing.screenEdge)
+                        .padding(.vertical, Spacing.between)
+                }
                 if let list {
                     if list.items.isEmpty {
                         SectionEmpty(title: "trainings_section_empty_title", hint: "trainings_section_empty_hint")
@@ -44,7 +50,13 @@ struct TrainingsSectionView: View {
             }
             .connectionChrome()
             .navigationDestination(for: EntryRoute.self) { EntryDetailView(route: $0) }
-            .overlay(alignment: .bottomTrailing) { AddEntryButton(request: EntryRequest(kind: .training)) }
+            .overlay(alignment: .bottomTrailing) {
+                // „Nagraj jazdę” obok „+” (Task 17, jak `secondaryAction` działu w Androidzie); środek na wysokości środka „+”.
+                HStack(alignment: .bottom, spacing: Spacing.between) {
+                    RideRecordButton().padding(.bottom, Spacing.screenEdge + 6)
+                    AddEntryButton(request: EntryRequest(kind: .training))
+                }
+            }
             .task(id: LoadKey(query: filters.trainings, revision: environment.dataRevision)) {
                 await names.load(using: environment)
                 list = try? await environment.entries.trainings(filters.trainings)

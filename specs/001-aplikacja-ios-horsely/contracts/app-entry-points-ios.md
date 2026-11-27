@@ -56,7 +56,8 @@ przy powrocie na pierwszy plan i w zadaniach w tle `pl.glapa.horsely.refresh` / 
 
 ## Zadania w tle (`BGTaskSchedulerPermittedIdentifiers`)
 
-`pl.glapa.horsely.refresh` (`BGAppRefreshTask`), `pl.glapa.horsely.sync` i `pl.glapa.horsely.backup` (`BGProcessingTask`);
+`pl.glapa.horsely.refresh` (`BGAppRefreshTask`), `pl.glapa.horsely.sync`, `pl.glapa.horsely.backup` i `pl.glapa.horsely.video`
+(przygotowanie filmów do 720p, 3.0) (`BGProcessingTask`);
 sesja w tle `pl.glapa.horsely.upload`.
 
 ## Powiadomienia

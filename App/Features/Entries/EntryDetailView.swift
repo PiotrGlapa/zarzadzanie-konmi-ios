@@ -100,7 +100,7 @@ struct EntryDetailView: View {
                 ForEach(Array(FormSpec.sections(for: kind).enumerated()), id: \.offset) { _, section in
                     sectionView(section, kind: kind, draft: draft, record: record)
                 }
-                if let owner = Self.attachmentOwner(record) {
+                if let owner = Self.attachmentOwner(record, mode: environment.workMode, capabilities: environment.capabilities) {
                     AttachmentsSection(owner: owner).padding(.top, Spacing.beforeSection)
                 }
                 actions(record, kind)
@@ -127,8 +127,9 @@ struct EntryDetailView: View {
         }
     }
 
-    /// Wpisy, które mogą mieć załączniki (rodzaje właściciela programu).
-    static func attachmentOwner(_ record: any LocalRecord) -> AttachmentOwner? {
+    /// Wpisy, które mogą mieć załączniki (rodzaje właściciela programu). Trening — tylko gdy telefon oferuje załączniki treningu: tryb
+    /// samodzielny albo program z `trainingAttachments` (ZAT-06); inaczej sekcja jest ukryta.
+    static func attachmentOwner(_ record: any LocalRecord, mode: WorkMode, capabilities: ProgramCapabilities) -> AttachmentOwner? {
         let type: AttachmentOwnerType
         switch record.recordType {
         case .vetVisit: type = .vetVisit
@@ -139,6 +140,9 @@ struct EntryDetailView: View {
         case .competitionStart: type = .competitionStart
         case .purchase: type = .purchase
         case .note: type = .note
+        case .training:
+            guard trainingAttachmentsAvailable(mode: mode, capabilities: capabilities) else { return nil }
+            type = .training
         default: return nil
         }
         return AttachmentOwner(type: type, id: record.id, horseId: record.primaryHorseId)

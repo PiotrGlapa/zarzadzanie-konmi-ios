@@ -90,9 +90,17 @@ struct NotificationSettingsView: View {
                 switch pushState {
                 case .registered:
                     registeredBlock
-                case .pending, .noPermission(asked: false):
-                    // Przed pytaniem o zgodę ekran nie mówi o odmowie (FR-012a).
+                case .pending:
                     Text("push_state_pending").accessibilityIdentifier("push-state")
+                case .noPermission(asked: false):
+                    // Przed pytaniem o zgodę ekran nie mówi o odmowie (FR-012a), ale też nie udaje, że rejestracja trwa: bez zgody
+                    // rejestrator czeka, a pytanie z Pulpitu mogło nie paść (użytkownik był na innym ekranie).
+                    Text("push_state_waiting_permission").accessibilityIdentifier("push-state")
+                    Button(tr("push_allow")) {
+                        Task { await requestPushPermission() }
+                    }
+                    .frame(minHeight: Spacing.minTouchTarget)
+                    .accessibilityIdentifier("push-allow")
                 case .fallback(.serverHasNoPush):
                     warning("push_state_no_push")
                 case .fallback(.apnsUnavailable):
@@ -312,6 +320,15 @@ struct NotificationSettingsView: View {
         save(enabled: true)
         denied = !granted
         await environment.pushRegistrar.reconcile(.permissionChanged)
+    }
+
+    /// „Zezwól na powiadomienia” w sekcji serwera: pytanie systemu o zgodę dla powiadomień z serwera (jak z Pulpitu — bez włączania
+    /// powiadomień lokalnych), potem rejestracja.
+    private func requestPushPermission() async {
+        _ = try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge])
+        environment.settings.pushPermissionAsked = true
+        await environment.pushRegistrar.reconcile(.permissionChanged)
+        await refreshAuthorization()
     }
 
     private func save(enabled value: Bool) {

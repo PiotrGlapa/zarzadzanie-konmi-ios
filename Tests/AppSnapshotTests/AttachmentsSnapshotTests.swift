@@ -20,8 +20,8 @@ final class AttachmentsSnapshotTests: XCTestCase {
         }
         let store = env.attachments
         let owner = AttachmentOwner(type: .horse, id: grom, horseId: grom)
-        try await store.add(owner, [PendingAttachment(file: try store.prepare(data: photo, fileName: "zdjecie.jpg", mimeType: "image/jpeg"))])
-        try await store.add(owner, [PendingAttachment(file: try store.prepare(data: Data("%PDF-1.4".utf8), fileName: "faktura-weterynarz.pdf", mimeType: "application/pdf"))])
+        try await store.add(owner, [PendingAttachment(file: try await store.prepare(data: photo, fileName: "zdjecie.jpg", mimeType: "image/jpeg"))])
+        try await store.add(owner, [PendingAttachment(file: try await store.prepare(data: Data("%PDF-1.4".utf8), fileName: "faktura-weterynarz.pdf", mimeType: "application/pdf"))])
         return (env, grom)
     }
 

@@ -4,24 +4,42 @@ import HorselyKit
 import XCTest
 @testable import Horsely
 
-/// Prywatność (T136, konstytucja II): `Info.plist` prosi tylko o aparat, sieć lokalną i Face ID — bez lokalizacji, kontaktów,
-/// pełnej biblioteki zdjęć i `NSAllowsArbitraryLoads`; w trybie samodzielnym aplikacja nie łączy się z siecią (transport zapisuje
-/// każde żądanie).
+/// Prywatność (T136, konstytucja II 3.0.0): `Info.plist` prosi tylko o aparat, sieć lokalną, Face ID oraz — dla nagrywania jazdy —
+/// lokalizację „Podczas używania”, mikrofon (dźwięk filmu) i dodawanie do galerii; bez lokalizacji „Zawsze”, kontaktów, pełnej biblioteki
+/// zdjęć i `NSAllowsArbitraryLoads`; w trybie samodzielnym aplikacja nie łączy się z siecią (transport zapisuje każde żądanie).
 @MainActor
 final class InfoPlistPolicyTests: XCTestCase {
     private var info: [String: Any] { Bundle.main.infoDictionary ?? [:] }
 
     func testOnlyTheNeededPermissionsAreRequested() {
-        for key in ["NSCameraUsageDescription", "NSLocalNetworkUsageDescription", "NSFaceIDUsageDescription"] {
+        let needed = [
+            "NSCameraUsageDescription", "NSLocalNetworkUsageDescription", "NSFaceIDUsageDescription", "NSLocationWhenInUseUsageDescription",
+            "NSMicrophoneUsageDescription", "NSPhotoLibraryAddUsageDescription",
+        ]
+        for key in needed {
             XCTAssertFalse((info[key] as? String ?? "").isEmpty, "brak \(key)")
         }
         XCTAssertEqual(info["NSFaceIDUsageDescription"] as? String, "Odblokowanie aplikacji z danymi stajni")
         let forbidden = [
-            "NSLocationWhenInUseUsageDescription", "NSLocationAlwaysAndWhenInUseUsageDescription", "NSLocationAlwaysUsageDescription",
-            "NSLocationUsageDescription", "NSContactsUsageDescription", "NSPhotoLibraryUsageDescription", "NSPhotoLibraryAddUsageDescription",
-            "NSMicrophoneUsageDescription", "NSCalendarsUsageDescription", "NSBluetoothAlwaysUsageDescription",
+            "NSLocationAlwaysAndWhenInUseUsageDescription", "NSLocationAlwaysUsageDescription", "NSLocationUsageDescription",
+            "NSLocationTemporaryUsageDescriptionDictionary", "NSContactsUsageDescription", "NSPhotoLibraryUsageDescription",
+            "NSCalendarsUsageDescription", "NSBluetoothAlwaysUsageDescription", "NSMotionUsageDescription",
         ]
         for key in forbidden { XCTAssertNil(info[key], "niedozwolona zgoda \(key)") }
+    }
+
+    /// Nagrywanie jazdy (Task 15, FR-NAG-07, [ZAK] 6): lokalizacja wyłącznie „Podczas używania” — opis zgody z tekstu Androida
+    /// `ride_location_text` (ten sam, który widzi użytkownik przed pytaniem systemu), tryb tła `location`; nigdy klucza „Zawsze”.
+    func testLocationWhenInUseOnly() {
+        XCTAssertEqual(info["NSLocationWhenInUseUsageDescription"] as? String, tr("ride_location_text"))
+        XCTAssertEqual(
+            info["NSLocationWhenInUseUsageDescription"] as? String,
+            "Aplikacja zapisuje trasę z GPS tylko wtedy, gdy nagrywasz jazdę. Zezwól na dokładną lokalizację „podczas używania aplikacji”."
+        )
+        let modes = info["UIBackgroundModes"] as? [String] ?? []
+        XCTAssertTrue(modes.contains("location"), "brak trybu tła location")
+        XCTAssertNil(info["NSLocationAlwaysAndWhenInUseUsageDescription"], "lokalizacja „Zawsze” jest zabroniona")
+        XCTAssertNil(info["NSLocationAlwaysUsageDescription"], "lokalizacja „Zawsze” jest zabroniona")
     }
 
     /// Push z serwera (spec 003, FR-027, FR-030b, research R1/R3): Firebase bez swizzlingu i bez samoczynnego startu,
@@ -41,6 +59,22 @@ final class InfoPlistPolicyTests: XCTestCase {
         let share = try XCTUnwrap(PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any])
         XCTAssertFalse(share.keys.contains { $0.localizedCaseInsensitiveContains("firebase") }, "rozszerzenie nie może mieć kluczy Firebase")
         XCTAssertFalse((share["UIBackgroundModes"] as? [String] ?? []).contains("remote-notification"))
+    }
+
+    /// Live Activity nagrywania jazdy (Task 16, FR-NAG-05, SPECYFIKACJA 9.5): `NSSupportsLiveActivities` w aplikacji, rozszerzenie
+    /// `HorselyRideActivity` to rozszerzenie WidgetKit bez Firebase i bez trybów tła.
+    func testLiveActivitiesAreSupported() throws {
+        XCTAssertEqual(info["NSSupportsLiveActivities"] as? Bool, true)
+        var root = URL(fileURLWithPath: #filePath)
+        while root.pathComponents.count > 1, !FileManager.default.fileExists(atPath: root.appendingPathComponent("RideActivity/Info.plist").path) {
+            root.deleteLastPathComponent()
+        }
+        let data = try Data(contentsOf: root.appendingPathComponent("RideActivity/Info.plist"))
+        let widget = try XCTUnwrap(PropertyListSerialization.propertyList(from: data, options: [], format: nil) as? [String: Any])
+        let extensionInfo = try XCTUnwrap(widget["NSExtension"] as? [String: Any])
+        XCTAssertEqual(extensionInfo["NSExtensionPointIdentifier"] as? String, "com.apple.widgetkit-extension")
+        XCTAssertFalse(widget.keys.contains { $0.localizedCaseInsensitiveContains("firebase") })
+        XCTAssertNil(widget["UIBackgroundModes"])
     }
 
     func testArbitraryLoadsAreNotAllowed() {
@@ -96,7 +130,7 @@ final class InfoPlistPolicyTests: XCTestCase {
         _ = try await env.reports.costs(CostFilter())
         _ = try await env.reports.horseBalance(statuses: [], horseIds: [])
         let horse = try XCTUnwrap(env.horseDirectory.horses.first)
-        let file = try env.attachments.prepare(data: Data("notatka".utf8), fileName: "a.txt", mimeType: "text/plain")
+        let file = try await env.attachments.prepare(data: Data("notatka".utf8), fileName: "a.txt", mimeType: "text/plain")
         try await env.attachments.add(AttachmentOwner(type: .horse, id: horse.id, horseId: horse.id), [PendingAttachment(file: file)])
         try await env.backup.write(to: root.appendingPathComponent("kopia.zkkopia"), password: nil, attachmentsCacheMb: 200)
         await env.processSharedInbox()

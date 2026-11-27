@@ -90,7 +90,7 @@ struct BackupTests {
         #expect(result.bytes > 0)
 
         let manifest = try source.service.inspect(file, password: password)
-        #expect(manifest.formatVersion == 2 && manifest.exportSchemaVersion == "1.5")
+        #expect(manifest.formatVersion == 3 && manifest.exportSchemaVersion == "1.6" && manifest.dataSchemaVersion == "3.0")
 
         let target = try setup()
         let summary = try await restore(target, file, password: password)
@@ -172,12 +172,12 @@ struct BackupTests {
 
         var manifest = try JSONValue.parse(try #require(entries[BackupManifest.manifestName]))
         if case var .object(fields) = manifest {
-            fields["formatVersion"] = .number(3)
+            fields["formatVersion"] = .number(4)
             manifest = .object(fields)
         }
         entries[BackupManifest.manifestName] = try manifest.data()
         let newer = try zip(entries, at: source.root.appendingPathComponent("nowsza.zkkopia"))
-        #expect(throws: BackupError.newerVersion(3)) { _ = try source.service.inspect(newer, password: nil) }
+        #expect(throws: BackupError.newerVersion(4)) { _ = try source.service.inspect(newer, password: nil) }
     }
 
     @Test func aFormat1BackupWithSchema14GetsThe200TrainingTypes() async throws {

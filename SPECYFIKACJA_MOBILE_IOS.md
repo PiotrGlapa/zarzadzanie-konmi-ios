@@ -9,6 +9,8 @@
 | **Zakres wersji 2.0.1 aplikacji** | nazwa „Horsely – Zarządzanie Koniem, Trening i Budżet”, słowniki zgodne z programem 2.0.0, możliwości programu (`capabilities`), status „Kontuzjowany” z ikoną plastra, poprawka układu wierszy raportów, szczegółowy dziennik diagnostyczny — sekcje [3.2](#32-historie-wersji-201) i [4.13](#413-wersja-201--horsely-i-program-200) |
 | **Zakres wersji 2.0.2 aplikacji** | 2026-10-17 — poprawki iOS: blokada aplikacji nie blokuje ponownie po odblokowaniu, miniatury zdjęć koni z programu, czytelny raport „Treningi jeźdźca” (sumy na górze, wykres słupkowy grup, zwinięta lista treningów) — FR-M-RAP-03; szczegóły: `specs/002-poprawki-2-0-2/`. Zmiana zakresu raportu obowiązuje też w specyfikacji Androida (do wdrożenia w Androidzie) |
 | **Zakres wersji 2.1.0 aplikacji** | 2026-11-05 — powiadomienia push z serwera Horsely 2.0 (Firebase Cloud Messaging przez APNs) w trybie z serwerem z możliwością `push`: rejestracja telefonu, brak dubli z powiadomieniami lokalnymi, tryb awaryjny, ekran „Powiadomienia” z listą reguł, karta Pulpitu „Powiadomienia o terminach są wyłączone” — sekcje [4.9a](#49a-powiadomienia-z-serwera-psh-wersja-210) i [9.9](#99-powiadomienia-push-z-serwera-wersja-210); szczegóły: `specs/003-push-z-serwera/`. Odpowiednik: Android 2.1.0 (`specs/006-push-z-serwera/`) |
+
+| **Zakres wersji 3.0.0 aplikacji** | załączniki treningów, nagrywanie jazdy (GPS, akcelerometr), statystyki chodów, mapa MapKit, GPX, pogoda Open‑Meteo, progi i obciążenie, raport „Analiza jazd”, synchronizacja `/api/v3`, kopia formatu 3 — sekcje [4.5b](#45b-nagrywanie-jazdy) i [3.3](#33-historie-wersji-30); FR-ZAT-*, NAG-*, STA-*, MAP-*, POG-*, PAR-*, RAJ-*, SYN-*. Odpowiednik: Android 3.0.2 (`docs/superpowers/specs/2026-11-14-treningi-nagrania-zalaczniki-design.md`) |
 | **Platforma** | iOS (iPhone) — aplikacja natywna (osobny projekt; odpowiednik na Androida: `SPECYFIKACJA_MOBILE_ANDROID.md`, implementacja wzorcowa: repozytorium `zarzadzanie_konmi_android`, wersja 2.0.1) |
 | **Współpracuje z** | program „Horsely” (dawniej „Zarządzanie końmi”) na Windows, wersja **1.5.0 lub nowsza** (API `/api/v1`; kontrakt bez zmian do 1.6.1; od 2.0.0 możliwości programu wykrywane polem `capabilities`, §6.6); wersja testowana: **2.0.0** |
 | **Autor systemu** | Piotr Glapa |
@@ -541,8 +543,6 @@ formularz kolejnego treningu tego konia ma trenera, jeźdźca i koszt wypełnion
 8. **Given** brak połączenia, **When** zapisuję nowy trening, **Then** trafia do kolejki wysyłki jak inne wpisy
    ([US5](#us5--praca-bez-połączenia-p1)); podpowiedź z ostatniego treningu korzysta z pamięci podręcznej.
 
-Treningi nie mają załączników — program 1.6.1 nie przyjmuje plików do treningu.
-
 ### US11 — Działy Treningi, Zakupy i Zawody (P1, wersja 1.1 aplikacji)
 
 Jako właściciel chcę mieć w aplikacji te same działy co w menu programu, żeby przeglądać i uzupełniać dane stajni bez
@@ -818,6 +818,65 @@ Wymagania: [4.13](#413-wersja-201--horsely-i-program-200).
 3. **Given** dowolny wpis, **When** jest zapisywany lub pokazywany, **Then** nie zawiera klucza API, treści wpisów, nazw koni,
    danych kontaktów ani parametrów zapytań.
 
+### 3.3 Historie wersji 3.0
+
+Wymagania: [4.5b](#45b-nagrywanie-jazdy), [ZAK](#zakres-wersji-30).
+
+### US3.0-1 — Załączniki treningów (P1)
+
+1. **Given** trening bez załączników, **When** dodaję zdjęcie lub film z aparatu/galerii, **Then** załącznik trafia do treningu
+   z metadanymi (czas, położenie) i jest widoczny w sekcji „Załączniki” na ekranie szczegółów treningu; załączniki są
+   wysyłane do programu przez `/api/v3` (gdy `apiVersions` zawiera `"3"`).
+2. **Given** trening z załącznikami, **When** go oglądam, **Then** widzę miniatury zdjęć i filmów; dotknięcie otwiera pełny podgląd;
+   filmy mają przycisk „Odtwórz” i „Pokaż szczegóły” (czas, rozmiar, lokalizacja).
+3. **Given** filmy z jazdy, **When** aplikacja je przygotowuje, **Then** filmy > 100 MB są przekodowywane do 720p; filmy ≤ 100 MB
+   są wysyłane jako oryginały; miniatura (pierwsza klatka, JPEG ≤ 1 MB) jest generowana automatycznie.
+4. **Given** tryb samodzielny, **When** dodaję załącznik, **Then** operacja jest w kolejce; po powrocie sieci trafia do programu.
+5. **Given** program bez `trainingAttachments`, **When** dodaję załącznik, **Then** operacja jest wstrzymana z komunikatem
+   „Czeka na aktualizację programu”; nie jest usuwana.
+
+### US3.0-2 — Nagrywanie jazdy (P1)
+
+1. **Given** ekran konia, **When** naciskam „Nagraj jazdę”, **Then** wybieram konia (lub jest domyślnie), aplikacja pokazuje instrukcję
+   noszenia telefonu („Nie pokazuj więcej”) → prośbę o lokalizację (tylko „Podczas używania”) → start nagrywania.
+2. **Given** aktywne nagrywanie, **When** oglądam ekran jazdy, **Then** widzę czas, dystans, chód (z kolorem), rytm, obciążenie,
+   pogodę, mapę z śladem i pinezkami; Live Activity pokazuje skrót na ekranie blokady i Dynamic Island.
+3. **Given** słaby GPS (> 25 m przez > 30 s), **When** nagrywam, **Then** widzę ostrzeżenie „Słaby sygnał GPS”; punkty są zapisywane.
+4. **Given** bateria < 15 %, **When** nagrywam, **Then** widzę ostrzeżenie „Niska bateria”; nagrywanie trwa, ale po 8 h sesja
+   jest automatycznie zamykana.
+5. **Given** zakończone nagrywanie, **When** je zamykam, **Then** widzę formularz treningu z danymi z jazdy (dystans, czas, chody);
+   mogę zapisać jako trening lub odrzucić nagranie; zdjęcia i filmy z jazdy są zapisywane do galerii.
+
+### US3.0-3 — Statystyki i chody (P2)
+
+1. **Given** nagranie z chodami, **When** je oglądam, **Then** widzę rozdział czasu i dystansu na chody (stóp, kłus, kanter)
+   z kolorami (`#9E9E9E` / `#43A047` / `#FB8C00` / `#E53935); statystyki są wyliczone tymi samymi regułami co Android 3.0.2.
+2. **Given** trasa z przerwami, **When** przycinam lub przeliczam, **Then** punkty z przyciętego początku są usuwane, a statystyki
+   są przeliczane od nowa z nowymi progami.
+
+### US3.0-4 — Mapa i GPX (P2)
+
+1. **Given** nagranie z mapą, **When** je otwieram, **Then** widzę ślad na MapKit (Satelita domyślnie) z polilijnami w kolorach chodów,
+   pinezkami załączników i przełącznikiem widoku (Satelita / Teren / Mapa).
+2. **Given** ekran mapy, **When** udostępniam trasę (GPX), **Then** plik `.gpx` jest generowany i udostępniany przez system;
+   nazwa pliku: `{NazwaKonia}_{data}_{rodzaj}.gpx`.
+
+### US3.0-5 — Raport „Analiza jazd” (P2)
+
+1. **Given** jazdy z nagraniem, **When** otwieram raport „Analiza jazd”, **Then** widzę tabelę z jazdami (data, koń, dystans, czas,
+   chody, obciążenie), mapę tras i przycisk eksportu CSV/PDF; wyniki są identyczne z programem dla tych samych danych.
+2. **Given** raport wygenerowany, **When** go eksportuję, **Then** CSV jest zgodny bajt w bajt z formatem programu (UTF-8 z BOM,
+   `;`, `\r\n`, przecinek dziesiętny).
+
+### US3.0-6 — Synchronizacja i kopia (P2)
+
+1. **Given** serwer z `apiVersions` zawierającym `"3"`, **When** aplikacja się łączy, **Then** używa `/api/v3` dla nagrań,
+   profili i ustawień jazd; `system/info` zawsze pod `/api/v1`.
+2. **Given** kopia formatu 3, **When** ją odtwarzam, **Then** nagrania, trasy, profile i ustawienia jazd są przywrócone;
+   kopia z Androida 3.0.2 odtwarza się na iOS z tymi samymi danymi.
+3. **Given** serwer 2.x (bez `trainingRecordings`), **When** pełne pobranie, **Then** nagrania, trasy, profile i ustawienia
+   jazd zostają; operacje czekają z „Czeka na aktualizację programu”.
+
 ---
 
 ## 4. Wymagania funkcjonalne
@@ -1035,6 +1094,32 @@ Identyfikatory: `FR-M-<obszar>-<nr>`. Słowa MUST/SHOULD jak w RFC 2119.
 - **FR-M-TRN-04**: Lista treningów (zakładka karty konia) MUST obsługiwać filtry `from`, `to`, `typeId`, `trainerId`,
   `riderId` i pokazywać podliczenie z programu: liczbę (`totalCount`) i sumę kosztów (`totalCost`, całego filtra,
   nie tylko strony). Czas MUST być pokazywany jak w programie: „X h Y min” od 60 minut, „Y min” poniżej, „—” bez czasu.
+
+### 4.5b Nagrywanie jazdy (`NAG`)
+
+- **FR-NAG-01**: Aplikacja MUSI pozwalać nagrać jazdę każdego konia: start z ekranu konia → instrukcja noszenia telefonu →
+  zgoda na lokalizację → nagrywanie z GPS i akcelerometrem; zakończenie zapisuje nagranie, załączniki z jazdy i trasy do
+  treningu. Lokalizacja „Podczas używania” (When In Use) jest dozwolona TYLKO w trakcie nagrywania; nigdy w logach, nigdy
+  poza nagrywaniem.
+- **FR-NAG-02**: Nagranie to osobny rekord zależny od treningu (nie modyfikuje go), z osobną tabelą `local_track`
+  (format `zk-track/1`, gzip + JSON, base64); punkty i media są przechowywane lokalnie do wysłania.
+- **FR-NAG-03**: Statystyki jazdy (dystans, czas, chody, obciążenie) są wyliczane lokalnie tymi samymi regułami co Android
+  3.0.2 (algorytm v1, zaokrąglanie HALF_UP „od zera” na `Decimal`, progi 1,5/7/15 km/h, wagi 1/2/3, podjazd 1 pkt/10 m,
+  ostrzeżenie 30 %, ciężka jazda 60 pkt).
+- **FR-NAG-04**: Pogoda jest pobierana z Open‑Meteo (z zaokrąglonym położeniem do 0,01° i godziną startu) przy zakończeniu
+  jazdy; pobieranie jest możliwe w obu trybach pracy (online i samodzielny).
+- **FR-NAG-05**: Live Activity (ekran blokady, Dynamic Island) pokazuje nazwę konia, czas, dystans, chód i ostrzeżenie „Słaby
+  sygnał GPS”; przyciski „Pauza / Wznów” i „Zakończ” działają przez `LiveActivityIntent`.
+- **FR-NAG-06**: Nagrywanie przeżywa wygaszenie ekranu i wyjście z aplikacji; po zamknięciu przez system wznawia się automatycznie,
+  po przesunięciu — przy ponownym starcie „Zapisz / Odrzuć” z punktami zapisanymi ≥ 10 s wcześniej.
+- **FR-NAG-07**: Aplikacja NIE MOŻE prosić o lokalizację „Zawsze” — wyłącznie `NSLocationWhenInUseUsageDescription`;
+  `UIBackgroundModes` zawiera `location`.
+- **FR-NAG-08**: Załączniki z jazdy (zdjęcia i filmy z aparatu) są dodawane do treningu z metadanymi (`capturedAt`, `latitude`,
+  `longitude`); filmy są przekodowywane do 720p według polityki (reguły jak w Androidzie 3.0.2).
+- **FR-NAG-09**: Przybliżona lokalizacja albo odmowa blokuje start z wyjaśnieniem; cofnięcie zgody w trakcie zamyka sesję
+  jako przerwaną bez utraty punktów.
+- **FR-NAG-10**: Nagranie jest synchronizowane przez `/api/v3` (gdy `apiVersions` zawiera `"3"`), z obsługą trybu offline
+  i konfliktów (`training-has-recording`).
 
 ### 4.6 Załączniki (`ZAL`)
 
@@ -1789,6 +1874,90 @@ Kryteria wersji 2.0.1: **SC-001** pliki wzorcowe programu 2.0.0 (słowniki, koń
 **SC-008** 0 wystąpień nazwy „Zarządzanie końmi” w interfejsie; **SC-009** żaden wiersz raportu nie łamie się po literze
 (tekst 100 % i 200 %, szerokość 320 pt); **SC-010** z dziennika w < 1 min widać adres, IP i przyczynę nieudanego odświeżenia,
 0 wpisów z kluczem lub danymi osobowymi.
+
+---
+
+## 9. Różnice iOS względem Androida 3.0.2
+
+### 9.1 Mapa i nawigacja
+
+- **MapKit zamiast Google Maps** — iOS używa natywnego MapKit z `MapPolyline` w kolorach chodów; brak klucza API.
+- **Przełącznik widoku**: Satelita (`.imagery`), Teren (`.hybrid(elevation: .realistic)`), Mapa (`.standard`); domyślnie Satelita.
+- **Brak klucza Google Maps** — nie wymaga nowego sekretu CI.
+- **Offline** — MapKit pokazuje to, co ma w pamięci podręcznej; ślad i statystyki są zawsze widoczne.
+
+### 9.2 Zgody w `Info.plist`
+
+| Klucz | Po co | Kiedy system pyta |
+|---|---|---|
+| `NSLocationWhenInUseUsageDescription` | Lokalizacja TYLKO w trakcie nagrywania jazdy (nigdy „Zawsze”) | Przy pierwszym nagraniu |
+| `NSMicrophoneUsageDescription` | Dźwięk w filmach z aparatu podczas nagrywania | Przy pierwszym nagraniu filmu |
+| `NSPhotoLibraryAddUsageDescription` | Zapis zdjęć i filmów z jazdy do galerii | Przy pierwszym zapisie do galerii |
+| `NSSupportsLiveActivities` | Live Activity (ekran blokady, Dynamic Island) | — (bez osobnego pytania) |
+| `NSLocalNetworkUsageDescription` | Połączenie z komputerem w sieci lokalnej | Przy pierwszym połączeniu |
+| `NSCameraUsageDescription` | Aparat do zdjęć i filmów | Przy pierwszym zdjęciu |
+| Powiadomienia (`UNUserNotificationCenter`) | Przypomnienia i push z serwera | Po parowaniu |
+| `UIBackgroundModes` → `location` | Nagrywanie w tle | — |
+| `NSFaceIDUsageDescription` | Blokada aplikacji | Przy pierwszym odblokowaniu |
+
+**Nigdy** `NSLocationAlwaysAndWhenInUseUsageDescription` — lokalizacja jest proszona wyłącznie „Podczas używania”.
+
+### 9.3 Nagrywanie w tle
+
+- **`CLLocationUpdate.liveUpdates(.fitness)` + `CLBackgroundActivitySession`** — po zamknięciu przez system iOS uruchamia
+  ponownie w tle (odpowiednik `START_STICKY`); po przesunięciu — koniec, przy ponownym starcie „Zapisz / Odrzuć”. Wznowienie tylko
+  przy uruchomieniu w tle (klucz `location`; inne uruchomienie w tle — gdy ostatni zapis ma ≤ 10 min); otwarcie aplikacji przez
+  użytkownika z niezakończoną jazdą w bazie = jazda przerwana i „Zapisz / Odrzuć”.
+- **`CLServiceSession(authorization: .whenInUse)`** — dokładna lokalizacja wymagana; przybliżona blokuje start.
+- **Akcelerometr**: `CMMotionManager.deviceMotionUpdateInterval = 1/50`, okna 5 s → analizator rytmu; próbka to
+  `userAcceleration + gravity` (w g, potem × 9,80665) — analizator, jak na Androidzie, potrzebuje przyspieszenia z grawitacją.
+- **Brak optymalizacji baterii** — nie dotyczy na iOS.
+
+### 9.4 Format trasy i statystyki
+
+- **`zk-track/1`** — gzip (nagłówek gzip, nie surowy deflate) z JSON; porównanie dokumentu po rozpakowaniu, nie bajtów.
+- **Zaokrąglanie HALF_UP „od zera”** na `Decimal` (`.plain` / `NSDecimalNumber.RoundingMode` „od zera”), nigdy w `Double`.
+- **Statystyki**: okna domknięte z prawej `(5k, 5k+5]`, luka GPS > ~10 s = postój, `JumpAnchorFilter`.
+- **Rytm**: przepróbkowanie do 50 Hz, autokorelacja 0,3–1,5 s, próg 0,4, ≥ 150 próbek.
+
+### 9.5 Live Activity
+
+- **Nowy cel rozszerzenia** `HorselyRideActivity` — widżet ekranu blokady i Dynamic Island.
+- **Teksty**: „Grom · 24 min · 3,2 km · kłus”, „Słaby sygnał GPS”.
+- **Intents**: `PauseRideIntent`, `ResumeRideIntent`, `FinishRideIntent` (`openAppWhenRun`); napisy przycisków z `ride_notification_pause`,
+  `ride_notification_resume`, `ride_notification_finish`. Intencje wykonują się w procesie aplikacji i trafiają do jedynego kontrolera nagrywania
+  przez rejestr `RideActivityActions` (HorselyCore); stan aktywności bez współrzędnych, aktualizacja tylko przy zmianie widocznej treści.
+
+### 9.6 Przekodowanie filmów
+
+- **`AVAssetExportSession`** preset `AVAssetExportPreset1280x720`, `.mp4`, z zachowaniem orientacji.
+- **Miniatura**: `AVAssetImageGenerator`, JPEG ≤ 1 MB, dłuższy bok 512 px.
+- **Operacja `Held`** do końca przygotowania; przerwane wznawiane przy następnym starcie i w `BGProcessingTask`.
+
+### 9.7 Synchronizacja
+
+- **`/api/v3`** gdy `apiVersions` zawiera `"3"`, inaczej `/api/v1` z ukryciem funkcji serwerowych.
+- **`system/info`** zawsze `/api/v1`.
+- **Zmiana `apiV3`** wymusza pełne pobranie (ta sama ścieżka co dziś przy zmianie możliwości).
+- **Kopia**: `formatVersion 3`, `exportSchemaVersion "1.6"`, `dataSchemaVersion "3.0"`.
+
+### 9.8 Bezpieczniki
+
+- **Progi chodów**: 1,5 / 7 / 15 km/h; wagi 1 / 2 / 3; podjazd 1 pkt / 10 m.
+- **Obciążenie**: ostrzeżenie 30 %, ciężka jazda 60 pkt.
+- **Bateria**: 15 %; czas: 8 h.
+- **GPS**: < 1 min lub < 100 m = postój; słaby GPS > 25 m przez > 30 s.
+- **Zapis**: ≤ 10 s; limit pliku 100 MB; miniatura ≤ 1 MB.
+- **Trasa**: `pointCount ≥ 2`; ≤ 20 000 odcinków.
+- **Kolory chodów**: `#9E9E9E` / `#43A047` / `#FB8C00` / `#E53935`.
+
+### 9.9 Wyjątki z zasady II konstytucji
+
+- Lokalizacja „Podczas używania” dozwolona TYLKO podczas nagrywania jazdy uruchomionego przez użytkownika.
+- Kafle Apple Maps są dozwolone (wyjątek od „brak usług zewnętrznych”).
+- Open‑Meteo z położeniem zaokrąglonym do 0,01° i godziną startu, z wyłącznikiem.
+- Zdanie „NIE MOŻE prosić o lokalizację” zastąpione powyższymi wyjątkami.
+- Lista zgód z sekcji 9.2 powyżej (lokalizacja, mikrofon, dodawanie do galerii).
 
 ---
 
