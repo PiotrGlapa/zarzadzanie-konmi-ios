@@ -11,11 +11,6 @@ import XCTest
 /// `SnapshotSupport`, oraz teksty z katalogu podstawione tak jak na ekranie.
 @MainActor
 final class RideFlowSnapshotTests: XCTestCase {
-    // DIAGNOSTYKA (tymczasowo): czy te testy zmieniają stan symulatora dla kolejnych klas migawek.
-    override func setUp() async throws {
-        throw XCTSkip("diagnostyka przesunięcia Pulpitu")
-    }
-
     private let warsaw = TimeZone(identifier: "Europe/Warsaw")!
     /// 2026-10-05 12:05 UTC = 14:05 w Warszawie.
     private let startedAt = Date(timeIntervalSince1970: 1_791_201_900)
