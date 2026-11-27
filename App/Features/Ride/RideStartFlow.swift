@@ -36,9 +36,8 @@ final class RideStartModel {
     @ObservationIgnored private let environment: AppEnvironment
     @ObservationIgnored private let preselectedHorseId: String?
     @ObservationIgnored private let preview: Bool
-    /// Tworzony dopiero przy pierwszym użyciu (krok lokalizacji): menedżer lokalizacji nie powstaje w stanach podglądu ani przed startem.
-    /// Pomiar w CI (poprawka I1 Task 17): po migawkach `RideFlowSnapshotTests` duży tytuł ekranów renderowanych później w tym samym procesie
-    /// (Pulpit, dział Treningi) był przesunięty o ok. 6 pt; jedyny stan systemowy, który te migawki tworzyły, to ten menedżer lokalizacji.
+    /// Tworzony dopiero przy pierwszym użyciu (krok lokalizacji): menedżer lokalizacji nie powstaje w stanach podglądu (migawki) ani przed
+    /// pytaniem o zgodę.
     @ObservationIgnored private var permissionRequester: LocationPermissionRequester?
     private var permission: LocationPermissionRequester {
         if let permissionRequester { return permissionRequester }

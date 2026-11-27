@@ -9,8 +9,15 @@ import XCTest
 /// Start nagrywania, ekran jazdy, pasek NAG-01 i pytanie o odzyskanie (Task 17 = Android 3.0.2 `RideStartFlowTest`, `RideRecordingScreenTest`):
 /// migawki na stałych danych (koń „Grom”, 24:10, 3,24 km, kłus; bez żywego zegara), jasny / ciemny / tekst 200 % według konwencji
 /// `SnapshotSupport`, oraz teksty z katalogu podstawione tak jak na ekranie.
+///
+/// KOLEJNOŚĆ (poprawka I1 Task 17): klasa nazywa się `TrainingsRideFlowSnapshotTests`, żeby XCTest (kolejność alfabetyczna klas)
+/// uruchamiał ją PO pozostałych migawkach. Pomiar w CI (45916321752, 45918277126, 45919450844): po migawkach ekranu startu/nagrywania
+/// z tej klasy duży tytuł ekranów renderowanych później w tym samym procesie symulatora (Pulpit, dział Treningi) wypadał o ok. 17 px
+/// przy 3x (≈ 6 pt) niżej — także dla Pulpitu z kodem identycznym jak przed Task 17; bez tej klasy wzorce sprzed Task 17 przechodzą bez
+/// zmian. Przyczyny (stanu systemu zostawianego przez te widoki) nie ustalono; wzorce plików zostają w `__Snapshots__/RideFlowSnapshotTests/`
+/// (katalog wynika z nazwy pliku). Migawki z paskiem na Pulpicie i w dziale Treningi biegną w tej klasie jako pierwsze (`testBanner…`).
 @MainActor
-final class RideFlowSnapshotTests: XCTestCase {
+final class TrainingsRideFlowSnapshotTests: XCTestCase {
     private let warsaw = TimeZone(identifier: "Europe/Warsaw")!
     /// 2026-10-05 12:05 UTC = 14:05 w Warszawie.
     private let startedAt = Date(timeIntervalSince1970: 1_791_201_900)
@@ -78,7 +85,7 @@ final class RideFlowSnapshotTests: XCTestCase {
     }
 
     /// Android: `the dashboard shows the banner above everything and opens the recording` — pasek obserwuje sesję w sklepie sesji.
-    func testDashboardShowsTheBanner() async throws {
+    func testBannerOnTheDashboard() async throws {
         for variant in [SnapshotVariant.light, .dark] {
             let env = try await environmentWithRide(variant)
             let observer = Task { await env.observeActiveRide() }
@@ -88,7 +95,7 @@ final class RideFlowSnapshotTests: XCTestCase {
     }
 
     /// Android: `the trainings section shows the banner and the record button next to the plus`.
-    func testTrainingsSectionShowsTheBannerAndTheRecordButton() async throws {
+    func testBannerInTheTrainingsSectionWithTheRecordButton() async throws {
         let env = try await environmentWithRide(.light)
         let observer = Task { await env.observeActiveRide() }
         defer { observer.cancel() }
